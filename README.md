@@ -1,15 +1,21 @@
 # BookChat 
-***
 
-backend
+Backend
+
 * TDD (도전)
 * OOP 준수(특정상황에서 타협O)
 * Google Coding Convention 
-* Clean한 Code, Architecure (도전)
+* Clean한 Code, Architecture (도전)
+
+[__문제 해결 or 고민__](https://github.com/geneaky/BookChat/wiki/backend-issue)
 
 ***
+Android
 
 
+
+
+***
 
 Commit Message
 * **feat** (feature)                              : 새로운 기능에 대한 커밋
