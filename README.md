@@ -1,6 +1,16 @@
 # BookChat 
 ***
 
+backend
+* TDD (도전)
+* OOP 준수(특정상황에서 타협O)
+* Google Coding Convention 
+* Clean한 Code, Architecure (도전)
+
+***
+
+
+
 Commit Message
 * **feat** (feature)                              : 새로운 기능에 대한 커밋
 * **fix** (bug fix)                               : 버그 수정에 대한 커밋
