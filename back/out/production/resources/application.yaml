@@ -1,0 +1,19 @@
+spring:
+  #MySQL Setting
+  datasource:
+    url: jdbc:h2:tcp://localhost/~/book-chat
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  #JPA Setting
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+
+  #mustach test
+  mustache:
+    suffix: .html

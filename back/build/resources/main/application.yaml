@@ -1,0 +1,12 @@
+spring:
+  #MySQL Setting
+  datasource:
+    url: jdbc:mysql://localhost:3306/eight?serverTimezone=UTC&characterEncoding=UTF-8
+    username: 
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  #JPA Setting
+  jpa:
+    database: mysql
+    hibernate:
+      ddl-auto: create
