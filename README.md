@@ -7,7 +7,7 @@
 * Google Coding Convention 
 * Clean한 Code, Architecture (도전)
 
-[__문제 해결 or 고민__](https://github.com/geneaky/BookChat/wiki/backend-issue)
+[__Issuelog(문제 해결 or 고민)__](https://github.com/geneaky/BookChat/wiki/backend-issue)
 
 ***
 ### Android
@@ -21,6 +21,8 @@
 * Clean한 Code (도전)
 * 오직 터미널을 이용한 Git 사용 (도전)
 * Figma를 이용한 앱 디자인 (도전)
+
+* [__Issuelog(문제 해결 or 고민)__](https://github.com/geneaky/BookChat/wiki/Android-Issue)
 
 ***
 ### Commit Message
