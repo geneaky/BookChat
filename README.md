@@ -34,3 +34,6 @@
 * **test** (when adding missing tests)            : 테스트 코드 수정에 대한 커밋
 * **chore** (maintain)                            : 그 외 자잘한 수정에 대한 커밋
 
+###App design 초안
+![image](https://user-images.githubusercontent.com/81726145/158088455-f690caa5-b5fb-4cf2-9240-4c7ea3b6613e.png)
+링크 : https://www.figma.com/file/h6ZwMa9QzWDn1TyCJmawsb/BookChat?node-id=0%3A1
