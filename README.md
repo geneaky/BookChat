@@ -38,3 +38,10 @@
 ### App Design 초안
 ![image](https://user-images.githubusercontent.com/81726145/158088455-f690caa5-b5fb-4cf2-9240-4c7ea3b6613e.png)
 링크 : https://www.figma.com/file/h6ZwMa9QzWDn1TyCJmawsb/BookChat?node-id=0%3A1
+
+***
+### ERD
+https://www.erdcloud.com/d/74XWPhiFg3an4Zwsd
+
+***
+### System Design
