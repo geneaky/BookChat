@@ -5,7 +5,7 @@ spring:
     username: sa
     password:
     driver-class-name: org.h2.Driver
-  #JPA Setting
+  #Spring Data JPA Setting
   jpa:
     hibernate:
       ddl-auto: create
@@ -14,6 +14,45 @@ spring:
         format_sql: true
         use_sql_comments: true
 
+  #Spring Security Setting
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 657251466234-bvnhcbj9hpuf7vsjt2n1khlp68ifv1hu.apps.googleusercontent.com
+            client-secret: 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
+            redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
+            scope:
+              - email
+              - profile
+          kakao:
+            client-id: 5cf85c227a5bc79e05c013a03ab64050
+            redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
+            authorization-grant-type: authorization_code
+            scope:
+              - account_email
+              - profile_image
+            client-name: Kakao
+        provider:
+          kakao:
+            authorization_uri: https://kauth.kakao.com/oauth/authorize
+            token_uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user_name_attribute: id
+
   #mustach test
   mustache:
     suffix: .html
+
+token:
+  secret: 'hihi'
+  expired_time: 8600000
+  oauth2:
+    authorizaedRedirectUris:
+      - http://localhost:8080/
+
+logging:
+  level:
+    root: info
+    org.springframework.security: trace
