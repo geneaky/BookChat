@@ -36,7 +36,7 @@
 
 ***
 ### App Design 초안
-![image](https://user-images.githubusercontent.com/81726145/158088455-f690caa5-b5fb-4cf2-9240-4c7ea3b6613e.png)
+![image](https://user-images.githubusercontent.com/81726145/159914048-e2c96cda-b956-4d57-be63-5f66f6c5e0d0.png)
 링크 : https://www.figma.com/file/h6ZwMa9QzWDn1TyCJmawsb/BookChat?node-id=0%3A1
 
 ***
