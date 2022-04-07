@@ -1,0 +1,13 @@
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
+= Book
+
+== REQUEST
+
+include::{snippets}/book/http-request.adoc[]
+
+== RESPONSE
+
+include::{snippets}/book/http-response.adoc[]
