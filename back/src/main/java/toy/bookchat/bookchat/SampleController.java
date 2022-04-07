@@ -22,7 +22,7 @@ public class SampleController {
 
     @GetMapping
     public String index() {
-        return "hello";
+        return "인증되었습니다.";
     }
 
     @GetMapping("/user/{id}")
