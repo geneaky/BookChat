@@ -25,8 +25,10 @@ jobs:
         distribution: temurin
         java-version: '11'
         
-    - name: SetUp Gradle
-      uses: gradle/gradle-build-action@0d13054264b0bb894ded474f08ebb30921341cee
-      
-    - name: Excute Gradle Build
-      run: ./gradlew build
+    - name: Grant execute permission for gradlew
+      run: chmod +x ./gradlew
+      shell: bash
+
+    - name: Build with Gradle
+      run: ./gradlew clean build
+      shell: bash
