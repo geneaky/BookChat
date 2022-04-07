@@ -1,5 +1,11 @@
 package toy.bookchat.bookchat.security.jwt;
 
+import java.io.IOException;
+import java.util.Optional;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,13 +18,6 @@ import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Optional;
-
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -28,11 +27,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserRepository userRepository;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+        FilterChain filterChain) throws ServletException, IOException {
         try {
             String jwt = getJwtFromRequest(request);
             validUserRequestByJwt(request, jwt);
-        } catch(Exception ignored){
+        } catch (Exception ignored) {
         }
 
         filterChain.doFilter(request, response);
@@ -40,16 +40,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private String getJwtFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
-        logger.error(bearerToken);
-        logger.error(bearerToken.substring(BEGIN_INDEX));
-        if(StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer")) {
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer")) {
             return bearerToken.substring(BEGIN_INDEX);
         }
         return null;
     }
 
     private void validUserRequestByJwt(HttpServletRequest request, String jwt) {
-        if(StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt)) {
+        if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt)) {
             String email = jwtTokenProvider.getEmailFromToken(jwt);
             Optional<User> optionalUser = userRepository.findByEmail(email);
 
@@ -58,10 +56,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
     }
 
-    private void registerUserAuthentication(HttpServletRequest request, Optional<User> optionalUser) {
-        if(optionalUser.isPresent()) {
+    private void registerUserAuthentication(HttpServletRequest request,
+        Optional<User> optionalUser) {
+        if (optionalUser.isPresent()) {
             UserDetails userDetails = UserPrincipal.create(optionalUser.get());
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                userDetails, null, userDetails.getAuthorities());
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
