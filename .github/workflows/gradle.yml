@@ -33,6 +33,6 @@ jobs:
       working-directory: ${{ env.working-directory }}
 
     - name: Build with Gradle
-      run: ./gradlew clean build --exclude-task test
+      run: ./gradlew clean build -x test asciidoctor
       shell: bash
       working-directory: ${{ env.working-directory }}
