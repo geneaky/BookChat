@@ -13,6 +13,8 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    env:
+     working-directory: ./back
 
     steps:
     
@@ -28,7 +30,9 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x ./gradlew
       shell: bash
+      working-directory: ${{ env.working-directory }}
 
     - name: Build with Gradle
       run: ./gradlew clean build
       shell: bash
+      working-directory: ${{ env.working-directory }}
