@@ -41,7 +41,7 @@ jobs:
       uses: josStorer/get-current-time@v2.0.0
       id: current-time
       with:
-        format: YYYY-MM-DDTHH-mm-ss
+        format: YYYY-MM-DD-HH-mm-ss
         utcOffset: "+09:00"
         
     - name: Show Current Time
