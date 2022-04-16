@@ -54,4 +54,7 @@ dependencies {
     //데이터 바인딩을 이용할때 BindingAdapter라는 annotation을 작성하게 되는데
     //kotlin의 annotation을 동작시키기 위해서 plugin kapt를 추가해야한다.
     //kapt 'com.android.databinding:compiler:7.0.1'
+
+    //ChromeCustomTab
+    implementation "androidx.browser:browser:1.4.0"
 }
