@@ -5,10 +5,13 @@
     <data>
         <variable
             name="model"
-            type="com.example.bookchat.viewmodel.MainViewModel" />
+            type="com.example.bookchat.viewmodel.UserInforViewModel" />
         <variable
             name="activity"
             type="com.example.bookchat.MainActivity" />
+        <variable
+            name="pageType"
+            type="com.example.bookchat.utils.ActivityType" />
     </data>
     <androidx.drawerlayout.widget.DrawerLayout
         android:id="@+id/drawerlayout"
@@ -44,7 +47,7 @@
                         android:layout_height="53dp"
                         android:layout_marginRight="4dp"
                         android:layout_toLeftOf="@id/menu_btn"
-                        android:onClick="@{() -> activity.goSearch()}"
+                        android:onClick="@{() -> activity.changePage(pageType.SearchActivity)}"
                         android:src="@drawable/search_btn" />
 
                     <ImageView
@@ -129,7 +132,7 @@
 
                         <androidx.cardview.widget.CardView
                             android:id="@+id/cardView1"
-                            android:onClick="@{() -> activity.goBookShelf()}"
+                            android:onClick="@{() -> activity.changePage(pageType.BookShelfActivity)}"
                             android:layout_width="93dp"
                             android:layout_height="142dp"
                             android:layout_marginLeft="20dp"
@@ -145,7 +148,7 @@
 
                         <androidx.cardview.widget.CardView
                             android:id="@+id/cardView2"
-                            android:onClick="@{() -> activity.goBookShelf()}"
+                            android:onClick="@{() -> activity.changePage(pageType.BookShelfActivity)}"
                             android:layout_width="93dp"
                             android:layout_height="142dp"
                             android:layout_marginLeft="60dp"
@@ -161,7 +164,7 @@
 
                         <androidx.cardview.widget.CardView
                             android:id="@+id/cardView3"
-                            android:onClick="@{() -> activity.goBookShelf()}"
+                            android:onClick="@{() -> activity.changePage(pageType.BookShelfActivity)}"
                             android:layout_width="93dp"
                             android:layout_height="142dp"
                             android:layout_marginLeft="100dp"
@@ -177,7 +180,7 @@
 
                         <androidx.cardview.widget.CardView
                             android:id="@+id/cardView4"
-                            android:onClick="@{() -> activity.goBookShelf()}"
+                            android:onClick="@{() -> activity.changePage(pageType.BookShelfActivity)}"
                             android:layout_width="93dp"
                             android:layout_height="142dp"
                             android:layout_marginLeft="140dp"
@@ -193,7 +196,7 @@
 
                         <androidx.cardview.widget.CardView
                             android:id="@+id/cardView5"
-                            android:onClick="@{() -> activity.goBookShelf()}"
+                            android:onClick="@{() -> activity.changePage(pageType.BookShelfActivity)}"
                             android:layout_width="93dp"
                             android:layout_height="142dp"
                             android:layout_marginLeft="180dp"

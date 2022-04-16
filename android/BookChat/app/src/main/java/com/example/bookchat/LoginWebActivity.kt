@@ -74,7 +74,11 @@ class LoginWebActivity : AppCompatActivity() {
             editor.putString("token","$token")
             editor.apply()
             Log.d(TAG, "LoginWebActivity: handleIntent() - checkPref = ${pref.getString("token","notToken")}")
+
             //토큰 받았으면 다음페이지로 넘어가는 거 구현해야함
+
+            val intent = Intent(this,MainActivity::class.java)
+            startActivity(intent)
 
         }else{
             //handle error

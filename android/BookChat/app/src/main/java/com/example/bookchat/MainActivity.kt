@@ -12,22 +12,22 @@ import androidx.recyclerview.widget.LinearSnapHelper
 import com.example.bookchat.adapter.MainChatRoomAdapter
 import com.example.bookchat.databinding.ActivityMainBinding
 import com.example.bookchat.utils.Constansts.TAG
-import com.example.bookchat.viewmodel.MainViewModel
+import com.example.bookchat.viewmodel.UserInforViewModel
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding : ActivityMainBinding
-    private lateinit var mainViewModel: MainViewModel
+    private lateinit var userInforViewModel: UserInforViewModel
     private lateinit var chatRoomAdapter: MainChatRoomAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this,R.layout.activity_main)
-        mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+        userInforViewModel = ViewModelProvider(this).get(UserInforViewModel::class.java)
 
         with(binding){
             lifecycleOwner =this@MainActivity
-            model = mainViewModel
+            model = userInforViewModel
             activity = this@MainActivity
 
             //프로필 이미지 라운드 설정
@@ -53,13 +53,17 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-    fun goBookShelf() {
-        val intent = Intent(this,BookShelfActivity::class.java)
-        startActivity(intent)
-    }
-    fun goSearch(){
-        val intent = Intent(this,SearchActivity::class.java)
-        startActivity(intent)
+    fun changePage(pageName: String) {
+        when(pageName){
+            "BookShelfActivity" -> {
+                val intent = Intent(this,BookShelfActivity::class.java)
+                startActivity(intent)
+            }
+            "SearchActivity" -> {
+                val intent = Intent(this,SearchActivity::class.java)
+                startActivity(intent)
+            }
+        }
     }
 
 }
