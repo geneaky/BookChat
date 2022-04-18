@@ -5,6 +5,8 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 src/main/resources/*
+logs/
+!src/main/resources/log4j2-spring-local.xml
 
 ### STS ###
 .apt_generated
