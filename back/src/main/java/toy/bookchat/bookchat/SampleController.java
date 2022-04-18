@@ -1,20 +1,24 @@
 package toy.bookchat.bookchat;
 
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.messaging.handler.annotation.Header;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import javax.servlet.http.HttpServletResponse;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/")
@@ -22,15 +26,20 @@ public class SampleController {
 
     @GetMapping
     public String index() {
-        return "인증되었습니다.";
+        return "Main Page";
+    }
+
+    @GetMapping("/auth")
+    public String authenticatedUserRedirect() {
+        return "you are authenticated!";
     }
 
     @GetMapping("/user/{id}")
     public UserId userId(@PathVariable String id) {
         UserId contact = UserId.builder()
-                .contact(new HashMap<>())
-                .contact2(new HashMap<>())
-                .build();
+            .contact(new HashMap<>())
+            .contact2(new HashMap<>())
+            .build();
         contact.getContact().put("name", "jane doe" + id);
         contact.getContact().put("email", "jane@gmail.com");
         contact.getContact2().put("name", "jane" + id);
@@ -40,7 +49,8 @@ public class SampleController {
     }
 
     @GetMapping("/users")
-    public String parameter(@RequestParam Integer page, @RequestParam(required = false) Integer per_page) {
+    public String parameter(@RequestParam Integer page,
+        @RequestParam(required = false) Integer per_page) {
         return "book : " + page + per_page;
     }
 
@@ -48,14 +58,6 @@ public class SampleController {
     @ResponseStatus(HttpStatus.CREATED)
     public String paramter2(@RequestParam String username) {
         return "create-user-name is : " + username;
-    }
-
-    @Builder
-    @Getter
-    @Setter
-    public static class UserId {
-        HashMap<String, String> contact;
-        HashMap<String, String> contact2;
     }
 
     @GetMapping("/books/{id}")
@@ -74,7 +76,8 @@ public class SampleController {
     }
 
     @GetMapping("/locations/{id}")
-    public HashMap<String, HashMap<String, HashMap<String, Double>>> location(@PathVariable String id) {
+    public HashMap<String, HashMap<String, HashMap<String, Double>>> location(
+        @PathVariable String id) {
         HashMap<String, Double> wind = new HashMap<>();
         wind.put("speed", 15.3);
         wind.put("direction", 287.0);
@@ -111,11 +114,21 @@ public class SampleController {
     }
 
     @GetMapping(value = "/people")
-    public String requestHeader(@RequestHeader("Authorization") String headers, HttpServletResponse response) {
-        response.setHeader("X-RateLimit-Limit","a");
-        response.setHeader("X-RateLimit-Remaining","b");
-        response.setHeader("X-RateLimit-Reset","c");
+    public String requestHeader(@RequestHeader("Authorization") String headers,
+        HttpServletResponse response) {
+        response.setHeader("X-RateLimit-Limit", "a");
+        response.setHeader("X-RateLimit-Remaining", "b");
+        response.setHeader("X-RateLimit-Reset", "c");
 
         return headers;
+    }
+
+    @Builder
+    @Getter
+    @Setter
+    public static class UserId {
+
+        HashMap<String, String> contact;
+        HashMap<String, String> contact2;
     }
 }

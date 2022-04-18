@@ -33,23 +33,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.addFilterAt(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         http.authorizeHttpRequests()
-                .antMatchers("/").permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .formLogin().disable()
-                .oauth2Login()
-                .authorizationEndpoint()
-                .baseUri("/oauth2/authorize")
-                .authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository)
-                .and()
-                .redirectionEndpoint()
-                .baseUri("/oauth2/callback/*")
-                .and()
-                .userInfoEndpoint()
-                .userService(customOAuth2UserService)
-                .and()
-                .successHandler(customAuthenticationSuccessHandler)
-                .failureHandler(customAuthenticationFailureHandler);
+            .antMatchers("/", "/auth").permitAll()
+            .anyRequest().authenticated()
+            .and()
+            .formLogin().disable()
+            .oauth2Login()
+            .authorizationEndpoint()
+            .baseUri("/oauth2/authorize")
+            .authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository)
+            .and()
+            .redirectionEndpoint()
+            .baseUri("/oauth2/callback/*")
+            .and()
+            .userInfoEndpoint()
+            .userService(customOAuth2UserService)
+            .and()
+            .successHandler(customAuthenticationSuccessHandler)
+            .failureHandler(customAuthenticationFailureHandler);
 //        failureHandler 만들어야함
 
     }
