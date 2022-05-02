@@ -18,8 +18,8 @@ import toy.bookchat.bookchat.security.CookieUtils;
 import toy.bookchat.bookchat.security.jwt.JwtTokenProvider;
 import toy.bookchat.bookchat.security.oauth.HttpCookieOAuth2AuthorizationRequestRepository;
 
-@Component
 @Slf4j
+@Component
 @RequiredArgsConstructor
 public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
