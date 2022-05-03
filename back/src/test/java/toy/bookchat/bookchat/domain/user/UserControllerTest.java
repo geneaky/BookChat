@@ -96,7 +96,7 @@ public class UserControllerTest {
         //given
         String real = objectMapper.writeValueAsString(UserProfileResponse.builder()
             .userEmail("test@gmail.com")
-            .username("testUser")
+            .userName("testUser")
             .userProfileImageUri("somethingImageUrl.com")
             .build());
         MvcResult mvcResult = mockMvc.perform(get("/v1/api/users/profile")

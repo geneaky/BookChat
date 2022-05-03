@@ -8,13 +8,13 @@ import toy.bookchat.bookchat.security.user.UserPrincipal;
 @Builder
 public class UserProfileResponse {
 
-    private String username;
+    private String userName;
     private String userEmail;
     private String userProfileImageUri;
 
     public static UserProfileResponse of(UserPrincipal userPrincipal) {
         return UserProfileResponse.builder()
-            .username(userPrincipal.getName())
+            .userName(userPrincipal.getName())
             .userEmail(userPrincipal.getEmail())
             .userProfileImageUri(userPrincipal.getProfileImageUri())
             .build();
