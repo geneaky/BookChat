@@ -1,5 +1,9 @@
 package toy.bookchat.bookchat.security.user;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
@@ -8,35 +12,41 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import toy.bookchat.bookchat.domain.user.User;
 
-import java.util.*;
-
 @Getter
 public class UserPrincipal implements UserDetails, OAuth2User {
 
     private Long id;
     private String email;
     private String password;
+    private String userName;
+    private String profileImageUri;
     private Collection<? extends GrantedAuthority> authorities;
     @Setter
     private Map<String, Object> attributes;
 
-    public UserPrincipal(Long id, String email, String password, Collection<? extends GrantedAuthority> authorities) {
+    public UserPrincipal(Long id, String email, String password, String userName,
+        String profileImageUri,
+        Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.email = email;
         this.password = password;
+        this.userName = userName;
+        this.profileImageUri = profileImageUri;
         this.authorities = authorities;
     }
 
     public static UserPrincipal create(User user) {
         List<GrantedAuthority> authorities = Collections.singletonList(
-                new SimpleGrantedAuthority("ROLE_" + user.getRole().name())
+            new SimpleGrantedAuthority("ROLE_" + user.getRole().name())
         );
 
         return new UserPrincipal(
-                user.getId(),
-                user.getEmail(),
-                user.getPassword(),
-                authorities
+            user.getId(),
+            user.getEmail(),
+            user.getPassword(),
+            user.getName(),
+            user.getProfileImageUrl(),
+            authorities
         );
     }
 
@@ -48,7 +58,7 @@ public class UserPrincipal implements UserDetails, OAuth2User {
 
     @Override
     public String getName() {
-        return null;
+        return this.userName;
     }
 
     @Override

@@ -1,13 +1,15 @@
 package toy.bookchat.bookchat.domain.user;
 
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import toy.bookchat.bookchat.domain.user.domain.ROLE;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
-
-import javax.persistence.*;
 
 @Entity
 @Getter

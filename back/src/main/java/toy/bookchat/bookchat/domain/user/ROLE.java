@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.domain.user.domain;
+package toy.bookchat.bookchat.domain.user;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +12,7 @@ public enum ROLE implements GrantedAuthority {
 
 
     private final String roleName;
+
     @Override
     public String getAuthority() {
         return ROLE.USER.toString();
