@@ -1,6 +1,8 @@
 package toy.bookchat.bookchat.domain.book;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -9,7 +11,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collections;
 import java.util.List;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
@@ -24,6 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import toy.bookchat.bookchat.domain.book.api.BookController;
 import toy.bookchat.bookchat.domain.book.dto.BookDto;
+import toy.bookchat.bookchat.domain.book.exception.BookNotFoundException;
 import toy.bookchat.bookchat.domain.book.service.BookSearchService;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.security.handler.CustomAuthenticationFailureHandler;
@@ -72,6 +74,16 @@ public class BookControllerTest {
         return userPrincipal;
     }
 
+    private BookDto getBookDto(String isbn, String title, String author) {
+        BookDto bookDto = BookDto.builder()
+            .isbn(isbn)
+            .title(title)
+            .author(author)
+            .bookCoverImageUrl("bookCoverImageUrl")
+            .build();
+        return bookDto;
+    }
+
     @Test
     public void 로그인하지_않은_사용자_요청_401() throws Exception {
         mockMvc.perform(get("/v1/api/books")
@@ -81,14 +93,9 @@ public class BookControllerTest {
 
     @Test
     public void 로그인한_사용자_요청_200() throws Exception {
-        BookDto bookDto = BookDto.builder()
-            .isbn("213123")
-            .title("effectiveJava")
-            .author("joshua")
-            .bookCoverImageUrl("testCoverImageUrl")
-            .build();
+        BookDto bookDto = getBookDto("213123", "effectiveJava", "Joshua");
 
-        when(bookSearchService.search(anyString())).thenReturn(bookDto);
+        when(bookSearchService.searchByIsbn(anyString())).thenReturn(bookDto);
         mockMvc.perform(get("/v1/api/books")
                 .param("isbn", "213123")
                 .with(user(getUserPrincipal())))
@@ -97,14 +104,9 @@ public class BookControllerTest {
 
     @Test
     public void 사용자가_isbn으로_책_검색_요청시_성공() throws Exception {
-        BookDto bookDto = BookDto.builder()
-            .isbn("1231513")
-            .title("effectiveJava")
-            .author("Joshua")
-            .bookCoverImageUrl("imageUrl.com")
-            .build();
+        BookDto bookDto = getBookDto("1231513", "effectiveJava", "Joshua");
 
-        when(bookSearchService.search("1231513")).thenReturn(bookDto);
+        when(bookSearchService.searchByIsbn("1231513")).thenReturn(bookDto);
 
         String result = objectMapper.writeValueAsString(bookDto);
 
@@ -114,7 +116,98 @@ public class BookControllerTest {
             .andExpect(status().isOk())
             .andReturn();
 
-        Assertions.assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo(result);
+        verify(bookSearchService).searchByIsbn(anyString());
+        assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo(result);
     }
 
+    @Test
+    public void 사용자가_잘못된_isbn으로_책_검색_요청시_실패() throws Exception {
+        mockMvc.perform(get("/v1/api/books")
+                .param("isbn", "")
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void 외부api_isbn_검색_요청_실패시_404() throws Exception {
+        when(bookSearchService.searchByIsbn("123456")).thenThrow(BookNotFoundException.class);
+
+        mockMvc.perform(get("/v1/api/books")
+                .param("isbn", "123456")
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void 사용자가_도서명_검색_요청시_성공() throws Exception {
+        BookDto bookDto = getBookDto("1231513", "effectiveJava", "Joshua");
+
+        when(bookSearchService.searchByTitle("effectiveJava")).thenReturn(bookDto);
+
+        String result = objectMapper.writeValueAsString(bookDto);
+
+        MvcResult mvcResult = mockMvc.perform(get("/v1/api/books")
+                .param("title", "effectiveJava")
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isOk())
+            .andReturn();
+
+        verify(bookSearchService).searchByTitle(anyString());
+        assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo(result);
+    }
+
+    @Test
+    public void 사용자가_빈_도서명_검색_요청시_실패() throws Exception {
+        mockMvc.perform(get("/v1/api/books")
+                .param("title", "")
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void 외부api_도서명_검색_요청_실패시_404() throws Exception {
+        when(bookSearchService.searchByTitle("effectiveJava")).thenThrow(
+            BookNotFoundException.class);
+
+        mockMvc.perform(get("/v1/api/books")
+                .param("title", "effectiveJava")
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void 사용자가_작가명_검색_요청시_성공() throws Exception {
+        BookDto bookDto = getBookDto("1231513", "effectiveJava", "Joshua");
+
+        when(bookSearchService.searchByAuthor("Joshua")).thenReturn(bookDto);
+
+        String result = objectMapper.writeValueAsString(bookDto);
+
+        MvcResult mvcResult = mockMvc.perform(get("/v1/api/books")
+                .param("author", "Joshua")
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isOk())
+            .andReturn();
+
+        verify(bookSearchService).searchByAuthor(anyString());
+        assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo(result);
+    }
+
+    @Test
+    public void 사용자가_빈_작가명_검색_요청시_실패() throws Exception {
+        mockMvc.perform(get("/v1/api/books")
+                .param("author", "")
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void 외부api_작가명_검색_요청_실패시_404() throws Exception {
+        when(bookSearchService.searchByAuthor("Joshua")).thenThrow(BookNotFoundException.class);
+
+        mockMvc.perform(get("/v1/api/books")
+                .param("author", "Joshua")
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isNotFound());
+    }
 }

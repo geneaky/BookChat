@@ -4,5 +4,9 @@ import toy.bookchat.bookchat.domain.book.dto.BookDto;
 
 public interface BookSearchService {
 
-    BookDto search(String isbn);
+    BookDto searchByIsbn(String isbn);
+
+    BookDto searchByTitle(String title);
+
+    BookDto searchByAuthor(String author);
 }

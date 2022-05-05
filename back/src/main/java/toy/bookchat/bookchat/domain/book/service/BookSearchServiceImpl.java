@@ -7,7 +7,17 @@ import toy.bookchat.bookchat.domain.book.dto.BookDto;
 public class BookSearchServiceImpl implements BookSearchService {
 
     @Override
-    public BookDto search(String isbn) {
+    public BookDto searchByIsbn(String isbn) {
+        return null;
+    }
+
+    @Override
+    public BookDto searchByTitle(String title) {
+        return null;
+    }
+
+    @Override
+    public BookDto searchByAuthor(String author) {
         return null;
     }
 }
