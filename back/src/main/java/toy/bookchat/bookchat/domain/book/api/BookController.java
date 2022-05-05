@@ -18,7 +18,7 @@ import toy.bookchat.bookchat.security.user.UserPrincipal;
 @RequiredArgsConstructor
 public class BookController {
 
-    private BookSearchService bookSearchService;
+    private final BookSearchService bookSearchService;
 
     @GetMapping("/books")
     public ResponseEntity<BookDto> getBookInformation(
@@ -27,6 +27,6 @@ public class BookController {
         @RequestParam(name = "bookName", required = false) Optional<String> bookName,
         @RequestParam(name = "author", required = false) Optional<String> author) {
 
-        return new ResponseEntity<BookDto>(bookSearchService.search(isbn.get()), HttpStatus.OK);
+        return new ResponseEntity<>(bookSearchService.search(isbn.get()), HttpStatus.OK);
     }
 }

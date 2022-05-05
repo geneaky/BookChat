@@ -1,6 +1,6 @@
 package toy.bookchat.bookchat.domain.book;
 
-import static org.mockito.Mockito.mock;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -74,55 +74,47 @@ public class BookControllerTest {
 
     @Test
     public void 로그인하지_않은_사용자_요청_401() throws Exception {
-        //given
-        mockMvc.perform(get("/v1/api/books?isbn=213123"))
+        mockMvc.perform(get("/v1/api/books")
+                .param("isbn", "234134"))
             .andExpect(status().isUnauthorized());
-
-        //when
-
-        //then
-
     }
 
     @Test
     public void 로그인한_사용자_요청_200() throws Exception {
-        //given
-        BookDto bookDto = mock(BookDto.class);
-        when(bookSearchService.search("213123")).thenReturn(bookDto);
-        mockMvc.perform(get("/v1/api/books?isbn=213123")
+        BookDto bookDto = BookDto.builder()
+            .isbn("213123")
+            .title("effectiveJava")
+            .author("joshua")
+            .bookCoverImageUrl("testCoverImageUrl")
+            .build();
+
+        when(bookSearchService.search(anyString())).thenReturn(bookDto);
+        mockMvc.perform(get("/v1/api/books")
+                .param("isbn", "213123")
                 .with(user(getUserPrincipal())))
             .andExpect(status().isOk());
-
-        //when
-
-        //then
-
     }
 
     @Test
     public void 사용자가_isbn으로_책_검색_요청시_성공() throws Exception {
-        //given
-
-        BookDto book = BookDto.builder()
-            .isbn("213123")
+        BookDto bookDto = BookDto.builder()
+            .isbn("1231513")
             .title("effectiveJava")
-            .author("JoshuaBloke")
+            .author("Joshua")
             .bookCoverImageUrl("imageUrl.com")
             .build();
 
-        String result = objectMapper.writeValueAsString(book);
+        when(bookSearchService.search("1231513")).thenReturn(bookDto);
 
-        MvcResult mvcResult = mockMvc.perform(get("/v1/api/books?isbn=213123")
+        String result = objectMapper.writeValueAsString(bookDto);
+
+        MvcResult mvcResult = mockMvc.perform(get("/v1/api/books")
+                .param("isbn", "1231513")
                 .with(user(getUserPrincipal())))
             .andExpect(status().isOk())
             .andReturn();
 
         Assertions.assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo(result);
-
-        //when
-
-        //then
-
     }
 
 }

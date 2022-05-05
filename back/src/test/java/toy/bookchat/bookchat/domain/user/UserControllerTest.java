@@ -69,45 +69,31 @@ public class UserControllerTest {
 
     @Test
     public void 인증받지_않은_사용자_요청_401응답() throws Exception {
-        //given
         mockMvc.perform(get("/v1/api/users/profile"))
             .andExpect(status().isUnauthorized());
-        //when
-
-        //then
-
     }
 
     @Test
     public void 인증받은_사용자의_요청_200응답() throws Exception {
-        //given
         mockMvc.perform(get("/v1/api/users/profile")
                 .with(user(getUserPrincipal())))
             .andExpect(status().isOk());
-
-        //when
-
-        //then
-
     }
 
     @Test
     public void 사용자_프로필_정보_반환() throws Exception {
-        //given
         String real = objectMapper.writeValueAsString(UserProfileResponse.builder()
             .userEmail("test@gmail.com")
             .userName("testUser")
             .userProfileImageUri("somethingImageUrl.com")
             .build());
+
         MvcResult mvcResult = mockMvc.perform(get("/v1/api/users/profile")
                 .with(user(getUserPrincipal())))
             .andExpect(status().isOk())
             .andReturn();
-        //when
 
-        //then
         Assertions.assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo(real);
-
     }
 
 
