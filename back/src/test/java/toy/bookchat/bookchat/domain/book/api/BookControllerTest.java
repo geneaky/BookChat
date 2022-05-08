@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.domain.book;
+package toy.bookchat.bookchat.domain.book.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -23,7 +23,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import toy.bookchat.bookchat.domain.book.api.BookController;
 import toy.bookchat.bookchat.domain.book.dto.BookDto;
 import toy.bookchat.bookchat.domain.book.exception.BookNotFoundException;
 import toy.bookchat.bookchat.domain.book.service.BookSearchService;
@@ -74,7 +73,7 @@ public class BookControllerTest {
         return userPrincipal;
     }
 
-    private BookDto getBookDto(String isbn, String title, String author) {
+    private BookDto getBookDto(String isbn, String title, String[] author) {
         BookDto bookDto = BookDto.builder()
             .isbn(isbn)
             .title(title)
@@ -93,7 +92,7 @@ public class BookControllerTest {
 
     @Test
     public void 로그인한_사용자_요청_200() throws Exception {
-        BookDto bookDto = getBookDto("213123", "effectiveJava", "Joshua");
+        BookDto bookDto = getBookDto("213123", "effectiveJava", new String[]{"Joshua"});
 
         when(bookSearchService.searchByIsbn(anyString())).thenReturn(bookDto);
         mockMvc.perform(get("/v1/api/books")
@@ -104,7 +103,7 @@ public class BookControllerTest {
 
     @Test
     public void 사용자가_isbn으로_책_검색_요청시_성공() throws Exception {
-        BookDto bookDto = getBookDto("1231513", "effectiveJava", "Joshua");
+        BookDto bookDto = getBookDto("1231513", "effectiveJava", new String[]{"Joshua"});
 
         when(bookSearchService.searchByIsbn("1231513")).thenReturn(bookDto);
 
@@ -140,7 +139,7 @@ public class BookControllerTest {
 
     @Test
     public void 사용자가_도서명_검색_요청시_성공() throws Exception {
-        BookDto bookDto = getBookDto("1231513", "effectiveJava", "Joshua");
+        BookDto bookDto = getBookDto("1231513", "effectiveJava", new String[]{"Joshua"});
 
         when(bookSearchService.searchByTitle("effectiveJava")).thenReturn(bookDto);
 
@@ -177,7 +176,7 @@ public class BookControllerTest {
 
     @Test
     public void 사용자가_작가명_검색_요청시_성공() throws Exception {
-        BookDto bookDto = getBookDto("1231513", "effectiveJava", "Joshua");
+        BookDto bookDto = getBookDto("1231513", "effectiveJava", new String[]{"Joshua"});
 
         when(bookSearchService.searchByAuthor("Joshua")).thenReturn(bookDto);
 

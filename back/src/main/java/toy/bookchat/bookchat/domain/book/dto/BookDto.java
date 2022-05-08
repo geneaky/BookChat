@@ -9,7 +9,7 @@ public class BookDto {
 
     private String isbn;
     private String title;
-    private String author;
+    private String[] author;
     private String bookCoverImageUrl;
 
 }

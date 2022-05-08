@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.domain.user;
+package toy.bookchat.bookchat.domain.user.api;
 
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -20,7 +20,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import toy.bookchat.bookchat.domain.user.api.UserController;
 import toy.bookchat.bookchat.domain.user.dto.UserProfileResponse;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.security.handler.CustomAuthenticationFailureHandler;
