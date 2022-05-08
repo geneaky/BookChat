@@ -1,6 +1,7 @@
 package toy.bookchat.bookchat.domain.book.service;
 
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
@@ -61,7 +62,8 @@ public class BookSearchServiceImpl implements BookSearchService {
 
         HttpEntity<?> httpEntity = new HttpEntity<>(httpHeaders);
 
-        KakaoBook kakaoBook = restTemplate.exchange(uriComponentsBuilder.build().toUri(),
+        KakaoBook kakaoBook = restTemplate.exchange(uriComponentsBuilder.build().encode(
+                StandardCharsets.UTF_8).toUri(),
             HttpMethod.GET,
             httpEntity, KakaoBook.class).getBody();
 
