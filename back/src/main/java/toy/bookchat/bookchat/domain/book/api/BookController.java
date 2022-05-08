@@ -1,5 +1,6 @@
 package toy.bookchat.bookchat.domain.book.api;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,7 @@ public class BookController {
     private final BookSearchService bookSearchService;
 
     @GetMapping("/books")
-    public ResponseEntity<BookDto> getBookInformation(
+    public ResponseEntity<List<BookDto>> getBookInformation(
         @AuthenticationPrincipal UserPrincipal userPrincipal,
         @ModelAttribute BookSearchRequestDto bookSearchRequestDto) {
 

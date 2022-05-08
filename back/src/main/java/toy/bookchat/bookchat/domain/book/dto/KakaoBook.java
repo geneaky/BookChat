@@ -4,15 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
 @NoArgsConstructor
 public class KakaoBook {
 
+    private List<Document> documents;
     private Meta meta;
-    private Document[] documents;
 
-    public List<BookDto> getBookDto() {
+    public List<BookDto> getBookDtos() {
         List<BookDto> list = new ArrayList<>();
 
         for (Document document : documents) {

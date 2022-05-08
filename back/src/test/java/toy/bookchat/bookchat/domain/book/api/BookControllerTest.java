@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -73,7 +74,7 @@ public class BookControllerTest {
         return userPrincipal;
     }
 
-    private BookDto getBookDto(String isbn, String title, String[] author) {
+    private BookDto getBookDto(String isbn, String title, List<String> author) {
         BookDto bookDto = BookDto.builder()
             .isbn(isbn)
             .title(title)
@@ -92,9 +93,10 @@ public class BookControllerTest {
 
     @Test
     public void 로그인한_사용자_요청_200() throws Exception {
-        BookDto bookDto = getBookDto("213123", "effectiveJava", new String[]{"Joshua"});
+        List<BookDto> bookDtos = new ArrayList<>();
+        bookDtos.add(getBookDto("213123", "effectiveJava", List.of("Joshua")));
 
-        when(bookSearchService.searchByIsbn(anyString())).thenReturn(bookDto);
+        when(bookSearchService.searchByIsbn(anyString())).thenReturn(bookDtos);
         mockMvc.perform(get("/v1/api/books")
                 .param("isbn", "213123")
                 .with(user(getUserPrincipal())))
@@ -103,11 +105,12 @@ public class BookControllerTest {
 
     @Test
     public void 사용자가_isbn으로_책_검색_요청시_성공() throws Exception {
-        BookDto bookDto = getBookDto("1231513", "effectiveJava", new String[]{"Joshua"});
+        List<BookDto> bookDtos = new ArrayList<>();
+        bookDtos.add(getBookDto("213123", "effectiveJava", List.of("Joshua")));
 
-        when(bookSearchService.searchByIsbn("1231513")).thenReturn(bookDto);
+        when(bookSearchService.searchByIsbn("1231513")).thenReturn(bookDtos);
 
-        String result = objectMapper.writeValueAsString(bookDto);
+        String result = objectMapper.writeValueAsString(bookDtos);
 
         MvcResult mvcResult = mockMvc.perform(get("/v1/api/books")
                 .param("isbn", "1231513")
@@ -139,11 +142,12 @@ public class BookControllerTest {
 
     @Test
     public void 사용자가_도서명_검색_요청시_성공() throws Exception {
-        BookDto bookDto = getBookDto("1231513", "effectiveJava", new String[]{"Joshua"});
+        List<BookDto> bookDtos = new ArrayList<>();
+        bookDtos.add(getBookDto("213123", "effectiveJava", List.of("Joshua")));
 
-        when(bookSearchService.searchByTitle("effectiveJava")).thenReturn(bookDto);
+        when(bookSearchService.searchByTitle("effectiveJava")).thenReturn(bookDtos);
 
-        String result = objectMapper.writeValueAsString(bookDto);
+        String result = objectMapper.writeValueAsString(bookDtos);
 
         MvcResult mvcResult = mockMvc.perform(get("/v1/api/books")
                 .param("title", "effectiveJava")
@@ -176,11 +180,12 @@ public class BookControllerTest {
 
     @Test
     public void 사용자가_작가명_검색_요청시_성공() throws Exception {
-        BookDto bookDto = getBookDto("1231513", "effectiveJava", new String[]{"Joshua"});
+        List<BookDto> bookDtos = new ArrayList<>();
+        bookDtos.add(getBookDto("213123", "effectiveJava", List.of("Joshua")));
 
-        when(bookSearchService.searchByAuthor("Joshua")).thenReturn(bookDto);
+        when(bookSearchService.searchByAuthor("Joshua")).thenReturn(bookDtos);
 
-        String result = objectMapper.writeValueAsString(bookDto);
+        String result = objectMapper.writeValueAsString(bookDtos);
 
         MvcResult mvcResult = mockMvc.perform(get("/v1/api/books")
                 .param("author", "Joshua")

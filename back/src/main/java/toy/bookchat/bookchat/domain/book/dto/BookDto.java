@@ -1,5 +1,6 @@
 package toy.bookchat.bookchat.domain.book.dto;
 
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -9,7 +10,7 @@ public class BookDto {
 
     private String isbn;
     private String title;
-    private String[] author;
+    private List<String> author;
     private String bookCoverImageUrl;
 
 }

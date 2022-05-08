@@ -1,11 +1,16 @@
 package toy.bookchat.bookchat.domain.book.dto;
 
+import java.util.List;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
+@NoArgsConstructor
 public class Document {
 
-    private String[] authors;
+    private List<String> authors;
     private String contents;
     private String datetime;
     private String isbn;
@@ -15,6 +20,6 @@ public class Document {
     private String status;
     private String thumbnail;
     private String title;
-    private String[] translators;
+    private List<String> translators;
     private String url;
 }
