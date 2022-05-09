@@ -79,6 +79,7 @@ public class BookControllerTest {
             .isbn(isbn)
             .title(title)
             .author(author)
+            .publisher("testPublisher")
             .bookCoverImageUrl("bookCoverImageUrl")
             .build();
         return bookDto;

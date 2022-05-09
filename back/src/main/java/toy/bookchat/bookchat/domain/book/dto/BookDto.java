@@ -11,6 +11,7 @@ public class BookDto {
     private String isbn;
     private String title;
     private List<String> author;
+    private String publisher;
     private String bookCoverImageUrl;
 
 }

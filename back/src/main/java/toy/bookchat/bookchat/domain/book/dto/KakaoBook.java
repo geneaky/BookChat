@@ -23,6 +23,7 @@ public class KakaoBook {
                     .isbn(document.getIsbn())
                     .title(document.getTitle())
                     .author(document.getAuthors())
+                    .publisher(document.getPublisher())
                     .bookCoverImageUrl(document.getThumbnail())
                     .build()
             );
