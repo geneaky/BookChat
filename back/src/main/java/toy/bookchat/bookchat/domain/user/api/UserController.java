@@ -11,11 +11,11 @@ import toy.bookchat.bookchat.domain.user.dto.UserProfileResponse;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @RestController
-@RequestMapping("/v1")
+@RequestMapping("/v1/api")
 public class UserController {
 
     @PreAuthorize("isAuthenticated()")
-    @GetMapping("/api/users/profile")
+    @GetMapping("/users/profile")
     public ResponseEntity<UserProfileResponse> userProfile(
         @AuthenticationPrincipal UserPrincipal userPrincipal) {
         return new ResponseEntity<UserProfileResponse>(UserProfileResponse.of(userPrincipal),

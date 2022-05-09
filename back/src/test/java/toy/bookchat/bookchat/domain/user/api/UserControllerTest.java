@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.domain.user;
+package toy.bookchat.bookchat.domain.user.api;
 
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -20,7 +20,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import toy.bookchat.bookchat.domain.user.api.UserController;
 import toy.bookchat.bookchat.domain.user.dto.UserProfileResponse;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.security.handler.CustomAuthenticationFailureHandler;
@@ -69,45 +68,31 @@ public class UserControllerTest {
 
     @Test
     public void 인증받지_않은_사용자_요청_401응답() throws Exception {
-        //given
         mockMvc.perform(get("/v1/api/users/profile"))
             .andExpect(status().isUnauthorized());
-        //when
-
-        //then
-
     }
 
     @Test
     public void 인증받은_사용자의_요청_200응답() throws Exception {
-        //given
         mockMvc.perform(get("/v1/api/users/profile")
                 .with(user(getUserPrincipal())))
             .andExpect(status().isOk());
-
-        //when
-
-        //then
-
     }
 
     @Test
     public void 사용자_프로필_정보_반환() throws Exception {
-        //given
         String real = objectMapper.writeValueAsString(UserProfileResponse.builder()
             .userEmail("test@gmail.com")
             .userName("testUser")
             .userProfileImageUri("somethingImageUrl.com")
             .build());
+
         MvcResult mvcResult = mockMvc.perform(get("/v1/api/users/profile")
                 .with(user(getUserPrincipal())))
             .andExpect(status().isOk())
             .andReturn();
-        //when
 
-        //then
         Assertions.assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo(real);
-
     }
 
 
