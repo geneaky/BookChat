@@ -1,5 +1,6 @@
 package toy.bookchat.bookchat.domain.user.api;
 
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -90,6 +91,7 @@ public class UserControllerTest {
         MvcResult mvcResult = mockMvc.perform(get("/v1/api/users/profile")
                 .with(user(getUserPrincipal())))
             .andExpect(status().isOk())
+            .andDo(document("user"))
             .andReturn();
 
         Assertions.assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo(real);

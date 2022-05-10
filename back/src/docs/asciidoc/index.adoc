@@ -2,12 +2,43 @@ ifndef::snippets[]
 :snippets: ./build/generated-snippets
 endif::[]
 
-= Book
+= BookChat API Documentation
 
-== REQUEST
+== 사용자
 
-include::{snippets}/book/http-request.adoc[]
+=== 사용자 기본 프로필 조회
 
-== RESPONSE
+include::{snippets}/user/http-request.adoc[]
+include::{snippets}/user/http-response.adoc[]
+include::{snippets}/user/response-body.adoc[]
 
-include::{snippets}/book/http-response.adoc[]
+---
+
+== 도서
+
+=== ISBN 도서 검색
+
+include::{snippets}/book-search-isbn/http-request.adoc[]
+include::{snippets}/book-search-isbn/request-parameters.adoc[]
+include::{snippets}/book-search-isbn/http-response.adoc[]
+include::{snippets}/book-search-isbn/response-body.adoc[]
+---
+
+=== Title 도서 검색
+
+include::{snippets}/book-search-title/http-request.adoc[]
+include::{snippets}/book-search-title/request-parameters.adoc[]
+include::{snippets}/book-search-title/http-response.adoc[]
+include::{snippets}/book-search-title/response-body.adoc[]
+
+---
+
+=== Title 도서 검색
+
+include::{snippets}/book-search-author/http-request.adoc[]
+include::{snippets}/book-search-author/request-parameters.adoc[]
+include::{snippets}/book-search-author/http-response.adoc[]
+include::{snippets}/book-search-author/response-body.adoc[]
+
+---
+
