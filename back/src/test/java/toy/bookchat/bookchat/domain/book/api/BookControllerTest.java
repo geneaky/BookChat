@@ -4,6 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -19,6 +22,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -113,10 +117,13 @@ public class BookControllerTest {
 
         String result = objectMapper.writeValueAsString(bookDtos);
 
-        MvcResult mvcResult = mockMvc.perform(get("/v1/api/books")
+        MvcResult mvcResult = mockMvc.perform(RestDocumentationRequestBuilders.get("/v1/api/books")
                 .param("isbn", "1231513")
                 .with(user(getUserPrincipal())))
             .andExpect(status().isOk())
+            .andDo(document("book-search-isbn",
+                requestParameters(parameterWithName("isbn").description("isbn  번호"))
+            ))
             .andReturn();
 
         verify(bookSearchService).searchByIsbn(anyString());
@@ -154,6 +161,8 @@ public class BookControllerTest {
                 .param("title", "effectiveJava")
                 .with(user(getUserPrincipal())))
             .andExpect(status().isOk())
+            .andDo(document("book-search-title",
+                requestParameters(parameterWithName("title").description("도서 제목"))))
             .andReturn();
 
         verify(bookSearchService).searchByTitle(anyString());
@@ -192,6 +201,8 @@ public class BookControllerTest {
                 .param("author", "Joshua")
                 .with(user(getUserPrincipal())))
             .andExpect(status().isOk())
+            .andDo(document("book-search-author",
+                requestParameters(parameterWithName("author").description("작가"))))
             .andReturn();
 
         verify(bookSearchService).searchByAuthor(anyString());
