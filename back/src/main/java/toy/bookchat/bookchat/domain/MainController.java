@@ -25,7 +25,7 @@ public class MainController {
         return "<html>\n" + "<header><title>BookChat</title>"
             + "</header>\n" +
             "<body>\n" + "<p> you are authenticated! </p>\n"
-            + "<a href=\"http://localhost:8080/app?token=" + token
+            + "<a href=\"https://bookchat.link/app?token=" + token
             + "\" style=\"font: bold 11px Arial;\n"
             + "  text-decoration: none;\n"
             + "  background-color: #EEEEEE;\n"
