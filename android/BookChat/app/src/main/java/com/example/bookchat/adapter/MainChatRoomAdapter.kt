@@ -11,7 +11,8 @@ class MainChatRoomAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
     private lateinit var itemMainChatroomBinding: ItemMainChatroomBinding
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        itemMainChatroomBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.item_main_chatroom,parent,false)
+        itemMainChatroomBinding = DataBindingUtil
+            .inflate(LayoutInflater.from(parent.context), R.layout.item_main_chatroom,parent,false)
         return ChatRoomViewHolder(itemMainChatroomBinding)
     }
 

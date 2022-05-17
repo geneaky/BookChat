@@ -4,11 +4,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <variable
-            name="model"
+            name="userModel"
             type="com.example.bookchat.viewmodel.UserInforViewModel" />
         <variable
             name="activity"
-            type="com.example.bookchat.MainActivity" />
+            type="com.example.bookchat.activities.MainActivity" />
         <variable
             name="pageType"
             type="com.example.bookchat.utils.ActivityType" />
@@ -18,7 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:openDrawer="right"
-        tools:context=".MainActivity">
+        tools:context=".activities.MainActivity">
 
         <ScrollView
             android:layout_width="match_parent"
@@ -47,7 +47,7 @@
                         android:layout_height="53dp"
                         android:layout_marginRight="4dp"
                         android:layout_toLeftOf="@id/menu_btn"
-                        android:onClick="@{() -> activity.changePage(pageType.SearchActivity)}"
+                        android:onClick="@{() -> activity.changePage(pageType.searchActivity)}"
                         android:src="@drawable/search_btn" />
 
                     <ImageView
@@ -87,7 +87,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/sf_pro_display_bold"
-                            android:text="@{model.userName}"
+                            android:text="@{userModel.userName}"
                             android:textColor="@color/black"
                             android:textSize="20sp" />
 
@@ -97,7 +97,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="-8dp"
                             android:fontFamily="@font/sf_pro_display_bold"
-                            android:text="@{model.userEmail}"
+                            android:text="@{userModel.userEmail}"
                             android:textColor="@color/black"
                             android:textSize="13sp" />
 
@@ -132,7 +132,7 @@
 
                         <androidx.cardview.widget.CardView
                             android:id="@+id/cardView1"
-                            android:onClick="@{() -> activity.changePage(pageType.BookShelfActivity)}"
+                            android:onClick="@{() -> activity.changePage(pageType.bookShelfActivity)}"
                             android:layout_width="93dp"
                             android:layout_height="142dp"
                             android:layout_marginLeft="20dp"
@@ -148,7 +148,7 @@
 
                         <androidx.cardview.widget.CardView
                             android:id="@+id/cardView2"
-                            android:onClick="@{() -> activity.changePage(pageType.BookShelfActivity)}"
+                            android:onClick="@{() -> activity.changePage(pageType.bookShelfActivity)}"
                             android:layout_width="93dp"
                             android:layout_height="142dp"
                             android:layout_marginLeft="60dp"
@@ -164,7 +164,7 @@
 
                         <androidx.cardview.widget.CardView
                             android:id="@+id/cardView3"
-                            android:onClick="@{() -> activity.changePage(pageType.BookShelfActivity)}"
+                            android:onClick="@{() -> activity.changePage(pageType.bookShelfActivity)}"
                             android:layout_width="93dp"
                             android:layout_height="142dp"
                             android:layout_marginLeft="100dp"
@@ -180,7 +180,7 @@
 
                         <androidx.cardview.widget.CardView
                             android:id="@+id/cardView4"
-                            android:onClick="@{() -> activity.changePage(pageType.BookShelfActivity)}"
+                            android:onClick="@{() -> activity.changePage(pageType.bookShelfActivity)}"
                             android:layout_width="93dp"
                             android:layout_height="142dp"
                             android:layout_marginLeft="140dp"
@@ -196,7 +196,7 @@
 
                         <androidx.cardview.widget.CardView
                             android:id="@+id/cardView5"
-                            android:onClick="@{() -> activity.changePage(pageType.BookShelfActivity)}"
+                            android:onClick="@{() -> activity.changePage(pageType.bookShelfActivity)}"
                             android:layout_width="93dp"
                             android:layout_height="142dp"
                             android:layout_marginLeft="180dp"
@@ -238,7 +238,8 @@
                         android:id="@+id/chatRoomRecyclerView"
                         android:layout_marginTop="10dp"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content"
+                        tools:listitem="@layout/item_main_chatroom"/>
 
                 </LinearLayout>
 

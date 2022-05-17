@@ -1,7 +1,8 @@
-package com.example.bookchat
+package com.example.bookchat.activities
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import com.example.bookchat.R
 
 class BookShelfActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

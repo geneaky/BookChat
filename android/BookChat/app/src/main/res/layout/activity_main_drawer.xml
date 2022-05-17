@@ -3,7 +3,7 @@
     <data>
         <variable
             name="activity"
-            type="com.example.bookchat.MainActivity" />
+            type="com.example.bookchat.activities.MainActivity" />
     </data>
     <com.google.android.material.navigation.NavigationView
         xmlns:android="http://schemas.android.com/apk/res/android"
