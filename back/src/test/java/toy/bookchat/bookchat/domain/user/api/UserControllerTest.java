@@ -51,13 +51,6 @@ public class UserControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void 인증받은_사용자의_요청_200응답() throws Exception {
-        mockMvc.perform(get("/v1/api/users/profile")
-                .with(user(getUserPrincipal())))
-            .andExpect(status().isOk());
-    }
-
-    @Test
     public void 사용자_프로필_정보_반환() throws Exception {
         String real = objectMapper.writeValueAsString(UserProfileResponse.builder()
             .userEmail("test@gmail.com")

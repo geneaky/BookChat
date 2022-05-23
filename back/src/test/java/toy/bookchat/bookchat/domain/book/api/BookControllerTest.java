@@ -76,18 +76,6 @@ public class BookControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void 로그인한_사용자_요청_200() throws Exception {
-        List<BookDto> bookDtos = new ArrayList<>();
-        bookDtos.add(getBookDto("213123", "effectiveJava", List.of("Joshua")));
-
-        when(bookSearchService.searchByIsbn(anyString())).thenReturn(bookDtos);
-        mockMvc.perform(get("/v1/api/books")
-                .param("isbn", "213123")
-                .with(user(getUserPrincipal())))
-            .andExpect(status().isOk());
-    }
-
-    @Test
     public void 사용자가_isbn으로_책_검색_요청시_성공() throws Exception {
         List<BookDto> bookDtos = new ArrayList<>();
         bookDtos.add(getBookDto("213123", "effectiveJava", List.of("Joshua")));

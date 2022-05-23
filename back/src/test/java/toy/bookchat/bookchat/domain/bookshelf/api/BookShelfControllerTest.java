@@ -23,7 +23,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.dto.BookShelfRequestDto;
@@ -54,20 +53,30 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
         return userPrincipal;
     }
 
-    @Test
-    public void 읽고_있는_책_등록_성공() throws Exception {
-
+    private BookShelfRequestDto getBookShelfRequestDto(ReadingStatus readingStatus) {
         BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
             .isbn("124151214")
             .title("effectiveJava")
             .author(List.of("Joshua"))
             .publisher("oreilly")
             .bookCoverImageUrl("bookCoverImage.com")
-            .readingStatus(ReadingStatus.READING)
+            .readingStatus(readingStatus)
             .build();
+        return bookShelfRequestDto;
+    }
 
-        MvcResult mvcResult = mockMvc.perform(post("/v1/api/bookshelf/books")
-                .content(objectMapper.writeValueAsString(bookShelfRequestDto))
+    @Test
+    public void 로그인하지_않은_사용자_요청_401() throws Exception {
+        mockMvc.perform(post("/v1/api/bookshelf/books")
+                .content(objectMapper.writeValueAsString(getBookShelfRequestDto(ReadingStatus.READING)))
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void 읽고_있는_책_등록_성공() throws Exception {
+        mockMvc.perform(post("/v1/api/bookshelf/books")
+                .content(objectMapper.writeValueAsString(getBookShelfRequestDto(ReadingStatus.READING)))
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isCreated())
@@ -77,9 +86,28 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
                     fieldWithPath("author").description("author"),
                     fieldWithPath("publisher").description("publisher"),
                     fieldWithPath("bookCoverImageUrl").description("bookCoverImageUrl"),
-                    fieldWithPath("readingStatus").description("readingStatus"))))
-            .andReturn();
+                    fieldWithPath("readingStatus").description("readingStatus"))));
 
         verify(bookShelfService).putBookOnBookShelf(any(BookShelfRequestDto.class));
     }
+
+    @Test
+    public void 읽은_책_등록_성공() throws Exception {
+        mockMvc.perform(post("/v1/api/bookshelf/books")
+                .content(
+                    objectMapper.writeValueAsString(getBookShelfRequestDto(ReadingStatus.COMPLETE)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isCreated())
+            .andDo(document("bookshelf",
+                requestFields(fieldWithPath("isbn").description("isbn"),
+                    fieldWithPath("title").description("title"),
+                    fieldWithPath("author").description("author"),
+                    fieldWithPath("publisher").description("publisher"),
+                    fieldWithPath("bookCoverImageUrl").description("bookCoverImageUrl"),
+                    fieldWithPath("readingStatus").description("readingStatus"))));
+
+        verify(bookShelfService).putBookOnBookShelf(any(BookShelfRequestDto.class));
+    }
+
 }
