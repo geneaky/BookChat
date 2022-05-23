@@ -1,5 +1,6 @@
 package toy.bookchat.bookchat.domain.bookshelf.api;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -54,7 +55,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void sett() throws Exception {
+    public void 읽고_있는_책_등록_성공() throws Exception {
 
         BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
             .isbn("124151214")
@@ -79,6 +80,6 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
                     fieldWithPath("readingStatus").description("readingStatus"))))
             .andReturn();
 
-        verify(bookShelfService).putBookOnBookShelf();
+        verify(bookShelfService).putBookOnBookShelf(any(BookShelfRequestDto.class));
     }
 }
