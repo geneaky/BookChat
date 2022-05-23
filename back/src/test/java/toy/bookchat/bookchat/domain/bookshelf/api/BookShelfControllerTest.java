@@ -110,4 +110,21 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
         verify(bookShelfService).putBookOnBookShelf(any(BookShelfRequestDto.class));
     }
 
+    @Test
+    public void 읽을_책_등록_성공() throws Exception {
+        mockMvc.perform(post("/v1/api/bookshelf/books")
+                .content(objectMapper.writeValueAsString(getBookShelfRequestDto(ReadingStatus.READY)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isCreated())
+            .andDo(document("bookshelf",
+                requestFields(fieldWithPath("isbn").description("isbn"),
+                    fieldWithPath("title").description("title"),
+                    fieldWithPath("author").description("author"),
+                    fieldWithPath("publisher").description("publisher"),
+                    fieldWithPath("bookCoverImageUrl").description("bookCoverImageUrl"),
+                    fieldWithPath("readingStatus").description("readingStatus"))));
+
+        verify(bookShelfService).putBookOnBookShelf(any(BookShelfRequestDto.class));
+    }
 }
