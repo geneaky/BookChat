@@ -13,43 +13,20 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Import;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
 import toy.bookchat.bookchat.domain.user.dto.UserProfileResponse;
-import toy.bookchat.bookchat.domain.user.repository.UserRepository;
-import toy.bookchat.bookchat.security.handler.CustomAuthenticationFailureHandler;
-import toy.bookchat.bookchat.security.handler.CustomAuthenticationSuccessHandler;
-import toy.bookchat.bookchat.security.handler.RestAuthenticationEntryPoint;
-import toy.bookchat.bookchat.security.jwt.JwtAuthenticationFilter;
-import toy.bookchat.bookchat.security.jwt.JwtTokenProvider;
-import toy.bookchat.bookchat.security.oauth.CustomOAuth2UserService;
-import toy.bookchat.bookchat.security.oauth.HttpCookieOAuth2AuthorizationRequestRepository;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @WebMvcTest(controllers = UserController.class,
     includeFilters = @ComponentScan.Filter(classes = {EnableWebSecurity.class}))
-@Import({JwtAuthenticationFilter.class, RestAuthenticationEntryPoint.class})
 @AutoConfigureRestDocs
-public class UserControllerTest {
-
-    @MockBean
-    CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
-    @MockBean
-    CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
-    @MockBean
-    CustomOAuth2UserService customOAuth2UserService;
-    @MockBean
-    JwtTokenProvider jwtTokenProvider;
-    @MockBean
-    UserRepository userRepository;
-    @MockBean
-    HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
+public class UserControllerTest extends AuthenticationTestExtension {
 
     @Autowired
     ObjectMapper objectMapper;
