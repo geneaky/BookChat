@@ -9,6 +9,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collections;
 import java.util.List;
@@ -86,7 +87,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
                     fieldWithPath("author").description("author"),
                     fieldWithPath("publisher").description("publisher"),
                     fieldWithPath("bookCoverImageUrl").description("bookCoverImageUrl"),
-                    fieldWithPath("readingStatus").description("readingStatus"))));
+                    fieldWithPath("readingStatus").description("READING"))));
 
         verify(bookShelfService).putBookOnBookShelf(any(BookShelfRequestDto.class));
     }
@@ -105,7 +106,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
                     fieldWithPath("author").description("author"),
                     fieldWithPath("publisher").description("publisher"),
                     fieldWithPath("bookCoverImageUrl").description("bookCoverImageUrl"),
-                    fieldWithPath("readingStatus").description("readingStatus"))));
+                    fieldWithPath("readingStatus").description("COMPLETE"))));
 
         verify(bookShelfService).putBookOnBookShelf(any(BookShelfRequestDto.class));
     }
@@ -123,8 +124,219 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
                     fieldWithPath("author").description("author"),
                     fieldWithPath("publisher").description("publisher"),
                     fieldWithPath("bookCoverImageUrl").description("bookCoverImageUrl"),
-                    fieldWithPath("readingStatus").description("readingStatus"))));
+                    fieldWithPath("readingStatus").description("READY"))));
 
         verify(bookShelfService).putBookOnBookShelf(any(BookShelfRequestDto.class));
     }
+
+    @Test
+    public void null로_요청_실패() throws Exception {
+        mockMvc.perform(post("/v1/api/bookshelf/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void 존재하지않은_readingstatus_책_등록_실패() throws Exception {
+        BookShelfTestRequestDto bookShelfTestRequestDto = new BookShelfTestRequestDto("124151214",
+            "effectiveJava", List.of("Joshua"), "oreilly",
+            "bookCoverImage.com", "NOT_EXISTED_READING_STATUS");
+
+        mockMvc.perform(post("/v1/api/bookshelf/books")
+                .content(objectMapper.writeValueAsString(bookShelfTestRequestDto))
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void readingStatus_없이_요청_실패() throws Exception {
+        BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
+            .isbn("135135414")
+            .title("effectiveJava")
+            .author(List.of("Joshua"))
+            .publisher("oreilly")
+            .bookCoverImageUrl("bookCoverImage.com")
+            .build();
+
+        mockMvc.perform(post("/v1/api/bookshelf/books")
+                .content(objectMapper.writeValueAsString(bookShelfRequestDto))
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isBadRequest());
+
+    }
+
+    @Test
+    public void isbn_없이_책_등록_요청_실패() throws Exception {
+        BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
+            .title("effectiveJava")
+            .author(List.of("Joshua"))
+            .publisher("oreilly")
+            .bookCoverImageUrl("bookCoverImage.com")
+            .readingStatus(ReadingStatus.READY)
+            .build();
+
+        mockMvc.perform(post("/v1/api/bookshelf/books")
+                .content(objectMapper.writeValueAsString(bookShelfRequestDto))
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void isbn_빈_문자열_요청_실패() throws Exception {
+        BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
+            .isbn("")
+            .title("effectiveJava")
+            .author(List.of("Joshua"))
+            .publisher("oreilly")
+            .bookCoverImageUrl("bookCoverImage.com")
+            .readingStatus(ReadingStatus.READY)
+            .build();
+
+        mockMvc.perform(post("/v1/api/bookshelf/books")
+                .content(objectMapper.writeValueAsString(bookShelfRequestDto))
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void 제목_없이_요청_실패() throws Exception {
+        BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
+            .isbn("124151214")
+            .author(List.of("Joshua"))
+            .publisher("oreilly")
+            .bookCoverImageUrl("bookCoverImage.com")
+            .readingStatus(ReadingStatus.READY)
+            .build();
+
+        mockMvc.perform(post("/v1/api/bookshelf/books")
+                .content(objectMapper.writeValueAsString(bookShelfRequestDto))
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void 제목_빈_문자열_요청_실패() throws Exception {
+        BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
+            .isbn("124151214")
+            .title("")
+            .author(List.of("Joshua"))
+            .publisher("oreilly")
+            .bookCoverImageUrl("bookCoverImage.com")
+            .readingStatus(ReadingStatus.READY)
+            .build();
+
+        mockMvc.perform(post("/v1/api/bookshelf/books")
+                .content(objectMapper.writeValueAsString(bookShelfRequestDto))
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isBadRequest());
+
+    }
+
+    @Test
+    public void 작가명_없이_요청_실패() throws Exception {
+        BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
+            .isbn("124151214")
+            .title("effectiveJava")
+            .publisher("oreilly")
+            .bookCoverImageUrl("bookCoverImage.com")
+            .readingStatus(ReadingStatus.READY)
+            .build();
+
+        mockMvc.perform(post("/v1/api/bookshelf/books")
+                .content(objectMapper.writeValueAsString(bookShelfRequestDto))
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isBadRequest());
+
+    }
+
+    @Test
+    public void 작가명_빈_문자열_요청_실패() throws Exception {
+        BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
+            .isbn("124151214")
+            .title("effectiveJava")
+            .author(List.of(""))
+            .publisher("oreilly")
+            .bookCoverImageUrl("bookCoverImage.com")
+            .readingStatus(ReadingStatus.READY)
+            .build();
+
+        mockMvc.perform(post("/v1/api/bookshelf/books")
+                .content(objectMapper.writeValueAsString(bookShelfRequestDto))
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isBadRequest());
+
+    }
+
+    @Test
+    public void 출판사_없이_요청_실패() throws Exception {
+        BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
+            .isbn("124151214")
+            .title("effectiveJava")
+            .author(List.of("Joshua"))
+            .bookCoverImageUrl("bookCoverImage.com")
+            .readingStatus(ReadingStatus.READY)
+            .build();
+
+        mockMvc.perform(post("/v1/api/bookshelf/books")
+                .content(objectMapper.writeValueAsString(bookShelfRequestDto))
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isBadRequest());
+
+    }
+
+    @Test
+    public void 출판사_빈_문자열_요청_실패() throws Exception {
+        BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
+            .isbn("124151214")
+            .title("effectiveJava")
+            .author(List.of("Joshua"))
+            .publisher("")
+            .bookCoverImageUrl("bookCoverImage.com")
+            .readingStatus(ReadingStatus.READY)
+            .build();
+
+        mockMvc.perform(post("/v1/api/bookshelf/books")
+                .content(objectMapper.writeValueAsString(bookShelfRequestDto))
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isBadRequest());
+
+    }
+
+    static class BookShelfTestRequestDto {
+
+        @JsonProperty
+        String isbn;
+        @JsonProperty
+        String title;
+        @JsonProperty
+        List<String> author;
+        @JsonProperty
+        String publisher;
+        @JsonProperty
+        String bookCoverImageUrl;
+        @JsonProperty
+        String readingStatus;
+
+        public BookShelfTestRequestDto(String isbn, String title, List<String> author,
+            String publisher, String bookCoverImageUrl, String readingStatus) {
+            this.isbn = isbn;
+            this.title = title;
+            this.author = author;
+            this.publisher = publisher;
+            this.bookCoverImageUrl = bookCoverImageUrl;
+            this.readingStatus = readingStatus;
+        }
+    }
+
 }

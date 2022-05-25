@@ -1,6 +1,7 @@
 package toy.bookchat.bookchat.domain.bookshelf.dto;
 
 import java.util.List;
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -20,11 +21,11 @@ public class BookShelfRequestDto {
     private String isbn;
     @NotBlank
     private String title;
+    @Valid
     @NotNull
-    private List<String> author;
+    private List<@NotBlank String> author;
     @NotBlank
     private String publisher;
-    @NotBlank
     private String bookCoverImageUrl;
     @NotNull
     private ReadingStatus readingStatus;
