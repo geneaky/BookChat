@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import toy.bookchat.bookchat.domain.book.model.Book;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 
 @Getter
@@ -30,4 +31,13 @@ public class BookShelfRequestDto {
     @NotNull
     private ReadingStatus readingStatus;
 
+    public Book getBook() {
+        return Book.builder()
+            .isbn(getIsbn())
+            .title(getTitle())
+            .authors(getAuthor())
+            .publisher(getPublisher())
+            .bookCoverImageUrl(getBookCoverImageUrl())
+            .build();
+    }
 }
