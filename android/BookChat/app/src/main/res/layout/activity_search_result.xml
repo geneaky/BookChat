@@ -1,21 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <data>
+
+        <import type="android.view.View" />
+
         <variable
             name="activity"
             type="com.example.bookchat.activities.SearchResultActivity" />
+        <variable
+            name="viewModel"
+            type="com.example.bookchat.viewmodel.SearchResultViewModel" />
     </data>
 
-    <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".activities.SearchResultActivity">
+<!--    <com.sothree.slidinguppanel.SlidingUpPanelLayout-->
+<!--        android:id="@+id/option_frame"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:gravity="bottom"-->
+<!--        app:umanoDragView="@id/drawer"-->
+<!--        app:umanoPanelHeight="50dp"-->
+<!--        app:umanoShadowHeight="0dp"-->
+<!--        app:umanoOverlay="true">-->
 
-        <ScrollView
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            tools:context=".activities.SearchResultActivity">
+
+            <ProgressBar
+                android:id="@+id/loading_progressBar"
+                android:elevation="11dp"
+                android:visibility="@{viewModel.isLoading() ? View.VISIBLE : View.GONE}"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -49,15 +70,15 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="38dp"
-                            android:layout_marginRight="64dp"
                             android:layout_marginTop="23dp"
+                            android:layout_marginRight="64dp"
                             android:background="@android:color/transparent"
                             android:fontFamily="@font/jua_regular"
                             android:hint="책을 검색해주세요!"
-                            android:inputType="text"
                             android:imeOptions="actionDone"
-                            android:textColorHint="#B0B0B4"
-                            android:textColor="#12121D" />
+                            android:inputType="text"
+                            android:textColor="#12121D"
+                            android:textColorHint="#B0B0B4" />
 
                         <ImageView
                             android:id="@+id/search_option_btn"
@@ -112,7 +133,13 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/jua_regular"
                         android:textColor="#12121D"
-                        android:text="x개"/>
+                        android:text="@{String.valueOf(viewModel.books.size())}"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/jua_regular"
+                        android:textColor="#12121D"
+                        android:text=" 개"/>
                 </LinearLayout>
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -123,6 +150,7 @@
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    setItem="@{viewModel.books}"
                     tools:listitem="@layout/item_book_search_result"/>
 
                 <LinearLayout
@@ -131,6 +159,7 @@
                     android:layout_marginTop="20dp"
                     android:layout_marginLeft="35dp"
                     android:orientation="horizontal">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -152,8 +181,20 @@
                     android:layout_height="wrap_content"/>
 
             </LinearLayout>
-        </ScrollView>
+        </FrameLayout>
 
-    </LinearLayout>
+<!--        &lt;!&ndash;옵션 drawer&ndash;&gt;-->
+<!--        <LinearLayout-->
+<!--            android:id="@+id/drawer"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="400dp"-->
+<!--            android:orientation="vertical">-->
+
+<!--            <include layout="@layout/layout_search_option_drawer"-->
+<!--                android:id="@+id/drawer_option"-->
+<!--                app:viewModel ="@{optionViewModel}"/>-->
+<!--        </LinearLayout>-->
+
+<!--    </com.sothree.slidinguppanel.SlidingUpPanelLayout>-->
 </layout>
     

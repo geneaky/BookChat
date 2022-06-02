@@ -26,6 +26,7 @@ object ApiClient {
             build()
         }
 
+    //통신시에 항상 토큰값 실어서 보내게 인터셉터 등록해두기
     class AppInterceptor : Interceptor {
         @Throws(IOException::class)
         override fun intercept(chain: Interceptor.Chain)

@@ -3,6 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.bookchat">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!--현재 인터넷 연결상태 체크 위해 권한 등록-->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -54,6 +58,5 @@
             android:exported="true" />
     </application>
 
-    <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>

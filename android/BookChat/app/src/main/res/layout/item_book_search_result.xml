@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
+    <data>
+        <variable
+            name="book"
+            type="com.example.bookchat.data.BookResponse" />
+    </data>
     <LinearLayout
         android:id="@+id/item_layout"
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -25,6 +30,7 @@
                     android:id="@+id/bookImg"
                     android:layout_width="93dp"
                     android:layout_height="142dp"
+                    loadUrl="@{book.bookCoverImageUrl}"
                     android:scaleType="fitXY"
                     android:src="@drawable/ex_book2"/>
             </androidx.cardview.widget.CardView>
@@ -39,7 +45,7 @@
             android:layout_gravity="center"
             android:gravity="center"
             android:ellipsize="end"
-            android:text="이펙티브 자바 Effective Java 3/E"
+            android:text="@{book.title}"
             android:maxLength="36"
             android:maxLines="3"
             android:maxWidth="95dp"
@@ -57,7 +63,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="10sp"
                 android:fontFamily="@font/jua_regular"
-                android:text="조슈아 블로크"/>
+                android:text="@{book.author[0]}"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -72,7 +78,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/jua_regular"
                 android:textSize="10sp"
-                android:text="인사이트"/>
+                android:text="@{book.publisher}"/>
         </LinearLayout>
 
 
