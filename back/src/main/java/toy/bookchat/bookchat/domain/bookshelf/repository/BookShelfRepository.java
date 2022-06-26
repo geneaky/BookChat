@@ -1,8 +1,8 @@
 package toy.bookchat.bookchat.domain.bookshelf.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import toy.bookchat.bookchat.domain.book.model.Book;
+import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 
-public interface BookShelfRepository extends JpaRepository<Book, Long> {
+public interface BookShelfRepository extends JpaRepository<BookShelf, Long> {
 
 }

@@ -89,7 +89,8 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
                     fieldWithPath("bookCoverImageUrl").description("bookCoverImageUrl"),
                     fieldWithPath("readingStatus").description("READING"))));
 
-        verify(bookShelfService).putBookOnBookShelf(any(BookShelfRequestDto.class));
+        verify(bookShelfService).putBookOnBookShelf(any(BookShelfRequestDto.class),
+            getUserPrincipal().getId());
     }
 
     @Test
@@ -108,7 +109,8 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
                     fieldWithPath("bookCoverImageUrl").description("bookCoverImageUrl"),
                     fieldWithPath("readingStatus").description("COMPLETE"))));
 
-        verify(bookShelfService).putBookOnBookShelf(any(BookShelfRequestDto.class));
+        verify(bookShelfService).putBookOnBookShelf(any(BookShelfRequestDto.class),
+            getUserPrincipal().getId());
     }
 
     @Test
@@ -126,7 +128,8 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
                     fieldWithPath("bookCoverImageUrl").description("bookCoverImageUrl"),
                     fieldWithPath("readingStatus").description("READY"))));
 
-        verify(bookShelfService).putBookOnBookShelf(any(BookShelfRequestDto.class));
+        verify(bookShelfService).putBookOnBookShelf(any(BookShelfRequestDto.class),
+            getUserPrincipal().getId());
     }
 
     @Test

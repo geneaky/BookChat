@@ -4,5 +4,5 @@ import toy.bookchat.bookchat.domain.bookshelf.dto.BookShelfRequestDto;
 
 public interface BookShelfService {
 
-    void putBookOnBookShelf(BookShelfRequestDto bookShelfRequestDto);
+    void putBookOnBookShelf(BookShelfRequestDto bookShelfRequestDto, Long userId);
 }
