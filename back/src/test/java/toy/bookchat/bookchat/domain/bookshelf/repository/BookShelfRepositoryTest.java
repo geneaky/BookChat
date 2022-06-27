@@ -12,7 +12,8 @@ public class BookShelfRepositoryTest {
 
     @Test
     public void 책_저장() throws Exception {
-
+        BookShelf
+        bookShelfRepository.save()
 //        bookShelfRepository.save()
     }
 }

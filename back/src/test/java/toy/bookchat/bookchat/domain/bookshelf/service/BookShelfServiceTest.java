@@ -26,7 +26,7 @@ public class BookShelfServiceTest {
     @Mock
     BookRepository bookRepository;
     @InjectMocks
-    BookShelfServiceImpl bookShelfService;
+    BookShelfService bookShelfService;
 
     private Book getBook() {
         return Book.builder()
