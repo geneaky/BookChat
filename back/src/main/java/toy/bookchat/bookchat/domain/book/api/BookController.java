@@ -27,23 +27,17 @@ public class BookController {
         @ModelAttribute BookSearchRequestDto bookSearchRequestDto) {
 
         if (bookSearchRequestDto.isIsbnPresent()) {
-            return new ResponseEntity<>(
-                bookSearchService.searchByIsbn(bookSearchRequestDto.getIsbn()),
-                HttpStatus.OK);
+            return ResponseEntity.ok(bookSearchService.searchByIsbn(bookSearchRequestDto.getIsbn()));
         }
 
         if (bookSearchRequestDto.isTitlePresent()) {
-            return new ResponseEntity<>(
-                bookSearchService.searchByTitle(bookSearchRequestDto.getTitle()),
-                HttpStatus.OK);
+            return ResponseEntity.ok(bookSearchService.searchByTitle(bookSearchRequestDto.getTitle()));
         }
 
         if (bookSearchRequestDto.isAuthorPresent()) {
-            return new ResponseEntity<>(
-                bookSearchService.searchByAuthor(bookSearchRequestDto.getAuthor()),
-                HttpStatus.OK);
+            return ResponseEntity.ok(bookSearchService.searchByAuthor(bookSearchRequestDto.getAuthor()));
         }
 
-        return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        return  ResponseEntity.badRequest().body(null);
     }
 }

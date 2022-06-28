@@ -20,7 +20,6 @@ import toy.bookchat.bookchat.security.user.UserPrincipal;
 public class BookShelfController {
 
     private final BookShelfService bookShelfService;
-    MultipartFile dd;
 
     @PostMapping("/bookshelf/books")
     public ResponseEntity<Void> putBookOnBookShelf(
@@ -28,7 +27,6 @@ public class BookShelfController {
         @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         bookShelfService.putBookOnBookShelf(bookShelfRequestDto, userPrincipal.getId());
-        return new ResponseEntity<>(HttpStatus.CREATED);
-
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
