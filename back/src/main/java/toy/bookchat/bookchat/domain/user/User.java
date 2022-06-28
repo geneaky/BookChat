@@ -1,15 +1,16 @@
 package toy.bookchat.bookchat.domain.user;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -28,6 +29,8 @@ public class User {
     private ROLE role;
     @Enumerated(EnumType.STRING)
     private OAuth2Provider provider;
+    @OneToMany
+    private List<BookShelf> bookShelves = new ArrayList<>();
 
 
     public void updateEmail(String email) {

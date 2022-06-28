@@ -11,18 +11,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import toy.bookchat.bookchat.domain.book.model.Book;
+import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.book.repository.BookRepository;
-import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
-import toy.bookchat.bookchat.domain.bookshelf.dto.BookShelfRequestDto;
-import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfRequestDto;
 
 @ExtendWith(MockitoExtension.class)
 public class BookShelfServiceTest {
 
-    @Mock
-    BookShelfRepository bookShelfRepository;
     @Mock
     BookRepository bookRepository;
     @InjectMocks
@@ -60,7 +56,7 @@ public class BookShelfServiceTest {
 
         bookShelfService.putBookOnBookShelf(bookShelfRequestDto, userId);
 
-        verify(bookShelfRepository).save(any(BookShelf.class));
+        verify(bookRepository).save(any(Book.class));
     }
 
 
@@ -74,8 +70,6 @@ public class BookShelfServiceTest {
         bookShelfService.putBookOnBookShelf(bookShelfRequestDto, userId);
 
         verify(bookRepository).save(any(Book.class));
-        verify(bookShelfRepository).save(any(BookShelf.class));
-
     }
 
 }

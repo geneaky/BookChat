@@ -5,10 +5,10 @@ import java.util.function.Consumer;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import toy.bookchat.bookchat.domain.book.model.Book;
+import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.book.repository.BookRepository;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
-import toy.bookchat.bookchat.domain.bookshelf.dto.BookShelfRequestDto;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfRequestDto;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
 
 @Service

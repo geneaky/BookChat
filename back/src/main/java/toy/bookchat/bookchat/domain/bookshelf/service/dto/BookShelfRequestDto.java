@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.domain.bookshelf.dto;
+package toy.bookchat.bookchat.domain.bookshelf.service.dto;
 
 import java.util.List;
 import javax.validation.Valid;
@@ -9,7 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import toy.bookchat.bookchat.domain.book.model.Book;
+import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 
 @Getter

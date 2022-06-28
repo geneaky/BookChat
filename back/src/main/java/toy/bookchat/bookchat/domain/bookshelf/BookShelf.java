@@ -10,7 +10,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
-import toy.bookchat.bookchat.domain.book.model.Book;
+import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.user.User;
 
 @Entity
