@@ -27,6 +27,11 @@ public class Book {
     private List<String> authors = new ArrayList<>();
     private String publisher;
     private String bookCoverImageUrl;
-    @OneToMany
+    @OneToMany(mappedBy = "book")
     private List<BookShelf> bookShelves = new ArrayList<>();
+
+    public void setBookShelf(BookShelf bookShelf) {
+        this.getBookShelves().add(bookShelf);
+        bookShelf.setBook(this);
+    }
 }

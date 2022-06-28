@@ -1,15 +1,8 @@
 package toy.bookchat.bookchat.domain.bookshelf;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import javax.persistence.*;
+
+import lombok.*;
 import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.user.User;
 
@@ -23,13 +16,20 @@ public class BookShelf {
     @GeneratedValue
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Book book;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
     @Enumerated(EnumType.STRING)
     private ReadingStatus readingStatus;
 
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public void setBook(Book book) {
+        this.book = book;
+    }
 }

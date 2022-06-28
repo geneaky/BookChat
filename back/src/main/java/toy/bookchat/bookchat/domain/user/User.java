@@ -29,9 +29,13 @@ public class User {
     private ROLE role;
     @Enumerated(EnumType.STRING)
     private OAuth2Provider provider;
-    @OneToMany
+    @OneToMany(mappedBy = "user")
     private List<BookShelf> bookShelves = new ArrayList<>();
 
+    public void setBookShelf(BookShelf bookShelf) {
+        this.getBookShelves().add(bookShelf);
+        bookShelf.setUser(this);
+    }
 
     public void updateEmail(String email) {
         this.email = email;
