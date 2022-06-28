@@ -1,6 +1,7 @@
 package toy.bookchat.bookchat.domain.bookshelf.service;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -13,14 +14,22 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.book.repository.BookRepository;
+import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
+import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfRequestDto;
+import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class BookShelfServiceTest {
 
     @Mock
     BookRepository bookRepository;
+    @Mock
+    UserRepository userRepository;
+    @Mock
+    BookShelfRepository bookShelfRepository;
     @InjectMocks
     BookShelfService bookShelfService;
 
@@ -32,6 +41,11 @@ public class BookShelfServiceTest {
             .publisher("test publisher")
             .bookCoverImageUrl("test@naver.com")
             .build();
+    }
+
+    private User getUser() {
+        return User.builder()
+                .build();
     }
 
     private BookShelfRequestDto getBookShelfRequestDto() {
@@ -51,12 +65,14 @@ public class BookShelfServiceTest {
         Long userId = 1L;
         Book book = getBook();
 
+        when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(getUser()));
+
         when(bookRepository.findByIsbn(bookShelfRequestDto.getIsbn())).thenReturn(
             Optional.of(book));
 
         bookShelfService.putBookOnBookShelf(bookShelfRequestDto, userId);
 
-        verify(bookRepository).save(any(Book.class));
+        verify(bookShelfRepository).save(any(BookShelf.class));
     }
 
 
@@ -65,11 +81,14 @@ public class BookShelfServiceTest {
         BookShelfRequestDto bookShelfRequestDto = getBookShelfRequestDto();
         Long userId = 1L;
 
+        when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(getUser()));
+
         when(bookRepository.findByIsbn(bookShelfRequestDto.getIsbn())).thenReturn(Optional.empty());
 
         bookShelfService.putBookOnBookShelf(bookShelfRequestDto, userId);
 
         verify(bookRepository).save(any(Book.class));
+        verify(bookShelfRepository).save(any(BookShelf.class));
     }
 
 }
