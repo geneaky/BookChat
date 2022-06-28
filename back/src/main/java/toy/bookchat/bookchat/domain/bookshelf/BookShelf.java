@@ -8,6 +8,7 @@ import toy.bookchat.bookchat.domain.user.User;
 
 @Entity
 @Builder
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class BookShelf {
