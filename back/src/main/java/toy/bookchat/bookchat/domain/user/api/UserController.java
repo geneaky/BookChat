@@ -18,7 +18,6 @@ public class UserController {
     @GetMapping("/users/profile")
     public ResponseEntity<UserProfileResponse> userProfile(
         @AuthenticationPrincipal UserPrincipal userPrincipal) {
-        return new ResponseEntity<UserProfileResponse>(UserProfileResponse.of(userPrincipal),
-            HttpStatus.OK);
+        return ResponseEntity.ok(UserProfileResponse.of(userPrincipal));
     }
 }
