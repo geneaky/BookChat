@@ -7,14 +7,12 @@ import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.user.User;
 
 @Entity
-@Builder
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BookShelf {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -25,6 +23,13 @@ public class BookShelf {
 
     @Enumerated(EnumType.STRING)
     private ReadingStatus readingStatus;
+
+    @Builder
+    private BookShelf(Book book, User user, ReadingStatus readingStatus) {
+        this.book = book;
+        this.user = user;
+        this.readingStatus = readingStatus;
+    }
 
     public void setUser(User user) {
         this.user = user;

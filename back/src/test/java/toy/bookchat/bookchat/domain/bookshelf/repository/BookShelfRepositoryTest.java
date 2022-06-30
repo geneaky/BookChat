@@ -16,7 +16,6 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.*;
 
 @DataJpaTest(showSql = false)
-@Rollback(value = false)
 public class BookShelfRepositoryTest {
 
     @Autowired
@@ -42,16 +41,15 @@ public class BookShelfRepositoryTest {
 
     @Test
     public void register_book_user_info_at_bookshelf_repository() throws Exception {
+
         BookShelf bookShelf = BookShelf.builder().build();
 
         Book book = Book.builder()
-                .bookShelves(new ArrayList<>())
                 .build();
         book.setBookShelf(bookShelf);
         Book savedBook = bookRepository.save(book);
 
         User user = User.builder()
-                .bookShelves(new ArrayList<>())
                 .build();
         user.setBookShelf(bookShelf);
         User savedUser = userRepository.save(user);
