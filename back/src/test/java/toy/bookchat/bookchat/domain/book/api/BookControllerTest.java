@@ -31,6 +31,7 @@ import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
 import toy.bookchat.bookchat.domain.book.dto.BookDto;
 import toy.bookchat.bookchat.domain.book.exception.BookNotFoundException;
 import toy.bookchat.bookchat.domain.book.service.BookSearchService;
+import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @WebMvcTest(controllers = BookController.class,
@@ -51,10 +52,17 @@ public class BookControllerTest extends AuthenticationTestExtension {
         List<GrantedAuthority> authorities = Collections.singletonList(
             new SimpleGrantedAuthority("ROLE_USER")
         );
-        UserPrincipal userPrincipal = new UserPrincipal(1L, "test@gmail.com", "password",
-            "testUser", "somethingImageUrl.com", authorities);
 
-        return userPrincipal;
+        User user = User.builder()
+            .email("test@gmail.com")
+            .password("password")
+            .name("testUser")
+            .profileImageUrl("somethingImageUrl@naver.com")
+            .build();
+
+        return new UserPrincipal(1L, user.getEmail(), user.getPassword(),
+            user.getName(), user.getProfileImageUrl(), authorities, user);
+
     }
 
     private BookDto getBookDto(String isbn, String title, List<String> author) {

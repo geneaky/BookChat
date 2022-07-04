@@ -20,6 +20,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
+import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.api.dto.UserProfileResponse;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
@@ -38,10 +39,15 @@ public class UserControllerTest extends AuthenticationTestExtension {
         List<GrantedAuthority> authorities = Collections.singletonList(
             new SimpleGrantedAuthority("ROLE_USER")
         );
-        UserPrincipal userPrincipal = new UserPrincipal(1L, "test@gmail.com", "password",
-            "testUser", "somethingImageUrl.com", authorities);
+        User user = User.builder()
+            .email("test@gmail.com")
+            .password("password")
+            .name("testUser")
+            .profileImageUrl("somethingImageUrl@naver.com")
+            .build();
 
-        return userPrincipal;
+        return new UserPrincipal(1L, user.getEmail(), user.getPassword(),
+            user.getName(), user.getProfileImageUrl(), authorities, user);
     }
 
     @Test
@@ -55,7 +61,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
         String real = objectMapper.writeValueAsString(UserProfileResponse.builder()
             .userEmail("test@gmail.com")
             .userName("testUser")
-            .userProfileImageUri("somethingImageUrl.com")
+            .userProfileImageUri("somethingImageUrl@naver.com")
             .build());
 
         MvcResult mvcResult = mockMvc.perform(get("/v1/api/users/profile")

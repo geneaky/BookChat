@@ -26,8 +26,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfRequestDto;
 import toy.bookchat.bookchat.domain.bookshelf.service.BookShelfService;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfRequestDto;
+import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @WebMvcTest(controllers = BookShelfController.class,
@@ -48,10 +49,15 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
         List<GrantedAuthority> authorities = Collections.singletonList(
             new SimpleGrantedAuthority("ROLE_USER")
         );
-        UserPrincipal userPrincipal = new UserPrincipal(1L, "test@gmail.com", "password",
-            "testUser", "somethingImageUrl.com", authorities);
+        User user = User.builder()
+            .email("test@gmail.com")
+            .password("password")
+            .name("testUser")
+            .profileImageUrl("somethingImageUrl@naver.com")
+            .build();
 
-        return userPrincipal;
+        return new UserPrincipal(1L, user.getEmail(), user.getPassword(),
+            user.getName(), user.getProfileImageUrl(), authorities, user);
     }
 
     private BookShelfRequestDto getBookShelfRequestDto(ReadingStatus readingStatus) {
@@ -90,7 +96,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
                     fieldWithPath("readingStatus").description("READING"))));
 
         verify(bookShelfService).putBookOnBookShelf(any(BookShelfRequestDto.class),
-            getUserPrincipal().getId());
+            getUserPrincipal().getUser());
     }
 
     @Test
@@ -110,7 +116,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
                     fieldWithPath("readingStatus").description("COMPLETE"))));
 
         verify(bookShelfService).putBookOnBookShelf(any(BookShelfRequestDto.class),
-            getUserPrincipal().getId());
+            getUserPrincipal().getUser());
     }
 
     @Test
@@ -129,7 +135,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
                     fieldWithPath("readingStatus").description("READY"))));
 
         verify(bookShelfService).putBookOnBookShelf(any(BookShelfRequestDto.class),
-            getUserPrincipal().getId());
+            getUserPrincipal().getUser());
     }
 
     @Test

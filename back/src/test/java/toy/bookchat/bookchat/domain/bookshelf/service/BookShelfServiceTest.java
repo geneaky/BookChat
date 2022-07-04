@@ -1,7 +1,6 @@
 package toy.bookchat.bookchat.domain.bookshelf.service;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -45,7 +44,7 @@ public class BookShelfServiceTest {
 
     private User getUser() {
         return User.builder()
-                .build();
+            .build();
     }
 
     private BookShelfRequestDto getBookShelfRequestDto() {
@@ -65,12 +64,10 @@ public class BookShelfServiceTest {
         Long userId = 1L;
         Book book = getBook();
 
-        when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(getUser()));
-
         when(bookRepository.findByIsbn(bookShelfRequestDto.getIsbn())).thenReturn(
             Optional.of(book));
 
-        bookShelfService.putBookOnBookShelf(bookShelfRequestDto, userId);
+        bookShelfService.putBookOnBookShelf(bookShelfRequestDto, getUser());
 
         verify(bookShelfRepository).save(any(BookShelf.class));
     }
@@ -81,11 +78,9 @@ public class BookShelfServiceTest {
         BookShelfRequestDto bookShelfRequestDto = getBookShelfRequestDto();
         Long userId = 1L;
 
-        when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(getUser()));
-
         when(bookRepository.findByIsbn(bookShelfRequestDto.getIsbn())).thenReturn(Optional.empty());
 
-        bookShelfService.putBookOnBookShelf(bookShelfRequestDto, userId);
+        bookShelfService.putBookOnBookShelf(bookShelfRequestDto, getUser());
 
         verify(bookRepository).save(any(Book.class));
         verify(bookShelfRepository).save(any(BookShelf.class));
