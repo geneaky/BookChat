@@ -61,15 +61,14 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
     }
 
     private BookShelfRequestDto getBookShelfRequestDto(ReadingStatus readingStatus) {
-        BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
+        return BookShelfRequestDto.builder()
             .isbn("124151214")
             .title("effectiveJava")
-            .author(List.of("Joshua"))
+            .authors(List.of("Joshua"))
             .publisher("oreilly")
             .bookCoverImageUrl("bookCoverImage.com")
             .readingStatus(readingStatus)
             .build();
-        return bookShelfRequestDto;
     }
 
     @Test
@@ -87,16 +86,16 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isCreated())
-            .andDo(document("bookshelf",
+            .andDo(document("bookshelf_reading",
                 requestFields(fieldWithPath("isbn").description("isbn"),
                     fieldWithPath("title").description("title"),
-                    fieldWithPath("author").description("author"),
+                    fieldWithPath("authors.[]").description("authors"),
                     fieldWithPath("publisher").description("publisher"),
                     fieldWithPath("bookCoverImageUrl").description("bookCoverImageUrl"),
                     fieldWithPath("readingStatus").description("READING"))));
 
         verify(bookShelfService).putBookOnBookShelf(any(BookShelfRequestDto.class),
-            getUserPrincipal().getUser());
+            any(User.class));
     }
 
     @Test
@@ -107,16 +106,16 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isCreated())
-            .andDo(document("bookshelf",
+            .andDo(document("bookshelf_complete",
                 requestFields(fieldWithPath("isbn").description("isbn"),
                     fieldWithPath("title").description("title"),
-                    fieldWithPath("author").description("author"),
+                    fieldWithPath("authors.[]").description("authors"),
                     fieldWithPath("publisher").description("publisher"),
                     fieldWithPath("bookCoverImageUrl").description("bookCoverImageUrl"),
                     fieldWithPath("readingStatus").description("COMPLETE"))));
 
         verify(bookShelfService).putBookOnBookShelf(any(BookShelfRequestDto.class),
-            getUserPrincipal().getUser());
+            any(User.class));
     }
 
     @Test
@@ -126,16 +125,16 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isCreated())
-            .andDo(document("bookshelf",
+            .andDo(document("bookshelf_ready",
                 requestFields(fieldWithPath("isbn").description("isbn"),
                     fieldWithPath("title").description("title"),
-                    fieldWithPath("author").description("author"),
+                    fieldWithPath("authors.[]").description("author"),
                     fieldWithPath("publisher").description("publisher"),
                     fieldWithPath("bookCoverImageUrl").description("bookCoverImageUrl"),
                     fieldWithPath("readingStatus").description("READY"))));
 
         verify(bookShelfService).putBookOnBookShelf(any(BookShelfRequestDto.class),
-            getUserPrincipal().getUser());
+            any(User.class));
     }
 
     @Test
@@ -164,7 +163,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
         BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
             .isbn("135135414")
             .title("effectiveJava")
-            .author(List.of("Joshua"))
+            .authors(List.of("Joshua"))
             .publisher("oreilly")
             .bookCoverImageUrl("bookCoverImage.com")
             .build();
@@ -181,7 +180,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
     public void isbn_없이_책_등록_요청_실패() throws Exception {
         BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
             .title("effectiveJava")
-            .author(List.of("Joshua"))
+            .authors(List.of("Joshua"))
             .publisher("oreilly")
             .bookCoverImageUrl("bookCoverImage.com")
             .readingStatus(ReadingStatus.READY)
@@ -199,7 +198,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
         BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
             .isbn("")
             .title("effectiveJava")
-            .author(List.of("Joshua"))
+            .authors(List.of("Joshua"))
             .publisher("oreilly")
             .bookCoverImageUrl("bookCoverImage.com")
             .readingStatus(ReadingStatus.READY)
@@ -216,7 +215,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
     public void 제목_없이_요청_실패() throws Exception {
         BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
             .isbn("124151214")
-            .author(List.of("Joshua"))
+            .authors(List.of("Joshua"))
             .publisher("oreilly")
             .bookCoverImageUrl("bookCoverImage.com")
             .readingStatus(ReadingStatus.READY)
@@ -234,7 +233,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
         BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
             .isbn("124151214")
             .title("")
-            .author(List.of("Joshua"))
+            .authors(List.of("Joshua"))
             .publisher("oreilly")
             .bookCoverImageUrl("bookCoverImage.com")
             .readingStatus(ReadingStatus.READY)
@@ -271,7 +270,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
         BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
             .isbn("124151214")
             .title("effectiveJava")
-            .author(List.of(""))
+            .authors(List.of(""))
             .publisher("oreilly")
             .bookCoverImageUrl("bookCoverImage.com")
             .readingStatus(ReadingStatus.READY)
@@ -290,7 +289,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
         BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
             .isbn("124151214")
             .title("effectiveJava")
-            .author(List.of("Joshua"))
+            .authors(List.of("Joshua"))
             .bookCoverImageUrl("bookCoverImage.com")
             .readingStatus(ReadingStatus.READY)
             .build();
@@ -308,7 +307,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
         BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
             .isbn("124151214")
             .title("effectiveJava")
-            .author(List.of("Joshua"))
+            .authors(List.of("Joshua"))
             .publisher("")
             .bookCoverImageUrl("bookCoverImage.com")
             .readingStatus(ReadingStatus.READY)

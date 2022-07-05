@@ -24,18 +24,18 @@ public class BookShelfRequestDto {
     private String title;
     @Valid
     @NotNull
-    private List<@NotBlank String> author;
+    private List<@NotBlank String> authors;
     @NotBlank
     private String publisher;
     private String bookCoverImageUrl;
     @NotNull
     private ReadingStatus readingStatus;
 
-    public Book getBook() {
+    public Book extractBookEntity() {
         return Book.builder()
             .isbn(getIsbn())
             .title(getTitle())
-            .authors(getAuthor())
+            .authors(getAuthors())
             .publisher(getPublisher())
             .bookCoverImageUrl(getBookCoverImageUrl())
             .build();

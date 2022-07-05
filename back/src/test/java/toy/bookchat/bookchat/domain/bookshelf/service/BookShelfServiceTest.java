@@ -51,7 +51,7 @@ public class BookShelfServiceTest {
         return BookShelfRequestDto.builder()
             .isbn("12345")
             .title("testBook")
-            .author(List.of("test Author"))
+            .authors(List.of("test Author"))
             .publisher("test publisher")
             .bookCoverImageUrl("test@naver.com")
             .readingStatus(ReadingStatus.READING)

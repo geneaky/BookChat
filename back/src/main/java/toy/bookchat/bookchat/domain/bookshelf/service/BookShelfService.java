@@ -31,7 +31,7 @@ public class BookShelfService {
     private Runnable saveBookBeforePuttingBookOnBookShelf(BookShelfRequestDto bookShelfRequestDto,
         User user) {
         return () -> {
-            Book book = bookRepository.save(bookShelfRequestDto.getBook());
+            Book book = bookRepository.save(bookShelfRequestDto.extractBookEntity());
             putBookOnBookShelf(bookShelfRequestDto, book, user);
         };
     }
