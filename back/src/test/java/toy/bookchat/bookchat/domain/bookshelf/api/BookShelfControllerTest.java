@@ -125,13 +125,13 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isCreated())
-            .andDo(document("bookshelf_ready",
+            .andDo(document("bookshelf_wish",
                 requestFields(fieldWithPath("isbn").description("isbn"),
                     fieldWithPath("title").description("title"),
                     fieldWithPath("authors.[]").description("author"),
                     fieldWithPath("publisher").description("publisher"),
                     fieldWithPath("bookCoverImageUrl").description("bookCoverImageUrl"),
-                    fieldWithPath("readingStatus").description("READY"))));
+                    fieldWithPath("readingStatus").description("WISH"))));
 
         verify(bookShelfService).putBookOnBookShelf(any(BookShelfRequestDto.class),
             any(User.class));
