@@ -15,18 +15,20 @@ import toy.bookchat.bookchat.domain.user.User;
 @Getter
 public class UserPrincipal implements UserDetails, OAuth2User {
 
-    private Long id;
-    private String email;
-    private String password;
-    private String userName;
-    private String profileImageUri;
-    private Collection<? extends GrantedAuthority> authorities;
+    private final User user;
+    private final Long id;
+    private final String email;
+    private final String password;
+    private final String userName;
+    private final String profileImageUri;
+    private final Collection<? extends GrantedAuthority> authorities;
     @Setter
     private Map<String, Object> attributes;
 
     public UserPrincipal(Long id, String email, String password, String userName,
         String profileImageUri,
-        Collection<? extends GrantedAuthority> authorities) {
+        Collection<? extends GrantedAuthority> authorities, User user) {
+        this.user = user;
         this.id = id;
         this.email = email;
         this.password = password;
@@ -46,7 +48,8 @@ public class UserPrincipal implements UserDetails, OAuth2User {
             user.getPassword(),
             user.getName(),
             user.getProfileImageUrl(),
-            authorities
+            authorities,
+            user
         );
     }
 
@@ -54,6 +57,10 @@ public class UserPrincipal implements UserDetails, OAuth2User {
         UserPrincipal userPrincipal = UserPrincipal.create(user);
         userPrincipal.setAttributes(attributes);
         return userPrincipal;
+    }
+
+    public User getUser() {
+        return user;
     }
 
     @Override

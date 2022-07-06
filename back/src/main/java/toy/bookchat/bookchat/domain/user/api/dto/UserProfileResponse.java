@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.domain.user.dto;
+package toy.bookchat.bookchat.domain.user.api.dto;
 
 import lombok.Builder;
 import lombok.Getter;

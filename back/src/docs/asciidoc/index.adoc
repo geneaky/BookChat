@@ -42,3 +42,27 @@ include::{snippets}/book-search-author/response-body.adoc[]
 
 ---
 
+=== 읽은 도서 등록
+
+include::{snippets}/bookshelf_complete/http-request.adoc[]
+include::{snippets}/bookshelf_complete/request-body.adoc[]
+include::{snippets}/bookshelf_complete/http-response.adoc[]
+
+---
+
+=== 읽고 있는 도서 등록
+
+include::{snippets}/bookshelf_reading/http-request.adoc[]
+include::{snippets}/bookshelf_reading/request-body.adoc[]
+include::{snippets}/bookshelf_reading/http-response.adoc[]
+
+---
+
+=== 읽을 도서 등록
+
+include::{snippets}/bookshelf_ready/http-request.adoc[]
+include::{snippets}/bookshelf_ready/request-body.adoc[]
+include::{snippets}/bookshelf_ready/http-response.adoc[]
+
+---
+

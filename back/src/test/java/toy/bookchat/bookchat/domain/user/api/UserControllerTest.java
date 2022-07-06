@@ -13,43 +13,21 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Import;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import toy.bookchat.bookchat.domain.user.dto.UserProfileResponse;
-import toy.bookchat.bookchat.domain.user.repository.UserRepository;
-import toy.bookchat.bookchat.security.handler.CustomAuthenticationFailureHandler;
-import toy.bookchat.bookchat.security.handler.CustomAuthenticationSuccessHandler;
-import toy.bookchat.bookchat.security.handler.RestAuthenticationEntryPoint;
-import toy.bookchat.bookchat.security.jwt.JwtAuthenticationFilter;
-import toy.bookchat.bookchat.security.jwt.JwtTokenProvider;
-import toy.bookchat.bookchat.security.oauth.CustomOAuth2UserService;
-import toy.bookchat.bookchat.security.oauth.HttpCookieOAuth2AuthorizationRequestRepository;
+import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
+import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.api.dto.UserProfileResponse;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @WebMvcTest(controllers = UserController.class,
     includeFilters = @ComponentScan.Filter(classes = {EnableWebSecurity.class}))
-@Import({JwtAuthenticationFilter.class, RestAuthenticationEntryPoint.class})
 @AutoConfigureRestDocs
-public class UserControllerTest {
-
-    @MockBean
-    CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
-    @MockBean
-    CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
-    @MockBean
-    CustomOAuth2UserService customOAuth2UserService;
-    @MockBean
-    JwtTokenProvider jwtTokenProvider;
-    @MockBean
-    UserRepository userRepository;
-    @MockBean
-    HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
+public class UserControllerTest extends AuthenticationTestExtension {
 
     @Autowired
     ObjectMapper objectMapper;
@@ -61,10 +39,15 @@ public class UserControllerTest {
         List<GrantedAuthority> authorities = Collections.singletonList(
             new SimpleGrantedAuthority("ROLE_USER")
         );
-        UserPrincipal userPrincipal = new UserPrincipal(1L, "test@gmail.com", "password",
-            "testUser", "somethingImageUrl.com", authorities);
+        User user = User.builder()
+            .email("test@gmail.com")
+            .password("password")
+            .name("testUser")
+            .profileImageUrl("somethingImageUrl@naver.com")
+            .build();
 
-        return userPrincipal;
+        return new UserPrincipal(1L, user.getEmail(), user.getPassword(),
+            user.getName(), user.getProfileImageUrl(), authorities, user);
     }
 
     @Test
@@ -74,18 +57,11 @@ public class UserControllerTest {
     }
 
     @Test
-    public void 인증받은_사용자의_요청_200응답() throws Exception {
-        mockMvc.perform(get("/v1/api/users/profile")
-                .with(user(getUserPrincipal())))
-            .andExpect(status().isOk());
-    }
-
-    @Test
     public void 사용자_프로필_정보_반환() throws Exception {
         String real = objectMapper.writeValueAsString(UserProfileResponse.builder()
             .userEmail("test@gmail.com")
             .userName("testUser")
-            .userProfileImageUri("somethingImageUrl.com")
+            .userProfileImageUri("somethingImageUrl@naver.com")
             .build());
 
         MvcResult mvcResult = mockMvc.perform(get("/v1/api/users/profile")

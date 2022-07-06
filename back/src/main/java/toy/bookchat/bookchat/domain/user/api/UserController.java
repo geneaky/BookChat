@@ -7,7 +7,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import toy.bookchat.bookchat.domain.user.dto.UserProfileResponse;
+import toy.bookchat.bookchat.domain.user.api.dto.UserProfileResponse;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @RestController
@@ -18,7 +18,6 @@ public class UserController {
     @GetMapping("/users/profile")
     public ResponseEntity<UserProfileResponse> userProfile(
         @AuthenticationPrincipal UserPrincipal userPrincipal) {
-        return new ResponseEntity<UserProfileResponse>(UserProfileResponse.of(userPrincipal),
-            HttpStatus.OK);
+        return ResponseEntity.ok(UserProfileResponse.of(userPrincipal));
     }
 }

@@ -21,44 +21,24 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Import;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
 import toy.bookchat.bookchat.domain.book.dto.BookDto;
 import toy.bookchat.bookchat.domain.book.exception.BookNotFoundException;
 import toy.bookchat.bookchat.domain.book.service.BookSearchService;
-import toy.bookchat.bookchat.domain.user.repository.UserRepository;
-import toy.bookchat.bookchat.security.handler.CustomAuthenticationFailureHandler;
-import toy.bookchat.bookchat.security.handler.CustomAuthenticationSuccessHandler;
-import toy.bookchat.bookchat.security.handler.RestAuthenticationEntryPoint;
-import toy.bookchat.bookchat.security.jwt.JwtAuthenticationFilter;
-import toy.bookchat.bookchat.security.jwt.JwtTokenProvider;
-import toy.bookchat.bookchat.security.oauth.CustomOAuth2UserService;
-import toy.bookchat.bookchat.security.oauth.HttpCookieOAuth2AuthorizationRequestRepository;
+import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @WebMvcTest(controllers = BookController.class,
     includeFilters = @ComponentScan.Filter(classes = {EnableWebSecurity.class}))
-@Import({JwtAuthenticationFilter.class, RestAuthenticationEntryPoint.class})
 @AutoConfigureRestDocs
-public class BookControllerTest {
+public class BookControllerTest extends AuthenticationTestExtension {
 
-    @MockBean
-    CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
-    @MockBean
-    CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
-    @MockBean
-    CustomOAuth2UserService customOAuth2UserService;
-    @MockBean
-    JwtTokenProvider jwtTokenProvider;
-    @MockBean
-    UserRepository userRepository;
-    @MockBean
-    HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
     @MockBean
     BookSearchService bookSearchService;
 
@@ -72,10 +52,17 @@ public class BookControllerTest {
         List<GrantedAuthority> authorities = Collections.singletonList(
             new SimpleGrantedAuthority("ROLE_USER")
         );
-        UserPrincipal userPrincipal = new UserPrincipal(1L, "test@gmail.com", "password",
-            "testUser", "somethingImageUrl.com", authorities);
 
-        return userPrincipal;
+        User user = User.builder()
+            .email("test@gmail.com")
+            .password("password")
+            .name("testUser")
+            .profileImageUrl("somethingImageUrl@naver.com")
+            .build();
+
+        return new UserPrincipal(1L, user.getEmail(), user.getPassword(),
+            user.getName(), user.getProfileImageUrl(), authorities, user);
+
     }
 
     private BookDto getBookDto(String isbn, String title, List<String> author) {
@@ -94,18 +81,6 @@ public class BookControllerTest {
         mockMvc.perform(get("/v1/api/books")
                 .param("isbn", "234134"))
             .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    public void 로그인한_사용자_요청_200() throws Exception {
-        List<BookDto> bookDtos = new ArrayList<>();
-        bookDtos.add(getBookDto("213123", "effectiveJava", List.of("Joshua")));
-
-        when(bookSearchService.searchByIsbn(anyString())).thenReturn(bookDtos);
-        mockMvc.perform(get("/v1/api/books")
-                .param("isbn", "213123")
-                .with(user(getUserPrincipal())))
-            .andExpect(status().isOk());
     }
 
     @Test
