@@ -60,9 +60,9 @@ include::{snippets}/bookshelf_reading/http-response.adoc[]
 
 === 읽을 도서 등록
 
-include::{snippets}/bookshelf_ready/http-request.adoc[]
-include::{snippets}/bookshelf_ready/request-body.adoc[]
-include::{snippets}/bookshelf_ready/http-response.adoc[]
+include::{snippets}/bookshelf_wish/http-request.adoc[]
+include::{snippets}/bookshelf_wish/request-body.adoc[]
+include::{snippets}/bookshelf_wish/http-response.adoc[]
 
 ---
 
