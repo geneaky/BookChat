@@ -2,7 +2,7 @@ package toy.bookchat.bookchat.domain.bookshelf;
 
 public enum ReadingStatus {
 
-    READY,
+    WISH,
     READING,
     COMPLETE
 }

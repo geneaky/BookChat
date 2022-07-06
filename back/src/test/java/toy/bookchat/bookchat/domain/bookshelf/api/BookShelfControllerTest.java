@@ -121,7 +121,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
     @Test
     public void 읽을_책_등록_성공() throws Exception {
         mockMvc.perform(post("/v1/api/bookshelf/books")
-                .content(objectMapper.writeValueAsString(getBookShelfRequestDto(ReadingStatus.READY)))
+                .content(objectMapper.writeValueAsString(getBookShelfRequestDto(ReadingStatus.WISH)))
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isCreated())
@@ -183,7 +183,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
             .authors(List.of("Joshua"))
             .publisher("oreilly")
             .bookCoverImageUrl("bookCoverImage.com")
-            .readingStatus(ReadingStatus.READY)
+            .readingStatus(ReadingStatus.WISH)
             .build();
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
@@ -201,7 +201,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
             .authors(List.of("Joshua"))
             .publisher("oreilly")
             .bookCoverImageUrl("bookCoverImage.com")
-            .readingStatus(ReadingStatus.READY)
+            .readingStatus(ReadingStatus.WISH)
             .build();
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
@@ -218,7 +218,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
             .authors(List.of("Joshua"))
             .publisher("oreilly")
             .bookCoverImageUrl("bookCoverImage.com")
-            .readingStatus(ReadingStatus.READY)
+            .readingStatus(ReadingStatus.WISH)
             .build();
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
@@ -236,7 +236,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
             .authors(List.of("Joshua"))
             .publisher("oreilly")
             .bookCoverImageUrl("bookCoverImage.com")
-            .readingStatus(ReadingStatus.READY)
+            .readingStatus(ReadingStatus.WISH)
             .build();
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
@@ -254,7 +254,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
             .title("effectiveJava")
             .publisher("oreilly")
             .bookCoverImageUrl("bookCoverImage.com")
-            .readingStatus(ReadingStatus.READY)
+            .readingStatus(ReadingStatus.WISH)
             .build();
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
@@ -273,7 +273,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
             .authors(List.of(""))
             .publisher("oreilly")
             .bookCoverImageUrl("bookCoverImage.com")
-            .readingStatus(ReadingStatus.READY)
+            .readingStatus(ReadingStatus.WISH)
             .build();
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
@@ -291,7 +291,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
             .title("effectiveJava")
             .authors(List.of("Joshua"))
             .bookCoverImageUrl("bookCoverImage.com")
-            .readingStatus(ReadingStatus.READY)
+            .readingStatus(ReadingStatus.WISH)
             .build();
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
@@ -310,7 +310,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
             .authors(List.of("Joshua"))
             .publisher("")
             .bookCoverImageUrl("bookCoverImage.com")
-            .readingStatus(ReadingStatus.READY)
+            .readingStatus(ReadingStatus.WISH)
             .build();
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
