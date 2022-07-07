@@ -1,18 +1,256 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MainActivity">
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="userModel"
+            type="com.example.bookchat.viewmodel.MainViewModel" />
+        <variable
+            name="activity"
+            type="com.example.bookchat.activities.MainActivity" />
+        <variable
+            name="pageType"
+            type="com.example.bookchat.utils.ActivityType" />
+    </data>
+    <androidx.drawerlayout.widget.DrawerLayout
+        android:id="@+id/drawerlayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:openDrawer="right"
+        tools:context=".activities.MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="30dp"
+                    android:paddingLeft="20dp">
+
+                    <ImageView
+                        android:id="@+id/logo"
+                        android:layout_marginTop="-10dp"
+                        android:layout_width="160dp"
+                        android:layout_height="60dp"
+                        android:src="@drawable/bookchatlogo_main"
+                        />
+
+                    <ImageView
+                        android:id="@+id/search"
+                        android:layout_width="53dp"
+                        android:layout_height="53dp"
+                        android:layout_marginRight="4dp"
+                        android:layout_toLeftOf="@id/menu_btn"
+                        android:onClick="@{() -> activity.changePage(pageType.searchActivity)}"
+                        android:src="@drawable/search_btn" />
+
+                    <ImageView
+                        android:id="@+id/menu_btn"
+                        android:layout_width="53dp"
+                        android:layout_height="53dp"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginRight="13dp"
+                        android:onClick="@{() -> activity.open_closeMenu()}"
+                        android:src="@drawable/menu_btn" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_marginTop="20dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="20dp">
+
+                    <ImageView
+                        android:id="@+id/profile"
+                        loadUrl="@{userModel.user.userProfileImageUri}"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:background="@drawable/profile_background"
+                        android:scaleType="fitXY" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toRightOf="@id/profile"
+                        android:orientation="vertical"
+                        android:paddingLeft="20dp">
+
+                        <TextView
+                            android:id="@+id/userName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/sf_pro_display_bold"
+                            android:text="@{userModel.user.userName}"
+                            android:textColor="@color/black"
+                            android:textSize="20sp" />
+
+                        <TextView
+                            android:id="@+id/userEmail"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="-8dp"
+                            android:fontFamily="@font/sf_pro_display_bold"
+                            android:text="@{userModel.user.userEmail}"
+                            android:textColor="@color/black"
+                            android:textSize="13sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/sf_pro_display_light"
+                            android:text="프로필 수정"
+                            android:textColor="#B8B8BB"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="20dp"
+                        android:text="서재"
+                        android:textSize="20sp"
+                        android:fontFamily="@font/sf_pro_display_bold"
+                        android:textColor="@color/black"/>
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="160dp">
+
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/cardView1"
+                            android:onClick="@{() -> activity.changePage(pageType.bookShelfActivity)}"
+                            android:layout_width="93dp"
+                            android:layout_height="142dp"
+                            android:layout_marginLeft="20dp"
+                            app:cardElevation="10dp"
+                            app:cardCornerRadius="16dp">
+                            <ImageView
+                                android:id="@+id/bookimg1"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:scaleType="fitXY"
+                                android:src="@drawable/ex_book1"/>
+                        </androidx.cardview.widget.CardView>
+
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/cardView2"
+                            android:onClick="@{() -> activity.changePage(pageType.bookShelfActivity)}"
+                            android:layout_width="93dp"
+                            android:layout_height="142dp"
+                            android:layout_marginLeft="60dp"
+                            app:cardElevation="9dp"
+                            app:cardCornerRadius="16dp">
+                            <ImageView
+                                android:id="@+id/bookimg2"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:scaleType="fitXY"
+                                android:src="@drawable/ex_book2"/>
+                        </androidx.cardview.widget.CardView>
+
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/cardView3"
+                            android:onClick="@{() -> activity.changePage(pageType.bookShelfActivity)}"
+                            android:layout_width="93dp"
+                            android:layout_height="142dp"
+                            android:layout_marginLeft="100dp"
+                            app:cardElevation="8dp"
+                            app:cardCornerRadius="16dp">
+                            <ImageView
+                                android:id="@+id/bookimg3"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:scaleType="fitXY"
+                                android:src="@drawable/ex_book3"/>
+                        </androidx.cardview.widget.CardView>
+
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/cardView4"
+                            android:onClick="@{() -> activity.changePage(pageType.bookShelfActivity)}"
+                            android:layout_width="93dp"
+                            android:layout_height="142dp"
+                            android:layout_marginLeft="140dp"
+                            app:cardElevation="7dp"
+                            app:cardCornerRadius="16dp">
+                            <ImageView
+                                android:id="@+id/bookimg4"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:scaleType="fitXY"
+                                android:src="@drawable/ex_book4"/>
+                        </androidx.cardview.widget.CardView>
+
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/cardView5"
+                            android:onClick="@{() -> activity.changePage(pageType.bookShelfActivity)}"
+                            android:layout_width="93dp"
+                            android:layout_height="142dp"
+                            android:layout_marginLeft="180dp"
+                            app:cardElevation="6dp"
+                            app:cardCornerRadius="16dp">
+                            <ImageView
+                                android:id="@+id/bookimg5"
+                                android:layout_width="93dp"
+                                android:layout_height="142dp"
+                                android:scaleType="fitXY"
+                                android:src="@drawable/ex_book5"/>
+                        </androidx.cardview.widget.CardView>
+
+                        <ImageView
+                            android:layout_width="80dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/etc_img"
+                            android:layout_marginLeft="270dp"
+                            android:layout_gravity="center_vertical"/>
+                    </FrameLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="현재 속한 채팅방"
+                        android:paddingLeft="20dp"
+                        android:textSize="20sp"
+                        android:fontFamily="@font/sf_pro_display_bold"
+                        android:textColor="@color/black"/>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/chatRoomRecyclerView"
+                        android:layout_marginTop="10dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:listitem="@layout/item_main_chatroom"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </ScrollView>
+
+        <include layout="@layout/layout_main_drawer"
+            android:id="@+id/drawer_subPage"
+            app:activity ="@{activity}"/>
+
+    </androidx.drawerlayout.widget.DrawerLayout>
+
+</layout>
