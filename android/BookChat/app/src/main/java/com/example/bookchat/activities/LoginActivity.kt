@@ -29,15 +29,16 @@ class LoginActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_login)
         binding.lifecycleOwner = this
         binding.activity = this
+        handleIntent(intent)
 
         if(!SharedPreferenceManager.getToken().isNullOrEmpty()){
             //불러온 토큰의 기간이 만료된거라면 새로운 리프레시토큰을 요청해야함
-            Toast.makeText(this,"저장된 로그인 정보를 불러옵니다.",Toast.LENGTH_SHORT).show()
+            Toast.makeText(this,"로그인 정보를 불러옵니다.",Toast.LENGTH_SHORT).show()
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
             finish()
         }else{
-            Toast.makeText(this,"저장된 로그인 정보가 없습니다.\n로그인을 진행해주세요.",Toast.LENGTH_LONG).show()
+            Toast.makeText(this,"로그인 정보가 없습니다.\n로그인을 진행해주세요.",Toast.LENGTH_LONG).show()
         }
     }
 
