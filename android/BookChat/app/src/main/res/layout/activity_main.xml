@@ -57,7 +57,7 @@
                         android:layout_height="53dp"
                         android:layout_alignParentRight="true"
                         android:layout_marginRight="13dp"
-                        android:onClick="@{() -> activity.open_closeMenu()}"
+                        android:onClick="@{() -> activity.clickMenu()}"
                         android:src="@drawable/menu_btn" />
                 </RelativeLayout>
 

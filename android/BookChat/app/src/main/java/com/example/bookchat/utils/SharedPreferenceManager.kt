@@ -29,4 +29,10 @@ object SharedPreferenceManager {
         return  tokenPref.getString(TOKEN_PREF_KEY,"")
     }
 
+    //토큰값 있는지 확인
+    fun isTokenEmpty() :Boolean{
+        return tokenPref.getString(TOKEN_PREF_KEY,"").isNullOrEmpty()
+    }
+
+
 }

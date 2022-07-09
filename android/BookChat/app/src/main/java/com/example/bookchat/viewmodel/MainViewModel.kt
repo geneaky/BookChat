@@ -1,10 +1,12 @@
 package com.example.bookchat.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.bookchat.data.User
 import com.example.bookchat.repository.UesrRepository
+import com.example.bookchat.utils.Constants.TAG
 
 class MainViewModel : ViewModel(){
 
@@ -26,8 +28,8 @@ class MainViewModel : ViewModel(){
     fun getUserInfo(){
         mRepository = UesrRepository()
         if (_user.value == null){
-            mRepository.getUser{ user: User -> _user.value = user
-            println("_user.value : ${_user.value}")}   //user 받아올 콜백 메서드 전달
+            mRepository.getUserProfile{ user: User -> _user.value = user}   //user 받아올 콜백 메서드 전달
+            Log.d(TAG, "MainViewModel: getUserInfo() - 값 불러오기 완료")
         }
 
     }

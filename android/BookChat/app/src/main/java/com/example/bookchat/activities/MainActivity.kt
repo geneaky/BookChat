@@ -23,6 +23,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var chatRoomAdapter: MainChatRoomAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d(TAG, "MainActivity: onCreate() - called")
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
@@ -46,28 +47,23 @@ class MainActivity : AppCompatActivity() {
             snapHelper.attachToRecyclerView(chatRoomRecyclerView)
         }
     }
-    fun open_closeMenu() {
+    fun clickMenu() {
         with(binding){
             if(drawerlayout.isDrawerOpen(Gravity.RIGHT)) {
-                Log.d(TAG, "MainActivity: closeMenu() - called")
                 drawerlayout.closeDrawer(Gravity.RIGHT)
             } else {
-                Log.d(TAG, "MainActivity: openMenu() - called")
                 drawerlayout.openDrawer(Gravity.RIGHT)
             }
         }
     }
     fun changePage(activityType: ActivityType) {
-        when(activityType){
-            ActivityType.bookShelfActivity -> {
-                val intent = Intent(this, BookShelfActivity::class.java)
-                startActivity(intent)
-            }
-            ActivityType.searchActivity -> {
-                val intent = Intent(this, SearchActivity::class.java)
-                startActivity(intent)
-            }
+        lateinit var targetActivity :Any
+        targetActivity = when(activityType) {
+            ActivityType.bookShelfActivity -> { BookShelfActivity::class.java }
+            ActivityType.searchActivity -> { SearchActivity::class.java }
         }
+        val intent = Intent(this, targetActivity)
+        startActivity(intent)
     }
 
 }
