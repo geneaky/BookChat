@@ -2,8 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.bookchat">
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <!--현재 인터넷 연결상태 체크 위해 권한 등록-->
+    <uses-permission android:name="android.permission.INTERNET" /> <!-- 현재 인터넷 연결상태 체크 위해 권한 등록 -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
@@ -15,6 +14,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BookChat">
         <activity
+            android:name=".activities.SearchResultActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.SearchResult_BookPageActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.SearchActivity"
             android:exported="false" />
         <activity
@@ -22,19 +27,22 @@
             android:exported="false" />
         <activity
             android:name=".activities.MainActivity"
-            android:exported="true"/>
+            android:exported="true" />
         <activity
             android:name=".activities.LoginActivity"
             android:exported="true"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data
                     android:host="bookchat.link"
                     android:pathPattern="/app"
