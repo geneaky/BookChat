@@ -17,7 +17,7 @@
             android:name=".activities.SearchResultActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.SearchResult_BookPageActivity"
+            android:name=".activities.BookClickPageActivity"
             android:exported="false" />
         <activity
             android:name=".activities.SearchActivity"

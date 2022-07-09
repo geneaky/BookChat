@@ -8,7 +8,7 @@ import com.example.bookchat.data.Book
 import com.example.bookchat.databinding.ActivitySearchResultBookPageBinding
 import com.example.bookchat.viewmodel.SearchResultBookPageViewModel
 
-class SearchResult_BookPageActivity : AppCompatActivity() {
+class BookClickPageActivity : AppCompatActivity() {
 
     private lateinit var binding : ActivitySearchResultBookPageBinding
     private lateinit var searchResultBookPageViewModel: SearchResultBookPageViewModel
@@ -16,11 +16,11 @@ class SearchResult_BookPageActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_search_result_book_page)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_book_click_page)
 
         with(binding){
-            lifecycleOwner = this@SearchResult_BookPageActivity
-            activity = this@SearchResult_BookPageActivity
+            lifecycleOwner = this@BookClickPageActivity
+            activity = this@BookClickPageActivity
             searchResultBookPageViewModel = SearchResultBookPageViewModel()
             viewModel = searchResultBookPageViewModel
 

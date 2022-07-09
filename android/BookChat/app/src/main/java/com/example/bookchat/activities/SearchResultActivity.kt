@@ -96,7 +96,7 @@ class SearchResultActivity : AppCompatActivity() {
         //사실 그냥 context넘겨서 저기서 작업해도 상관없긴해
         bookResultAdapter.setItemClickListener(object: SearchResultBookAdapter.OnItemClickListener{
             override fun onClick(v: View, position: Int) {
-                val intent = Intent(this@SearchResultActivity, SearchResult_BookPageActivity::class.java)
+                val intent = Intent(this@SearchResultActivity, BookClickPageActivity::class.java)
                 intent.putExtra("clickedBook",searchResultViewModel.books.value?.get(position) ?: "NO DATA")
                 startActivity(intent)
             }

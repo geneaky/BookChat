@@ -3,7 +3,7 @@
     <data>
         <variable
             name="activity"
-            type="com.example.bookchat.activities.SearchResult_BookPageActivity" />
+            type="com.example.bookchat.activities.BookClickPageActivity" />
         <variable
             name="viewModel"
             type="com.example.bookchat.viewmodel.SearchResultBookPageViewModel" />
@@ -15,7 +15,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".activities.SearchResult_BookPageActivity">
+        tools:context=".activities.BookClickPageActivity">
 
 
         <ImageView
