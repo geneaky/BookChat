@@ -39,7 +39,7 @@ class UesrRepository{
             })
         }
     }
-    fun isNetworkConnected() :Boolean{
+    private fun isNetworkConnected() :Boolean{
         return App.instance.networkManager.checkNetworkState()
     }
 }
