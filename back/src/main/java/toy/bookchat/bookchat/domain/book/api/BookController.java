@@ -2,7 +2,6 @@ package toy.bookchat.bookchat.domain.book.api;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,17 +26,17 @@ public class BookController {
         @ModelAttribute BookSearchRequestDto bookSearchRequestDto) {
 
         if (bookSearchRequestDto.isIsbnPresent()) {
-            return ResponseEntity.ok(bookSearchService.searchByIsbn(bookSearchRequestDto.getIsbn()));
+            return ResponseEntity.ok(bookSearchService.searchByIsbn(bookSearchRequestDto));
         }
 
         if (bookSearchRequestDto.isTitlePresent()) {
-            return ResponseEntity.ok(bookSearchService.searchByTitle(bookSearchRequestDto.getTitle()));
+            return ResponseEntity.ok(bookSearchService.searchByTitle(bookSearchRequestDto));
         }
 
         if (bookSearchRequestDto.isAuthorPresent()) {
-            return ResponseEntity.ok(bookSearchService.searchByAuthor(bookSearchRequestDto.getAuthor()));
+            return ResponseEntity.ok(bookSearchService.searchByAuthor(bookSearchRequestDto));
         }
 
-        return  ResponseEntity.badRequest().body(null);
+        return ResponseEntity.badRequest().body(null);
     }
 }

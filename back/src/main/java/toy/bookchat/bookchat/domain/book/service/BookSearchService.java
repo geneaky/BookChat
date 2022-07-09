@@ -2,12 +2,13 @@ package toy.bookchat.bookchat.domain.book.service;
 
 import java.util.List;
 import toy.bookchat.bookchat.domain.book.dto.BookDto;
+import toy.bookchat.bookchat.domain.book.dto.BookSearchRequestDto;
 
 public interface BookSearchService {
 
-    List<BookDto> searchByIsbn(String isbn);
+    List<BookDto> searchByIsbn(BookSearchRequestDto bookSearchRequestDto);
 
-    List<BookDto> searchByTitle(String title);
+    List<BookDto> searchByTitle(BookSearchRequestDto bookSearchRequestDto);
 
-    List<BookDto> searchByAuthor(String author);
+    List<BookDto> searchByAuthor(BookSearchRequestDto bookSearchRequestDto);
 }

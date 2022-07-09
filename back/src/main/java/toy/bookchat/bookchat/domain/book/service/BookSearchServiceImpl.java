@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import toy.bookchat.bookchat.domain.book.dto.BookDto;
+import toy.bookchat.bookchat.domain.book.dto.BookSearchRequestDto;
 import toy.bookchat.bookchat.domain.book.dto.KakaoBook;
 import toy.bookchat.bookchat.domain.book.exception.BookNotFoundException;
 
@@ -25,6 +26,12 @@ public class BookSearchServiceImpl implements BookSearchService {
     public static final String QUERY = "query";
     public static final String TITLE = "title";
     public static final String AUTHOR = "author";
+
+    public static final String SIZE = "size";
+
+    public static final String PAGE = "page";
+
+    public static final String SORT = "sort";
     private final RestTemplate restTemplate;
     @Value("${book.api.uri}")
     private String apiUri;
@@ -36,24 +43,27 @@ public class BookSearchServiceImpl implements BookSearchService {
     }
 
     @Override
-    public List<BookDto> searchByIsbn(String isbn) {
-        return getBookDtos(ISBN, isbn);
+    public List<BookDto> searchByIsbn(BookSearchRequestDto bookSearchRequestDto) {
+        return getBookDtos(ISBN, bookSearchRequestDto);
     }
 
     @Override
-    public List<BookDto> searchByTitle(String title) {
-        return getBookDtos(TITLE, title);
+    public List<BookDto> searchByTitle(BookSearchRequestDto bookSearchRequestDto) {
+        return getBookDtos(TITLE, bookSearchRequestDto);
     }
 
     @Override
-    public List<BookDto> searchByAuthor(String author) {
-        return getBookDtos(AUTHOR, author);
+    public List<BookDto> searchByAuthor(BookSearchRequestDto bookSearchRequestDto) {
+        return getBookDtos(AUTHOR, bookSearchRequestDto);
     }
 
-    private List<BookDto> getBookDtos(String queryOption, String queryParameter) {
+    private List<BookDto> getBookDtos(String queryOption, BookSearchRequestDto queryParameter) {
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder
             .fromUri(URI.create(apiUri + queryOption))
-            .queryParam(QUERY, queryParameter);
+            .queryParam(QUERY, getQueryByQueryOption(queryOption, queryParameter))
+            .queryParamIfPresent(PAGE, queryParameter.getPage())
+            .queryParamIfPresent(SIZE, queryParameter.getSize())
+            .queryParamIfPresent(SORT, queryParameter.getBookSearchSort());
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.set(AUTHORIZATION, header);
@@ -72,6 +82,23 @@ public class BookSearchServiceImpl implements BookSearchService {
         }
 
         throw new BookNotFoundException("can't find book");
+    }
+
+    private String getQueryByQueryOption(String queryOption, BookSearchRequestDto queryParameter) {
+
+        if (queryOption.equals(ISBN)) {
+            return queryParameter.getIsbn();
+        }
+
+        if (queryOption.equals(TITLE)) {
+            return queryParameter.getTitle();
+        }
+
+        if (queryOption.equals(AUTHOR)) {
+            return queryParameter.getAuthor();
+        }
+
+        throw new IllegalArgumentException();
     }
 
 }

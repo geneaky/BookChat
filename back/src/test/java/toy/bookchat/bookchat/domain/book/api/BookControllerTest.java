@@ -1,7 +1,7 @@
 package toy.bookchat.bookchat.domain.book.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -29,8 +29,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
 import toy.bookchat.bookchat.domain.book.dto.BookDto;
+import toy.bookchat.bookchat.domain.book.dto.BookSearchRequestDto;
 import toy.bookchat.bookchat.domain.book.exception.BookNotFoundException;
 import toy.bookchat.bookchat.domain.book.service.BookSearchService;
+import toy.bookchat.bookchat.domain.book.service.BookSearchSort;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
@@ -76,6 +78,18 @@ public class BookControllerTest extends AuthenticationTestExtension {
         return bookDto;
     }
 
+    private BookSearchRequestDto getBookSearchRequestDto(String isbn, String title, String author,
+        Integer size, Integer page, BookSearchSort bookSearchSort) {
+        return BookSearchRequestDto.builder()
+            .isbn(isbn)
+            .title(title)
+            .author(author)
+            .size(size)
+            .page(page)
+            .bookSearchSort(bookSearchSort)
+            .build();
+    }
+
     @Test
     public void 로그인하지_않은_사용자_요청_401() throws Exception {
         mockMvc.perform(get("/v1/api/books")
@@ -87,8 +101,10 @@ public class BookControllerTest extends AuthenticationTestExtension {
     public void 사용자가_isbn으로_책_검색_요청시_성공() throws Exception {
         List<BookDto> bookDtos = new ArrayList<>();
         bookDtos.add(getBookDto("213123", "effectiveJava", List.of("Joshua")));
+        BookSearchRequestDto bookSearchRequestDto = getBookSearchRequestDto("213123",
+            "effectiveJava", "Joshua", null, null, null);
 
-        when(bookSearchService.searchByIsbn("1231513")).thenReturn(bookDtos);
+        when(bookSearchService.searchByIsbn(bookSearchRequestDto)).thenReturn(bookDtos);
 
         String result = objectMapper.writeValueAsString(bookDtos);
 
@@ -101,7 +117,7 @@ public class BookControllerTest extends AuthenticationTestExtension {
             ))
             .andReturn();
 
-        verify(bookSearchService).searchByIsbn(anyString());
+        verify(bookSearchService).searchByIsbn(any(BookSearchRequestDto.class));
         assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo(result);
     }
 
@@ -115,7 +131,11 @@ public class BookControllerTest extends AuthenticationTestExtension {
 
     @Test
     public void 외부api_isbn_검색_요청_실패시_404() throws Exception {
-        when(bookSearchService.searchByIsbn("123456")).thenThrow(BookNotFoundException.class);
+        BookSearchRequestDto bookSearchRequestDto = getBookSearchRequestDto("213123",
+            "effectiveJava", "Joshua", null, null, null);
+
+        when(bookSearchService.searchByIsbn(bookSearchRequestDto)).thenThrow(
+            BookNotFoundException.class);
 
         mockMvc.perform(get("/v1/api/books")
                 .param("isbn", "123456")
@@ -127,8 +147,10 @@ public class BookControllerTest extends AuthenticationTestExtension {
     public void 사용자가_도서명_검색_요청시_성공() throws Exception {
         List<BookDto> bookDtos = new ArrayList<>();
         bookDtos.add(getBookDto("213123", "effectiveJava", List.of("Joshua")));
+        BookSearchRequestDto bookSearchRequestDto = getBookSearchRequestDto("213123",
+            "effectiveJava", "Joshua", null, null, null);
 
-        when(bookSearchService.searchByTitle("effectiveJava")).thenReturn(bookDtos);
+        when(bookSearchService.searchByTitle(bookSearchRequestDto)).thenReturn(bookDtos);
 
         String result = objectMapper.writeValueAsString(bookDtos);
 
@@ -140,7 +162,7 @@ public class BookControllerTest extends AuthenticationTestExtension {
                 requestParameters(parameterWithName("title").description("도서 제목"))))
             .andReturn();
 
-        verify(bookSearchService).searchByTitle(anyString());
+        verify(bookSearchService).searchByTitle(any(BookSearchRequestDto.class));
         assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo(result);
     }
 
@@ -154,7 +176,11 @@ public class BookControllerTest extends AuthenticationTestExtension {
 
     @Test
     public void 외부api_도서명_검색_요청_실패시_404() throws Exception {
-        when(bookSearchService.searchByTitle("effectiveJava")).thenThrow(
+
+        BookSearchRequestDto bookSearchRequestDto = getBookSearchRequestDto("213123",
+            "effectiveJava", "Joshua", null, null, null);
+
+        when(bookSearchService.searchByTitle(bookSearchRequestDto)).thenThrow(
             BookNotFoundException.class);
 
         mockMvc.perform(get("/v1/api/books")
@@ -167,8 +193,10 @@ public class BookControllerTest extends AuthenticationTestExtension {
     public void 사용자가_작가명_검색_요청시_성공() throws Exception {
         List<BookDto> bookDtos = new ArrayList<>();
         bookDtos.add(getBookDto("213123", "effectiveJava", List.of("Joshua")));
+        BookSearchRequestDto bookSearchRequestDto = getBookSearchRequestDto(null,
+            null, "Joshua", null, null, null);
 
-        when(bookSearchService.searchByAuthor("Joshua")).thenReturn(bookDtos);
+        when(bookSearchService.searchByAuthor(bookSearchRequestDto)).thenReturn(bookDtos);
 
         String result = objectMapper.writeValueAsString(bookDtos);
 
@@ -180,7 +208,7 @@ public class BookControllerTest extends AuthenticationTestExtension {
                 requestParameters(parameterWithName("author").description("작가"))))
             .andReturn();
 
-        verify(bookSearchService).searchByAuthor(anyString());
+        verify(bookSearchService).searchByAuthor(any(BookSearchRequestDto.class));
         assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo(result);
     }
 
@@ -194,7 +222,11 @@ public class BookControllerTest extends AuthenticationTestExtension {
 
     @Test
     public void 외부api_작가명_검색_요청_실패시_404() throws Exception {
-        when(bookSearchService.searchByAuthor("Joshua")).thenThrow(BookNotFoundException.class);
+        BookSearchRequestDto bookSearchRequestDto = getBookSearchRequestDto("213123",
+            "effectiveJava", "Joshua", null, null, null);
+
+        when(bookSearchService.searchByAuthor(bookSearchRequestDto)).thenThrow(
+            BookNotFoundException.class);
 
         mockMvc.perform(get("/v1/api/books")
                 .param("author", "Joshua")
