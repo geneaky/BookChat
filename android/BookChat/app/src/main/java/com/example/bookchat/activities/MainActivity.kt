@@ -51,14 +51,13 @@ class MainActivity : AppCompatActivity() {
         with(binding){
             if(drawerlayout.isDrawerOpen(Gravity.RIGHT)) {
                 drawerlayout.closeDrawer(Gravity.RIGHT)
-            } else {
-                drawerlayout.openDrawer(Gravity.RIGHT)
+                return
             }
+            drawerlayout.openDrawer(Gravity.RIGHT)
         }
     }
     fun changePage(activityType: ActivityType) {
-        lateinit var targetActivity :Any
-        targetActivity = when(activityType) {
+        val targetActivity = when(activityType) {
             ActivityType.bookShelfActivity -> { BookShelfActivity::class.java }
             ActivityType.searchActivity -> { SearchActivity::class.java }
         }

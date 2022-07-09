@@ -33,13 +33,13 @@ class LoginActivity : AppCompatActivity() {
 
         if(SharedPreferenceManager.isTokenEmpty()){
             Toast.makeText(this,"로그인 정보가 없습니다.\n로그인을 진행해주세요.",Toast.LENGTH_LONG).show()
-        }else{
-            //불러온 토큰의 기간이 만료된거라면 새로운 리프레시토큰을 요청해야함
-            Toast.makeText(this,"로그인 정보를 불러옵니다.",Toast.LENGTH_SHORT).show()
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
-            finish()
+            return
         }
+        //불러온 토큰의 기간이 만료된거라면 새로운 리프레시토큰을 요청해야함
+        Toast.makeText(this,"로그인 정보를 불러옵니다.",Toast.LENGTH_SHORT).show()
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 
     //현재 액티비티가 살아있고, 재호출되는 경우 onCreate()대신 호출됨
@@ -55,13 +55,14 @@ class LoginActivity : AppCompatActivity() {
             LoginType.KAKAO ->{ KAKAO_LOGIN }
             LoginType.GOOGLE ->{ GOOGLE_LOGIN }
         }
-        if(sdkVersionCheck(Build.VERSION.SDK_INT)){ //브라우저로 진행
+        if(sdkVersionCheck()){ //브라우저로 진행
             val intent = Intent(Intent.ACTION_VIEW,Uri.parse(uri))
             startActivity(intent)
             finish()
-        }else{ //크롬 커스텀 탭으로 진행
-            openCustomTab(uri)
+            return
         }
+        //크롬 커스텀 탭으로 진행
+        openCustomTab(uri)
     }
 
     private fun openCustomTab(uri :String){
@@ -78,20 +79,16 @@ class LoginActivity : AppCompatActivity() {
     private fun handleIntent(intent: Intent) {
         val FinalUri: Uri? = intent.data
         val token = FinalUri?.getQueryParameter("token")
-        Log.d(TAG, "LoginActivity: handleIntent() - token : $token")
-        if (!token.isNullOrEmpty()){
-            //SharedPreference에 토큰 저장 (암호화 필요)
-            SharedPreferenceManager.saveToken(token)
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
-            finish()
-        }else{
-            Log.d(TAG, "LoginActivity: handleIntent() - 토큰 없음")
-        }
+        if (token.isNullOrEmpty()){ return }
+        //SharedPreference에 토큰 저장 (암호화 필요)
+        SharedPreferenceManager.saveToken(token)
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 
-    fun sdkVersionCheck(SDKversion :Int) :Boolean{
-        return SDKversion == Build.VERSION_CODES.S ||
-                SDKversion == Build.VERSION_CODES.S_V2
+    private fun sdkVersionCheck() :Boolean{
+        return Build.VERSION.SDK_INT == Build.VERSION_CODES.S ||
+                Build.VERSION.SDK_INT == Build.VERSION_CODES.S_V2
     }
 }
