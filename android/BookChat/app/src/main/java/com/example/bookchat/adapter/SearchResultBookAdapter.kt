@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.data.Book
 import com.example.bookchat.databinding.ItemBookSearchResultBinding
-import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.viewmodel.SearchResultViewModel
 
 class SearchResultBookAdapter(val searchResultViewModel :SearchResultViewModel)
@@ -21,7 +20,6 @@ class SearchResultBookAdapter(val searchResultViewModel :SearchResultViewModel)
 
     //뷰홀더 객체 생성하는 메소드
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        Log.d(TAG, "SearchResultBookAdapter: onCreateViewHolder() - called")
         itemBookSearchResultBinding = DataBindingUtil.inflate(
             LayoutInflater.from(parent.context),
             R.layout.item_book_search_result,
@@ -33,7 +31,6 @@ class SearchResultBookAdapter(val searchResultViewModel :SearchResultViewModel)
 
     //position에 해당하는 데이터를 뷰홀더의 아이템 뷰에 표시
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        Log.d(TAG, "SearchResultBookAdapter: onBindViewHolder() - called")
         if (holder is SearchResultBookAdapter.BookResultViewHolder) {
 
             holder.binding.book = searchResultViewModel.books.value?.get(position)

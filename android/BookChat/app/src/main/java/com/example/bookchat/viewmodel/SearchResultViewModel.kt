@@ -19,9 +19,7 @@ class SearchResultViewModel() : ViewModel(){
     val isLoading: LiveData<Boolean>
         get() =_isLoading
     val books : LiveData<ArrayList<Book>>
-        get() = _books.also {
-            Log.d(TAG, "SearchResultViewModel: () - _books.value : ${_books.value}")
-        }
+        get() = _books
     val optionType: LiveData<SearchOptionType>
         get() = _optionType
 

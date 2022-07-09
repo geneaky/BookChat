@@ -37,9 +37,6 @@ class SearchHistoryAdapter(var searchHistoryList :ArrayList<String>) : RecyclerV
     }
 
     inner class SearchHistoryViewHolder(val binding: ItemSearchHistoryBinding): RecyclerView.ViewHolder(binding.root){
-        init {
-            Log.d(TAG, "SearchHistoryViewHolder: () - called")
-        }
     }
 
 }
