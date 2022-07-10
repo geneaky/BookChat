@@ -247,4 +247,5 @@ fabric.properties
 
 !/gradle/wrapper/gradle-wrapper.jar
 
-# End of https://www.toptal.com/developers/gitignore/api/windows,android,androidstudio,kotlin,gradle
+#도메인 주소
+/app/src/main/java/com/example/bookchat/utils/Constants.kt
