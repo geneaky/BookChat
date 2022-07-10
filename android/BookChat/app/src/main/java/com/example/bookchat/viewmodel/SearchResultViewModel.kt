@@ -33,7 +33,10 @@ class SearchResultViewModel() : ViewModel(){
         mRepository = BookRepository()
         //books 배열 받아올 콜백 메서드 전달
         mRepository.getBooks(searchKeyWord ,searchOption){books ->
-            if(books.isNullOrEmpty()) fail() //결과 없음 화면 출력
+            if(books.isNullOrEmpty()) { //결과 없음 화면 출력
+                fail()
+                _books.value = books
+            }
             else {
                 success() //리사이클러뷰 갱신
                 _books.value = books.also { Log.d(TAG, "SearchResultViewModel: getBooks() - 가져온 _books 값 : ${it}") }

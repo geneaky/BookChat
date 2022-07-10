@@ -71,7 +71,6 @@ class SearchResultActivity : AppCompatActivity() {
                     binding.emptyResultImg.visibility = View.VISIBLE
                     binding.emptyResultText.visibility = View.VISIBLE
                     binding.bookSearchResultRcyView.visibility = View.INVISIBLE
-                    binding.searchBackground.visibility = View.INVISIBLE
                     bookResultAdapter.notifyDataSetChanged()
                     binding.searchBackground.setBackgroundResource(R.drawable.search_result_background_white)
                 }
