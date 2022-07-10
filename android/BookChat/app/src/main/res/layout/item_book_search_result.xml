@@ -44,8 +44,8 @@
             android:gravity="center"
             android:ellipsize="end"
             android:text="@{book.title}"
-            android:maxLength="36"
-            android:maxLines="3"
+            android:ems="24"
+            android:maxLines="2"
             android:maxWidth="140dp"
             android:textColor="#12121D"
             android:fontFamily="@font/jua_regular"/>

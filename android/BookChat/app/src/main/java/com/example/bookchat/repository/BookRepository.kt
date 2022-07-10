@@ -9,6 +9,7 @@ import com.example.bookchat.utils.SearchOptionType
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.lang.StringBuilder
 
 class BookRepository {
 
@@ -39,7 +40,20 @@ class BookRepository {
                     if (response.isSuccessful){
                         Log.d(TAG, "BookRepository: onResponse() - Success(통신 성공)-response.body() : ${response.body() } , 응답 코드 : ${response.code()}")
                         books = response.body()!!
-                        callback(books)
+
+                        books.forEach{
+                            Log.d(TAG, "SearchResultViewModel: 테스트 : title : it.title , '(' index : ${it.title.indexOf('(')   }")
+                        }
+                        val t= books.map {
+                            if(it.title.indexOf('(') != -1) {
+                                it.title = StringBuilder(it.title).insert(it.title.indexOf('('),"\n").toString()
+                                it
+                            }
+                            else it
+                        }.toCollection(ArrayList())
+
+                        //callback(books)
+                        callback(t)
                         return
                     }
                     Log.d(TAG, "BookRepository: onResponse() - Fail(통신 실패) 응답 코드 : ${response.code()}")

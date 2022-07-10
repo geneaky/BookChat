@@ -65,9 +65,8 @@
             android:ellipsize="end"
             android:textSize="20sp"
             android:text="@{String.valueOf(activity.book.title)}"
-            android:maxLength="36"
             android:maxLines="3"
-            android:maxWidth="170dp"
+            android:ems="36"
             android:textColor="@color/white"
             android:fontFamily="@font/jua_regular"/>
 
