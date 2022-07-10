@@ -62,6 +62,14 @@ class SearchActivity : AppCompatActivity() {
             }
             //검색기록 RcyV설정
             searchHistoryAdapter = SearchHistoryAdapter(SharedPreferenceManager.getSearchHistory())
+            searchHistoryAdapter.setItemClickListener( object :SearchHistoryAdapter.OnItemClickListener{
+                override fun onClick(v: View, position: Int) {
+                    val intent = Intent(this@SearchActivity, SearchResultActivity::class.java)
+                    intent.putExtra("SearchKeyWord",SharedPreferenceManager.getSearchHistory().get(position))
+                    intent.putExtra("OptionType",optionType)
+                    startActivity(intent)
+                }
+            })
             with(SearchHistoryRycv){
                 adapter = searchHistoryAdapter
                 setHasFixedSize(true)

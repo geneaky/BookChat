@@ -1,6 +1,5 @@
 package com.example.bookchat.adapter
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,7 +14,7 @@ class SearchResultBookAdapter(val searchResultViewModel :SearchResultViewModel)
     : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private lateinit var itemBookSearchResultBinding: ItemBookSearchResultBinding
-    private lateinit var itemClickListener: SearchResultBookAdapter.OnItemClickListener
+    private lateinit var itemClickListener: OnItemClickListener
     private val items = ArrayList<Book>()
 
     //뷰홀더 객체 생성하는 메소드
