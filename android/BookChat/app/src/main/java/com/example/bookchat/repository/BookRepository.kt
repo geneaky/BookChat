@@ -37,16 +37,12 @@ class BookRepository {
                     response: Response<ArrayList<Book>>
                 ) {
                     if (response.isSuccessful){
-                        Log.d(TAG, "BookRepository: onResponse() - Success(통신 성공)")
-
+                        Log.d(TAG, "BookRepository: onResponse() - Success(통신 성공)-response.body() : ${response.body() } , 응답 코드 : ${response.code()}")
                         books = response.body()!!
-                        callback(books).also { //검색 결과 책들 반환
-                            Log.d(TAG, "BookRepository: onResponse() - response.body() : ${response.body() }")
-                        }
-                    }else{
-                        //응답 코드 3xx, 4xx (통신 실패)
-                        Log.d(TAG, "BookRepository: onResponse() - Fail(통신 실패)")
+                        callback(books)
+                        return
                     }
+                    Log.d(TAG, "BookRepository: onResponse() - Fail(통신 실패) 응답 코드 : ${response.code()}")
                 }
 
                 override fun onFailure(

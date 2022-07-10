@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.INVISIBLE
@@ -36,7 +37,7 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout
 class SearchActivity : AppCompatActivity() {
     private lateinit var binding : ActivitySearchBinding
     private lateinit var searchHistoryAdapter: SearchHistoryAdapter
-    private var windowClickCheck = 0
+    private var optionIsClicked = false
     private var optionType = SearchOptionType.TITLE
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,7 +60,6 @@ class SearchActivity : AppCompatActivity() {
                 }
                 false
             }
-
             //검색기록 RcyV설정
             searchHistoryAdapter = SearchHistoryAdapter(SharedPreferenceManager.getSearchHistory())
             with(SearchHistoryRycv){
@@ -70,17 +70,13 @@ class SearchActivity : AppCompatActivity() {
                 val snapHelper = LinearSnapHelper()
                 snapHelper.attachToRecyclerView(SearchHistoryRycv)
             }
-
-
         }
 
         //옵션 슬라이드 설정
         binding.optionFrame.addPanelSlideListener( object : SlidingUpPanelLayout.PanelSlideListener{
-
             //패널이 슬라이드 중일 때
             override fun onPanelSlide(panel: View?, slideOffset: Float) {
             }
-
             //패널의 상태가 변했을 때 (올라왔거나 내려갔거나)
             override fun onPanelStateChanged(
                 panel: View?,
@@ -96,18 +92,16 @@ class SearchActivity : AppCompatActivity() {
         })
         //초기값 숨김 지정
         binding.optionFrame.panelState = SlidingUpPanelLayout.PanelState.HIDDEN
-
     }
 
     //검색창 클릭 이벤트(열기)
     fun clickSearchWindow(){
         Log.d(TAG, "SearchActivity: clickLayoutTest() - called")
 
-        if (windowClickCheck == 0){
-
-            windowClickCheck = 1
+        if (optionIsClicked == false){
+            optionIsClicked = true
             //검색창 이동 애니메이션
-            val openWindowAnimator = AnimatorInflater.loadAnimator( this,
+            AnimatorInflater.loadAnimator( this,
                 R.animator.move_search_window_open
             ).apply {
                 interpolator = AccelerateDecelerateInterpolator()
@@ -120,7 +114,7 @@ class SearchActivity : AppCompatActivity() {
             }
 
             //옵션버튼 이동 애니메이션
-            val openWindowAnimator2 = AnimatorInflater.loadAnimator( this,
+            AnimatorInflater.loadAnimator( this,
                 R.animator.move_search_option_btn_open
             ).apply {
                 interpolator = AccelerateDecelerateInterpolator()
@@ -149,23 +143,19 @@ class SearchActivity : AppCompatActivity() {
                     //검색기록 노출
                     SearchHistoryRycv.visibility = VISIBLE
 
-                }}, 300L
-            )
-
+                }}, 300L)
         }else{
-
         }
-
     }
 
     //검색창 클릭 이벤트(닫기)
     fun clickCancleBtn(){
 
-        if(windowClickCheck == 1){
-            windowClickCheck =0
+        if(optionIsClicked == true){
+            optionIsClicked = false
 
             //검색창 이동 애니메이션
-            val openWindowAnimator = AnimatorInflater.loadAnimator( this,
+            AnimatorInflater.loadAnimator( this,
                 R.animator.move_search_window_close
             ).apply {
                 interpolator = AccelerateDecelerateInterpolator()
@@ -178,7 +168,7 @@ class SearchActivity : AppCompatActivity() {
             }
 
             //옵션버튼 이동 애니메이션
-            val openWindowAnimator2 = AnimatorInflater.loadAnimator( this,
+            AnimatorInflater.loadAnimator( this,
                 R.animator.move_search_option_btn_close
             ).apply {
                 interpolator = AccelerateDecelerateInterpolator()
@@ -215,6 +205,17 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    //뒤로가기 버튼을 눌렀을 때
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        if(keyCode == KeyEvent.KEYCODE_BACK){
+            if(binding.optionFrame.panelState == SlidingUpPanelLayout.PanelState.EXPANDED){
+                binding.optionFrame.panelState = SlidingUpPanelLayout.PanelState.HIDDEN
+                return false
+            }
+        }
+        return super.onKeyDown(keyCode, event)
+    }
+
     //키보드가 아닌 다른곳 누르면 키보드 내림 (작동 확인 필요)
     override fun onTouchEvent(event: MotionEvent): Boolean {
         Log.d(TAG, "SearchActivity: onTouchEvent() - called")
@@ -245,15 +246,9 @@ class SearchActivity : AppCompatActivity() {
 
     fun clickOptionBtn(){
         Log.d(TAG, "SearchActivity: clickOptionBtn() - called")
-        with(binding){
-            when(optionFrame.panelState){
-                SlidingUpPanelLayout.PanelState.HIDDEN -> {
-                    optionFrame.panelState = SlidingUpPanelLayout.PanelState.EXPANDED
-                }
-                SlidingUpPanelLayout.PanelState.EXPANDED -> {
-                    optionFrame.panelState = SlidingUpPanelLayout.PanelState.EXPANDED
-                }
-            }
+        if(binding.optionFrame.panelState == SlidingUpPanelLayout.PanelState.HIDDEN){
+            binding.optionFrame.panelState = SlidingUpPanelLayout.PanelState.EXPANDED
+            return
         }
     }
 
@@ -283,6 +278,7 @@ class SearchActivity : AppCompatActivity() {
                 optionType = SearchOptionType.CHATROOMNAME
                 changeColorElseOptionBtn(view)
             }
+            else -> return
         }
     }
 

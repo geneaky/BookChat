@@ -5,12 +5,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.example.bookchat.R
 import com.example.bookchat.data.Book
-import com.example.bookchat.databinding.ActivitySearchResultBookPageBinding
+import com.example.bookchat.databinding.ActivityBookClickPageBinding
 import com.example.bookchat.viewmodel.SearchResultBookPageViewModel
 
 class BookClickPageActivity : AppCompatActivity() {
 
-    private lateinit var binding : ActivitySearchResultBookPageBinding
+    private lateinit var binding : ActivityBookClickPageBinding
     private lateinit var searchResultBookPageViewModel: SearchResultBookPageViewModel
     lateinit var book :Book
 

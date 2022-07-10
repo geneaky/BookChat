@@ -1,12 +1,10 @@
 package com.example.bookchat.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.bookchat.data.Book
 import com.example.bookchat.repository.BookRepository
-import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.SearchOptionType
 
 class SearchResultViewModel() : ViewModel(){
