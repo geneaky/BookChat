@@ -483,7 +483,7 @@ Content-Length: 104
 <h3 id="_isbn_도서_검색">ISBN 도서 검색</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code data-lang="http">GET /v1/api/books?isbn=1231513 HTTP/1.1
+<pre class="CodeRay highlight nowrap"><code data-lang="http">GET /v1/api/books?isbn=1231513&amp;size=5&amp;page=1&amp;sort=ACCURACY HTTP/1.1
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -503,6 +503,18 @@ Host: localhost:8080</code></pre>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>isbn</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">isbn  번호</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>size</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">한 번에 조회할 책의 수 - page 당 size</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>page</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">한 번에 조회할 page 수</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>sort</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">조회시 정렬 옵션</p></td>
+</tr>
 </tbody>
 </table>
 <div class="listingblock">
@@ -515,14 +527,14 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 131
+Content-Length: 203
 
-[{&quot;isbn&quot;:&quot;213123&quot;,&quot;title&quot;:&quot;effectiveJava&quot;,&quot;author&quot;:[&quot;Joshua&quot;],&quot;publisher&quot;:&quot;testPublisher&quot;,&quot;bookCoverImageUrl&quot;:&quot;bookCoverImageUrl&quot;}]</code></pre>
+{&quot;bookDtos&quot;:[{&quot;isbn&quot;:&quot;213123&quot;,&quot;title&quot;:&quot;effectiveJava&quot;,&quot;author&quot;:[&quot;Joshua&quot;],&quot;publisher&quot;:&quot;testPublisher&quot;,&quot;bookCoverImageUrl&quot;:&quot;bookCoverImageUrl&quot;}],&quot;meta&quot;:{&quot;is_end&quot;:false,&quot;pageable_count&quot;:5,&quot;total_count&quot;:5}}</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code>[{&quot;isbn&quot;:&quot;213123&quot;,&quot;title&quot;:&quot;effectiveJava&quot;,&quot;author&quot;:[&quot;Joshua&quot;],&quot;publisher&quot;:&quot;testPublisher&quot;,&quot;bookCoverImageUrl&quot;:&quot;bookCoverImageUrl&quot;}]</code></pre>
+<pre class="CodeRay highlight nowrap"><code>{&quot;bookDtos&quot;:[{&quot;isbn&quot;:&quot;213123&quot;,&quot;title&quot;:&quot;effectiveJava&quot;,&quot;author&quot;:[&quot;Joshua&quot;],&quot;publisher&quot;:&quot;testPublisher&quot;,&quot;bookCoverImageUrl&quot;:&quot;bookCoverImageUrl&quot;}],&quot;meta&quot;:{&quot;is_end&quot;:false,&quot;pageable_count&quot;:5,&quot;total_count&quot;:5}}</code></pre>
 </div>
 </div>
 <hr>
@@ -531,7 +543,7 @@ Content-Length: 131
 <h3 id="_title_도서_검색">Title 도서 검색</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code data-lang="http">GET /v1/api/books?title=effectiveJava HTTP/1.1
+<pre class="CodeRay highlight nowrap"><code data-lang="http">GET /v1/api/books?title=effectiveJava&amp;size=5&amp;page=1&amp;sort=LATEST HTTP/1.1
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -549,7 +561,19 @@ Host: localhost:8080</code></pre>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>title</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">도서 제목</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">도서명</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>size</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">한 번에 조회할 책의 수 - page 당 size</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>page</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">한 번에 조회할 page 수</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>sort</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">조회시 정렬 옵션</p></td>
 </tr>
 </tbody>
 </table>
@@ -563,23 +587,23 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 131
+Content-Length: 203
 
-[{&quot;isbn&quot;:&quot;213123&quot;,&quot;title&quot;:&quot;effectiveJava&quot;,&quot;author&quot;:[&quot;Joshua&quot;],&quot;publisher&quot;:&quot;testPublisher&quot;,&quot;bookCoverImageUrl&quot;:&quot;bookCoverImageUrl&quot;}]</code></pre>
+{&quot;bookDtos&quot;:[{&quot;isbn&quot;:&quot;213123&quot;,&quot;title&quot;:&quot;effectiveJava&quot;,&quot;author&quot;:[&quot;Joshua&quot;],&quot;publisher&quot;:&quot;testPublisher&quot;,&quot;bookCoverImageUrl&quot;:&quot;bookCoverImageUrl&quot;}],&quot;meta&quot;:{&quot;is_end&quot;:false,&quot;pageable_count&quot;:5,&quot;total_count&quot;:5}}</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code>[{&quot;isbn&quot;:&quot;213123&quot;,&quot;title&quot;:&quot;effectiveJava&quot;,&quot;author&quot;:[&quot;Joshua&quot;],&quot;publisher&quot;:&quot;testPublisher&quot;,&quot;bookCoverImageUrl&quot;:&quot;bookCoverImageUrl&quot;}]</code></pre>
+<pre class="CodeRay highlight nowrap"><code>{&quot;bookDtos&quot;:[{&quot;isbn&quot;:&quot;213123&quot;,&quot;title&quot;:&quot;effectiveJava&quot;,&quot;author&quot;:[&quot;Joshua&quot;],&quot;publisher&quot;:&quot;testPublisher&quot;,&quot;bookCoverImageUrl&quot;:&quot;bookCoverImageUrl&quot;}],&quot;meta&quot;:{&quot;is_end&quot;:false,&quot;pageable_count&quot;:5,&quot;total_count&quot;:5}}</code></pre>
 </div>
 </div>
 <hr>
 </div>
 <div class="sect2">
-<h3 id="_title_도서_검색_2">Title 도서 검색</h3>
+<h3 id="_author_도서_검색">Author 도서 검색</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code data-lang="http">GET /v1/api/books?author=Joshua HTTP/1.1
+<pre class="CodeRay highlight nowrap"><code data-lang="http">GET /v1/api/books?author=Joshua&amp;size=5&amp;page=1&amp;sort=LATEST HTTP/1.1
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -597,7 +621,19 @@ Host: localhost:8080</code></pre>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>author</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">작가</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">작가명</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>size</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">한 번에 조회할 책의 수 - page 당 size</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>page</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">한 번에 조회할 page 수</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>sort</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">조회시 정렬 옵션</p></td>
 </tr>
 </tbody>
 </table>
@@ -611,14 +647,14 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 131
+Content-Length: 203
 
-[{&quot;isbn&quot;:&quot;213123&quot;,&quot;title&quot;:&quot;effectiveJava&quot;,&quot;author&quot;:[&quot;Joshua&quot;],&quot;publisher&quot;:&quot;testPublisher&quot;,&quot;bookCoverImageUrl&quot;:&quot;bookCoverImageUrl&quot;}]</code></pre>
+{&quot;bookDtos&quot;:[{&quot;isbn&quot;:&quot;213123&quot;,&quot;title&quot;:&quot;effectiveJava&quot;,&quot;author&quot;:[&quot;Joshua&quot;],&quot;publisher&quot;:&quot;testPublisher&quot;,&quot;bookCoverImageUrl&quot;:&quot;bookCoverImageUrl&quot;}],&quot;meta&quot;:{&quot;is_end&quot;:false,&quot;pageable_count&quot;:5,&quot;total_count&quot;:5}}</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code>[{&quot;isbn&quot;:&quot;213123&quot;,&quot;title&quot;:&quot;effectiveJava&quot;,&quot;author&quot;:[&quot;Joshua&quot;],&quot;publisher&quot;:&quot;testPublisher&quot;,&quot;bookCoverImageUrl&quot;:&quot;bookCoverImageUrl&quot;}]</code></pre>
+<pre class="CodeRay highlight nowrap"><code>{&quot;bookDtos&quot;:[{&quot;isbn&quot;:&quot;213123&quot;,&quot;title&quot;:&quot;effectiveJava&quot;,&quot;author&quot;:[&quot;Joshua&quot;],&quot;publisher&quot;:&quot;testPublisher&quot;,&quot;bookCoverImageUrl&quot;:&quot;bookCoverImageUrl&quot;}],&quot;meta&quot;:{&quot;is_end&quot;:false,&quot;pageable_count&quot;:5,&quot;total_count&quot;:5}}</code></pre>
 </div>
 </div>
 <hr>
@@ -718,7 +754,7 @@ X-Frame-Options: DENY</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-07-06 13:09:10 +0900
+Last updated 2022-07-10 19:21:24 +0900
 </div>
 </div>
 </body>

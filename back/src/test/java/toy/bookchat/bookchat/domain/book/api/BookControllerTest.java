@@ -329,7 +329,7 @@ public class BookControllerTest extends AuthenticationTestExtension {
                 .param("sort", "LATEST")
                 .with(user(getUserPrincipal())))
             .andExpect(status().isOk())
-            .andDo(document("book-search-title-paging",
+            .andDo(document("book-search-author-paging",
                 requestParameters(parameterWithName("author").description("작가명"),
                     parameterWithName("size").description("한 번에 조회할 책의 수 - page 당 size"),
                     parameterWithName("page").description("한 번에 조회할 page 수"),
