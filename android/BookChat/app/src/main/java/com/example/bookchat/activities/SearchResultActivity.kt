@@ -1,6 +1,7 @@
 package com.example.bookchat.activities
 
 import android.content.Intent
+import android.opengl.Visibility
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -58,7 +59,21 @@ class SearchResultActivity : AppCompatActivity() {
                 intent.getStringExtra("SearchKeyWord")!!,
                 intent.getSerializableExtra("OptionType") as SearchOptionType,
                 success = {
+                    Log.d(TAG, "binding.emptyResultImg.visibility = View.INVISIBLE1 - called")
+                    binding.emptyResultImg.visibility = View.INVISIBLE
+                    binding.emptyResultText.visibility = View.INVISIBLE
+                    binding.bookSearchResultRcyView.visibility = View.VISIBLE
+                    binding.searchBackground.setBackgroundResource(R.drawable.search_result_background)
                     bookResultAdapter.notifyDataSetChanged()
+                },
+                fail = {
+                    Log.d(TAG, "binding.emptyResultImg.visibility = View.VISIBLE2- called")
+                    binding.emptyResultImg.visibility = View.VISIBLE
+                    binding.emptyResultText.visibility = View.VISIBLE
+                    binding.bookSearchResultRcyView.visibility = View.INVISIBLE
+                    binding.searchBackground.visibility = View.INVISIBLE
+                    bookResultAdapter.notifyDataSetChanged()
+                    binding.searchBackground.setBackgroundResource(R.drawable.search_result_background_white)
                 }
             )
 
@@ -75,7 +90,20 @@ class SearchResultActivity : AppCompatActivity() {
                         searchTextEt.text.toString(),
                         viewModel?.optionType?.value!!,
                         success = {
+                            Log.d(TAG, "binding.emptyResultImg.visibility = View.INVISIBLE3 - called")
+                            binding.emptyResultImg.visibility = View.INVISIBLE
+                            binding.emptyResultText.visibility = View.INVISIBLE
+                            binding.bookSearchResultRcyView.visibility = View.VISIBLE
+                            binding.searchBackground.setBackgroundResource(R.drawable.search_result_background)
                             bookResultAdapter.notifyDataSetChanged()
+                                  },
+                        fail = {
+                            Log.d(TAG, "binding.emptyResultImg.visibility = View.VISIBLE4- called")
+                            binding.emptyResultImg.visibility = View.VISIBLE
+                            binding.emptyResultText.visibility = View.VISIBLE
+                            binding.bookSearchResultRcyView.visibility = View.INVISIBLE
+                            bookResultAdapter.notifyDataSetChanged()
+                            binding.searchBackground.setBackgroundResource(R.drawable.search_result_background_white)
                         }
                     )
 

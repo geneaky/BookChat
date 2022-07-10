@@ -23,7 +23,6 @@ class BookClickPageActivity : AppCompatActivity() {
             activity = this@BookClickPageActivity
             searchResultBookPageViewModel = SearchResultBookPageViewModel()
             viewModel = searchResultBookPageViewModel
-
         }
         book = intent.getSerializableExtra("clickedBook") as Book
 

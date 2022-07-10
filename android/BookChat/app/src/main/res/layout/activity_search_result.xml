@@ -160,11 +160,33 @@
 
             </LinearLayout>
 
-            <LinearLayout
+            <FrameLayout
+                android:id="@+id/search_background"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:minHeight="800dp"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/search_result_background">
+
+                <ImageView
+                    android:visibility="invisible"
+                    android:id="@+id/empty_result_img"
+                    android:layout_gravity="center"
+                    android:layout_width="400dp"
+                    android:layout_height="400dp"
+                    android:src="@drawable/empty_result"/>
+                <TextView
+                    android:visibility="invisible"
+                    android:id="@+id/empty_result_text"
+                    android:layout_marginTop="30dp"
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="해당 검색결과가 없습니다."
+                    android:fontFamily="@font/jua_regular"
+                    android:textColor="#000000"
+                    android:textSize="23sp"/>
+
                 <androidx.recyclerview.widget.RecyclerView
                     android:layout_marginTop="10dp"
                     android:id="@+id/book_search_result_rcyView"
@@ -174,7 +196,7 @@
                     android:layout_height="wrap_content"
                     setItem="@{viewModel.books}"
                     tools:listitem="@layout/item_book_search_result"/>
-            </LinearLayout>
+            </FrameLayout>
 
         </LinearLayout>
     </FrameLayout>
