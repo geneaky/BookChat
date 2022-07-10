@@ -2,7 +2,6 @@ package toy.bookchat.bookchat.domain.book.service;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -13,8 +12,8 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import toy.bookchat.bookchat.domain.book.dto.BookDto;
 import toy.bookchat.bookchat.domain.book.dto.BookSearchRequestDto;
+import toy.bookchat.bookchat.domain.book.dto.BookSearchResponseDto;
 import toy.bookchat.bookchat.domain.book.dto.KakaoBook;
 import toy.bookchat.bookchat.domain.book.exception.BookNotFoundException;
 
@@ -43,21 +42,22 @@ public class BookSearchServiceImpl implements BookSearchService {
     }
 
     @Override
-    public List<BookDto> searchByIsbn(BookSearchRequestDto bookSearchRequestDto) {
-        return getBookDtos(ISBN, bookSearchRequestDto);
+    public BookSearchResponseDto searchByIsbn(BookSearchRequestDto bookSearchRequestDto) {
+        return fetchBooks(ISBN, bookSearchRequestDto);
     }
 
     @Override
-    public List<BookDto> searchByTitle(BookSearchRequestDto bookSearchRequestDto) {
-        return getBookDtos(TITLE, bookSearchRequestDto);
+    public BookSearchResponseDto searchByTitle(BookSearchRequestDto bookSearchRequestDto) {
+        return fetchBooks(TITLE, bookSearchRequestDto);
     }
 
     @Override
-    public List<BookDto> searchByAuthor(BookSearchRequestDto bookSearchRequestDto) {
-        return getBookDtos(AUTHOR, bookSearchRequestDto);
+    public BookSearchResponseDto searchByAuthor(BookSearchRequestDto bookSearchRequestDto) {
+        return fetchBooks(AUTHOR, bookSearchRequestDto);
     }
 
-    private List<BookDto> getBookDtos(String queryOption, BookSearchRequestDto queryParameter) {
+    private BookSearchResponseDto fetchBooks(String queryOption,
+        BookSearchRequestDto queryParameter) {
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder
             .fromUri(URI.create(apiUri + queryOption))
             .queryParam(QUERY, getQueryByQueryOption(queryOption, queryParameter))
@@ -78,7 +78,7 @@ public class BookSearchServiceImpl implements BookSearchService {
             httpEntity, KakaoBook.class).getBody();
 
         if (Optional.ofNullable(kakaoBook).isPresent()) {
-            return kakaoBook.getBookDtos();
+            return kakaoBook.getBookSearchResponseDto();
         }
 
         throw new BookNotFoundException("can't find book");

@@ -30,9 +30,10 @@ import org.springframework.test.web.servlet.MvcResult;
 import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
 import toy.bookchat.bookchat.domain.book.dto.BookDto;
 import toy.bookchat.bookchat.domain.book.dto.BookSearchRequestDto;
+import toy.bookchat.bookchat.domain.book.dto.BookSearchResponseDto;
+import toy.bookchat.bookchat.domain.book.dto.Meta;
 import toy.bookchat.bookchat.domain.book.exception.BookNotFoundException;
 import toy.bookchat.bookchat.domain.book.service.BookSearchService;
-import toy.bookchat.bookchat.domain.book.service.BookSearchSort;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
@@ -78,18 +79,6 @@ public class BookControllerTest extends AuthenticationTestExtension {
         return bookDto;
     }
 
-    private BookSearchRequestDto getBookSearchRequestDto(String isbn, String title, String author,
-        Integer size, Integer page, BookSearchSort bookSearchSort) {
-        return BookSearchRequestDto.builder()
-            .isbn(isbn)
-            .title(title)
-            .author(author)
-            .size(size)
-            .page(page)
-            .bookSearchSort(bookSearchSort)
-            .build();
-    }
-
     @Test
     public void 로그인하지_않은_사용자_요청_401() throws Exception {
         mockMvc.perform(get("/v1/api/books")
@@ -101,12 +90,14 @@ public class BookControllerTest extends AuthenticationTestExtension {
     public void 사용자가_isbn으로_책_검색_요청시_성공() throws Exception {
         List<BookDto> bookDtos = new ArrayList<>();
         bookDtos.add(getBookDto("213123", "effectiveJava", List.of("Joshua")));
-        BookSearchRequestDto bookSearchRequestDto = getBookSearchRequestDto("213123",
-            "effectiveJava", "Joshua", null, null, null);
+        BookSearchResponseDto bookSearchResponseDto = BookSearchResponseDto.builder()
+            .bookDtos(bookDtos)
+            .build();
 
-        when(bookSearchService.searchByIsbn(bookSearchRequestDto)).thenReturn(bookDtos);
+        when(bookSearchService.searchByIsbn(any(BookSearchRequestDto.class))).thenReturn(
+            bookSearchResponseDto);
 
-        String result = objectMapper.writeValueAsString(bookDtos);
+        String result = objectMapper.writeValueAsString(bookSearchResponseDto);
 
         MvcResult mvcResult = mockMvc.perform(RestDocumentationRequestBuilders.get("/v1/api/books")
                 .param("isbn", "1231513")
@@ -131,10 +122,7 @@ public class BookControllerTest extends AuthenticationTestExtension {
 
     @Test
     public void 외부api_isbn_검색_요청_실패시_404() throws Exception {
-        BookSearchRequestDto bookSearchRequestDto = getBookSearchRequestDto("213123",
-            "effectiveJava", "Joshua", null, null, null);
-
-        when(bookSearchService.searchByIsbn(bookSearchRequestDto)).thenThrow(
+        when(bookSearchService.searchByIsbn(any(BookSearchRequestDto.class))).thenThrow(
             BookNotFoundException.class);
 
         mockMvc.perform(get("/v1/api/books")
@@ -147,12 +135,15 @@ public class BookControllerTest extends AuthenticationTestExtension {
     public void 사용자가_도서명_검색_요청시_성공() throws Exception {
         List<BookDto> bookDtos = new ArrayList<>();
         bookDtos.add(getBookDto("213123", "effectiveJava", List.of("Joshua")));
-        BookSearchRequestDto bookSearchRequestDto = getBookSearchRequestDto("213123",
-            "effectiveJava", "Joshua", null, null, null);
 
-        when(bookSearchService.searchByTitle(bookSearchRequestDto)).thenReturn(bookDtos);
+        BookSearchResponseDto bookSearchResponseDto = BookSearchResponseDto.builder()
+            .bookDtos(bookDtos)
+            .build();
 
-        String result = objectMapper.writeValueAsString(bookDtos);
+        when(bookSearchService.searchByTitle(any(BookSearchRequestDto.class))).thenReturn(
+            bookSearchResponseDto);
+
+        String result = objectMapper.writeValueAsString(bookSearchResponseDto);
 
         MvcResult mvcResult = mockMvc.perform(get("/v1/api/books")
                 .param("title", "effectiveJava")
@@ -176,11 +167,7 @@ public class BookControllerTest extends AuthenticationTestExtension {
 
     @Test
     public void 외부api_도서명_검색_요청_실패시_404() throws Exception {
-
-        BookSearchRequestDto bookSearchRequestDto = getBookSearchRequestDto("213123",
-            "effectiveJava", "Joshua", null, null, null);
-
-        when(bookSearchService.searchByTitle(bookSearchRequestDto)).thenThrow(
+        when(bookSearchService.searchByTitle(any(BookSearchRequestDto.class))).thenThrow(
             BookNotFoundException.class);
 
         mockMvc.perform(get("/v1/api/books")
@@ -193,12 +180,15 @@ public class BookControllerTest extends AuthenticationTestExtension {
     public void 사용자가_작가명_검색_요청시_성공() throws Exception {
         List<BookDto> bookDtos = new ArrayList<>();
         bookDtos.add(getBookDto("213123", "effectiveJava", List.of("Joshua")));
-        BookSearchRequestDto bookSearchRequestDto = getBookSearchRequestDto(null,
-            null, "Joshua", null, null, null);
 
-        when(bookSearchService.searchByAuthor(bookSearchRequestDto)).thenReturn(bookDtos);
+        BookSearchResponseDto bookSearchResponseDto = BookSearchResponseDto.builder()
+            .bookDtos(bookDtos)
+            .build();
 
-        String result = objectMapper.writeValueAsString(bookDtos);
+        when(bookSearchService.searchByAuthor(any(BookSearchRequestDto.class))).thenReturn(
+            bookSearchResponseDto);
+
+        String result = objectMapper.writeValueAsString(bookSearchResponseDto);
 
         MvcResult mvcResult = mockMvc.perform(get("/v1/api/books")
                 .param("author", "Joshua")
@@ -222,15 +212,132 @@ public class BookControllerTest extends AuthenticationTestExtension {
 
     @Test
     public void 외부api_작가명_검색_요청_실패시_404() throws Exception {
-        BookSearchRequestDto bookSearchRequestDto = getBookSearchRequestDto("213123",
-            "effectiveJava", "Joshua", null, null, null);
-
-        when(bookSearchService.searchByAuthor(bookSearchRequestDto)).thenThrow(
+        when(bookSearchService.searchByAuthor(any(BookSearchRequestDto.class))).thenThrow(
             BookNotFoundException.class);
 
         mockMvc.perform(get("/v1/api/books")
                 .param("author", "Joshua")
                 .with(user(getUserPrincipal())))
             .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void 사용자가_isbn_검색시_paging_성공() throws Exception {
+        List<BookDto> bookDtos = new ArrayList<>();
+        bookDtos.add(getBookDto("213123", "effectiveJava", List.of("Joshua")));
+
+        Meta meta = Meta.builder()
+            .total_count(5)
+            .pageable_count(5)
+            .is_end(false)
+            .build();
+
+        BookSearchResponseDto bookSearchResponseDto = BookSearchResponseDto.builder()
+            .bookDtos(bookDtos)
+            .meta(meta)
+            .build();
+
+        when(bookSearchService.searchByIsbn(any(BookSearchRequestDto.class))).thenReturn(
+            bookSearchResponseDto);
+
+        String result = objectMapper.writeValueAsString(bookSearchResponseDto);
+
+        MvcResult mvcResult = mockMvc.perform(RestDocumentationRequestBuilders.get("/v1/api/books")
+                .param("isbn", "1231513")
+                .param("size", "5")
+                .param("page", "1")
+                .param("sort", "ACCURACY")
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isOk())
+            .andDo(document("book-search-isbn-paging",
+                requestParameters(parameterWithName("isbn").description("isbn  번호"),
+                    parameterWithName("size").description("한 번에 조회할 책의 수 - page 당 size"),
+                    parameterWithName("page").description("한 번에 조회할 page 수"),
+                    parameterWithName("sort").description("조회시 정렬 옵션"))
+            )).andReturn();
+
+        verify(bookSearchService).searchByIsbn(any(BookSearchRequestDto.class));
+        assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo(result);
+
+    }
+
+    @Test
+    public void 사용자가_도서명_검색시_paging_성공() throws Exception {
+        List<BookDto> bookDtos = new ArrayList<>();
+        bookDtos.add(getBookDto("213123", "effectiveJava", List.of("Joshua")));
+
+        Meta meta = Meta.builder()
+            .total_count(5)
+            .pageable_count(5)
+            .is_end(false)
+            .build();
+
+        BookSearchResponseDto bookSearchResponseDto = BookSearchResponseDto.builder()
+            .bookDtos(bookDtos)
+            .meta(meta)
+            .build();
+
+        when(bookSearchService.searchByTitle(any(BookSearchRequestDto.class))).thenReturn(
+            bookSearchResponseDto);
+
+        String result = objectMapper.writeValueAsString(bookSearchResponseDto);
+
+        MvcResult mvcResult = mockMvc.perform(RestDocumentationRequestBuilders.get("/v1/api/books")
+                .param("title", "effectiveJava")
+                .param("size", "5")
+                .param("page", "1")
+                .param("sort", "LATEST")
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isOk())
+            .andDo(document("book-search-title-paging",
+                requestParameters(parameterWithName("title").description("도서명"),
+                    parameterWithName("size").description("한 번에 조회할 책의 수 - page 당 size"),
+                    parameterWithName("page").description("한 번에 조회할 page 수"),
+                    parameterWithName("sort").description("조회시 정렬 옵션"))
+            )).andReturn();
+
+        verify(bookSearchService).searchByTitle(any(BookSearchRequestDto.class));
+        assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo(result);
+
+    }
+
+    @Test
+    public void 사용자가_작가명_검색시_paging_성공() throws Exception {
+        List<BookDto> bookDtos = new ArrayList<>();
+        bookDtos.add(getBookDto("213123", "effectiveJava", List.of("Joshua")));
+
+        Meta meta = Meta.builder()
+            .total_count(5)
+            .pageable_count(5)
+            .is_end(false)
+            .build();
+
+        BookSearchResponseDto bookSearchResponseDto = BookSearchResponseDto.builder()
+            .bookDtos(bookDtos)
+            .meta(meta)
+            .build();
+
+        when(bookSearchService.searchByAuthor(any(BookSearchRequestDto.class))).thenReturn(
+            bookSearchResponseDto);
+
+        String result = objectMapper.writeValueAsString(bookSearchResponseDto);
+
+        MvcResult mvcResult = mockMvc.perform(RestDocumentationRequestBuilders.get("/v1/api/books")
+                .param("author", "Joshua")
+                .param("size", "5")
+                .param("page", "1")
+                .param("sort", "LATEST")
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isOk())
+            .andDo(document("book-search-title-paging",
+                requestParameters(parameterWithName("author").description("작가명"),
+                    parameterWithName("size").description("한 번에 조회할 책의 수 - page 당 size"),
+                    parameterWithName("page").description("한 번에 조회할 page 수"),
+                    parameterWithName("sort").description("조회시 정렬 옵션"))
+            )).andReturn();
+
+        verify(bookSearchService).searchByAuthor(any(BookSearchRequestDto.class));
+        assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo(result);
+
     }
 }
