@@ -1,15 +1,19 @@
 package toy.bookchat.bookchat.domain.bookshelf.service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.book.repository.BookRepository;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
+import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfRequestDto;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfSearchResponseDto;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 
@@ -50,5 +54,11 @@ public class BookShelfService {
             .build();
 
         bookShelfRepository.save(bookShelf);
+    }
+
+    public List<BookShelfSearchResponseDto> takeBookOutOfBookShelf(ReadingStatus readingStatus,
+        Pageable pageable, User user) {
+
+        bookShelfRepository.findSpecificStateBookByUserId(readingStatus, pageable, user.getId());
     }
 }

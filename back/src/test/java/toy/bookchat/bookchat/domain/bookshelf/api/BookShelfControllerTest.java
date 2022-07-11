@@ -6,6 +6,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -319,6 +320,17 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
                 .with(user(getUserPrincipal())))
             .andExpect(status().isBadRequest());
 
+    }
+
+    @Test
+    public void 읽고있는_책_조회_성공() throws Exception {
+
+        mockMvc.perform(get("/v1/api/bookshelf/books")
+                .queryParam("size", "5")
+                .queryParam("page", "1")
+                .queryParam("sort", "id,DESC")
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isOk());
     }
 
     static class BookShelfTestRequestDto {
