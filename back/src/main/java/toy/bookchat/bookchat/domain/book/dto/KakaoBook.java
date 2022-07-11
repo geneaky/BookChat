@@ -14,11 +14,11 @@ public class KakaoBook {
     private List<Document> documents;
     private Meta meta;
 
-    public List<BookDto> getBookDtos() {
-        List<BookDto> list = new ArrayList<>();
+    public BookSearchResponseDto getBookSearchResponseDto() {
+        List<BookDto> bookDtos = new ArrayList<>();
 
         for (Document document : documents) {
-            list.add(
+            bookDtos.add(
                 BookDto.builder()
                     .isbn(document.getIsbn())
                     .title(document.getTitle())
@@ -29,6 +29,9 @@ public class KakaoBook {
             );
         }
 
-        return list;
+        return BookSearchResponseDto.builder()
+            .bookDtos(bookDtos)
+            .meta(meta)
+            .build();
     }
 }
