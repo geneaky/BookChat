@@ -67,3 +67,26 @@ include::{snippets}/bookshelf_wish/http-response.adoc[]
 
 ---
 
+=== 읽고 있는 도서 조회
+
+include::{snippets}/get_bookshelf_reading/request-parameters.adoc[]
+include::{snippets}/get_bookshelf_reading/http-request.adoc[]
+include::{snippets}/get_bookshelf_reading/response-body.adoc[]
+
+---
+
+=== 읽은 도서 조회
+
+include::{snippets}/get_bookshelf_complete/request-parameters.adoc[]
+include::{snippets}/get_bookshelf_complete/http-request.adoc[]
+include::{snippets}/get_bookshelf_complete/response-body.adoc[]
+
+---
+
+=== 읽을 도서 조회
+
+include::{snippets}/get_bookshelf_wish/request-parameters.adoc[]
+include::{snippets}/get_bookshelf_wish/http-request.adoc[]
+include::{snippets}/get_bookshelf_wish/response-body.adoc[]
+
+---

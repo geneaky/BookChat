@@ -14,7 +14,7 @@ import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 
 @Getter
 @Builder
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class BookShelfRequestDto {
 
