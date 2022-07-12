@@ -20,6 +20,7 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.GrantedAuthority;
@@ -324,13 +325,45 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
 
     @Test
     public void 읽고있는_책_조회_성공() throws Exception {
-
         mockMvc.perform(get("/v1/api/bookshelf/books")
+                .queryParam("readingStatus", "READING")
+                .queryParam("size", "5")
+                .queryParam("page", "1")
+                .queryParam("sort", "id,DESC")
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isOk())
+            .andDo(document("get_bookshelf_reading"));
+
+        verify(bookShelfService).takeBookOutOfBookShelf(any(ReadingStatus.class),
+            any(Pageable.class), any(User.class));
+    }
+
+    @Test
+    public void 읽은_책_조회_성공() throws Exception {
+        mockMvc.perform(get("/v1/api/bookshelf/books")
+                .queryParam("readingStatus", "COMPLETE")
                 .queryParam("size", "5")
                 .queryParam("page", "1")
                 .queryParam("sort", "id,DESC")
                 .with(user(getUserPrincipal())))
             .andExpect(status().isOk());
+
+        verify(bookShelfService).takeBookOutOfBookShelf(any(ReadingStatus.class),
+            any(Pageable.class), any(User.class));
+    }
+
+    @Test
+    public void 읽을_책_조회_성공() throws Exception {
+        mockMvc.perform(get("/v1/api/bookshelf/books")
+                .queryParam("readingStatus", "WISH")
+                .queryParam("size", "5")
+                .queryParam("page", "1")
+                .queryParam("sort", "id,DESC")
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isOk());
+
+        verify(bookShelfService).takeBookOutOfBookShelf(any(ReadingStatus.class),
+            any(Pageable.class), any(User.class));
     }
 
     static class BookShelfTestRequestDto {

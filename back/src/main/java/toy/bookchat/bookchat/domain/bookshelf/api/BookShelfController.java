@@ -40,7 +40,8 @@ public class BookShelfController {
         @CurrentUser User user
     ) {
 
-        bookShelfService.takeBookOutOfBookShelf(readingStatus, pageable, user);
-        return ResponseEntity.status(HttpStatus.OK).body().build();
+        List<BookShelfSearchResponseDto> bookShelfSearchResponseDtos = bookShelfService.takeBookOutOfBookShelf(
+            readingStatus, pageable, user);
+        return ResponseEntity.status(HttpStatus.OK).body(bookShelfSearchResponseDtos);
     }
 }

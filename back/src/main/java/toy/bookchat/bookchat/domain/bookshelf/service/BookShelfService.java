@@ -59,6 +59,7 @@ public class BookShelfService {
     public List<BookShelfSearchResponseDto> takeBookOutOfBookShelf(ReadingStatus readingStatus,
         Pageable pageable, User user) {
 
-        bookShelfRepository.findSpecificStateBookByUserId(readingStatus, pageable, user.getId());
+//        bookShelfRepository.findSpecificStateBookByUserId(readingStatus, pageable, user.getId());
+        return null;
     }
 }
