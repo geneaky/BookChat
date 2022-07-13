@@ -24,13 +24,8 @@ public class BookShelfRepositoryTest {
 
     @Test
     public void 책_저장() throws Exception {
-        Book book = Book.builder()
-            .isbn("1234")
-            .title("effective java")
-            .authors(List.of("Joshua"))
-            .publisher("insight")
-            .bookCoverImageUrl("bookCover@naver.com")
-            .build();
+        Book book = new Book("1234", "effective java", List.of("Joshua"), "insight",
+            "bookCover@naver.com");
 
         Book savedBook = bookRepository.save(book);
         assertThat(book).isEqualTo(savedBook);
@@ -41,8 +36,9 @@ public class BookShelfRepositoryTest {
 
         BookShelf bookShelf = BookShelf.builder().build();
 
-        Book book = Book.builder()
-            .build();
+        Book book = new Book("1234", "effective java", List.of("Joshua"), "insight",
+            "bookCover@naver.com");
+
         book.setBookShelf(bookShelf);
         Book savedBook = bookRepository.save(book);
 
@@ -58,5 +54,13 @@ public class BookShelfRepositoryTest {
         assertThat(book).isEqualTo(savedBook);
         assertThat(user).isEqualTo(savedUser);
         assertThat(bookShelf).isEqualTo(savedBookShelf);
+    }
+
+    @Test
+    public void 읽고있는_책을_조회() throws Exception {
+        Book book = new Book("1234", "effective java", List.of("Joshua"), "insight",
+            "bookCover@naver.com");
+
+
     }
 }

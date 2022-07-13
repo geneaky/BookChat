@@ -32,13 +32,8 @@ public class BookShelfServiceTest {
     BookShelfService bookShelfService;
 
     private Book getBook() {
-        return Book.builder()
-            .isbn("12345")
-            .title("testBook")
-            .authors(List.of("test Author"))
-            .publisher("test publisher")
-            .bookCoverImageUrl("test@naver.com")
-            .build();
+        return new Book("12345", "testBook", List.of("test Author"), "test publisher",
+            "test@naver.com");
     }
 
     private User getUser() {

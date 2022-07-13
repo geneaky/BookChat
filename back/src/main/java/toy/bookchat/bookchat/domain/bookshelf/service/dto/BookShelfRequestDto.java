@@ -32,12 +32,7 @@ public class BookShelfRequestDto {
     private ReadingStatus readingStatus;
 
     public Book extractBookEntity() {
-        return Book.builder()
-            .isbn(getIsbn())
-            .title(getTitle())
-            .authors(getAuthors())
-            .publisher(getPublisher())
-            .bookCoverImageUrl(getBookCoverImageUrl())
-            .build();
+        return new Book(getIsbn(), getTitle(), getAuthors(), getPublisher(),
+            getBookCoverImageUrl());
     }
 }
