@@ -344,7 +344,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
 
         result.add(bookShelfSearchResponseDto);
 
-        when(bookShelfService.takeBookOutOfBookShelf(any(ReadingStatus.class), any(Pageable.class),
+        when(bookShelfService.takeBooksOutOfBookShelf(any(ReadingStatus.class), any(Pageable.class),
             any(User.class))).thenReturn(result);
 
         mockMvc.perform(get("/v1/api/bookshelf/books")
@@ -364,7 +364,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
                 ))
             );
 
-        verify(bookShelfService).takeBookOutOfBookShelf(any(ReadingStatus.class),
+        verify(bookShelfService).takeBooksOutOfBookShelf(any(ReadingStatus.class),
             any(Pageable.class), any(User.class));
     }
 
@@ -382,7 +382,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
 
         result.add(bookShelfSearchResponseDto);
 
-        when(bookShelfService.takeBookOutOfBookShelf(any(ReadingStatus.class), any(Pageable.class),
+        when(bookShelfService.takeBooksOutOfBookShelf(any(ReadingStatus.class), any(Pageable.class),
             any(User.class))).thenReturn(result);
 
         mockMvc.perform(get("/v1/api/bookshelf/books")
@@ -402,7 +402,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
                 ))
             );
 
-        verify(bookShelfService).takeBookOutOfBookShelf(any(ReadingStatus.class),
+        verify(bookShelfService).takeBooksOutOfBookShelf(any(ReadingStatus.class),
             any(Pageable.class), any(User.class));
     }
 
@@ -420,7 +420,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
 
         result.add(bookShelfSearchResponseDto);
 
-        when(bookShelfService.takeBookOutOfBookShelf(any(ReadingStatus.class), any(Pageable.class),
+        when(bookShelfService.takeBooksOutOfBookShelf(any(ReadingStatus.class), any(Pageable.class),
             any(User.class))).thenReturn(result);
 
         mockMvc.perform(get("/v1/api/bookshelf/books")
@@ -440,7 +440,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
                 ))
             );
 
-        verify(bookShelfService).takeBookOutOfBookShelf(any(ReadingStatus.class),
+        verify(bookShelfService).takeBooksOutOfBookShelf(any(ReadingStatus.class),
             any(Pageable.class), any(User.class));
     }
 

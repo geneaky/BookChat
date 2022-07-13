@@ -1,6 +1,7 @@
 package toy.bookchat.bookchat.domain.bookshelf.service;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -85,9 +86,38 @@ public class BookShelfServiceTest {
     @Test
     public void 읽고있는_책을_조회_성공() throws Exception {
 
-        bookShelfService.takeBookOutOfBookShelf(ReadingStatus.READING, any(Pageable.class),
-            getUser());
-        
+        Pageable pageable = mock(Pageable.class);
+        User user = getUser();
+
+        bookShelfService.takeBooksOutOfBookShelf(ReadingStatus.READING, pageable,
+            user);
+
+        verify(bookShelfRepository).findSpecificReadingStateBookByUserId(ReadingStatus.READING,
+            pageable, user);
+    }
+
+    @Test
+    public void 읽은_책을_조회_성공() throws Exception {
+        Pageable pageable = mock(Pageable.class);
+        User user = getUser();
+
+        bookShelfService.takeBooksOutOfBookShelf(ReadingStatus.COMPLETE, pageable,
+            user);
+
+        verify(bookShelfRepository).findSpecificReadingStateBookByUserId(ReadingStatus.COMPLETE,
+            pageable, user);
+    }
+
+    @Test
+    public void 읽을_책을_조회_성공() throws Exception {
+        Pageable pageable = mock(Pageable.class);
+        User user = getUser();
+
+        bookShelfService.takeBooksOutOfBookShelf(ReadingStatus.WISH, pageable,
+            user);
+
+        verify(bookShelfRepository).findSpecificReadingStateBookByUserId(ReadingStatus.WISH,
+            pageable, user);
 
     }
 }
