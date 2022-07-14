@@ -87,8 +87,8 @@ public class BookShelfServiceTest {
         bookShelfService.takeBooksOutOfBookShelf(ReadingStatus.READING, pageable,
             user);
 
-        verify(bookShelfRepository).findSpecificReadingStateBookByUserId(ReadingStatus.READING,
-            pageable, user);
+        verify(bookShelfRepository).findSpecificStatusBookByUserId(ReadingStatus.READING,
+            pageable, user.getId());
     }
 
     @Test
@@ -99,8 +99,8 @@ public class BookShelfServiceTest {
         bookShelfService.takeBooksOutOfBookShelf(ReadingStatus.COMPLETE, pageable,
             user);
 
-        verify(bookShelfRepository).findSpecificReadingStateBookByUserId(ReadingStatus.COMPLETE,
-            pageable, user);
+        verify(bookShelfRepository).findSpecificStatusBookByUserId(ReadingStatus.COMPLETE,
+            pageable, user.getId());
     }
 
     @Test
@@ -111,8 +111,8 @@ public class BookShelfServiceTest {
         bookShelfService.takeBooksOutOfBookShelf(ReadingStatus.WISH, pageable,
             user);
 
-        verify(bookShelfRepository).findSpecificReadingStateBookByUserId(ReadingStatus.WISH,
-            pageable, user);
+        verify(bookShelfRepository).findSpecificStatusBookByUserId(ReadingStatus.WISH,
+            pageable, user.getId());
 
     }
 }

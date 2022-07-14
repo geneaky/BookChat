@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import toy.bookchat.bookchat.domain.bookshelf.Star;
 
 @Getter
 @Builder
@@ -15,6 +16,6 @@ public class BookShelfSearchResponseDto {
     private String bookCoverImageUrl;
     private List<String> authors;
     private String publisher;
-    private Float star;
+    private Star star;
     private String singleLineAssessment;
 }

@@ -1,5 +1,6 @@
 package toy.bookchat.bookchat.domain.bookshelf.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -60,7 +61,25 @@ public class BookShelfService {
     public List<BookShelfSearchResponseDto> takeBooksOutOfBookShelf(ReadingStatus readingStatus,
         Pageable pageable, User user) {
 
-        return bookShelfRepository.findSpecificReadingStateBookByUserId(readingStatus, pageable,
-            user);
+        List<BookShelf> bookShelves = bookShelfRepository.findSpecificStatusBookByUserId(
+            readingStatus, pageable,
+            user.getId());
+
+        List<BookShelfSearchResponseDto> bookShelfSearchResponseDtos = new ArrayList<>();
+
+        for (BookShelf bookShelf : bookShelves) {
+            BookShelfSearchResponseDto bookShelfSearchResponseDto = BookShelfSearchResponseDto.builder()
+                .title(bookShelf.getBook().getTitle())
+                .authors(bookShelf.getBook().getAuthors())
+                .publisher(bookShelf.getBook().getPublisher())
+                .bookCoverImageUrl(bookShelf.getBook().getBookCoverImageUrl())
+                .star(bookShelf.getStar())
+                .singleLineAssessment(bookShelf.getSingleLineAssessment())
+                .build();
+
+            bookShelfSearchResponseDtos.add(bookShelfSearchResponseDto);
+        }
+
+        return bookShelfSearchResponseDtos;
     }
 }

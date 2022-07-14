@@ -6,6 +6,9 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.book.repository.BookRepository;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
@@ -60,26 +63,44 @@ public class BookShelfRepositoryTest {
 
     @Test
     public void 읽고있는_책을_조회() throws Exception {
-        Book book = new Book("1234", "effective java", List.of("Joshua"), "insight",
+        Book book1 = new Book("1234", "effective java", List.of("Joshua"), "insight",
             "bookCover@naver.com");
-        bookRepository.save(book);
+        Book book2 = new Book("12345", "effective java2", List.of("Joshua"), "insight",
+            "bookCove2r@naver.com");
+        bookRepository.save(book1);
+        bookRepository.save(book2);
 
         User user = User.builder().build();
         userRepository.save(user);
 
-        BookShelf bookShelf = BookShelf.builder()
-            .book(book)
+        BookShelf bookShelf1 = BookShelf.builder()
+            .book(book1)
             .user(user)
             .readingStatus(ReadingStatus.READING)
             .star(Star.ZERO)
             .singleLineAssessment(null)
             .build();
 
-        book.setBookShelf(bookShelf);
-        user.setBookShelf(bookShelf);
+        BookShelf bookShelf2 = BookShelf.builder()
+            .book(book2)
+            .user(user)
+            .readingStatus(ReadingStatus.READING)
+            .star(Star.ZERO)
+            .singleLineAssessment(null)
+            .build();
 
-        bookShelfRepository.save(bookShelf);
+        book1.setBookShelf(bookShelf1);
+        book2.setBookShelf(bookShelf2);
+        user.setBookShelf(bookShelf1);
+        user.setBookShelf(bookShelf2);
 
-        bookShelfRepository.findSpecificReadingStateBookByUserId(ReadingStatus.READING, ,user)
+        bookShelfRepository.save(bookShelf1);
+        bookShelfRepository.save(bookShelf2);
+
+        Pageable pageable = PageRequest.of(1, 2, Sort.by("id,DESC"));
+        List<BookShelf> bookShelves = bookShelfRepository.findSpecificStatusBookByUserId(
+            ReadingStatus.READING, pageable, user.getId());
+
+        assertThat(bookShelves.size()).isEqualTo(5);
     }
 }
