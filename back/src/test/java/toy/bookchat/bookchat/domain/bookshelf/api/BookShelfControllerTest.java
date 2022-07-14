@@ -33,6 +33,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
+import toy.bookchat.bookchat.domain.bookshelf.Star;
 import toy.bookchat.bookchat.domain.bookshelf.service.BookShelfService;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfRequestDto;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfSearchResponseDto;
@@ -377,7 +378,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
             .authors(List.of("joshua"))
             .bookCoverImageUrl("testBookCoverImage@naver.com")
             .publisher("jpub")
-            .star(4.5F)
+            .star(Star.FOUR_HALF)
             .singleLineAssessment("it's is best").build();
 
         result.add(bookShelfSearchResponseDto);

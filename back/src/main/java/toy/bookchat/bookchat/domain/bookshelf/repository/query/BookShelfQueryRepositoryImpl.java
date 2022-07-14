@@ -1,5 +1,7 @@
 package toy.bookchat.bookchat.domain.bookshelf.repository.query;
 
+import static toy.bookchat.bookchat.domain.bookshelf.QBookShelf.bookShelf;
+
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,10 @@ public class BookShelfQueryRepositoryImpl implements
     public List<BookShelf> findSpecificStatusBookByUserId(
         ReadingStatus readingStatus, Pageable pageable, Long userId) {
 
-        jpaQueryFactory.
+        return jpaQueryFactory.selectFrom(bookShelf)
+            .where(bookShelf.readingStatus.eq(readingStatus))
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .fetch();
     }
 }

@@ -6,6 +6,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -14,10 +15,12 @@ import toy.bookchat.bookchat.domain.book.repository.BookRepository;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.Star;
+import toy.bookchat.bookchat.domain.configuration.TestConfig;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 
 @DataJpaTest(showSql = false)
+@Import(TestConfig.class)
 public class BookShelfRepositoryTest {
 
     @Autowired
@@ -97,10 +100,10 @@ public class BookShelfRepositoryTest {
         bookShelfRepository.save(bookShelf1);
         bookShelfRepository.save(bookShelf2);
 
-        Pageable pageable = PageRequest.of(1, 2, Sort.by("id,DESC"));
+        Pageable pageable = PageRequest.of(0, 2, Sort.by("id,DESC"));
         List<BookShelf> bookShelves = bookShelfRepository.findSpecificStatusBookByUserId(
             ReadingStatus.READING, pageable, user.getId());
 
-        assertThat(bookShelves.size()).isEqualTo(5);
+        assertThat(bookShelves.size()).isEqualTo(2);
     }
 }
