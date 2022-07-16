@@ -65,6 +65,11 @@ public class BookShelfService {
             readingStatus, pageable,
             user.getId());
 
+        return getBookShelfSearchResponseDtos(bookShelves);
+    }
+
+    private List<BookShelfSearchResponseDto> getBookShelfSearchResponseDtos(
+        List<BookShelf> bookShelves) {
         List<BookShelfSearchResponseDto> bookShelfSearchResponseDtos = new ArrayList<>();
 
         for (BookShelf bookShelf : bookShelves) {
@@ -79,7 +84,6 @@ public class BookShelfService {
 
             bookShelfSearchResponseDtos.add(bookShelfSearchResponseDto);
         }
-
         return bookShelfSearchResponseDtos;
     }
 }
