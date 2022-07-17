@@ -2,15 +2,21 @@ package toy.bookchat.bookchat.domain.bookshelf.api;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -19,6 +25,7 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.GrantedAuthority;
@@ -26,8 +33,10 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
+import toy.bookchat.bookchat.domain.bookshelf.Star;
 import toy.bookchat.bookchat.domain.bookshelf.service.BookShelfService;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfRequestDto;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfSearchResponseDto;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
@@ -319,6 +328,121 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
                 .with(user(getUserPrincipal())))
             .andExpect(status().isBadRequest());
 
+    }
+
+    @Test
+    public void 읽고있는_책_조회_성공() throws Exception {
+
+        List<BookShelfSearchResponseDto> result = new ArrayList<>();
+
+        BookShelfSearchResponseDto bookShelfSearchResponseDto = BookShelfSearchResponseDto.builder()
+            .title("effectiveJava")
+            .authors(List.of("joshua"))
+            .bookCoverImageUrl("testBookCoverImage@naver.com")
+            .publisher("jpub")
+            .star(null)
+            .singleLineAssessment(null).build();
+
+        result.add(bookShelfSearchResponseDto);
+
+        when(bookShelfService.takeBooksOutOfBookShelf(any(ReadingStatus.class), any(Pageable.class),
+            any(User.class))).thenReturn(result);
+
+        mockMvc.perform(get("/v1/api/bookshelf/books")
+                .queryParam("readingStatus", "READING")
+                .queryParam("size", "5")
+                .queryParam("page", "1")
+                .queryParam("sort", "id,DESC")
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isOk())
+            .andDo(print())
+            .andDo(document("get_bookshelf_reading",
+                requestParameters(
+                    parameterWithName("readingStatus").description("READING"),
+                    parameterWithName("size").description("page 당 size"),
+                    parameterWithName("page").description("한번에 조회할 page수"),
+                    parameterWithName("sort").description("등록순-id")
+                ))
+            );
+
+        verify(bookShelfService).takeBooksOutOfBookShelf(any(ReadingStatus.class),
+            any(Pageable.class), any(User.class));
+    }
+
+    @Test
+    public void 읽은_책_조회_성공() throws Exception {
+        List<BookShelfSearchResponseDto> result = new ArrayList<>();
+
+        BookShelfSearchResponseDto bookShelfSearchResponseDto = BookShelfSearchResponseDto.builder()
+            .title("effectiveJava")
+            .authors(List.of("joshua"))
+            .bookCoverImageUrl("testBookCoverImage@naver.com")
+            .publisher("jpub")
+            .star(Star.FOUR_HALF)
+            .singleLineAssessment("it's is best").build();
+
+        result.add(bookShelfSearchResponseDto);
+
+        when(bookShelfService.takeBooksOutOfBookShelf(any(ReadingStatus.class), any(Pageable.class),
+            any(User.class))).thenReturn(result);
+
+        mockMvc.perform(get("/v1/api/bookshelf/books")
+                .queryParam("readingStatus", "COMPLETE")
+                .queryParam("size", "5")
+                .queryParam("page", "1")
+                .queryParam("sort", "id,DESC")
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isOk())
+            .andDo(print())
+            .andDo(document("get_bookshelf_complete",
+                requestParameters(
+                    parameterWithName("readingStatus").description("COMPLETE"),
+                    parameterWithName("size").description("page 당 size"),
+                    parameterWithName("page").description("한번에 조회할 page수"),
+                    parameterWithName("sort").description("등록순-id")
+                ))
+            );
+
+        verify(bookShelfService).takeBooksOutOfBookShelf(any(ReadingStatus.class),
+            any(Pageable.class), any(User.class));
+    }
+
+    @Test
+    public void 읽을_책_조회_성공() throws Exception {
+        List<BookShelfSearchResponseDto> result = new ArrayList<>();
+
+        BookShelfSearchResponseDto bookShelfSearchResponseDto = BookShelfSearchResponseDto.builder()
+            .title("effectiveJava")
+            .authors(List.of("joshua"))
+            .bookCoverImageUrl("testBookCoverImage@naver.com")
+            .publisher("jpub")
+            .star(null)
+            .singleLineAssessment(null).build();
+
+        result.add(bookShelfSearchResponseDto);
+
+        when(bookShelfService.takeBooksOutOfBookShelf(any(ReadingStatus.class), any(Pageable.class),
+            any(User.class))).thenReturn(result);
+
+        mockMvc.perform(get("/v1/api/bookshelf/books")
+                .queryParam("readingStatus", "WISH")
+                .queryParam("size", "5")
+                .queryParam("page", "1")
+                .queryParam("sort", "id,DESC")
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isOk())
+            .andDo(print())
+            .andDo(document("get_bookshelf_wish",
+                requestParameters(
+                    parameterWithName("readingStatus").description("WISH"),
+                    parameterWithName("size").description("page 당 size"),
+                    parameterWithName("page").description("한번에 조회할 page수"),
+                    parameterWithName("sort").description("등록순-id")
+                ))
+            );
+
+        verify(bookShelfService).takeBooksOutOfBookShelf(any(ReadingStatus.class),
+            any(Pageable.class), any(User.class));
     }
 
     static class BookShelfTestRequestDto {

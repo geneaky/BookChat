@@ -2,11 +2,13 @@ package toy.bookchat.bookchat.domain.book;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.*;
-
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
@@ -28,8 +30,8 @@ public class Book {
     @OneToMany(mappedBy = "book")
     private List<BookShelf> bookShelves = new ArrayList<>();
 
-    @Builder
-    private Book(String isbn, String title, List<String> authors, String publisher, String bookCoverImageUrl) {
+    public Book(String isbn, String title, List<String> authors, String publisher,
+        String bookCoverImageUrl) {
         this.isbn = isbn;
         this.title = title;
         this.authors = authors;
