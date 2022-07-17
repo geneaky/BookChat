@@ -17,9 +17,9 @@ public class BookShelfQueryRepositoryImpl extends QuerydslRepositorySupport impl
 
     private final JPAQueryFactory jpaQueryFactory;
 
-    public BookShelfQueryRepositoryImpl(JPAQueryFactory jpaQueryFactory) {
+    public BookShelfQueryRepositoryImpl() {
         super(BookShelf.class);
-        this.jpaQueryFactory = jpaQueryFactory;
+        this.jpaQueryFactory = new JPAQueryFactory(getEntityManager());
     }
 
     @Override
