@@ -1,5 +1,6 @@
 package toy.bookchat.bookchat.domain.bookshelf;
 
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -54,5 +55,21 @@ public class BookShelf {
 
     public void setBook(Book book) {
         this.book = book;
+    }
+
+    public String getBookTitle() {
+        return this.book.getTitle();
+    }
+
+    public List<String> getBookAuthors() {
+        return this.book.getAuthors();
+    }
+
+    public String getBookPublisher() {
+        return this.book.getBookCoverImageUrl();
+    }
+
+    public String getBookCoverImageUrl() {
+        return this.book.getBookCoverImageUrl();
     }
 }

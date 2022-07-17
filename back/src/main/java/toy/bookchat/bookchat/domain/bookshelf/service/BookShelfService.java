@@ -74,10 +74,10 @@ public class BookShelfService {
 
         for (BookShelf bookShelf : bookShelves) {
             BookShelfSearchResponseDto bookShelfSearchResponseDto = BookShelfSearchResponseDto.builder()
-                .title(bookShelf.getBook().getTitle())
-                .authors(bookShelf.getBook().getAuthors())
-                .publisher(bookShelf.getBook().getPublisher())
-                .bookCoverImageUrl(bookShelf.getBook().getBookCoverImageUrl())
+                .title(bookShelf.getBookTitle())
+                .authors(bookShelf.getBookAuthors())
+                .publisher(bookShelf.getBookPublisher())
+                .bookCoverImageUrl(bookShelf.getBookCoverImageUrl())
                 .star(bookShelf.getStar())
                 .singleLineAssessment(bookShelf.getSingleLineAssessment())
                 .build();
