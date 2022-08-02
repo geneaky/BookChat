@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.exception.UserNotFoundException;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
@@ -29,11 +30,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
         FilterChain filterChain) throws ServletException, IOException {
-        try {
-            String jwt = getJwtFromRequest(request);
-            validUserRequestByJwt(request, jwt);
-        } catch (Exception ignored) {
-        }
+
+        String jwt = getJwtFromRequest(request);
+
+        validUserRequestByJwt(request, jwt);
 
         filterChain.doFilter(request, response);
     }
@@ -51,21 +51,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String email = jwtTokenProvider.getEmailFromToken(jwt);
             Optional<User> optionalUser = userRepository.findByEmail(email);
 
-            registerUserAuthentication(request, optionalUser);
-
+            optionalUser.ifPresentOrElse((user -> registerUserAuthentication(request, user)),
+                () -> {
+                    throw new UserNotFoundException("Not Registered User Request");
+                });
         }
+        
     }
 
     private void registerUserAuthentication(HttpServletRequest request,
-        Optional<User> optionalUser) {
-        if (optionalUser.isPresent()) {
-            UserDetails userDetails = UserPrincipal.create(optionalUser.get());
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                userDetails, null, userDetails.getAuthorities());
-            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        User user) {
+        UserDetails userDetails = UserPrincipal.create(user);
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+            userDetails, null, userDetails.getAuthorities());
+        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-        }
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
 }
