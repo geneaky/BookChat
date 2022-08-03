@@ -49,6 +49,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private void validUserRequestByJwt(HttpServletRequest request, String jwt) {
         if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt)) {
             String email = jwtTokenProvider.getEmailFromToken(jwt);
+            /*@todo
+             *   사용자의 이메일과 token안에 담긴 oauth2provider로 계정을 선택해서 가져올 수 있도록 함*/
             Optional<User> optionalUser = userRepository.findByEmail(email);
 
             optionalUser.ifPresentOrElse((user -> registerUserAuthentication(request, user)),
@@ -56,7 +58,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     throw new UserNotFoundException("Not Registered User Request");
                 });
         }
-        
+
     }
 
     private void registerUserAuthentication(HttpServletRequest request,

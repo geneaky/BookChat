@@ -6,6 +6,7 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SignatureException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +18,10 @@ import toy.bookchat.bookchat.security.user.UserPrincipal;
 @Slf4j
 @Component
 public class JwtTokenProvider {
+
+    /*@todo
+     *   외부 의존성인 io.jwts를 사용하는 것이 아니라 인터페이스를 만들고 그 구현체에서 사용하는 방식으로
+     *   작성하면 이후 io.jwts가 아니라 다른 jwt 구현체를 사용하도록 확장가능*/
 
     public static final String EMAIL = "email";
     public static final String SOCIAL_TYPE = "social_type";
@@ -43,13 +48,23 @@ public class JwtTokenProvider {
         } else {
             email = (String) defaultOAuth2User.getAttributes().get(EMAIL);
         }
+        /*@todo
+         *   oauth2 provider 를 토큰에 같이 넘겨주기 -> 우선 token에 대한 조사 분석부터*/
 
         return Jwts.builder()
             .setSubject(email)
+            .setClaims(createClaims(oAuth2Provider, email))
             .setIssuedAt(now)
             .setExpiration(expiredDate)
             .signWith(SignatureAlgorithm.HS256, secret)
             .compact();
+    }
+
+    private Map<String, Object> createClaims(OAuth2Provider oAuth2Provider, String email) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("email", email);
+        claims.put("provider", oAuth2Provider.name());
+        return claims;
     }
 
     public String getEmailFromToken(String token) {
