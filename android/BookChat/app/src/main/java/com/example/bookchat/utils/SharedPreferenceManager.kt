@@ -8,6 +8,8 @@ import androidx.security.crypto.MasterKeys
 import com.example.bookchat.App
 import com.example.bookchat.utils.Constants.TAG
 import com.google.gson.Gson
+import java.util.*
+import kotlin.collections.ArrayList
 
 object SharedPreferenceManager {
 
@@ -47,12 +49,11 @@ object SharedPreferenceManager {
         return tokenPref.getString(TOKEN_PREF_KEY,"").isNullOrEmpty()
     }
 
-    //history 가져오기
+    //history 가져오기 // 스택으로 수정할 것(그러면 reversed 안써도 됨)
     fun getSearchHistory() :ArrayList<String>{
         Log.d(TAG, "SharedPreferenceManager: getSearchHistory() - called")
         val searchHistoryListString = historyPref.getString(SEARCH_HISTORY_PREF_KEY,"") ?: ""
         Log.d(TAG, "SearchActivity: getSearchHistory()- searchHistoryListString : ${searchHistoryListString}")
-
         var searchHistoryList = ArrayList<String>()
 
         if (searchHistoryListString.isNotEmpty()){
@@ -61,7 +62,7 @@ object SharedPreferenceManager {
             fromJson(searchHistoryListString, Array<String>::class.java).
             toMutableList() as ArrayList<String>
         }
-        return searchHistoryList.reversed().toCollection(ArrayList())
+        return searchHistoryList.toCollection(ArrayList())
     }
 
     //history 저장하기
@@ -69,14 +70,16 @@ object SharedPreferenceManager {
         Log.d(TAG, "SearchActivity: setSearchHistory() - called")
 
         val searchHistoryList = getSearchHistory() //저장되어있는 검색기록 불러옴
-        searchHistoryList.add(searchKeyWord)
+        val temp = ArrayList<String>()
+        temp.add(searchKeyWord)
+        temp.addAll(searchHistoryList)
 
         // 배열 -> 문자열(Json)으로 변환
-        val searchHistoryListString : String = Gson().toJson(searchHistoryList)
-        Log.d(TAG, "SearchActivity: setSearchHistory() - searchHistoryListString : ${searchHistoryListString}") //저장 잘 되는거 확인
+        val newHistoryString : String = Gson().toJson(temp)
+        Log.d(TAG, "SearchActivity: setSearchHistory() - searchHistoryListString : ${newHistoryString}") //저장 잘 되는거 확인
 
         val editor = historyPref.edit()
-        editor.putString(SEARCH_HISTORY_PREF_KEY,searchHistoryListString)
+        editor.putString(SEARCH_HISTORY_PREF_KEY,newHistoryString)
         editor.apply()
     }
 
