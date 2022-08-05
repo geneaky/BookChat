@@ -49,7 +49,7 @@ object SharedPreferenceManager {
         return tokenPref.getString(TOKEN_PREF_KEY,"").isNullOrEmpty()
     }
 
-    //history 가져오기 // 스택으로 수정할 것(그러면 reversed 안써도 됨)
+    //history 가져오기
     fun getSearchHistory() :ArrayList<String>{
         Log.d(TAG, "SharedPreferenceManager: getSearchHistory() - called")
         val searchHistoryListString = historyPref.getString(SEARCH_HISTORY_PREF_KEY,"") ?: ""

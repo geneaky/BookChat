@@ -4,6 +4,7 @@ import android.util.Log
 import android.widget.Toast
 import com.example.bookchat.App
 import com.example.bookchat.data.Book
+import com.example.bookchat.data.BookSearchResultDto
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.SearchOptionType
 import retrofit2.Call
@@ -14,7 +15,7 @@ import java.lang.StringBuilder
 class BookRepository {
 
     private lateinit var books :ArrayList<Book>
-    private lateinit var call : Call<ArrayList<Book>>
+    private lateinit var call : Call<BookSearchResultDto>
 
     fun getBooks(searchKeyWord : String,searchOption: SearchOptionType,callback : (ArrayList<Book>) -> Unit){
 
@@ -32,14 +33,14 @@ class BookRepository {
                 }}
             }
 
-            call.enqueue(object :Callback<ArrayList<Book>>{
+            call.enqueue(object :Callback<BookSearchResultDto>{
                 override fun onResponse(
-                    call: Call<ArrayList<Book>>,
-                    response: Response<ArrayList<Book>>
+                    call: Call<BookSearchResultDto>,
+                    response: Response<BookSearchResultDto>
                 ) {
                     if (response.isSuccessful){
                         Log.d(TAG, "BookRepository: onResponse() - Success(통신 성공)-response.body() : ${response.body() } , 응답 코드 : ${response.code()}")
-                        books = response.body()!!
+                        books = response.body()!!.books
 
                         books.forEach{
                             Log.d(TAG, "SearchResultViewModel: 테스트 : title : it.title , '(' index : ${it.title.indexOf('(')   }")
@@ -60,7 +61,7 @@ class BookRepository {
                 }
 
                 override fun onFailure(
-                    call: Call<ArrayList<Book>>,
+                    call: Call<BookSearchResultDto>,
                     t: Throwable) {
                     //인터넷 끊김 , 예외 발생 등 시스템적 이유로 통신 실패
                     Log.d(TAG, "BookRepository: onFailure() - Throwable : ${t}")
