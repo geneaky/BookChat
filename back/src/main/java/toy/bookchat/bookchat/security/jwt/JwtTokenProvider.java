@@ -6,6 +6,7 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SignatureException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,15 +19,37 @@ import toy.bookchat.bookchat.security.user.UserPrincipal;
 @Component
 public class JwtTokenProvider {
 
+    /*@todo
+     *   외부 의존성인 io.jwts를 사용하는 것이 아니라 인터페이스를 만들고 그 구현체에서 사용하는 방식으로
+     *   작성하면 이후 io.jwts가 아니라 다른 jwt 구현체를 사용하도록 확장가능
+     *   근데 추상화 비용을 생각해보면 추상화된 토큰 방식의 구현체를 변경할 일이 있을까 싶네,,,
+     *   사용하고 있는 라이브러리가 deprecated되거나 다른 라이브러리로 변경될때를 대비하는 의미로 할까 고민중
+     * */
+
     public static final String EMAIL = "email";
     public static final String SOCIAL_TYPE = "social_type";
     public static final String KAKAO_ACCOUNT = "kakao_account";
+    public static final String OAUTH2_PROVIDER = "oAuth2Provider";
 
-    @Value("${token.secret}")
-    private String secret;
+    private final String secret;
 
-    @Value("${token.expired_time}")
-    private long expiredTime;
+    private final long expiredTime;
+
+    /*@TODO
+     *   @Value를 사용해서 설정 정보를 받는 방식에서
+     *   별도의 Configuration 파일 (예: TokenConfiguration)을 만들어서
+     *   사용하는 것이 설정 값을 한 곳에 묶어서 사용할 수 있고 수정 사항을 한 곳으로
+     *   모아둘 수 있음.
+     *   @Value방식은 빈으로 등록된 후 Reflection을 사용해서 값을 runtime에 동적으로
+     *   넣어주기 때문에 비효율적이고 테스트할 때도 불편했음
+     * https://kkambi.tistory.com/210
+     *https://tuhrig.de/why-using-springs-value-annotation-is-bad/
+     * */
+    public JwtTokenProvider(@Value("${token.secret}") String secret,
+        @Value("${token.expired_time}") long expiredTime) {
+        this.secret = secret;
+        this.expiredTime = expiredTime;
+    }
 
     public String createToken(Authentication authentication) {
         UserPrincipal defaultOAuth2User = (UserPrincipal) authentication.getPrincipal();
@@ -43,21 +66,39 @@ public class JwtTokenProvider {
         } else {
             email = (String) defaultOAuth2User.getAttributes().get(EMAIL);
         }
+        /*@todo
+         *   oauth2 provider 를 토큰에 같이 넘겨주기 -> 우선 token에 대한 조사 분석부터*/
 
         return Jwts.builder()
-            .setSubject(email)
+            .setSubject("bookchat")
+            .setClaims(createClaims(oAuth2Provider, email))
             .setIssuedAt(now)
             .setExpiration(expiredDate)
             .signWith(SignatureAlgorithm.HS256, secret)
             .compact();
     }
 
+    private Map<String, Object> createClaims(OAuth2Provider oAuth2Provider, String email) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put(EMAIL, email);
+        claims.put(OAUTH2_PROVIDER, oAuth2Provider);
+        return claims;
+    }
+
     public String getEmailFromToken(String token) {
-        return Jwts.parser()
+        return (String) Jwts.parser()
             .setSigningKey(secret)
             .parseClaimsJws(token)
             .getBody()
-            .getSubject();
+            .get(EMAIL);
+    }
+
+    public OAuth2Provider getOauth2TokenProviderFromToken(String token) {
+        return OAuth2Provider.valueOf(Jwts.parser()
+            .setSigningKey(secret)
+            .parseClaimsJws(token)
+            .getBody()
+            .get(OAUTH2_PROVIDER).toString());
     }
 
     public boolean validateToken(String token) {
@@ -75,4 +116,5 @@ public class JwtTokenProvider {
         }
         return false;
     }
+
 }
