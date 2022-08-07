@@ -18,7 +18,6 @@ class SearchHistoryAdapter(var searchHistoryList :ArrayList<String>) : RecyclerV
     init {
         Log.d(TAG, "SearchHistoryAdapter: () - called")
     }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         binding = DataBindingUtil
             .inflate(LayoutInflater.from(parent.context), R.layout.item_search_history,parent,false)
@@ -41,8 +40,7 @@ class SearchHistoryAdapter(var searchHistoryList :ArrayList<String>) : RecyclerV
         return searchHistoryList.size
     }
 
-    inner class SearchHistoryViewHolder(val binding: ItemSearchHistoryBinding): RecyclerView.ViewHolder(binding.root){
-    }
+    inner class SearchHistoryViewHolder(val binding: ItemSearchHistoryBinding): RecyclerView.ViewHolder(binding.root)
 
     // 아이템 클릭 리스너 인터페이스 정의
     interface OnItemClickListener {

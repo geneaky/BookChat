@@ -48,6 +48,13 @@ class SearchActivity : AppCompatActivity() {
         binding.drawerViewModel = OptionDrawerViewModel() //의미 없음 라이프사이클 연결이 안되서 ,
         // 데이터 바인딩 써서하려면 프레그먼트나 액티비티로 만들어야하는데 그러면 SlidingUpPanddingWindow를 못씀 아마도 직접 구현해야할거임
 
+        initSearchWindow()
+        initHistoryRcyV()
+        initOptionSlide()
+
+    }
+
+    fun initSearchWindow(){
         with(binding){
             //검색창 엔터이벤트 등록
             searchTextEt.setOnEditorActionListener { textView, actionId, keyEvent ->
@@ -60,26 +67,28 @@ class SearchActivity : AppCompatActivity() {
                 }
                 false
             }
-            //검색기록 RcyV설정
-            searchHistoryAdapter = SearchHistoryAdapter(SharedPreferenceManager.getSearchHistory())
-            searchHistoryAdapter.setItemClickListener( object :SearchHistoryAdapter.OnItemClickListener{
-                override fun onClick(v: View, position: Int) {
-                    val intent = Intent(this@SearchActivity, SearchResultActivity::class.java)
-                    intent.putExtra("SearchKeyWord",SharedPreferenceManager.getSearchHistory().get(position))
-                    intent.putExtra("OptionType",optionType)
-                    startActivity(intent)
-                }
-            })
-            with(SearchHistoryRycv){
-                adapter = searchHistoryAdapter
-                setHasFixedSize(true)
-                layoutManager = LinearLayoutManager(this@SearchActivity,
-                    RecyclerView.VERTICAL,false)
-                val snapHelper = LinearSnapHelper()
-                snapHelper.attachToRecyclerView(SearchHistoryRycv)
-            }
         }
+    }
+    fun initHistoryRcyV(){
+        //검색기록 RcyV설정
+        searchHistoryAdapter = SearchHistoryAdapter(SharedPreferenceManager.getSearchHistory())
+        searchHistoryAdapter.setItemClickListener( object :SearchHistoryAdapter.OnItemClickListener{
+            override fun onClick(v: View, position: Int) {
+                val intent = Intent(this@SearchActivity, SearchResultActivity::class.java)
+                intent.putExtra("SearchKeyWord",SharedPreferenceManager.getSearchHistory().get(position))
+                intent.putExtra("OptionType",optionType)
+                startActivity(intent)
+            }
+        })
 
+        with(binding.SearchHistoryRycv){
+            adapter = searchHistoryAdapter
+            setHasFixedSize(true)
+            layoutManager = LinearLayoutManager(this@SearchActivity,
+                RecyclerView.VERTICAL,false)
+        }
+    }
+    fun initOptionSlide(){
         //옵션 슬라이드 설정
         binding.optionFrame.addPanelSlideListener( object : SlidingUpPanelLayout.PanelSlideListener{
             //패널이 슬라이드 중일 때
@@ -101,6 +110,7 @@ class SearchActivity : AppCompatActivity() {
         //초기값 숨김 지정
         binding.optionFrame.panelState = SlidingUpPanelLayout.PanelState.HIDDEN
     }
+
 
     //검색창 클릭 이벤트(열기)
     fun clickSearchWindow(){
@@ -299,6 +309,12 @@ class SearchActivity : AppCompatActivity() {
     override fun onRestart() {
         Log.d(TAG, "SearchActivity: onRestart() - 생명주기")
         //Restart() -> Start() -> Resume() 순서로 돌아옴 (돌아올 때 RecyclerView 갱신해야함)
+        //EditText 초기화
+        clearSearchText()
+        //리사이클러뷰 갱신
+        initHistoryRcyV()
+        searchHistoryAdapter.notifyDataSetChanged()
+
         super.onRestart()
     }
 
@@ -310,13 +326,6 @@ class SearchActivity : AppCompatActivity() {
     override fun onResume() {
         Log.d(TAG, "SearchActivity: onResume() - 생명주기")
         super.onResume()
-
-        //EditText 초기화
-        clearSearchText()
-
-        //리사이클러뷰 갱신
-        searchHistoryAdapter.searchHistoryList = SharedPreferenceManager.getSearchHistory()
-        searchHistoryAdapter.notifyDataSetChanged()
     }
 
     override fun onPause() {
