@@ -17,6 +17,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.exception.UserNotFoundException;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
+import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @Component
@@ -49,9 +50,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private void validUserRequestByJwt(HttpServletRequest request, String jwt) {
         if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt)) {
             String email = jwtTokenProvider.getEmailFromToken(jwt);
+            OAuth2Provider oAuth2TokenProvider = jwtTokenProvider.getOauth2TokenProviderFromToken(
+                jwt);
             /*@todo
              *   사용자의 이메일과 token안에 담긴 oauth2provider로 계정을 선택해서 가져올 수 있도록 함*/
-            Optional<User> optionalUser = userRepository.findByEmail(email);
+            Optional<User> optionalUser = userRepository.findByEmailAndProvider(email,
+                oAuth2TokenProvider);
 
             optionalUser.ifPresentOrElse((user -> registerUserAuthentication(request, user)),
                 () -> {

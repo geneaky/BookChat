@@ -47,12 +47,15 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 "Email not found from OAuth2 Provider");
         }
 
-        Optional<User> optionalUser = userRepository.findByEmail(oAuth2UserInfo.getEmail());
+        Optional<User> optionalUser = userRepository.findByEmailAndProvider(
+            oAuth2UserInfo.getEmail(),
+            getProviderFromOAuth2UserRequest(oAuth2UserRequest));
+
         User user;
+
         if (optionalUser.isPresent()) {
             user = optionalUser.get();
-            if (!user.getProvider().equals(OAuth2Provider.valueOf(
-                oAuth2UserRequest.getClientRegistration().getRegistrationId()))) {
+            if (!user.getProvider().equals(getProviderFromOAuth2UserRequest(oAuth2UserRequest))) {
                 throw new OAuth2AuthenticationProcessingException(
                     "you can use this account to login");
             }
@@ -64,11 +67,15 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         return UserPrincipal.create(user, oAuth2User.getAttributes());
     }
 
+    private OAuth2Provider getProviderFromOAuth2UserRequest(OAuth2UserRequest oAuth2UserRequest) {
+        return OAuth2Provider.valueOf(
+            oAuth2UserRequest.getClientRegistration().getRegistrationId());
+    }
+
     private User registerNewUser(OAuth2UserRequest oAuth2UserRequest,
         OAuth2UserInfo oAuth2UserInfo) {
         User user = User.builder()
-            .provider(OAuth2Provider.valueOf(
-                oAuth2UserRequest.getClientRegistration().getRegistrationId()))
+            .provider(getProviderFromOAuth2UserRequest(oAuth2UserRequest))
             .name(oAuth2UserInfo.getName())
             .email(oAuth2UserInfo.getEmail())
             .profileImageUrl(oAuth2UserInfo.getImageUrl())
