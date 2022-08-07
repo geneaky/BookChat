@@ -66,6 +66,8 @@ public class JwtTokenProvider {
         } else {
             email = (String) defaultOAuth2User.getAttributes().get(EMAIL);
         }
+        /*@todo
+         *   oauth2 provider 를 토큰에 같이 넘겨주기 -> 우선 token에 대한 조사 분석부터*/
 
         return Jwts.builder()
             .setSubject("bookchat")
