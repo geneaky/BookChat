@@ -8,7 +8,7 @@ public class KakaoOAuth2UserInfo extends OAuth2UserInfo {
     public static final String SUB = "sub";
     public static final String NAME = "name";
     public static final String EMAIL = "email";
-    public static final String PICTURE = "picture";
+    public static final String PROFILE_IMAGE = "profile_image";
 
     public KakaoOAuth2UserInfo(Map<String, Object> attributes) {
         super(attributes);
@@ -16,7 +16,7 @@ public class KakaoOAuth2UserInfo extends OAuth2UserInfo {
 
     @Override
     public String getId() {
-        return (String)attributes.get(SUB);
+        return (String) attributes.get(SUB);
     }
 
     @Override
@@ -26,11 +26,13 @@ public class KakaoOAuth2UserInfo extends OAuth2UserInfo {
 
     @Override
     public String getEmail() {
-        return (String)((LinkedHashMap<String, Object>)attributes.get("kakao_account")).get(EMAIL);
+        return (String) ((LinkedHashMap<String, Object>) attributes.get("kakao_account")).get(
+            EMAIL);
     }
 
     @Override
     public String getImageUrl() {
-        return null;
+        return (String) ((LinkedHashMap<String, Object>) attributes.get("properties")).get(
+            PROFILE_IMAGE);
     }
 }
