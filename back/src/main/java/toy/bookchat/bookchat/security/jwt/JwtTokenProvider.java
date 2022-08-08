@@ -27,7 +27,6 @@ public class JwtTokenProvider {
      * */
 
     public static final String EMAIL = "email";
-    public static final String SOCIAL_TYPE = "social_type";
     public static final String KAKAO_ACCOUNT = "kakao_account";
     public static final String OAUTH2_PROVIDER = "oAuth2Provider";
 
@@ -52,30 +51,30 @@ public class JwtTokenProvider {
     }
 
     public String createToken(Authentication authentication) {
-        UserPrincipal defaultOAuth2User = (UserPrincipal) authentication.getPrincipal();
 
-        Date now = new Date();
-        Date expiredDate = new Date(now.getTime() + expiredTime);
+        Date expiredDate = new Date(new Date().getTime() + expiredTime);
 
-        OAuth2Provider oAuth2Provider = (OAuth2Provider) defaultOAuth2User.getAttributes()
-            .get(SOCIAL_TYPE);
-        String email;
-        if (oAuth2Provider == OAuth2Provider.kakao) {
-            email = (String) ((Map<String, Object>) defaultOAuth2User.getAttributes()
-                .get(KAKAO_ACCOUNT)).get(EMAIL);
-        } else {
-            email = (String) defaultOAuth2User.getAttributes().get(EMAIL);
-        }
-        /*@todo
-         *   oauth2 provider 를 토큰에 같이 넘겨주기 -> 우선 token에 대한 조사 분석부터*/
+        OAuth2Provider oAuth2Provider = ((UserPrincipal) authentication.getPrincipal()).getUser()
+            .getProvider();
+
+        String email = extractEmailInAuthenticationByOAuth2Provider(authentication, oAuth2Provider);
 
         return Jwts.builder()
             .setSubject("bookchat")
             .setClaims(createClaims(oAuth2Provider, email))
-            .setIssuedAt(now)
+            .setIssuedAt(new Date())
             .setExpiration(expiredDate)
             .signWith(SignatureAlgorithm.HS256, secret)
             .compact();
+    }
+
+    private String extractEmailInAuthenticationByOAuth2Provider(Authentication authentication,
+        OAuth2Provider oAuth2Provider) {
+        if (oAuth2Provider == OAuth2Provider.kakao) {
+            return (String) ((Map<String, Object>) ((UserPrincipal) authentication.getPrincipal()).getAttributes()
+                .get(KAKAO_ACCOUNT)).get(EMAIL);
+        }
+        return (String) ((UserPrincipal) authentication.getPrincipal()).getAttributes().get(EMAIL);
     }
 
     private Map<String, Object> createClaims(OAuth2Provider oAuth2Provider, String email) {
@@ -96,9 +95,9 @@ public class JwtTokenProvider {
     public OAuth2Provider getOauth2TokenProviderFromToken(String token) {
         return OAuth2Provider.valueOf(Jwts.parser()
             .setSigningKey(secret)
+            .setSigningKey(secret)
             .parseClaimsJws(token)
-            .getBody()
-            .get(OAUTH2_PROVIDER).toString());
+            .getBody().get(OAUTH2_PROVIDER).toString());
     }
 
     public boolean validateToken(String token) {

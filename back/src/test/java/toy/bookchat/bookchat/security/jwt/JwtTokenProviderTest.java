@@ -3,6 +3,7 @@ package toy.bookchat.bookchat.security.jwt;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static toy.bookchat.bookchat.security.jwt.JwtTokenProvider.KAKAO_ACCOUNT;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
+import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
@@ -18,27 +20,30 @@ class JwtTokenProviderTest {
 
     JwtTokenProvider tokenProvider = new JwtTokenProvider("hihi", 860000L);
 
-    private String getToken() {
+    private String getKakaoToken() {
         Authentication authentication = mock(Authentication.class);
         UserPrincipal userPrincipal = mock(UserPrincipal.class);
+        User user = mock(User.class);
 
-        Map<String, Object> map = new HashMap<>();
-        map.put(JwtTokenProvider.EMAIL, "kaktus418@gmail.com");
-        map.put(JwtTokenProvider.OAUTH2_PROVIDER, "kakao");
+        Map<String, Object> innerMap = new HashMap<>();
+        innerMap.put(JwtTokenProvider.EMAIL, "kaktus418@gmail.com");
+        innerMap.put(JwtTokenProvider.OAUTH2_PROVIDER, "kakao");
+        OAuth2Provider oAuth2Provider = OAuth2Provider.kakao;
 
-        Map<String, Object> oAuth2Provider = new HashMap<>();
-        oAuth2Provider.put(JwtTokenProvider.KAKAO_ACCOUNT, map);
-        oAuth2Provider.put(JwtTokenProvider.SOCIAL_TYPE, OAuth2Provider.kakao);
+        Map<String, Object> outerMap = new HashMap<>();
+        outerMap.put(KAKAO_ACCOUNT, innerMap);
 
         when(authentication.getPrincipal()).thenReturn(userPrincipal);
-        when(userPrincipal.getAttributes()).thenReturn(oAuth2Provider);
+        when(userPrincipal.getUser()).thenReturn(user);
+        when(userPrincipal.getAttributes()).thenReturn(outerMap);
+        when(user.getProvider()).thenReturn(oAuth2Provider);
 
         return tokenProvider.createToken(authentication);
     }
 
     @Test
     public void 토큰을_생성_성공() throws Exception {
-        String token = getToken();
+        String token = getKakaoToken();
 
         assertThat(token).isNotBlank();
         assertThat(token).isInstanceOf(String.class);
@@ -47,7 +52,7 @@ class JwtTokenProviderTest {
 
     @Test
     public void 토큰에서_이메일_추출_성공() throws Exception {
-        String token = getToken();
+        String token = getKakaoToken();
 
         String email = tokenProvider.getEmailFromToken(token);
 
@@ -56,7 +61,7 @@ class JwtTokenProviderTest {
 
     @Test
     public void 토큰에서_Oauth2Provider_추출_성공() throws Exception {
-        String token = getToken();
+        String token = getKakaoToken();
 
         OAuth2Provider oauth2TokenProvider = tokenProvider.getOauth2TokenProviderFromToken(token);
 
@@ -66,7 +71,7 @@ class JwtTokenProviderTest {
     @Test
     public void 정상_토큰_validation_성공() throws Exception {
 
-        String token = getToken();
+        String token = getKakaoToken();
 
         assertThat(tokenProvider.validateToken(token)).isTrue();
     }
