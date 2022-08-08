@@ -1,9 +1,11 @@
 package com.example.bookchat.activities
 
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
@@ -15,6 +17,7 @@ import com.example.bookchat.databinding.ActivityMainBinding
 import com.example.bookchat.utils.ActivityType
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.viewmodel.MainViewModel
+import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
@@ -63,6 +66,35 @@ class MainActivity : AppCompatActivity() {
         }
         val intent = Intent(this, targetActivity)
         startActivity(intent)
+    }
+    fun clickSignOut(){
+        //다이얼 로그로 정말 로그아웃 하시겠습니까 물어보기
+        val dialog = AlertDialog.Builder(this,android.R.style.Theme_DeviceDefault_Light_Dialog)
+        dialog.setTitle("정말 로그아웃하시겠습니까?")
+            .setPositiveButton("취소",object : DialogInterface.OnClickListener {
+                override fun onClick(dialog: DialogInterface?, which: Int) {
+                    Log.d(TAG, "MainActivity: dialog- onClick() 취소- called")
+                }
+            })
+            .setNeutralButton("로그아웃",object : DialogInterface.OnClickListener{
+                override fun onClick(dialog: DialogInterface?, which: Int) {
+                    Log.d(TAG, "MainActivity: dialog- onClick() 로그아웃- called")
+                    //토큰 지우기
+                    deleteToken()
+                    //앱 종료
+                    finish()
+                }
+            })
+            .setCancelable(true) //백버튼으로 닫히게 설정
+            .show()
+    }
+    fun deleteToken(){
+        try {
+            val token = File("/data/data/com.example.bookchat/shared_prefs/encryptedShared.xml")
+            if (token.exists()) token.delete()
+        }catch (e :Exception){
+            e.printStackTrace()
+        }
     }
 
 }
