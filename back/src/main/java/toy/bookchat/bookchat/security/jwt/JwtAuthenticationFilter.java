@@ -1,5 +1,8 @@
 package toy.bookchat.bookchat.security.jwt;
 
+import static toy.bookchat.bookchat.utils.constants.AuthConstants.AUTHORIZATION;
+import static toy.bookchat.bookchat.utils.constants.AuthConstants.BEARER;
+
 import java.io.IOException;
 import java.util.Optional;
 import javax.servlet.FilterChain;
@@ -40,8 +43,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private String getJwtFromRequest(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer")) {
+        String bearerToken = request.getHeader(AUTHORIZATION);
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER)) {
             return bearerToken.substring(BEGIN_INDEX);
         }
         return null;
