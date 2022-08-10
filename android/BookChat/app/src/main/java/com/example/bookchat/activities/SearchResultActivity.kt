@@ -8,10 +8,14 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.bookchat.Pagingtest.SearchResultViewModelFactory
 import com.example.bookchat.R
 import com.example.bookchat.adapter.SearchResultBookAdapter
+import com.example.bookchat.data.Book
 import com.example.bookchat.databinding.ActivitySearchResultBinding
+import com.example.bookchat.repository.BookRepository
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.SearchOptionType
 import com.example.bookchat.utils.SharedPreferenceManager
@@ -21,7 +25,6 @@ import com.example.bookchat.viewmodel.SearchResultViewModel
 class SearchResultActivity : AppCompatActivity() {
     private lateinit var binding : ActivitySearchResultBinding
     private lateinit var bookResultAdapter : SearchResultBookAdapter
-
     private lateinit var searchResultViewModel : SearchResultViewModel
 
     //JetPack ViewModel은 View와 1:1관계로 연결되기 때문에 한개의 View에서 다수개의 View를 사용할 수 없다.
@@ -34,7 +37,6 @@ class SearchResultActivity : AppCompatActivity() {
 //        }
 //    }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "SearchResultActivity: onCreate() - called")
@@ -43,8 +45,10 @@ class SearchResultActivity : AppCompatActivity() {
         with(binding){
             lifecycleOwner = this@SearchResultActivity
             activity = this@SearchResultActivity
-            searchResultViewModel = SearchResultViewModel()
-            viewModel = searchResultViewModel
+
+            val repository = BookRepository()
+            val viewModelFactory = SearchResultViewModelFactory(repository)
+            searchResultViewModel = ViewModelProvider(this@SearchResultActivity,viewModelFactory).get(SearchResultViewModel::class.java)
 //            optionDrawerViewModel = OptionDrawerViewModel()
 
             searchTextEt.setText(intent.getStringExtra("SearchKeyWord") ?: "NO DATA")
@@ -55,26 +59,27 @@ class SearchResultActivity : AppCompatActivity() {
             bookSearchResultRcyView.layoutManager = GridLayoutManager(this@SearchResultActivity,2)
 
             //결과 액티비티 켜지자 마자 화면을 로딩시키고 데이터를 다 가져왔다면 리사이클러뷰 다시 갱신
-            viewModel?.getBooks(
-                intent.getStringExtra("SearchKeyWord")!!,
-                intent.getSerializableExtra("OptionType") as SearchOptionType,
-                success = {
-                    Log.d(TAG, "binding.emptyResultImg.visibility = View.INVISIBLE1 - called")
-                    binding.emptyResultImg.visibility = View.INVISIBLE
-                    binding.emptyResultText.visibility = View.INVISIBLE
-                    binding.bookSearchResultRcyView.visibility = View.VISIBLE
-                    binding.searchBackground.setBackgroundResource(R.drawable.search_result_background)
-                    bookResultAdapter.notifyDataSetChanged()
-                },
-                fail = {
-                    Log.d(TAG, "binding.emptyResultImg.visibility = View.VISIBLE2- called")
-                    binding.emptyResultImg.visibility = View.VISIBLE
-                    binding.emptyResultText.visibility = View.VISIBLE
-                    binding.bookSearchResultRcyView.visibility = View.INVISIBLE
-                    bookResultAdapter.notifyDataSetChanged()
-                    binding.searchBackground.setBackgroundResource(R.drawable.search_result_background_white)
-                }
-            )
+
+//            viewModel?.getBooks(
+//                intent.getStringExtra("SearchKeyWord")!!,
+//                intent.getSerializableExtra("OptionType") as SearchOptionType,
+//                success = {
+//                    Log.d(TAG, "binding.emptyResultImg.visibility = View.INVISIBLE1 - called")
+//                    binding.emptyResultImg.visibility = View.INVISIBLE
+//                    binding.emptyResultText.visibility = View.INVISIBLE
+//                    binding.bookSearchResultRcyView.visibility = View.VISIBLE
+//                    binding.searchBackground.setBackgroundResource(R.drawable.search_result_background)
+//                    bookResultAdapter.notifyDataSetChanged()
+//                },
+//                fail = {
+//                    Log.d(TAG, "binding.emptyResultImg.visibility = View.VISIBLE2- called")
+//                    binding.emptyResultImg.visibility = View.VISIBLE
+//                    binding.emptyResultText.visibility = View.VISIBLE
+//                    binding.bookSearchResultRcyView.visibility = View.INVISIBLE
+//                    bookResultAdapter.notifyDataSetChanged()
+//                    binding.searchBackground.setBackgroundResource(R.drawable.search_result_background_white)
+//                }
+//            )
 
             //viewModel?.getBooks("조슈아 블로크",SearchOptionType.AUTHOR)
             //viewModel?.getBooks("9791165920760", SearchOptionType.ISBN)  //텅 빈값 넘어옴
@@ -117,14 +122,13 @@ class SearchResultActivity : AppCompatActivity() {
     }
 
     private fun initAdapter() {
-        bookResultAdapter = SearchResultBookAdapter(searchResultViewModel)
+        bookResultAdapter = SearchResultBookAdapter()
 
-        //아이템 클릭 리스너 정의 (화면 전환이 필요하기 때문에 여기서 정의) (파라미터로 넘겨주던 람다로 하던 상관없음)
-        //사실 그냥 context넘겨서 저기서 작업해도 상관없긴해
+        //아이템 클릭 리스너 정의 (화면 전환이 필요하기 때문에 여기서 정의)
         bookResultAdapter.setItemClickListener(object: SearchResultBookAdapter.OnItemClickListener{
-            override fun onClick(v: View, position: Int) {
+            override fun onItemClick(book : Book) {
                 val intent = Intent(this@SearchResultActivity, BookClickPageActivity::class.java)
-                intent.putExtra("clickedBook",searchResultViewModel.books.value?.get(position) ?: "NO DATA")
+                intent.putExtra("clickedBook",book)
                 startActivity(intent)
             }
         })

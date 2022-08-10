@@ -17,12 +17,13 @@ object DataBindingAdapter {
             .error(R.drawable.default_img)
             .into(imageView)
     }
-    @JvmStatic //Object밖에 바로 fun으로 정의할 거 아니면 써줘야함
-    @BindingAdapter("setItem")
-    fun RecyclerView.setAdapterItems(items: ArrayList<Book>?){
-        with((adapter as SearchResultBookAdapter)){
-            clear()
-            items?.let { addItems(it) }
-        }
-    }
+
+//    @JvmStatic //Object밖에 바로 fun으로 정의할 거 아니면 써줘야함
+//    @BindingAdapter("setItem")
+//    fun RecyclerView.setAdapterItems(items: ArrayList<Book>?){
+//        with((adapter as SearchResultBookAdapter)){
+//            clear()
+//            items?.let { addItems(it) }
+//        }
+//    }
 }

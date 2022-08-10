@@ -68,6 +68,7 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
     }
     fun clickSignOut(){
+        //다이얼로그 디자인 수정할 것
         //다이얼 로그로 정말 로그아웃 하시겠습니까 물어보기
         val dialog = AlertDialog.Builder(this,android.R.style.Theme_DeviceDefault_Light_Dialog)
         dialog.setTitle("정말 로그아웃하시겠습니까?")
@@ -79,9 +80,7 @@ class MainActivity : AppCompatActivity() {
             .setNeutralButton("로그아웃",object : DialogInterface.OnClickListener{
                 override fun onClick(dialog: DialogInterface?, which: Int) {
                     Log.d(TAG, "MainActivity: dialog- onClick() 로그아웃- called")
-                    //토큰 지우기
                     deleteToken()
-                    //앱 종료
                     finish()
                 }
             })
@@ -96,5 +95,4 @@ class MainActivity : AppCompatActivity() {
             e.printStackTrace()
         }
     }
-
 }

@@ -10,9 +10,7 @@
         <variable
             name="activity"
             type="com.example.bookchat.activities.SearchResultActivity" />
-        <variable
-            name="viewModel"
-            type="com.example.bookchat.viewmodel.SearchResultViewModel" />
+
     </data>
 
     <!--    <com.sothree.slidinguppanel.SlidingUpPanelLayout-->
@@ -194,9 +192,9 @@
                     app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    setItem="@{viewModel.books}"
                     tools:listitem="@layout/item_book_search_result"/>
             </FrameLayout>
+            <!--setItem="@{viewModel.books}"-->
 
         </LinearLayout>
     </FrameLayout>
