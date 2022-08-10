@@ -40,7 +40,7 @@ class SearchResultBookAdapter
         return BookResultViewHolder(itemBookSearchResultBinding)
     }
 
-    //position에 해당하는 데이터를 뷰홀더의 아이템 뷰에 표시
+    //position에 해당하는 데이터를 뷰홀더의 아이템 뷰에 표시 // getItem : Pager 내장 함수
     override fun onBindViewHolder(holder: BookResultViewHolder, position: Int) {
         val currentItem = getItem(position)
 
