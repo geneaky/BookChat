@@ -41,6 +41,10 @@ class JwtTokenProviderTest {
         return tokenProvider.createToken(authentication);
     }
 
+    private String getExpiredToken() {
+
+    }
+
     @Test
     public void 토큰을_생성_성공() throws Exception {
         String token = getKakaoToken();
@@ -74,6 +78,13 @@ class JwtTokenProviderTest {
         String token = getKakaoToken();
 
         assertThat(tokenProvider.validateToken(token)).isTrue();
+    }
+
+    @Test
+    public void 토큰_만료시_refreshToken요청_응답_세팅_성공() throws Exception {
+        String token = getExpiredToken();
+
+        tokenProvider.validateToken(token);
     }
 
     /*@TODO
