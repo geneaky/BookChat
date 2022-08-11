@@ -9,16 +9,16 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+import toy.bookchat.bookchat.config.JwtTokenConfig;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @Slf4j
 @Component
 public class JwtTokenProvider {
-
     /*@todo
      *   외부 의존성인 io.jwts를 사용하는 것이 아니라 인터페이스를 만들고 그 구현체에서 사용하는 방식으로
      *   작성하면 이후 io.jwts가 아니라 다른 jwt 구현체를 사용하도록 확장가능
@@ -29,30 +29,12 @@ public class JwtTokenProvider {
     public static final String EMAIL = "email";
     public static final String KAKAO_ACCOUNT = "kakao_account";
     public static final String OAUTH2_PROVIDER = "oAuth2Provider";
-
-    private final String secret;
-
-    private final long expiredTime;
-
-    /*@TODO
-     *   @Value를 사용해서 설정 정보를 받는 방식에서
-     *   별도의 Configuration 파일 (예: TokenConfiguration)을 만들어서
-     *   사용하는 것이 설정 값을 한 곳에 묶어서 사용할 수 있고 수정 사항을 한 곳으로
-     *   모아둘 수 있음.
-     *   @Value방식은 빈으로 등록된 후 Reflection을 사용해서 값을 runtime에 동적으로
-     *   넣어주기 때문에 비효율적이고 테스트할 때도 불편했음
-     * https://kkambi.tistory.com/210
-     *https://tuhrig.de/why-using-springs-value-annotation-is-bad/
-     * */
-    public JwtTokenProvider(@Value("${token.secret}") String secret,
-        @Value("${token.expired_time}") long expiredTime) {
-        this.secret = secret;
-        this.expiredTime = expiredTime;
-    }
+    @Autowired
+    JwtTokenConfig jwtTokenConfig;
 
     public String createToken(Authentication authentication) {
 
-        Date expiredDate = new Date(new Date().getTime() + expiredTime);
+        Date expiredDate = new Date(new Date().getTime() + jwtTokenConfig.getExpiredTime());
 
         OAuth2Provider oAuth2Provider = ((UserPrincipal) authentication.getPrincipal()).getUser()
             .getProvider();
@@ -64,7 +46,7 @@ public class JwtTokenProvider {
             .setClaims(createClaims(oAuth2Provider, email))
             .setIssuedAt(new Date())
             .setExpiration(expiredDate)
-            .signWith(SignatureAlgorithm.HS256, secret)
+            .signWith(SignatureAlgorithm.HS256, jwtTokenConfig.getSecret())
             .compact();
     }
 
@@ -86,7 +68,7 @@ public class JwtTokenProvider {
 
     public String getEmailFromToken(String token) {
         return (String) Jwts.parser()
-            .setSigningKey(secret)
+            .setSigningKey(jwtTokenConfig.getSecret())
             .parseClaimsJws(token)
             .getBody()
             .get(EMAIL);
@@ -94,15 +76,15 @@ public class JwtTokenProvider {
 
     public OAuth2Provider getOauth2TokenProviderFromToken(String token) {
         return OAuth2Provider.valueOf(Jwts.parser()
-            .setSigningKey(secret)
-            .setSigningKey(secret)
+            .setSigningKey(jwtTokenConfig.getSecret())
+            .setSigningKey(jwtTokenConfig.getSecret())
             .parseClaimsJws(token)
             .getBody().get(OAUTH2_PROVIDER).toString());
     }
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
+            Jwts.parser().setSigningKey(jwtTokenConfig.getSecret()).parseClaimsJws(token);
             return true;
         } catch (SignatureException ex) {
             log.info("Token :: {} :: is not valid JWT signature");
