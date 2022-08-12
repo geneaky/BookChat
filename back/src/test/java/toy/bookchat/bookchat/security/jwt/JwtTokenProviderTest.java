@@ -9,16 +9,24 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.Authentication;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import toy.bookchat.bookchat.config.JwtTokenConfig;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({SpringExtension.class, MockitoExtension.class})
 class JwtTokenProviderTest {
 
-    JwtTokenProvider tokenProvider = new JwtTokenProvider("hihi", 860000L);
+    @MockBean
+    JwtTokenConfig jwtTokenConfig;
+
+    @InjectMocks
+    JwtTokenProvider tokenProvider = new JwtTokenProvider();
 
     private String getKakaoToken() {
         Authentication authentication = mock(Authentication.class);
@@ -33,16 +41,14 @@ class JwtTokenProviderTest {
         Map<String, Object> outerMap = new HashMap<>();
         outerMap.put(KAKAO_ACCOUNT, innerMap);
 
+        when(jwtTokenConfig.getSecret()).thenReturn("hihi");
+        when(jwtTokenConfig.getExpiredTime()).thenReturn(3600L);
         when(authentication.getPrincipal()).thenReturn(userPrincipal);
         when(userPrincipal.getUser()).thenReturn(user);
         when(userPrincipal.getAttributes()).thenReturn(outerMap);
         when(user.getProvider()).thenReturn(oAuth2Provider);
 
         return tokenProvider.createToken(authentication);
-    }
-
-    private String getExpiredToken() {
-
     }
 
     @Test
@@ -80,13 +86,13 @@ class JwtTokenProviderTest {
         assertThat(tokenProvider.validateToken(token)).isTrue();
     }
 
-    @Test
+  /*      @Test
     public void 토큰_만료시_refreshToken요청_응답_세팅_성공() throws Exception {
         String token = getExpiredToken();
 
         tokenProvider.validateToken(token);
     }
-
+*/
     /*@TODO
      *   토큰 검증 테스트 추가
      *   유효시간만료, 토큰 수정여부, 토큰 시그니쳐 검증등*/
