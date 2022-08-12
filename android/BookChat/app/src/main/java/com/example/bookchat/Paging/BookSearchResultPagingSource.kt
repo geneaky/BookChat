@@ -1,8 +1,11 @@
 package com.example.bookchat.Paging
 
+import android.accounts.NetworkErrorException
 import android.util.Log
+import android.widget.Toast
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import com.example.bookchat.App
 import com.example.bookchat.api.ApiInterface
 import com.example.bookchat.data.Book
 import com.example.bookchat.data.BookSearchOption
@@ -65,16 +68,15 @@ class BookSearchResultPagingSource(
             )
             // 로드에 실패 시 LoadResult.Error 반환
         } catch (exception: IOException) {
-            Log.d(TAG, "BookSearchResultPagingSource: load() - IOException : ${exception.message}")
+
             LoadResult.Error(exception)
         } catch (exception: HttpException) {
-            Log.d(TAG, "BookSearchResultPagingSource: load() - HttpException : ${exception.message}")
             LoadResult.Error(exception)
+        }catch (e: NetworkErrorException){
+            LoadResult.Error(e)
+        }catch (e: Exception){
+            LoadResult.Error(e)
         }
-//        catch (e: Exception){
-//            Log.d(TAG, "BookSearchResultPagingSource: load() - Exception : $e  - message : ${e.message}")
-//            LoadResult.Error(e)
-//        }
     }
 //getRefreshKey() : 스와이프 Refresh나 데이터 업데이트 등으로 현재 목록을 대체할 새 데이터를 로드할 때 사용
     //가장 최근에 접근한 인덱스인 anchorPosition으로 주변 데이터를 다시 로드한다.

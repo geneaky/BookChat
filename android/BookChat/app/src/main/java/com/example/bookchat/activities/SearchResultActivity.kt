@@ -1,5 +1,6 @@
 package com.example.bookchat.activities
 
+import android.accounts.NetworkErrorException
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -11,6 +12,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.bookchat.App
 import com.example.bookchat.Paging.BookSearchResultPagingLoadStateAdapter
 import com.example.bookchat.viewmodel.BookSearchResultViewModelFactory
 import com.example.bookchat.R
@@ -21,6 +23,8 @@ import com.example.bookchat.databinding.ActivitySearchResultBinding
 import com.example.bookchat.repository.BookRepository
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.viewmodel.SearchResultViewModel
+import retrofit2.HttpException
+import java.io.IOException
 
 class SearchResultActivity : AppCompatActivity() {
     private lateinit var binding : ActivitySearchResultBinding
@@ -111,6 +115,10 @@ class SearchResultActivity : AppCompatActivity() {
         Log.d(TAG, "SearchResultActivity: initPagingDataObserver() - called")
         // 관찰하여 submitData 메소드로 PagingData<Post>를 PagingAdapter로 넘겨줌
         // (그 이후, Paging 이벤트들은 PagingDataDiffer에서 수집되어서 페이징 상태를 관리해줌)
+        if(!isNetworkConnected()) {
+            Toast.makeText(App.instance.applicationContext,"네트워크가 연결되어 있지 않습니다.\n네트워크를 연결해주세요", Toast.LENGTH_SHORT).show()
+            return
+        }
         searchResultViewModel.pagingData.observe(this@SearchResultActivity, Observer {
             bookResultAdapter.submitData(this@SearchResultActivity.lifecycle, it)
             Log.d(TAG, "SearchResultActivity: onCreate() - submitData 작동 시작")
@@ -121,15 +129,37 @@ class SearchResultActivity : AppCompatActivity() {
         // 로딩 상태 리스너
         bookResultAdapter.addLoadStateListener { combinedLoadStates ->
             binding.apply {
+                val loadState = combinedLoadStates.source.refresh
                 // 로딩 중 일 때
-                //loadingProgressBar.isVisible = combinedLoadStates.source.refresh is LoadState.Loading
+                loadingProgressBar.isVisible = loadState is LoadState.Loading
 
                 // 로딩 중이지 않을 때 (활성 로드 작업이 없고 에러가 없음)
-                bookSearchResultRcyView.isVisible = combinedLoadStates.source.refresh is LoadState.NotLoading
+                bookSearchResultRcyView.isVisible = loadState is LoadState.NotLoading
 
                 // 로딩 에러 발생 시
-                if(combinedLoadStates.source.refresh is LoadState.Error){
-                    bookResultAdapter.retry()
+                if(loadState is LoadState.Error){
+                    val error = loadState.error
+                    when(error){
+                        is IOException -> {
+                            Log.d(TAG, "SearchResultActivity: addLoadStateListener() - IOException : ${error.message}")
+                            Toast.makeText(App.instance.applicationContext,"입/출력 오류 :${error.message}", Toast.LENGTH_SHORT).show()
+                        }
+                        is HttpException -> {
+                            Log.d(TAG, "SearchResultActivity: addLoadStateListener() - HttpException : ${error.message}")
+                            Toast.makeText(App.instance.applicationContext,"HTTP 오류(${error.code()}) : ${error.message}", Toast.LENGTH_SHORT).show()
+                        }
+                        is NetworkErrorException -> {
+                            Log.d(TAG, "SearchResultActivity: addLoadStateListener() - NetworkErrorException : ${error.message}")
+                            Toast.makeText(App.instance.applicationContext,"네트워크 연결 오류\n네트워크를 확인해 주세요.", Toast.LENGTH_SHORT).show()
+                        }
+                        is Exception -> {
+                            Log.d(TAG, "SearchResultActivity: addLoadStateListener() - Exception : ${error.message}")
+                            Toast.makeText(App.instance.applicationContext,"오류 발생", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+
+                    //여기서 에러처리 해야되겠다.
+                    //bookResultAdapter.retry()
                     Log.d(TAG, "SearchResultActivity: onCreate() - 로딩 에러 발생!!")
                     //네트워크 상태 체크
                     /*
@@ -175,5 +205,7 @@ class SearchResultActivity : AppCompatActivity() {
         finish()
     }
 
-
+    private fun isNetworkConnected() :Boolean{
+        return App.instance.networkManager.checkNetworkState()
+    }
 }
