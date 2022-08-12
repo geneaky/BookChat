@@ -23,13 +23,12 @@ import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.adapter.SearchHistoryAdapter
 import com.example.bookchat.databinding.ActivitySearchBinding
 import com.example.bookchat.utils.Constants.TAG
-import com.example.bookchat.utils.SearchOptionType
+import com.example.bookchat.utils.SearchType
 import com.example.bookchat.utils.SharedPreferenceManager
 import com.example.bookchat.viewmodel.OptionDrawerViewModel
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
@@ -38,7 +37,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var binding : ActivitySearchBinding
     private lateinit var searchHistoryAdapter: SearchHistoryAdapter
     private var optionIsClicked = false
-    private var optionType = SearchOptionType.TITLE
+    private var optionType = SearchType.TITLE
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,7 +58,7 @@ class SearchActivity : AppCompatActivity() {
             //검색창 엔터이벤트 등록
             searchTextEt.setOnEditorActionListener { textView, actionId, keyEvent ->
                 Log.d(TAG, "SearchActivity: onCreate() - Enter!!")
-                if(searchTextEt.text.toString() != ""){
+                if(searchTextEt.text.toString().isNotEmpty()){
                     SharedPreferenceManager.setSearchHistory(searchTextEt.text.toString()) // 검색어 저장
                     openResult() //페이지 이동
                 }else{
@@ -277,23 +276,23 @@ class SearchActivity : AppCompatActivity() {
         when(view.id){
             R.id.bookNameOption_btn -> {
                 binding.optionFrame.panelState = SlidingUpPanelLayout.PanelState.HIDDEN
-                optionType = SearchOptionType.TITLE
+                optionType = SearchType.TITLE
                 changeColorElseOptionBtn(view)
             }
             R.id.authorNameOption_btn -> {
                 binding.optionFrame.panelState = SlidingUpPanelLayout.PanelState.HIDDEN
-                optionType = SearchOptionType.AUTHOR
+                optionType = SearchType.AUTHOR
                 changeColorElseOptionBtn(view)
             }
             R.id.isbnOption_btn ->{
                 binding.optionFrame.panelState = SlidingUpPanelLayout.PanelState.HIDDEN
-                optionType = SearchOptionType.ISBN
+                optionType = SearchType.ISBN
                 changeColorElseOptionBtn(view)
 
             }
             R.id.chatRoomNameOption_btn ->{
                 binding.optionFrame.panelState = SlidingUpPanelLayout.PanelState.HIDDEN
-                optionType = SearchOptionType.CHATROOMNAME
+                optionType = SearchType.CHATROOMNAME
                 changeColorElseOptionBtn(view)
             }
             else -> return

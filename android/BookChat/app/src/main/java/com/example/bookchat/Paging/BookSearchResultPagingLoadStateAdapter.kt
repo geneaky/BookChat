@@ -1,4 +1,4 @@
-package com.example.bookchat.Pagingtest
+package com.example.bookchat.Paging
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -7,11 +7,11 @@ import androidx.paging.LoadStateAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.databinding.LoadStateBinding
 
-class PagingLoadStateAdapter(private val retry: () -> Unit)
-    : LoadStateAdapter<PagingLoadStateAdapter.LoadStateViewHolder>() {
+class BookSearchResultPagingLoadStateAdapter(private val retry: () -> Unit)
+    : LoadStateAdapter<BookSearchResultPagingLoadStateAdapter.LoadStateViewHolder>() {
 
     override fun onBindViewHolder(
-        holder: PagingLoadStateAdapter.LoadStateViewHolder,
+        holder: BookSearchResultPagingLoadStateAdapter.LoadStateViewHolder,
         loadState: LoadState
     ) {
         holder.bind(loadState)
@@ -20,7 +20,7 @@ class PagingLoadStateAdapter(private val retry: () -> Unit)
     override fun onCreateViewHolder(
         parent: ViewGroup,
         loadState: LoadState
-    ): PagingLoadStateAdapter.LoadStateViewHolder {
+    ): BookSearchResultPagingLoadStateAdapter.LoadStateViewHolder {
         val binding = LoadStateBinding.inflate(LayoutInflater.from(parent.context),parent,false)
         return LoadStateViewHolder(binding)
     }

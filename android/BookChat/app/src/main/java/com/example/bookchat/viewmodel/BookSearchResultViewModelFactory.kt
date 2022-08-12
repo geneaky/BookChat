@@ -1,12 +1,11 @@
-package com.example.bookchat.Pagingtest
+package com.example.bookchat.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.bookchat.repository.BookRepository
-import com.example.bookchat.viewmodel.SearchResultViewModel
 
 // 뷰모델에 인자를 넘겨주기 위한 팩토리 메서드
-class SearchResultViewModelFactory(
+class BookSearchResultViewModelFactory(
     private val repository : BookRepository
 ) : ViewModelProvider.Factory {
 

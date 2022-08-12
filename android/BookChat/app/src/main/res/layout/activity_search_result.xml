@@ -11,6 +11,10 @@
             name="activity"
             type="com.example.bookchat.activities.SearchResultActivity" />
 
+        <variable
+            name="totalCount"
+            type="String" />
+
     </data>
 
     <!--    <com.sothree.slidinguppanel.SlidingUpPanelLayout-->
@@ -28,13 +32,13 @@
         android:layout_height="match_parent"
         tools:context=".activities.SearchResultActivity">
 
-        <ProgressBar
+        <!--<ProgressBar
             android:id="@+id/loading_progressBar"
             android:elevation="11dp"
             android:visibility="@{viewModel.isLoading() ? View.VISIBLE : View.GONE}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center"/>-->
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -142,19 +146,19 @@
                         android:fontFamily="@font/jua_regular"
                         android:textColor="#B8B8BB"
                         android:text="검색 결과 :  "/>
-                    <TextView
+                </LinearLayout>
+                <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/jua_regular"
                         android:textColor="#12121D"
-                        android:text="@{String.valueOf(viewModel.books.size())}"/>
+                        android:text="@{totalCount}"/>
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/jua_regular"
                         android:textColor="#12121D"
                         android:text=" 개"/>
-                </LinearLayout>
 
             </LinearLayout>
 

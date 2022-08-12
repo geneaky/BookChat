@@ -11,11 +11,12 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.bookchat.Pagingtest.PagingLoadStateAdapter
-import com.example.bookchat.Pagingtest.SearchResultViewModelFactory
+import com.example.bookchat.Paging.BookSearchResultPagingLoadStateAdapter
+import com.example.bookchat.viewmodel.BookSearchResultViewModelFactory
 import com.example.bookchat.R
 import com.example.bookchat.adapter.SearchResultBookAdapter
 import com.example.bookchat.data.Book
+import com.example.bookchat.data.BookSearchOption
 import com.example.bookchat.databinding.ActivitySearchResultBinding
 import com.example.bookchat.repository.BookRepository
 import com.example.bookchat.utils.Constants.TAG
@@ -30,11 +31,12 @@ class SearchResultActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "SearchResultActivity: onCreate() - called")
         binding = DataBindingUtil.setContentView(this, R.layout.activity_search_result)
+        val searchText = intent.getStringExtra("SearchKeyWord") ?: "NO DATA"
 
         with(binding){
             lifecycleOwner = this@SearchResultActivity
             activity = this@SearchResultActivity
-            searchTextEt.setText(intent.getStringExtra("SearchKeyWord") ?: "NO DATA")
+            searchTextEt.setText(searchText)
         }
         initAdapter()
         addLoadStateListener()
@@ -42,6 +44,8 @@ class SearchResultActivity : AppCompatActivity() {
         initRcyView(binding)
         initSearchWindow(binding)
         initPagingDataObserver()
+        search(searchText)
+
 
 //            // 다시 시도하기 버튼
 //            binding.retryButton.setOnClickListener {
@@ -58,6 +62,7 @@ class SearchResultActivity : AppCompatActivity() {
     }
 
     private fun initAdapter() {
+        Log.d(TAG, "SearchResultActivity: initAdapter() - called")
         bookResultAdapter = SearchResultBookAdapter()
         //아이템 클릭 리스너 정의 (화면 전환이 필요하기 때문에 여기서 정의)
         bookResultAdapter.setItemClickListener(object: SearchResultBookAdapter.OnItemClickListener{
@@ -71,40 +76,39 @@ class SearchResultActivity : AppCompatActivity() {
     }
 
     private fun initViewModel(){
+        Log.d(TAG, "SearchResultActivity: initViewModel() - called")
         val repository = BookRepository()
-        val viewModelFactory = SearchResultViewModelFactory(repository)
+        val viewModelFactory = BookSearchResultViewModelFactory(repository)
         searchResultViewModel = ViewModelProvider(this@SearchResultActivity,viewModelFactory).get(SearchResultViewModel::class.java)
     }
 
     private fun initRcyView(binding : ActivitySearchResultBinding){
+        Log.d(TAG, "SearchResultActivity: initRcyView() - called")
         with(binding){
             bookSearchResultRcyView.setHasFixedSize(true) //사이즈 고정
             bookSearchResultRcyView.layoutManager = GridLayoutManager(this@SearchResultActivity,2)
             // header, footer 설정 (끝부분에 다다랐을 떄 값 요청함 retry()는 에러시 새로고침하라고 전달함)
             bookSearchResultRcyView.adapter = bookResultAdapter.withLoadStateHeaderAndFooter(
-                header = PagingLoadStateAdapter { bookResultAdapter.retry() },
-                footer = PagingLoadStateAdapter { bookResultAdapter.retry() }
+                header = BookSearchResultPagingLoadStateAdapter { bookResultAdapter.retry() },
+                footer = BookSearchResultPagingLoadStateAdapter { bookResultAdapter.retry() }
             )
         }
     }
 
     private fun initSearchWindow(binding : ActivitySearchResultBinding){
+        Log.d(TAG, "SearchResultActivity: initSearchWindow() - called")
         with(binding){
             //검색창 엔터이벤트 등록
             searchTextEt.setOnEditorActionListener { _, _, _ ->
                 Log.d(TAG, "SearchResultActivity: onCreate() - Enter!!")
-                val searchKeyWord = searchTextEt.text.toString()
-                if(searchKeyWord.isNotEmpty()){
-                    searchResultViewModel.searchBook(searchKeyWord) //페이징 시작
-                }else{
-                    Toast.makeText(this@SearchResultActivity,"검색어를 입력해주세요", Toast.LENGTH_SHORT).show()
-                }
+                search(searchTextEt.text.toString())
                 false
             }
         }
     }
 
     private fun initPagingDataObserver(){
+        Log.d(TAG, "SearchResultActivity: initPagingDataObserver() - called")
         // 관찰하여 submitData 메소드로 PagingData<Post>를 PagingAdapter로 넘겨줌
         // (그 이후, Paging 이벤트들은 PagingDataDiffer에서 수집되어서 페이징 상태를 관리해줌)
         searchResultViewModel.pagingData.observe(this@SearchResultActivity, Observer {
@@ -113,17 +117,19 @@ class SearchResultActivity : AppCompatActivity() {
         })
     }
     private fun addLoadStateListener(){
+        Log.d(TAG, "SearchResultActivity: addLoadStateListener() - called")
         // 로딩 상태 리스너
         bookResultAdapter.addLoadStateListener { combinedLoadStates ->
             binding.apply {
                 // 로딩 중 일 때
-                loadingProgressBar.isVisible = combinedLoadStates.source.refresh is LoadState.Loading
+                //loadingProgressBar.isVisible = combinedLoadStates.source.refresh is LoadState.Loading
 
                 // 로딩 중이지 않을 때 (활성 로드 작업이 없고 에러가 없음)
                 bookSearchResultRcyView.isVisible = combinedLoadStates.source.refresh is LoadState.NotLoading
 
                 // 로딩 에러 발생 시
                 if(combinedLoadStates.source.refresh is LoadState.Error){
+                    bookResultAdapter.retry()
                     Log.d(TAG, "SearchResultActivity: onCreate() - 로딩 에러 발생!!")
                     //네트워크 상태 체크
                     /*
@@ -145,6 +151,19 @@ class SearchResultActivity : AppCompatActivity() {
                     emptyResultText.isVisible = false
                 }
             }
+        }
+    }
+    private fun search(searchText :String){
+        //넘겨받은 검색어로 검색
+        val bookSearchOption = BookSearchOption(
+            title = searchText,
+            sort = "LATEST"
+        )
+        if(bookSearchOption.title.isNotEmpty()){
+            Log.d(TAG, "SearchResultActivity: search() - 페이징 시작")
+            searchResultViewModel.searchBook(bookSearchOption) //페이징 시작
+        }else{
+            Toast.makeText(this@SearchResultActivity,"검색어를 입력해주세요", Toast.LENGTH_SHORT).show()
         }
     }
 

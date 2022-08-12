@@ -22,9 +22,12 @@ interface ApiInterface {
 
     //제목으로 도서 검색
     @GET("/v1/api/books")
-    fun getBookFromTitle(
-        @Query("title") title:String
-    ): Response<List<Book>>
+    suspend fun getBookFromTitle(
+        @Query("title") title:String,
+        @Query("size") size:String,
+        @Query("page") page:String,
+        @Query("sort") sort:String,
+    ): Response<BookSearchResultDto>
 
     //저자명으로 도서 검색
     @GET("/v1/api/books")

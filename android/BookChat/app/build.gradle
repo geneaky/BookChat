@@ -66,4 +66,8 @@ dependencies {
     implementation 'com.sothree.slidinguppanel:library:3.4.0'
     //activity-ktx (by viewModels()로 ViewModel간편 정의)
     implementation 'androidx.activity:activity-ktx:1.5.0'
+
+    // Paging3
+    def paging_version = "3.1.1"
+    implementation "androidx.paging:paging-runtime:$paging_version"
 }
