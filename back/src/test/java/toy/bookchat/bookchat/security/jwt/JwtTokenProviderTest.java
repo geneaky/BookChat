@@ -42,7 +42,7 @@ class JwtTokenProviderTest {
         outerMap.put(KAKAO_ACCOUNT, innerMap);
 
         when(jwtTokenConfig.getSecret()).thenReturn("hihi");
-        when(jwtTokenConfig.getExpiredTime()).thenReturn(3600L);
+        when(jwtTokenConfig.getAccessTokenExpiredTime()).thenReturn(3600L);
         when(authentication.getPrincipal()).thenReturn(userPrincipal);
         when(userPrincipal.getUser()).thenReturn(user);
         when(userPrincipal.getAttributes()).thenReturn(outerMap);

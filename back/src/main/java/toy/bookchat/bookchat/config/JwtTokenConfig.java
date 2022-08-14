@@ -8,7 +8,9 @@ import org.springframework.context.annotation.Configuration;
 public class JwtTokenConfig {
 
     private String secret;
-    private long expiredTime;
+    private long accessTokenExpiredTime;
+    private long refreshTokenExpiredTime;
+
 
     public String getSecret() {
         return secret;
@@ -18,11 +20,19 @@ public class JwtTokenConfig {
         this.secret = secret;
     }
 
-    public long getExpiredTime() {
-        return expiredTime;
+    public long getAccessTokenExpiredTime() {
+        return accessTokenExpiredTime;
     }
 
-    public void setExpiredTime(long expiredTime) {
-        this.expiredTime = expiredTime;
+    public void setAccessTokenExpiredTime(long accessTokenExpiredTime) {
+        this.accessTokenExpiredTime = accessTokenExpiredTime;
+    }
+
+    public long getRefreshTokenExpiredTime() {
+        return refreshTokenExpiredTime;
+    }
+
+    public void setRefreshTokenExpiredTime(long refreshTokenExpiredTime) {
+        this.refreshTokenExpiredTime = refreshTokenExpiredTime;
     }
 }

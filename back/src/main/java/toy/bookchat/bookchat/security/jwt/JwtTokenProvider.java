@@ -34,7 +34,8 @@ public class JwtTokenProvider {
 
     public String createToken(Authentication authentication) {
 
-        Date expiredDate = new Date(new Date().getTime() + jwtTokenConfig.getExpiredTime());
+        Date expiredDate = new Date(
+            new Date().getTime() + jwtTokenConfig.getAccessTokenExpiredTime());
 
         OAuth2Provider oAuth2Provider = ((UserPrincipal) authentication.getPrincipal()).getUser()
             .getProvider();
