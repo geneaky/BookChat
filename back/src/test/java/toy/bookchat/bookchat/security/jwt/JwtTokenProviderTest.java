@@ -83,7 +83,7 @@ class JwtTokenProviderTest {
 
         String token = getKakaoToken();
 
-        assertThat(tokenProvider.validateToken(token)).isTrue();
+        assertThat(tokenProvider.validateToken(token)).isEqualTo(JwtTokenValidationCode.ACCESS);
     }
 
   /*      @Test

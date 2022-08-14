@@ -1,5 +1,7 @@
 package toy.bookchat.bookchat.security.jwt;
 
+import static toy.bookchat.bookchat.security.jwt.JwtTokenValidationCode.ACCESS;
+import static toy.bookchat.bookchat.security.jwt.JwtTokenValidationCode.EXPIRED;
 import static toy.bookchat.bookchat.utils.constants.AuthConstants.AUTHORIZATION;
 import static toy.bookchat.bookchat.utils.constants.AuthConstants.BEARER;
 
@@ -51,21 +53,37 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void validUserRequestByJwt(HttpServletRequest request, String jwt) {
-        if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt)) {
+        if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt) == ACCESS) {
             String email = jwtTokenProvider.getEmailFromToken(jwt);
-
             OAuth2Provider oAuth2TokenProvider = jwtTokenProvider.getOauth2TokenProviderFromToken(
                 jwt);
 
             Optional<User> optionalUser = userRepository.findByEmailAndProvider(email,
                 oAuth2TokenProvider);
-
             optionalUser.ifPresentOrElse((user -> registerUserAuthentication(request, user)),
                 () -> {
                     throw new UserNotFoundException("Not Registered User Request");
                 });
         }
 
+        if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt) == EXPIRED) {
+            String refreshToken = resolveToken(request, "refresh");
+
+            if (StringUtils.hasText(refreshToken)
+                && jwtTokenProvider.validateToken(refreshToken) == ACCESS) {
+                String newRefresh = jwtTokenProvider.reIssueToken(refreshToken);
+
+            }
+        }
+
+    }
+
+    private String resolveToken(HttpServletRequest request, String header) {
+        String bearerToken = request.getHeader(header);
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        return null;
     }
 
     private void registerUserAuthentication(HttpServletRequest request,

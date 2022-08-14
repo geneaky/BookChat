@@ -1,10 +1,12 @@
 package toy.bookchat.bookchat.security.jwt;
 
+import static toy.bookchat.bookchat.security.jwt.JwtTokenValidationCode.ACCESS;
+import static toy.bookchat.bookchat.security.jwt.JwtTokenValidationCode.DENIED;
+import static toy.bookchat.bookchat.security.jwt.JwtTokenValidationCode.EXPIRED;
+
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.SignatureException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -83,20 +85,17 @@ public class JwtTokenProvider {
             .getBody().get(OAUTH2_PROVIDER).toString());
     }
 
-    public boolean validateToken(String token) {
+    public JwtTokenValidationCode validateToken(String token) {
         try {
             Jwts.parser().setSigningKey(jwtTokenConfig.getSecret()).parseClaimsJws(token);
-            return true;
-        } catch (SignatureException ex) {
-            log.info("Token :: {} :: is not valid JWT signature");
-        } catch (MalformedJwtException ex) {
-            log.info("Token :: {} :: is not valid JWT token");
+            return ACCESS;
         } catch (ExpiredJwtException ex) {
-            log.info("Token :: {} :: is expired token");
-        } catch (IllegalArgumentException ex) {
-            log.info("Token :: {} :: claims info is not existed");
+            log.debug("Token :: {} :: is expired token", token);
+            return EXPIRED;
+        } catch (Exception ex) {
+            log.debug("Token :: {} :: is denied", token);
         }
-        return false;
+        return DENIED;
     }
 
 }
