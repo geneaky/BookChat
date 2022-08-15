@@ -1,7 +1,6 @@
 package toy.bookchat.bookchat.security.jwt;
 
 import static toy.bookchat.bookchat.security.jwt.JwtTokenValidationCode.ACCESS;
-import static toy.bookchat.bookchat.security.jwt.JwtTokenValidationCode.EXPIRED;
 import static toy.bookchat.bookchat.utils.constants.AuthConstants.AUTHORIZATION;
 import static toy.bookchat.bookchat.utils.constants.AuthConstants.BEARER;
 
@@ -65,17 +64,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     throw new UserNotFoundException("Not Registered User Request");
                 });
         }
-
-        if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt) == EXPIRED) {
-            String refreshToken = resolveToken(request, "refresh");
-
-            if (StringUtils.hasText(refreshToken)
-                && jwtTokenProvider.validateToken(refreshToken) == ACCESS) {
-                String newRefresh = jwtTokenProvider.reIssueToken(refreshToken);
-
-            }
-        }
-
     }
 
     private String resolveToken(HttpServletRequest request, String header) {
