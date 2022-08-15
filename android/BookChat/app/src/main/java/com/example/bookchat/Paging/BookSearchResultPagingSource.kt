@@ -1,6 +1,5 @@
 package com.example.bookchat.Paging
 
-import android.accounts.NetworkErrorException
 import android.util.Log
 import android.widget.Toast
 import androidx.paging.PagingSource
@@ -10,10 +9,20 @@ import com.example.bookchat.api.ApiInterface
 import com.example.bookchat.data.Book
 import com.example.bookchat.data.BookSearchOption
 import com.example.bookchat.utils.Constants.TAG
-import retrofit2.HttpException
-import java.io.IOException
+import kotlin.random.Random
 
+// LoadParams : 로드할 키와 항목 수
+// [params.key : 현재 페이지 인덱스를 관리 (처음 데이터를 로드할 때에는 null이 반환)]
+// [params.loadSize : 가져올 데이터의 갯수를 관리]
+// LoadResult : load 작업의 결과
+// [LoadResult.Page : 로드에 성공한 경우, 데이터와 이전 다음 페이지 Key가 포함]
+// [LoadResult.Error : 오류가 발생한 경우]
 
+/* 로드에 성공 시 LoadResult.Page 반환
+data : 전송되는 데이터
+prevKey : 이전 값 (위 스크롤 방향)
+nextKey : 다음 값 (아래 스크롤 방향)
+*/
 private const val STARTING_PAGE_INDEX = 1
 /*
 Api : 데이터를 제공하는 인스턴스
@@ -26,19 +35,18 @@ class BookSearchResultPagingSource(
 
     // load() : 데이터 로드 (사용자가 스크롤 할 때마다 데이터를 비동기적으로 가져온다.)
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Book> {
-        // LoadParams : 로드할 키와 항목 수
-        // [params.key : 현재 페이지 인덱스를 관리 (처음 데이터를 로드할 때에는 null이 반환)]
-        // [params.loadSize : 가져올 데이터의 갯수를 관리]
-        // LoadResult : load 작업의 결과
-        // [LoadResult.Page : 로드에 성공한 경우, 데이터와 이전 다음 페이지 Key가 포함]
-        // [LoadResult.Error : 오류가 발생한 경우]
-
-        // 키 값이 없을 경우 기본값을 사용함
-        //android 공식 문서에는 params.key는 0부터 시작하고, API 호출이 끝나면 +1을 한다.
         val page = params.key ?: STARTING_PAGE_INDEX
-        val loadSize = if(params.loadSize == 60 ) 20 else 20 //Pager에 정의한 pageSize (최초엔 x3되어서 요첨함으로 그냥 일반 로드하기로함)
+        val loadSize = if(params.loadSize == 60 ) 20 else 20 //Pager에 정의한 pageSize (최초 호출엔 x3되어서 요첨하기 때문에 다시 기본값으로 세팅)
 
-        // 데이터를 제공하는 인스턴스의 메소드 사용
+        try {
+            if (!App.instance.isNetworkConnected()){
+                throw Exception("네트워크가 연결되어 있지 않습니다")
+            }
+        }catch (e: Exception){
+            Toast.makeText(App.instance.applicationContext,"${e.message}", Toast.LENGTH_SHORT).show()
+            return LoadResult.Error(e)
+        }
+
         val response = Api.getBookFromTitle(
             title = bookSearchOption.title,
             size = loadSize.toString(),
@@ -54,26 +62,18 @@ class BookSearchResultPagingSource(
         Log.d(TAG, "BookSearchResultPagingSource: load() - response.body()?.books 크기(${response.body()?.books?.size}) : ${response.body()?.books}")
         Log.d(TAG, "BookSearchResultPagingSource: load() - response.body()?.meta : ${response.body()?.meta}")
 
-        /* 로드에 성공 시 LoadResult.Page 반환
-        data : 전송되는 데이터
-        prevKey : 이전 값 (위 스크롤 방향)
-        nextKey : 다음 값 (아래 스크롤 방향)
-        */
-
         return try {
+
+            // 에러 발생 !
+            if (Random.nextFloat() < 0.5) {
+                throw Exception("error !!!")
+            }
+
             LoadResult.Page(
                 data = pagedBookList!!,
                 prevKey = if (page == 1) null else page - 1,
-                nextKey = if(response.body()?.meta?.isEnd == true) null else page + 1// 가져온만큼 다시 가져옴
+                nextKey = if(response.body()?.meta?.isEnd == true) null else page + 1
             )
-            // 로드에 실패 시 LoadResult.Error 반환
-        } catch (exception: IOException) {
-
-            LoadResult.Error(exception)
-        } catch (exception: HttpException) {
-            LoadResult.Error(exception)
-        }catch (e: NetworkErrorException){
-            LoadResult.Error(e)
         }catch (e: Exception){
             LoadResult.Error(e)
         }

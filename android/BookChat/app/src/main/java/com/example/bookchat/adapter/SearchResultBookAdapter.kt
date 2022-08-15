@@ -69,16 +69,4 @@ class SearchResultBookAdapter
     fun setItemClickListener(onItemClickListener: OnItemClickListener) {
         this.itemClickListener = onItemClickListener
     }
-
-    //삭제 보류 //////////////////////////////////////
-//    fun addItems(items: List<Book>) {
-//        this.items.addAll(items)
-//        notifyDataSetChanged()
-//    }
-//
-//    fun clear() {
-//        this.items.clear()
-//        notifyDataSetChanged()
-//    }
-
 }

@@ -33,7 +33,7 @@ class BookSearchResultPagingLoadStateAdapter(private val retry: () -> Unit)
                 retryButton.setOnClickListener { retry() }
                 isLoading = loadState is LoadState.Loading
                 isError = loadState is LoadState.Error
-                errorMessage = (loadState as? LoadState.Error)?.error?.message ?: "데이터 로드 실패(Default)"
+                errorMessage = (loadState as? LoadState.Error)?.error?.message ?: ""
             }
         }
     }
