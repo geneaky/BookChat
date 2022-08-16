@@ -25,7 +25,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private String nickname;
+    private String nickName;
     private String email;
     private String password;
     private String profileImageUrl;
@@ -37,13 +37,14 @@ public class User {
 
     @Builder
     private User(String name, String email, String password, String profileImageUrl, ROLE role,
-        OAuth2Provider provider) {
+        OAuth2Provider provider, String nickName) {
         this.name = name;
         this.email = email;
         this.password = password;
         this.profileImageUrl = profileImageUrl;
         this.role = role;
         this.provider = provider;
+        this.nickName = nickName;
     }
 
     public void setBookShelf(BookShelf bookShelf) {
