@@ -90,3 +90,9 @@ include::{snippets}/get_bookshelf_wish/http-request.adoc[]
 include::{snippets}/get_bookshelf_wish/response-body.adoc[]
 
 ---
+
+=== 사용자 닉네임 중복 체크
+
+include::{snippets}/user_nickname/request-parameters.adoc[]
+include::{snippets}/user_nickname/http-request.adoc[]
+include::{snippets}/user_nickname/http-response.adoc[]

@@ -834,7 +834,7 @@ Host: localhost:8080</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code>[{&quot;title&quot;:&quot;effectiveJava&quot;,&quot;bookCoverImageUrl&quot;:&quot;testBookCoverImage@naver.com&quot;,&quot;authors&quot;:[&quot;joshua&quot;],&quot;publisher&quot;:&quot;jpub&quot;,&quot;star&quot;:4.5,&quot;singleLineAssessment&quot;:&quot;it's is best&quot;}]</code></pre>
+<pre class="CodeRay highlight nowrap"><code>[{&quot;title&quot;:&quot;effectiveJava&quot;,&quot;bookCoverImageUrl&quot;:&quot;testBookCoverImage@naver.com&quot;,&quot;authors&quot;:[&quot;joshua&quot;],&quot;publisher&quot;:&quot;jpub&quot;,&quot;star&quot;:&quot;FOUR_HALF&quot;,&quot;singleLineAssessment&quot;:&quot;it's is best&quot;}]</code></pre>
 </div>
 </div>
 <hr>
@@ -884,12 +884,50 @@ Host: localhost:8080</code></pre>
 </div>
 <hr>
 </div>
+<div class="sect2">
+<h3 id="_사용자_닉네임_중복_체크">사용자 닉네임 중복 체크</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>nickname</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">사용자 nickname</p></td>
+</tr>
+</tbody>
+</table>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight nowrap"><code data-lang="http">GET /v1/api/users/profile/nickname?nickname=HiBs HTTP/1.1
+Host: localhost:8080</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight nowrap"><code data-lang="http">HTTP/1.1 200 OK
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY</code></pre>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-07-12 23:39:41 +0900
+Last updated 2022-08-16 23:08:51 +0900
 </div>
 </div>
 </body>
