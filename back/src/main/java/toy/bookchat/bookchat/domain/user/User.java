@@ -1,13 +1,20 @@
 package toy.bookchat.bookchat.domain.user;
 
-import javax.persistence.*;
-
-import lombok.*;
-import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
-import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
-
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
+import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
 @Entity
 @Getter
@@ -18,6 +25,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    private String nickname;
     private String email;
     private String password;
     private String profileImageUrl;
@@ -28,7 +36,8 @@ public class User {
     private List<BookShelf> bookShelves = new ArrayList<>();
 
     @Builder
-    private User(String name, String email, String password, String profileImageUrl, ROLE role, OAuth2Provider provider) {
+    private User(String name, String email, String password, String profileImageUrl, ROLE role,
+        OAuth2Provider provider) {
         this.name = name;
         this.email = email;
         this.password = password;
