@@ -59,12 +59,10 @@ class LoginActivity : AppCompatActivity() {
     //현재 액티비티가 살아있고, 재호출되는 경우 onCreate()대신 호출됨
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        Log.d(TAG, "LoginActivity: onNewIntent() - called")
         handleIntent(intent)
     }
 
     fun openWeb(loginType : LoginType){
-        Log.d(TAG, "LoginActivity: openWeb() - called")
         val uri = when(loginType){
             LoginType.KAKAO ->{ KAKAO_LOGIN }
             LoginType.GOOGLE ->{ GOOGLE_LOGIN }

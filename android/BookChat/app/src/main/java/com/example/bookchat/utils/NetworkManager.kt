@@ -17,5 +17,4 @@ class NetworkManager {
             else -> false
         }
     }
-
 }

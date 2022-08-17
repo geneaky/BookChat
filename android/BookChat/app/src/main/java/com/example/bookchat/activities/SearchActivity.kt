@@ -30,7 +30,6 @@ import com.example.bookchat.databinding.ActivitySearchBinding
 import com.example.bookchat.utils.Constants.TAG
 import com.example.bookchat.utils.SearchType
 import com.example.bookchat.utils.SharedPreferenceManager
-import com.example.bookchat.viewmodel.OptionDrawerViewModel
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
 
 class SearchActivity : AppCompatActivity() {
@@ -44,13 +43,11 @@ class SearchActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_search)
         binding.lifecycleOwner = this@SearchActivity
         binding.activity = this@SearchActivity
-        binding.drawerViewModel = OptionDrawerViewModel() //의미 없음 라이프사이클 연결이 안되서 ,
-        // 데이터 바인딩 써서하려면 프레그먼트나 액티비티로 만들어야하는데 그러면 SlidingUpPanddingWindow를 못씀 아마도 직접 구현해야할거임
+        //binding.drawerViewModel = OptionDrawerViewModel() //옵션 사라질 예정.. (ㅠㅠ)
 
         initSearchWindow()
         initHistoryRcyV()
         initOptionSlide()
-
     }
 
     fun initSearchWindow(){

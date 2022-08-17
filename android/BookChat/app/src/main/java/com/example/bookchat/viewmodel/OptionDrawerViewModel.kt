@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import com.example.bookchat.R
 import com.example.bookchat.utils.Constants.TAG
 
+//삭제 예정
 class OptionDrawerViewModel :ViewModel() {
     private val _optionClickDataArray = MutableLiveData<Array<Int>>(Array(4,{0}))
 

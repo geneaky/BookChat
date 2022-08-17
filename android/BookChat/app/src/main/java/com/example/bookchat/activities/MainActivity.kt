@@ -26,30 +26,18 @@ class MainActivity : AppCompatActivity() {
     private lateinit var chatRoomAdapter: MainChatRoomAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        Log.d(TAG, "MainActivity: onCreate() - called")
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-
         with(binding){
             lifecycleOwner =this@MainActivity
             activity = this@MainActivity
             userModel = mainViewModel
-
-            //유저 정보 불러오기
-            userModel?.activityInitialization()
-
-            //프로필 이미지 라운드 설정
-            binding.profile.clipToOutline = true
-
-            chatRoomAdapter = MainChatRoomAdapter()
-            chatRoomRecyclerView.adapter = chatRoomAdapter
-            chatRoomRecyclerView.setHasFixedSize(true)
-            chatRoomRecyclerView.layoutManager = LinearLayoutManager(this@MainActivity)
-            val snapHelper = LinearSnapHelper()
-            snapHelper.attachToRecyclerView(chatRoomRecyclerView)
         }
+            getUserInfo()
+            initRecyclerView()
     }
+
     fun clickMenu() {
         with(binding){
             if(drawerlayout.isDrawerOpen(Gravity.RIGHT)) {
@@ -68,18 +56,14 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
     }
     fun clickSignOut(){
-        //다이얼로그 디자인 수정할 것
-        //다이얼 로그로 정말 로그아웃 하시겠습니까 물어보기
         val dialog = AlertDialog.Builder(this,android.R.style.Theme_DeviceDefault_Light_Dialog)
         dialog.setTitle("정말 로그아웃하시겠습니까?")
             .setPositiveButton("취소",object : DialogInterface.OnClickListener {
                 override fun onClick(dialog: DialogInterface?, which: Int) {
-                    Log.d(TAG, "MainActivity: dialog- onClick() 취소- called")
                 }
             })
             .setNeutralButton("로그아웃",object : DialogInterface.OnClickListener{
                 override fun onClick(dialog: DialogInterface?, which: Int) {
-                    Log.d(TAG, "MainActivity: dialog- onClick() 로그아웃- called")
                     deleteToken()
                     finish()
                 }
@@ -93,6 +77,20 @@ class MainActivity : AppCompatActivity() {
             if (token.exists()) token.delete()
         }catch (e :Exception){
             e.printStackTrace()
+        }
+    }
+    private fun getUserInfo(){
+        binding.profile.clipToOutline = true //프로필 라운딩
+        binding.userModel?.activityInitialization()
+    }
+    private fun initRecyclerView(){
+        with(binding){
+            chatRoomAdapter = MainChatRoomAdapter()
+            chatRoomRecyclerView.adapter = chatRoomAdapter
+            chatRoomRecyclerView.setHasFixedSize(true)
+            chatRoomRecyclerView.layoutManager = LinearLayoutManager(this@MainActivity)
+            val snapHelper = LinearSnapHelper()
+            snapHelper.attachToRecyclerView(chatRoomRecyclerView)
         }
     }
 }

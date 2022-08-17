@@ -24,7 +24,6 @@ class SearchResultBookAdapter
         }
     }
 
-    //뷰홀더 객체 생성하는 메소드
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BookResultViewHolder {
         itemBookSearchResultBinding = DataBindingUtil.inflate(
             LayoutInflater.from(parent.context),
@@ -35,7 +34,6 @@ class SearchResultBookAdapter
         return BookResultViewHolder(itemBookSearchResultBinding)
     }
 
-    //position에 해당하는 데이터를 뷰홀더의 아이템 뷰에 표시 // getItem : Pager 내장 함수
     override fun onBindViewHolder(holder: BookResultViewHolder, position: Int) {
         val currentItem = getItem(position)
 
@@ -55,12 +53,10 @@ class SearchResultBookAdapter
         }
     }
 
-    // 내부 아이템 클릭 리스너 인터페이스 정의
     interface OnItemClickListener {
         fun onItemClick(book :Book)
     }
 
-    // 외부에서 클릭 시 이벤트 설정
     fun setItemClickListener(onItemClickListener: OnItemClickListener) {
         this.itemClickListener = onItemClickListener
     }
