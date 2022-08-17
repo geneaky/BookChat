@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.data.Book
 import com.example.bookchat.databinding.ItemBookSearchResultBinding
+import kotlin.collections.ArrayList
 
 class SearchResultBookAdapter
     : PagingDataAdapter<Book, SearchResultBookAdapter.BookResultViewHolder>(IMAGE_COMPARATOR) {
@@ -36,10 +37,7 @@ class SearchResultBookAdapter
 
     override fun onBindViewHolder(holder: BookResultViewHolder, position: Int) {
         val currentItem = getItem(position)
-
-        if (currentItem != null) {
-            holder.bind(currentItem)
-        }
+        currentItem?.let { holder.bind(it) }
     }
 
     //Diffutil 구현

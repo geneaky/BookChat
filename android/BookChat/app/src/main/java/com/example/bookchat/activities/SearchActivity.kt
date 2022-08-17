@@ -35,7 +35,6 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout
 class SearchActivity : AppCompatActivity() {
     private lateinit var binding : ActivitySearchBinding
     private lateinit var searchHistoryAdapter: SearchHistoryAdapter
-    private var optionIsClicked = false
     private var optionType = SearchType.TITLE
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,8 +52,7 @@ class SearchActivity : AppCompatActivity() {
     fun initSearchWindow(){
         with(binding){
             //검색창 엔터이벤트 등록
-            searchTextEt.setOnEditorActionListener { textView, actionId, keyEvent ->
-                Log.d(TAG, "SearchActivity: onCreate() - Enter!!")
+            searchTextEt.setOnEditorActionListener { _, _, _ ->
                 if(searchTextEt.text.toString().isNotEmpty()){
                     SharedPreferenceManager.setSearchHistory(searchTextEt.text.toString()) // 검색어 저장
                     openResult() //페이지 이동
@@ -110,113 +108,101 @@ class SearchActivity : AppCompatActivity() {
 
     //검색창 클릭 이벤트(열기)
     fun clickSearchWindow(){
-        Log.d(TAG, "SearchActivity: clickLayoutTest() - called")
 
-        if (optionIsClicked == false){
-            optionIsClicked = true
-            //검색창 이동 애니메이션
-            AnimatorInflater.loadAnimator( this,
-                R.animator.move_search_window_open
-            ).apply {
-                interpolator = AccelerateDecelerateInterpolator()
-                doOnStart { Log.d(TAG, "SearchActivity: clickSearchWindow() - AnimationStart") }
-                doOnEnd { Log.d(TAG, "SearchActivity: clickSearchWindow() - AnimationEnd") }
-                binding.SearchWindow.pivotX = 0.0f
-                binding.SearchWindow.pivotY = 0.0f
-                setTarget(binding.SearchWindow)
-                start()
-            }
-
-            //옵션버튼 이동 애니메이션
-            AnimatorInflater.loadAnimator( this,
-                R.animator.move_search_option_btn_open
-            ).apply {
-                interpolator = AccelerateDecelerateInterpolator()
-                doOnStart { Log.d(TAG, "SearchActivity: clickSearchWindow() - btn_AnimationStart") }
-                doOnEnd { Log.d(TAG, "SearchActivity: clickSearchWindow() - btn_AnimationEnd") }
-                setTarget(binding.searchOptionBtn)
-                start()
-            }
-
-            //애니메이션 작동시 노출View 설정
-            Handler(Looper.getMainLooper()).postDelayed({
-                with(binding){
-                    SearchText.visibility = INVISIBLE
-                    searchTextTv.visibility = INVISIBLE
-                    searchTextEt.visibility = VISIBLE
-
-                    // 키보드 포커스 & 키보드 올리기
-                    searchTextEt.requestFocus()
-                    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                    imm.showSoftInput(searchTextEt, SHOW_IMPLICIT)
-
-                    searchWindowDeleteBtn.visibility = VISIBLE
-                    searchWindowCencelBtn.visibility = VISIBLE
-                    recentSearchTitle.visibility = VISIBLE
-
-                    //검색기록 노출
-                    SearchHistoryRycv.visibility = VISIBLE
-
-                }}, 300L)
-        }else{
+        //검색창 이동 애니메이션
+        AnimatorInflater.loadAnimator( this,
+            R.animator.move_search_window_open
+        ).apply {
+            interpolator = AccelerateDecelerateInterpolator()
+            doOnStart { Log.d(TAG, "SearchActivity: clickSearchWindow() - AnimationStart") }
+            doOnEnd { Log.d(TAG, "SearchActivity: clickSearchWindow() - AnimationEnd") }
+            binding.SearchWindow.pivotX = 0.0f
+            binding.SearchWindow.pivotY = 0.0f
+            setTarget(binding.SearchWindow)
+            start()
         }
+
+        //옵션버튼 이동 애니메이션
+        AnimatorInflater.loadAnimator( this,
+            R.animator.move_search_option_btn_open
+        ).apply {
+            interpolator = AccelerateDecelerateInterpolator()
+            doOnStart { Log.d(TAG, "SearchActivity: clickSearchWindow() - btn_AnimationStart") }
+            doOnEnd { Log.d(TAG, "SearchActivity: clickSearchWindow() - btn_AnimationEnd") }
+            setTarget(binding.searchOptionBtn)
+            start()
+        }
+
+        //애니메이션 작동시 노출View 설정
+        Handler(Looper.getMainLooper()).postDelayed({
+            with(binding){
+                SearchText.visibility = INVISIBLE
+                searchTextTv.visibility = INVISIBLE
+                searchTextEt.visibility = VISIBLE
+
+                // 키보드 포커스 & 키보드 올리기
+                searchTextEt.requestFocus()
+                val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.showSoftInput(searchTextEt, SHOW_IMPLICIT)
+
+                searchWindowDeleteBtn.visibility = VISIBLE
+                searchWindowCencelBtn.visibility = VISIBLE
+                recentSearchTitle.visibility = VISIBLE
+
+                //검색기록 노출
+                SearchHistoryRycv.visibility = VISIBLE
+
+            }}, 300L)
     }
 
     //검색창 클릭 이벤트(닫기)
     fun clickCancleBtn(){
 
-        if(optionIsClicked == true){
-            optionIsClicked = false
-
-            //검색창 이동 애니메이션
-            AnimatorInflater.loadAnimator( this,
-                R.animator.move_search_window_close
-            ).apply {
-                interpolator = AccelerateDecelerateInterpolator()
-                doOnStart { Log.d(TAG, "SearchActivity: clickCancleBtn() - AnimationStart") }
-                doOnEnd { Log.d(TAG, "SearchActivity: clickCancleBtn() - AnimationEnd") }
-                binding.SearchWindow.pivotX = 0.0f
-                binding.SearchWindow.pivotY = 0.0f
-                setTarget(binding.SearchWindow)
-                start()
-            }
-
-            //옵션버튼 이동 애니메이션
-            AnimatorInflater.loadAnimator( this,
-                R.animator.move_search_option_btn_close
-            ).apply {
-                interpolator = AccelerateDecelerateInterpolator()
-                doOnStart { Log.d(TAG, "SearchActivity: clickCancleBtn() - btn_AnimationStart") }
-                doOnEnd { Log.d(TAG, "SearchActivity: clickCancleBtn() - btn_AnimationEnd") }
-                setTarget(binding.searchOptionBtn)
-                start()
-            }
-
-            //애니메이션 작동시 노출View 설정
-            Handler(Looper.getMainLooper()).postDelayed({
-                with(binding){
-                    SearchText.visibility = VISIBLE
-                    searchTextTv.visibility = VISIBLE
-                    searchTextEt.visibility = INVISIBLE
-                    clearSearchText()
-
-                    // 키보드 내리기
-                    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                    imm.hideSoftInputFromWindow(searchTextEt.windowToken, 0)
-
-                    searchWindowDeleteBtn.visibility = INVISIBLE
-                    searchWindowCencelBtn.visibility = INVISIBLE
-                    recentSearchTitle.visibility = INVISIBLE
-
-                    //검색기록 숨기기
-                    SearchHistoryRycv.visibility = INVISIBLE
-
-                }}, 100L
-            )
-
-        }else{
-
+        //검색창 이동 애니메이션
+        AnimatorInflater.loadAnimator( this,
+            R.animator.move_search_window_close
+        ).apply {
+            interpolator = AccelerateDecelerateInterpolator()
+            doOnStart { Log.d(TAG, "SearchActivity: clickCancleBtn() - AnimationStart") }
+            doOnEnd { Log.d(TAG, "SearchActivity: clickCancleBtn() - AnimationEnd") }
+            binding.SearchWindow.pivotX = 0.0f
+            binding.SearchWindow.pivotY = 0.0f
+            setTarget(binding.SearchWindow)
+            start()
         }
+
+        //옵션버튼 이동 애니메이션
+        AnimatorInflater.loadAnimator( this,
+            R.animator.move_search_option_btn_close
+        ).apply {
+            interpolator = AccelerateDecelerateInterpolator()
+            doOnStart { Log.d(TAG, "SearchActivity: clickCancleBtn() - btn_AnimationStart") }
+            doOnEnd { Log.d(TAG, "SearchActivity: clickCancleBtn() - btn_AnimationEnd") }
+            setTarget(binding.searchOptionBtn)
+            start()
+        }
+
+        //애니메이션 작동시 노출View 설정
+        Handler(Looper.getMainLooper()).postDelayed({
+            with(binding){
+                SearchText.visibility = VISIBLE
+                searchTextTv.visibility = VISIBLE
+                searchTextEt.visibility = INVISIBLE
+                clearSearchText()
+
+                // 키보드 내리기
+                val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(searchTextEt.windowToken, 0)
+
+                searchWindowDeleteBtn.visibility = INVISIBLE
+                searchWindowCencelBtn.visibility = INVISIBLE
+                recentSearchTitle.visibility = INVISIBLE
+
+                //검색기록 숨기기
+                SearchHistoryRycv.visibility = INVISIBLE
+
+            }}, 100L
+        )
     }
 
     //뒤로가기 버튼을 눌렀을 때
@@ -232,19 +218,16 @@ class SearchActivity : AppCompatActivity() {
 
     //키보드가 아닌 다른곳 누르면 키보드 내림 (작동 확인 필요)
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        Log.d(TAG, "SearchActivity: onTouchEvent() - called")
         val imm: InputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(currentFocus?.windowToken, 0)
         return true
     }
 
     fun clearSearchText(){
-        Log.d(TAG, "SearchActivity: clearSearchText() - called")
         binding.searchTextEt.setText("")
     }
 
     fun openResult(){
-        Log.d(TAG, "SearchActivity: openResult() - called")
         val intent = Intent(this, SearchResultActivity::class.java)
         intent.putExtra("SearchKeyWord",binding.searchTextEt.text.toString())
         intent.putExtra("OptionType",optionType)
@@ -259,15 +242,13 @@ class SearchActivity : AppCompatActivity() {
     }
 
     fun clickOptionBtn(){
-        Log.d(TAG, "SearchActivity: clickOptionBtn() - called")
         if(binding.optionFrame.panelState == SlidingUpPanelLayout.PanelState.HIDDEN){
             binding.optionFrame.panelState = SlidingUpPanelLayout.PanelState.EXPANDED
             return
         }
     }
 
-    //여러 개의 View 클릭 이벤트 처리는 한 개의 View 클릭 처리와 함수 형태와 xml에 적는 형식이 다르다.
-    //클릭한거만 검은색 클릭 안된애들은 회색으로 구현
+    //옵션 레거시 코드
     fun clizckOptionItem(view : View){
 
         when(view.id){

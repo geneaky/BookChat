@@ -3,7 +3,6 @@ package com.example.bookchat.activities
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Gravity
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -15,7 +14,7 @@ import com.example.bookchat.R
 import com.example.bookchat.adapter.MainChatRoomAdapter
 import com.example.bookchat.databinding.ActivityMainBinding
 import com.example.bookchat.utils.ActivityType
-import com.example.bookchat.utils.Constants.TAG
+import com.example.bookchat.utils.Constants.TOKEN_FATH
 import com.example.bookchat.viewmodel.MainViewModel
 import java.io.File
 
@@ -72,12 +71,8 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
     fun deleteToken(){
-        try {
-            val token = File("/data/data/com.example.bookchat/shared_prefs/encryptedShared.xml")
-            if (token.exists()) token.delete()
-        }catch (e :Exception){
-            e.printStackTrace()
-        }
+        val token = File(TOKEN_FATH)
+        if (token.exists()) token.delete()
     }
     private fun getUserInfo(){
         binding.profile.clipToOutline = true //프로필 라운딩

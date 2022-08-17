@@ -9,6 +9,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.paging.LoadState
+import androidx.paging.LoadStates
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.bookchat.App
 import com.example.bookchat.Paging.BookSearchResultPagingLoadStateAdapter
@@ -104,7 +105,6 @@ class SearchResultActivity : AppCompatActivity() {
                         LoadState.Error : 오류가 있음
             */
             binding.apply {
-                val appendLoadState = combinedLoadStates.source.append //끄트머리에서 데이터 로드 상태
                 val refreshLoadState = combinedLoadStates.source.refresh //새로고침 데이터 로드 상태
                 totalCount = searchResultViewModel.getResultCount().toString()
                 // 로딩 중 일 때
@@ -117,19 +117,14 @@ class SearchResultActivity : AppCompatActivity() {
                 retryButton.isVisible = refreshLoadState is LoadState.Error
                 errorText.isVisible = refreshLoadState is LoadState.Error
 
-                // 활성 로드 작업이 없고 에러가 없음 & 로드할 수 없음 & 개수 1 미만 (empty)
-                if (refreshLoadState is LoadState.NotLoading
-                    && appendLoadState.endOfPaginationReached
-                    && bookResultAdapter.itemCount < 1
-                ) {
+                if (isLoadResultEmpty(combinedLoadStates.source)) {
                     bookSearchResultRcyView.isVisible = false
                     emptyResultImg.isVisible = true
                     emptyResultText.isVisible = true
-                } else {
-                    emptyResultImg.isVisible = false
-                    emptyResultText.isVisible = false
                 }
 
+                emptyResultImg.isVisible = false
+                emptyResultText.isVisible = false
             }
         }
     }
@@ -151,6 +146,12 @@ class SearchResultActivity : AppCompatActivity() {
         }else{
             Toast.makeText(this@SearchResultActivity,"검색어를 입력해주세요", Toast.LENGTH_SHORT).show()
         }
+    }
+    // 활성 로드 작업이 없고 에러가 없음 & 로드할 수 없음 & 개수 1 미만 (empty)
+    private fun isLoadResultEmpty(loadStates : LoadStates) :Boolean{
+        return (loadStates.refresh is LoadState.NotLoading)
+                && (loadStates.append.endOfPaginationReached)
+                && (bookResultAdapter.itemCount < 1)
     }
 
     fun clearSearchText(){

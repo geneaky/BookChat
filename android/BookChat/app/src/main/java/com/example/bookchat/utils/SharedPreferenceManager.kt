@@ -2,20 +2,17 @@ package com.example.bookchat.utils
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
 import com.example.bookchat.App
-import com.example.bookchat.utils.Constants.TAG
+import com.example.bookchat.utils.Constants.SEARCH_HISTORY_PREF
+import com.example.bookchat.utils.Constants.SEARCH_HISTORY_PREF_KEY
+import com.example.bookchat.utils.Constants.TOKEN_PREF_KEY
 import com.google.gson.Gson
 import java.util.*
 import kotlin.collections.ArrayList
 
 object SharedPreferenceManager {
-
-    const val TOKEN_PREF_KEY = "TOKEN_PREF_KEY"
-    const val SEARCH_HISTORY_PREF = "SEARCH_HISTORY_PREF"
-    const val SEARCH_HISTORY_PREF_KEY = "SEARCH_HISTORY_PREF_KEY"
 
     //EncryptedSharedPreferences 인스턴스 생성
     val keyGenParameterSpec = MasterKeys.AES256_GCM_SPEC
@@ -32,7 +29,6 @@ object SharedPreferenceManager {
         App.instance.getSharedPreferences(SEARCH_HISTORY_PREF, Context.MODE_PRIVATE)
 
     fun saveToken(token :String){
-        Log.d(TAG, "SharedPreferenceManager: saveToken() - called")
         val editor = tokenPref.edit()
         editor.putString(TOKEN_PREF_KEY,"Bearer $token")
         editor.apply()
@@ -60,8 +56,6 @@ object SharedPreferenceManager {
     }
 
     fun setSearchHistory(searchKeyWord : String){
-        Log.d(TAG, "SearchActivity: setSearchHistory() - called")
-
         val searchHistoryList = getSearchHistory() //저장되어있는 검색기록 불러옴
         val temp = ArrayList<String>()
         temp.add(searchKeyWord)

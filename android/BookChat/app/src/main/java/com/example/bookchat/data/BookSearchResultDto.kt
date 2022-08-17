@@ -7,4 +7,8 @@ data class BookSearchResultDto(
     val books :List<Book>,
     @SerializedName("meta")
     val meta : Meta
-)
+){
+    fun isEnd() :Boolean{
+        return meta.isEnd
+    }
+}
