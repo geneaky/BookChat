@@ -38,6 +38,8 @@ public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         }
 
         clearAuthenticationAttributes(request, response);
+        // TODO: 2022-08-17 ip block table에 저장된 사용자의 block 횟 수 reset 시켜줘야함
+        clearIpBlockCount(request);
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 

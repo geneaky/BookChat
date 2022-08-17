@@ -25,6 +25,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    // TODO: 2022-08-17 front단에서 인증 구현 후 name property 제거 예정
     private String nickName;
     private String email;
     private String password;

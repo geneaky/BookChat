@@ -82,8 +82,6 @@ public class UserControllerTest extends AuthenticationTestExtension {
         assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo(real);
     }
 
-    // TODO: 2022-08-16 닉네임 중복체크 rest document 생성 로직 추가해야함
-
     @Test
     public void 사용자_닉네임_중복_아닐시_200반환() throws Exception {
         when(userService.isDuplicatedName(anyString())).thenReturn(false);
