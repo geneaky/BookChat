@@ -9,5 +9,5 @@ public class ResponseConstants {
         new ResponseEntity<>("도서를 찾을 수 없습니다", HttpStatus.NOT_FOUND);
 
     public static final ResponseEntity<String> USER_NOT_FOUND =
-            new ResponseEntity<>("등록된 사용자가 아닙니다", HttpStatus.NOT_FOUND);
+        new ResponseEntity<>("등록된 사용자가 아닙니다", HttpStatus.NOT_FOUND);
 }
