@@ -2,6 +2,8 @@ package toy.bookchat.bookchat.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -35,11 +37,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS); //세션 없이
 
         http.addFilterAt(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        // TODO: 2022-08-17 인증필터 전에 해당 ip가 block당했는지 확인하는 ip block filter 추가
 
         http.anonymous().disable();
 
         http.authorizeHttpRequests()
-            .antMatchers("/", "/auth", "/app","/v1/api/users/profile/nickname").permitAll()
+            .antMatchers("/", "/auth", "/app").permitAll()
+                .antMatchers(HttpMethod.GET,"/v1/api/users/profile/nickname").permitAll()
             .anyRequest().authenticated()
             .and()
             .exceptionHandling()
