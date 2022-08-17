@@ -13,6 +13,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import toy.bookchat.bookchat.security.handler.CustomAuthenticationFailureHandler;
 import toy.bookchat.bookchat.security.handler.CustomAuthenticationSuccessHandler;
 import toy.bookchat.bookchat.security.handler.RestAuthenticationEntryPoint;
+import toy.bookchat.bookchat.security.ipblock.IpBlockCheckingFilter;
 import toy.bookchat.bookchat.security.jwt.JwtAuthenticationFilter;
 import toy.bookchat.bookchat.security.oauth.CustomOAuth2UserService;
 import toy.bookchat.bookchat.security.oauth.HttpCookieOAuth2AuthorizationRequestRepository;
@@ -29,6 +30,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
     private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
+    private final IpBlockCheckingFilter ipBlockCheckingFilter;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -37,7 +39,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS); //세션 없이
 
         http.addFilterAt(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-        // TODO: 2022-08-17 인증필터 전에 해당 ip가 block당했는지 확인하는 ip block filter 추가
+        // TODO: 2022-08-17 must do ip block test
+        http.addFilterBefore(ipBlockCheckingFilter,JwtAuthenticationFilter.class);
 
         http.anonymous().disable();
 
