@@ -3,12 +3,10 @@ package com.example.bookchat.activities
 import android.animation.AnimatorInflater
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.INVISIBLE
@@ -16,7 +14,6 @@ import android.view.View.VISIBLE
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.inputmethod.InputMethodManager
 import android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.animation.doOnEnd
@@ -36,17 +33,16 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var binding : ActivitySearchBinding
     private lateinit var searchHistoryAdapter: SearchHistoryAdapter
     private var optionType = SearchType.TITLE
+    var SearchWindowIsOpened = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_search)
         binding.lifecycleOwner = this@SearchActivity
         binding.activity = this@SearchActivity
-        //binding.drawerViewModel = OptionDrawerViewModel() //옵션 사라질 예정.. (ㅠㅠ)
 
         initSearchWindow()
         initHistoryRcyV()
-        initOptionSlide()
     }
 
     fun initSearchWindow(){
@@ -82,32 +78,11 @@ class SearchActivity : AppCompatActivity() {
                 RecyclerView.VERTICAL,false)
         }
     }
-    fun initOptionSlide(){
-        //옵션 슬라이드 설정
-        binding.optionFrame.addPanelSlideListener( object : SlidingUpPanelLayout.PanelSlideListener{
-            //패널이 슬라이드 중일 때
-            override fun onPanelSlide(panel: View?, slideOffset: Float) {
-            }
-            //패널의 상태가 변했을 때 (올라왔거나 내려갔거나)
-            override fun onPanelStateChanged(
-                panel: View?,
-                previousState: SlidingUpPanelLayout.PanelState?,
-                newState: SlidingUpPanelLayout.PanelState?
-            ) {
-                if (newState == SlidingUpPanelLayout.PanelState.COLLAPSED){
-                    binding.optionFrame.panelState = SlidingUpPanelLayout.PanelState.HIDDEN
-                }else if (newState == SlidingUpPanelLayout.PanelState.EXPANDED){
-                    Toast.makeText(this@SearchActivity,"검색 필터를 설정해주세요.",Toast.LENGTH_SHORT).show()
-                }
-            }
-        })
-        //초기값 숨김 지정
-        binding.optionFrame.panelState = SlidingUpPanelLayout.PanelState.HIDDEN
-    }
-
 
     //검색창 클릭 이벤트(열기)
     fun clickSearchWindow(){
+        if (SearchWindowIsOpened) return
+        SearchWindowIsOpened = true
 
         //검색창 이동 애니메이션
         AnimatorInflater.loadAnimator( this,
@@ -157,6 +132,8 @@ class SearchActivity : AppCompatActivity() {
 
     //검색창 클릭 이벤트(닫기)
     fun clickCancleBtn(){
+        if (!SearchWindowIsOpened) return
+        SearchWindowIsOpened = false
 
         //검색창 이동 애니메이션
         AnimatorInflater.loadAnimator( this,
@@ -205,17 +182,6 @@ class SearchActivity : AppCompatActivity() {
         )
     }
 
-    //뒤로가기 버튼을 눌렀을 때
-    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-        if(keyCode == KeyEvent.KEYCODE_BACK){
-            if(binding.optionFrame.panelState == SlidingUpPanelLayout.PanelState.EXPANDED){
-                binding.optionFrame.panelState = SlidingUpPanelLayout.PanelState.HIDDEN
-                return false
-            }
-        }
-        return super.onKeyDown(keyCode, event)
-    }
-
     //키보드가 아닌 다른곳 누르면 키보드 내림 (작동 확인 필요)
     override fun onTouchEvent(event: MotionEvent): Boolean {
         val imm: InputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -240,48 +206,6 @@ class SearchActivity : AppCompatActivity() {
         searchHistoryAdapter.searchHistoryList = SharedPreferenceManager.getSearchHistory()
         searchHistoryAdapter.notifyDataSetChanged()
     }
-
-    fun clickOptionBtn(){
-        if(binding.optionFrame.panelState == SlidingUpPanelLayout.PanelState.HIDDEN){
-            binding.optionFrame.panelState = SlidingUpPanelLayout.PanelState.EXPANDED
-            return
-        }
-    }
-
-    //옵션 레거시 코드
-    fun clizckOptionItem(view : View){
-
-        when(view.id){
-            R.id.bookNameOption_btn -> {
-                binding.optionFrame.panelState = SlidingUpPanelLayout.PanelState.HIDDEN
-                optionType = SearchType.TITLE
-                changeColorElseOptionBtn(view)
-            }
-            R.id.authorNameOption_btn -> {
-                binding.optionFrame.panelState = SlidingUpPanelLayout.PanelState.HIDDEN
-                optionType = SearchType.AUTHOR
-                changeColorElseOptionBtn(view)
-            }
-            R.id.isbnOption_btn ->{
-                binding.optionFrame.panelState = SlidingUpPanelLayout.PanelState.HIDDEN
-                optionType = SearchType.ISBN
-                changeColorElseOptionBtn(view)
-
-            }
-            R.id.chatRoomNameOption_btn ->{
-                binding.optionFrame.panelState = SlidingUpPanelLayout.PanelState.HIDDEN
-                optionType = SearchType.CHATROOMNAME
-                changeColorElseOptionBtn(view)
-            }
-            else -> return
-        }
-    }
-
-    fun changeColorElseOptionBtn(view : View){
-        var textview = view as TextView
-        textview.setTextColor(Color.parseColor("#12121D"))
-    }
-
 
     override fun onRestart() {
         Log.d(TAG, "SearchActivity: onRestart() - 생명주기")

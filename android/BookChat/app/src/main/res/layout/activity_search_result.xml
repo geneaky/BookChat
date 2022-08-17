@@ -17,16 +17,6 @@
 
     </data>
 
-    <!--    <com.sothree.slidinguppanel.SlidingUpPanelLayout-->
-    <!--        android:id="@+id/option_frame"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="match_parent"-->
-    <!--        android:gravity="bottom"-->
-    <!--        app:umanoDragView="@id/drawer"-->
-    <!--        app:umanoPanelHeight="50dp"-->
-    <!--        app:umanoShadowHeight="0dp"-->
-    <!--        app:umanoOverlay="true">-->
-
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -215,23 +205,9 @@
                     android:layout_height="wrap_content"
                     tools:listitem="@layout/item_book_search_result"/>
             </FrameLayout>
-            <!--setItem="@{viewModel.books}"-->
 
         </LinearLayout>
     </FrameLayout>
 
-    <!--        &lt;!&ndash;옵션 drawer&ndash;&gt;-->
-    <!--        <LinearLayout-->
-    <!--            android:id="@+id/drawer"-->
-    <!--            android:layout_width="match_parent"-->
-    <!--            android:layout_height="400dp"-->
-    <!--            android:orientation="vertical">-->
-
-    <!--            <include layout="@layout/layout_search_option_drawer"-->
-    <!--                android:id="@+id/drawer_option"-->
-    <!--                app:viewModel ="@{optionViewModel}"/>-->
-    <!--        </LinearLayout>-->
-
-    <!--    </com.sothree.slidinguppanel.SlidingUpPanelLayout>-->
 </layout>
 
