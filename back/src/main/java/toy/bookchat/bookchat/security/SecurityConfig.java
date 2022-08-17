@@ -40,7 +40,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.addFilterAt(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         // TODO: 2022-08-17 must do ip block test
-        http.addFilterBefore(ipBlockCheckingFilter,JwtAuthenticationFilter.class);
+        http.addFilterBefore(ipBlockCheckingFilter,UsernamePasswordAuthenticationFilter.class);
 
         http.anonymous().disable();
 
