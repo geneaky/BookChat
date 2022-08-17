@@ -14,7 +14,7 @@ import com.example.bookchat.R
 import com.example.bookchat.adapter.MainChatRoomAdapter
 import com.example.bookchat.databinding.ActivityMainBinding
 import com.example.bookchat.utils.ActivityType
-import com.example.bookchat.utils.Constants.TOKEN_FATH
+import com.example.bookchat.utils.Constants.TOKEN_PATH
 import com.example.bookchat.viewmodel.MainViewModel
 import java.io.File
 
@@ -71,7 +71,7 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
     fun deleteToken(){
-        val token = File(TOKEN_FATH)
+        val token = File(TOKEN_PATH)
         if (token.exists()) token.delete()
     }
     private fun getUserInfo(){
