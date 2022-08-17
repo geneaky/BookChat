@@ -164,8 +164,7 @@
                         android:fontFamily="@font/jua_regular"
                         android:textColor="#B8B8BB"
                         android:text="검색 결과 :  "/>
-                </LinearLayout>
-                <TextView
+                    <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/jua_regular"
@@ -177,7 +176,7 @@
                         android:fontFamily="@font/jua_regular"
                         android:textColor="#12121D"
                         android:text=" 개"/>
-
+                </LinearLayout>
             </LinearLayout>
 
             <FrameLayout

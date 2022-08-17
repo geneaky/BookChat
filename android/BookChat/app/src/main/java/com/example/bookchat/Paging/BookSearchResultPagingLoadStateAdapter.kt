@@ -25,8 +25,8 @@ class BookSearchResultPagingLoadStateAdapter(private val retry: () -> Unit)
         return LoadStateViewHolder(binding)
     }
 
-    inner class LoadStateViewHolder(private val binding: LoadStateBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+    inner class LoadStateViewHolder(private val binding: LoadStateBinding)
+        : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(loadState : LoadState){
             with(binding){

@@ -1,6 +1,5 @@
 package com.example.bookchat.adapter
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
@@ -10,19 +9,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.bookchat.R
 import com.example.bookchat.data.Book
 import com.example.bookchat.databinding.ItemBookSearchResultBinding
-import com.example.bookchat.utils.Constants.TAG
 
 class SearchResultBookAdapter
     : PagingDataAdapter<Book, SearchResultBookAdapter.BookResultViewHolder>(IMAGE_COMPARATOR) {
-
     private lateinit var itemBookSearchResultBinding: ItemBookSearchResultBinding
     private lateinit var itemClickListener: OnItemClickListener
 
     inner class BookResultViewHolder(val binding: ItemBookSearchResultBinding) :RecyclerView.ViewHolder(binding.root) {
         fun bind(book : Book){
-            Log.d(TAG, "BookResultViewHolder: bind() - ${book.title} 바인드됨")
             binding.book = book
-            // 아이템 클릭시 어댑터에 지정해준 ClickListener 실행
             binding.root.setOnClickListener {
                 itemClickListener.onItemClick(book)
             }

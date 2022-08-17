@@ -11,10 +11,12 @@ import com.example.bookchat.data.Book
 import com.example.bookchat.data.BookSearchOption
 
 class BookRepository {
-    fun getBooks(bookSearchOption: BookSearchOption) : LiveData<PagingData<Book>> {
+    fun getBooks(bookSearchOption: BookSearchOption,
+                 searchResultCountCallBack : (Int) -> Unit)
+    : LiveData<PagingData<Book>> {
         return Pager(
             config = PagingConfig(pageSize = 20), //한 번에 로드된 항목 수
-            pagingSourceFactory = { BookSearchResultPagingSource(App.instance.apiInterface,bookSearchOption) }
+            pagingSourceFactory = { BookSearchResultPagingSource(App.instance.apiInterface,bookSearchOption,searchResultCountCallBack) }
         ).liveData
     }
 }
