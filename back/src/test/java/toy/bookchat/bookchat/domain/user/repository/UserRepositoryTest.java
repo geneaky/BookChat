@@ -1,7 +1,8 @@
 package toy.bookchat.bookchat.domain.user.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Optional;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -41,6 +42,29 @@ class UserRepositoryTest {
         Optional<User> googleUser = userRepository.findByEmailAndProvider(
             "kaktus418@gmail.com", OAuth2Provider.google);
 
-        Assertions.assertThat(kakaoUser).isNotEqualTo(googleUser);
+        assertThat(kakaoUser).isNotEqualTo(googleUser);
+    }
+
+    @Test
+    public void 사용자_nickname_존재시_true_반환_성공() throws Exception {
+        User user = User.builder()
+            .name("user")
+            .email("kaktus418@gmail.com")
+            .provider(OAuth2Provider.kakao)
+            .nickName("nickname")
+            .build();
+
+        userRepository.save(user);
+
+        boolean result = userRepository.existsByNickName("nickname");
+
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    public void 사용자_nickname_존재하지않을시_false_반환_성공() throws Exception {
+        boolean result = userRepository.existsByNickName("nickname");
+
+        assertThat(result).isFalse();
     }
 }

@@ -1,18 +1,23 @@
 package toy.bookchat.bookchat.domain.user.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collections;
 import java.util.List;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.GrantedAuthority;
@@ -22,12 +27,16 @@ import org.springframework.test.web.servlet.MvcResult;
 import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.api.dto.UserProfileResponse;
+import toy.bookchat.bookchat.domain.user.service.UserService;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @WebMvcTest(controllers = UserController.class,
     includeFilters = @ComponentScan.Filter(classes = {EnableWebSecurity.class}))
 @AutoConfigureRestDocs
 public class UserControllerTest extends AuthenticationTestExtension {
+
+    @MockBean
+    UserService userService;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -70,7 +79,26 @@ public class UserControllerTest extends AuthenticationTestExtension {
             .andDo(document("user"))
             .andReturn();
 
-        Assertions.assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo(real);
+        assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo(real);
+    }
+
+    // TODO: 2022-08-16 닉네임 중복체크 rest document 생성 로직 추가해야함
+
+    @Test
+    public void 사용자_닉네임_중복_아닐시_200반환() throws Exception {
+        when(userService.isDuplicatedName(anyString())).thenReturn(false);
+        mockMvc.perform(get("/v1/api/users/profile/nickname").param("nickname", "HiBs"))
+            .andExpect(status().isOk())
+            .andDo(document("user_nickname", requestParameters(
+                parameterWithName("nickname").description("사용자 nickname")
+            )));
+    }
+
+    @Test
+    public void 사용자_닉네임_중복시_409반환() throws Exception {
+        when(userService.isDuplicatedName(anyString())).thenReturn(true);
+        mockMvc.perform(get("/v1/api/users/profile/nickname").param("nickname", "HiBs"))
+            .andExpect(status().isConflict());
     }
 
 
