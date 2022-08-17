@@ -46,10 +46,10 @@ public class IpBlockManager {
         final String header = request.getHeader("X-Forwarded-For");
         if (header == null) {
             Optional<AccessIp> optionalAccessIp = accessIpRepository.findById(request.getRemoteAddr());
-            return optionalAccessIp.filter(accessIp -> accessIp.getAccessFailCount() < LIMITED_COUNT).isPresent();
+            return optionalAccessIp.map(accessIp -> accessIp.getAccessFailCount() < LIMITED_COUNT).orElse(true);
         } else {
             Optional<AccessIp> optionalAccessIp = accessIpRepository.findById(header);
-            return optionalAccessIp.filter(accessIp -> accessIp.getAccessFailCount() < LIMITED_COUNT).isPresent();
+            return optionalAccessIp.map(accessIp -> accessIp.getAccessFailCount() < LIMITED_COUNT).orElse(true);
         }
     }
 }
