@@ -28,4 +28,8 @@ class App : Application() {
         networkManager = NetworkManager()
         apiInterface = ApiClient.getApiClient().create(ApiInterface::class.java)
     }
+
+    fun isNetworkConnected() :Boolean{
+        return instance.networkManager.checkNetworkState()
+    }
 }

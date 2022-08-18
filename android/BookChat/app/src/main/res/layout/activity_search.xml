@@ -1,9 +1,147 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".activities.SearchActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="activity"
+            type="com.example.bookchat.activities.SearchActivity" />
+        <variable
+            name="drawerViewModel"
+            type="com.example.bookchat.viewmodel.OptionDrawerViewModel" />
+    </data>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <FrameLayout
+        android:id="@+id/Search_Frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".activities.SearchActivity">
+
+        <TextView
+            android:id="@+id/Search_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/sf_pro_display_bold"
+            android:text="검색"
+            android:textColor="@color/black"
+            android:layout_marginTop="30dp"
+            android:layout_marginLeft="20dp"
+            android:textSize="28dp" />
+
+        <RelativeLayout
+            android:id="@+id/Search_window"
+            android:onClick="@{() -> activity.clickSearchWindow()}"
+            android:layout_width="match_parent"
+            android:layout_height="68dp"
+            android:layout_marginTop="95dp"
+            android:layout_marginHorizontal="20dp"
+            android:background="@drawable/search_background"
+            android:paddingHorizontal="20dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/test_search_btn_Before"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginTop="17dp"
+                android:src="@drawable/search_icon_searchpage" />
+
+            <TextView
+                android:id="@+id/searchText_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="38dp"
+                android:layout_marginTop="23dp"
+                android:fontFamily="@font/jua_regular"
+                android:text="책을 검색해주세요!"
+                android:textColor="#B0B0B4"
+                android:textSize="17sp" />
+
+            <EditText
+                android:id="@+id/searchText_et"
+                android:visibility="invisible"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="38dp"
+                android:layout_marginRight="64dp"
+                android:layout_marginTop="23dp"
+                android:background="@android:color/transparent"
+                android:fontFamily="@font/jua_regular"
+                android:hint="책을 검색해주세요!"
+                android:inputType="text"
+                android:imeOptions="actionDone"
+                android:textColorHint="#B0B0B4"
+                android:textColor="#12121D"/>
+
+            <ImageView
+                android:id="@+id/search_option_btn"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="17dp"
+                android:src="@drawable/searchfilter_icon" />
+
+            <ImageView
+                android:id="@+id/search_window_delete_btn"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="22dp"
+                android:onClick="@{() -> activity.clearSearchText()}"
+                android:src="@drawable/search_window_delete"
+                android:visibility="invisible" />
+
+        </RelativeLayout>
+        <TextView
+            android:id="@+id/search_window_cencel_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="취소"
+            android:onClick="@{() -> activity.clickCancleBtn()}"
+            android:visibility="invisible"
+            android:textColor="#BBBBBB"
+            android:fontFamily="@font/jua_regular"
+            android:textSize="23sp"
+            android:layout_gravity="right"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="60dp"/>
+
+        <RelativeLayout
+            android:id="@+id/recent_search_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="130dp"
+            android:visibility="invisible"
+            android:layout_marginHorizontal="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/jua_regular"
+                android:textColor="#B8B8BB"
+                android:text="최근 검색어"/>
+
+            <TextView
+                android:id="@+id/Clear_searchHistory_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:fontFamily="@font/jua_regular"
+                android:onClick="@{()-> activity.clearHistory()}"
+                android:text="전체 삭제"
+                android:textColor="#717177" />
+        </RelativeLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/SearchHistory_Rycv"
+            android:visibility="invisible"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="25dp"
+            android:layout_marginTop="160dp"
+            android:layout_marginBottom="50dp"
+            tools:listitem="@layout/item_search_history"/>
+
+    </FrameLayout>
+
+</layout>

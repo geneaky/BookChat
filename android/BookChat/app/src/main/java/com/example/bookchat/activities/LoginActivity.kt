@@ -27,10 +27,24 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_login)
-        binding.lifecycleOwner = this
-        binding.activity = this
+        with(binding){
+            lifecycleOwner = this@LoginActivity
+            activity = this@LoginActivity
+        }
         handleIntent(intent)
+        checkToken()
+    }
 
+    private fun handleIntent(intent: Intent) {
+        val FinalUri: Uri? = intent.data
+        val token = FinalUri?.getQueryParameter("token")
+        if (token.isNullOrEmpty()){ return }
+        SharedPreferenceManager.saveToken(token)
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
+    private fun checkToken() {
         if(SharedPreferenceManager.isTokenEmpty()){
             Toast.makeText(this,"로그인 정보가 없습니다.\n로그인을 진행해주세요.",Toast.LENGTH_LONG).show()
             return
@@ -45,12 +59,10 @@ class LoginActivity : AppCompatActivity() {
     //현재 액티비티가 살아있고, 재호출되는 경우 onCreate()대신 호출됨
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        Log.d(TAG, "LoginActivity: onNewIntent() - called")
         handleIntent(intent)
     }
 
     fun openWeb(loginType : LoginType){
-        Log.d(TAG, "LoginActivity: openWeb() - called")
         val uri = when(loginType){
             LoginType.KAKAO ->{ KAKAO_LOGIN }
             LoginType.GOOGLE ->{ GOOGLE_LOGIN }
@@ -74,17 +86,6 @@ class LoginActivity : AppCompatActivity() {
             .setInstantAppsEnabled(true)
             .build()
             .launchUrl(this, Uri.parse(uri))
-    }
-
-    private fun handleIntent(intent: Intent) {
-        val FinalUri: Uri? = intent.data
-        val token = FinalUri?.getQueryParameter("token")
-        if (token.isNullOrEmpty()){ return }
-        //SharedPreference에 토큰 저장 (암호화 필요)
-        SharedPreferenceManager.saveToken(token)
-        val intent = Intent(this, MainActivity::class.java)
-        startActivity(intent)
-        finish()
     }
 
     private fun sdkVersionCheck() :Boolean{

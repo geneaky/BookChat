@@ -2,8 +2,10 @@ package com.example.bookchat.adapter
 
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.bookchat.R
+import com.example.bookchat.data.Book
 
 object DataBindingAdapter {
     @JvmStatic
@@ -15,5 +17,4 @@ object DataBindingAdapter {
             .error(R.drawable.default_img)
             .into(imageView)
     }
-
 }

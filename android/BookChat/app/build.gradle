@@ -54,5 +54,20 @@ dependencies {
     // Glide
     implementation 'com.github.bumptech.glide:glide:4.13.0'
     kapt 'com.github.bumptech.glide:compiler:4.13.0'
+    // EncryptedSharedPreferences
+    implementation "androidx.security:security-crypto:1.0.0"
 
+    def lifecycle_version = "2.6.0-alpha01"
+    // ViewModel
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
+    // LiveData
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
+    // slidinguppanel
+    implementation 'com.sothree.slidinguppanel:library:3.4.0'
+    //activity-ktx (by viewModels()로 ViewModel간편 정의)
+    implementation 'androidx.activity:activity-ktx:1.5.0'
+
+    // Paging3
+    def paging_version = "3.1.1"
+    implementation "androidx.paging:paging-runtime:$paging_version"
 }
