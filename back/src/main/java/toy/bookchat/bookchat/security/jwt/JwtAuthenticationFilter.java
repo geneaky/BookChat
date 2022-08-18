@@ -23,7 +23,6 @@ import toy.bookchat.bookchat.security.ipblock.IpBlockManager;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
-// TODO: 2022-08-17 jwtauthenticationfilter test 작성
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     public static final int BEGIN_INDEX = 7;

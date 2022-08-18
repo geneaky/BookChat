@@ -10,6 +10,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.Authentication;
@@ -22,7 +23,7 @@ import toy.bookchat.bookchat.security.user.UserPrincipal;
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
 class JwtTokenProviderTest {
 
-    @MockBean
+    @Mock
     JwtTokenConfig jwtTokenConfig;
 
     @InjectMocks

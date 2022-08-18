@@ -10,6 +10,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -32,7 +33,7 @@ public class JwtTokenProvider {
     public static final String KAKAO_ACCOUNT = "kakao_account";
     public static final String OAUTH2_PROVIDER = "oAuth2Provider";
     @Autowired
-    JwtTokenConfig jwtTokenConfig;
+    private JwtTokenConfig jwtTokenConfig;
 
     public String createToken(Authentication authentication) {
 
