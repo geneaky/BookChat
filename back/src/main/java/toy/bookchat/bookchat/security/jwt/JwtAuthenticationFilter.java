@@ -25,8 +25,6 @@ import toy.bookchat.bookchat.security.ipblock.IpBlockManager;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
-@Component
-@RequiredArgsConstructor
 // TODO: 2022-08-17 jwtauthenticationfilter test 작성
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -34,6 +32,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
     private final IpBlockManager ipBlockManager;
+
+    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, UserRepository userRepository, IpBlockManager ipBlockManager) {
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.userRepository = userRepository;
+        this.ipBlockManager = ipBlockManager;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -74,6 +78,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         if(StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt) == DENIED) {
+            ipBlockManager.increase(request);
+        }
+
+        if(!StringUtils.hasText(jwt)) { //인증된 사용자만 가능한 요청에 토큰자체를 담지 않는 경우, 인증이 필요없는 rest api의 경우 카운트하면안되는데 여길 통과하게됨
             ipBlockManager.increase(request);
         }
     }
