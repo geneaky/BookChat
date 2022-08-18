@@ -23,9 +23,9 @@ public class IpBlockCheckingFilter extends OncePerRequestFilter {
             response.setContentType("text/plain");
             response.setCharacterEncoding("utf-8");
             response.getWriter().write("you are blocked");
-            return;
             // TODO: 2022/08/18 여기서 이렇게 처리할게 아니라 위의 exceptionhandlingfilter같은걸 만들어서 거기서 block ip 처리하고 , 해외 ip 차단에 따른 처리도 거기서 하자
 //            throw new BlockedIpException("you are blocked");
+            return;
         }
         filterChain.doFilter(request, response);
     }

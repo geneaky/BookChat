@@ -47,9 +47,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         /*
         * custom filter를 bean으로 등록해두면 websecurity configure설정에서 security filter chain에서는 제외되지만 defautl chain에는 포함되므로 직접 생성하여 등록해줌 - 블로깅, ip 차단이랑 같이
+        * https://stackoverflow.com/questions/39152803/spring-websecurity-ignoring-doesnt-ignore-custom-filter/40969780#40969780
         * */
         http.addFilterAt(new JwtAuthenticationFilter(jwtTokenProvider, userRepository, ipBlockManager), UsernamePasswordAuthenticationFilter.class);
-        // TODO: 2022-08-17 must do ip block test
+        // TODO: 2022-08-18 exception handling filter 추가
         http.addFilterBefore(ipBlockCheckingFilter,UsernamePasswordAuthenticationFilter.class);
 
         http.anonymous().disable();
