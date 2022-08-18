@@ -29,7 +29,7 @@ class JwtTokenProviderTest {
     @InjectMocks
     JwtTokenProvider tokenProvider = new JwtTokenProvider();
 
-    private String getKakaoToken() {
+    private String getKakaoToken(Long expiredTime) {
         Authentication authentication = mock(Authentication.class);
         UserPrincipal userPrincipal = mock(UserPrincipal.class);
         User user = mock(User.class);
@@ -43,7 +43,7 @@ class JwtTokenProviderTest {
         outerMap.put(KAKAO_ACCOUNT, innerMap);
 
         when(jwtTokenConfig.getSecret()).thenReturn("hihi");
-        when(jwtTokenConfig.getAccessTokenExpiredTime()).thenReturn(3600L);
+        when(jwtTokenConfig.getAccessTokenExpiredTime()).thenReturn(expiredTime);
         when(authentication.getPrincipal()).thenReturn(userPrincipal);
         when(userPrincipal.getUser()).thenReturn(user);
         when(userPrincipal.getAttributes()).thenReturn(outerMap);
@@ -54,7 +54,7 @@ class JwtTokenProviderTest {
 
     @Test
     public void 토큰을_생성_성공() throws Exception {
-        String token = getKakaoToken();
+        String token = getKakaoToken(3600L);
 
         assertThat(token).isNotBlank();
         assertThat(token).isInstanceOf(String.class);
@@ -63,7 +63,7 @@ class JwtTokenProviderTest {
 
     @Test
     public void 토큰에서_이메일_추출_성공() throws Exception {
-        String token = getKakaoToken();
+        String token = getKakaoToken(3600L);
 
         String email = tokenProvider.getEmailFromToken(token);
 
@@ -72,7 +72,7 @@ class JwtTokenProviderTest {
 
     @Test
     public void 토큰에서_Oauth2Provider_추출_성공() throws Exception {
-        String token = getKakaoToken();
+        String token = getKakaoToken(3600L);
 
         OAuth2Provider oauth2TokenProvider = tokenProvider.getOauth2TokenProviderFromToken(token);
 
@@ -82,19 +82,22 @@ class JwtTokenProviderTest {
     @Test
     public void 정상_토큰_validation_성공() throws Exception {
 
-        String token = getKakaoToken();
+        String token = getKakaoToken(3600L);
 
         assertThat(tokenProvider.validateToken(token)).isEqualTo(JwtTokenValidationCode.ACCESS);
     }
 
-  /*      @Test
-    public void 토큰_만료시_refreshToken요청_응답_세팅_성공() throws Exception {
-        String token = getExpiredToken();
+    @Test
+    public void 유효시간_만료_토큰_validation_성공() throws Exception {
+        String token = getKakaoToken(0L);
 
-        tokenProvider.validateToken(token);
+        assertThat(tokenProvider.validateToken(token)).isEqualTo(JwtTokenValidationCode.EXPIRED);
     }
-*/
-    /*@TODO
-     *   토큰 검증 테스트 추가
-     *   유효시간만료, 토큰 수정여부, 토큰 시그니쳐 검증등*/
+
+    @Test
+    public void 발급받은_토큰_임의_수정한_경우_validation_성공() throws Exception {
+        String token = getKakaoToken(3600L) + "hahahoho";
+
+        assertThat(tokenProvider.validateToken(token)).isEqualTo(JwtTokenValidationCode.DENIED);
+    }
 }
