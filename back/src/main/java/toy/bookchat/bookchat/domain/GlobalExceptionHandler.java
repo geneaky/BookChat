@@ -22,7 +22,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(UserNotFoundException.class)
-    public final ResponseEntity<String> handleUserNotFoundException(UserNotFoundException exception) {
+    public final ResponseEntity<String> handleUserNotFoundException(
+        UserNotFoundException exception) {
         log.info("message = {} :: cause = {}", exception.getMessage(), exception.getCause());
         return USER_NOT_FOUND;
     }

@@ -22,8 +22,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
 
-    org.springframework.security.core.userdetails.User user;
-
     @Override
     public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest)
         throws OAuth2AuthenticationException {

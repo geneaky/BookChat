@@ -7,6 +7,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.anonymous;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -31,9 +32,9 @@ import toy.bookchat.bookchat.domain.user.service.UserService;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @WebMvcTest(controllers = UserController.class,
-    includeFilters = @ComponentScan.Filter(classes = {EnableWebSecurity.class}))
+        includeFilters = @ComponentScan.Filter(classes = {EnableWebSecurity.class}))
 @AutoConfigureRestDocs
-public class UserControllerTest extends AuthenticationTestExtension {
+public class UserControllerTest extends AuthenticationTestExtension{
 
     @MockBean
     UserService userService;
@@ -81,8 +82,6 @@ public class UserControllerTest extends AuthenticationTestExtension {
 
         assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo(real);
     }
-
-    // TODO: 2022-08-16 닉네임 중복체크 rest document 생성 로직 추가해야함
 
     @Test
     public void 사용자_닉네임_중복_아닐시_200반환() throws Exception {
