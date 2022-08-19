@@ -3,7 +3,6 @@ package toy.bookchat.bookchat.security;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -33,7 +32,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
     private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
-    private final IpBlockCheckingFilter ipBlockCheckingFilter;
     private final IpBlockManager ipBlockManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
@@ -51,7 +49,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         * */
         http.addFilterAt(new JwtAuthenticationFilter(jwtTokenProvider, userRepository, ipBlockManager), UsernamePasswordAuthenticationFilter.class);
         // TODO: 2022-08-18 exception handling filter 추가
-        http.addFilterBefore(ipBlockCheckingFilter,UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new IpBlockCheckingFilter(ipBlockManager),UsernamePasswordAuthenticationFilter.class);
 
         http.anonymous().disable();
 
@@ -82,4 +80,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         web.ignoring().antMatchers("/", "/auth", "/app")
                 .antMatchers(HttpMethod.GET,"/v1/api/users/profile/nickname");
     }
+
+
 }

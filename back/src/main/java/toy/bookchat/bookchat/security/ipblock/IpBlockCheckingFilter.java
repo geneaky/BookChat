@@ -5,15 +5,15 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-@Component
-@RequiredArgsConstructor
 public class IpBlockCheckingFilter extends OncePerRequestFilter {
 
     private final IpBlockManager ipBlockManager;
+
+    public IpBlockCheckingFilter(IpBlockManager ipBlockManager) {
+        this.ipBlockManager = ipBlockManager;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,

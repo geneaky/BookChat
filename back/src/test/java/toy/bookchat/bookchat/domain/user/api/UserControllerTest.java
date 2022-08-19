@@ -7,6 +7,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.anonymous;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -31,9 +32,9 @@ import toy.bookchat.bookchat.domain.user.service.UserService;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @WebMvcTest(controllers = UserController.class,
-    includeFilters = @ComponentScan.Filter(classes = {EnableWebSecurity.class}))
+        includeFilters = @ComponentScan.Filter(classes = {EnableWebSecurity.class}))
 @AutoConfigureRestDocs
-public class UserControllerTest extends AuthenticationTestExtension {
+public class UserControllerTest extends AuthenticationTestExtension{
 
     @MockBean
     UserService userService;
