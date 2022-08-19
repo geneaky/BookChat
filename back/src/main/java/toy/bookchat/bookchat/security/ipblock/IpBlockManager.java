@@ -1,5 +1,6 @@
 package toy.bookchat.bookchat.security.ipblock;
 
+import com.querydsl.core.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,9 +34,9 @@ public class IpBlockManager {
             if(Duration.between(LocalDateTime.now(),accessIp.getAccessTimeStamp()).getSeconds() > ONE_DAY) {
                 accessIp.updateAccessTimeStamp(LocalDateTime.now());
                 accessIp.reset();
-            } else {
-                accessIp.increase();
+                return;
             }
+            accessIp.increase();
         },() -> {
             AccessIp accessIp = new AccessIp(X_Forwarded_For,0L, LocalDateTime.now());
             accessIpRepository.save(accessIp);
@@ -44,12 +45,11 @@ public class IpBlockManager {
 
     public boolean validateRequest(HttpServletRequest request) {
         final String header = request.getHeader("X-Forwarded-For");
-        if (header == null) {
+        if (StringUtils.isNullOrEmpty(header)) {
             Optional<AccessIp> optionalAccessIp = accessIpRepository.findById(request.getRemoteAddr());
             return optionalAccessIp.map(accessIp -> accessIp.getAccessFailCount() < LIMITED_COUNT).orElse(true);
-        } else {
-            Optional<AccessIp> optionalAccessIp = accessIpRepository.findById(header);
-            return optionalAccessIp.map(accessIp -> accessIp.getAccessFailCount() < LIMITED_COUNT).orElse(true);
         }
+        Optional<AccessIp> optionalAccessIp = accessIpRepository.findById(header);
+        return optionalAccessIp.map(accessIp -> accessIp.getAccessFailCount() < LIMITED_COUNT).orElse(true);
     }
 }
