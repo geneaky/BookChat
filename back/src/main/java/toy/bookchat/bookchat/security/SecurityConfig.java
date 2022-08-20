@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
+import toy.bookchat.bookchat.security.exception.CustomExceptionHandlingFilter;
 import toy.bookchat.bookchat.security.handler.CustomAuthenticationFailureHandler;
 import toy.bookchat.bookchat.security.handler.CustomAuthenticationSuccessHandler;
 import toy.bookchat.bookchat.security.handler.RestAuthenticationEntryPoint;
@@ -44,12 +45,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         /*
-        * custom filter를 bean으로 등록해두면 websecurity configure설정에서 security filter chain에서는 제외되지만 defautl chain에는 포함되므로 직접 생성하여 등록해줌 - 블로깅, ip 차단이랑 같이
-        * https://stackoverflow.com/questions/39152803/spring-websecurity-ignoring-doesnt-ignore-custom-filter/40969780#40969780
-        * */
-        http.addFilterAt(new JwtAuthenticationFilter(jwtTokenProvider, userRepository, ipBlockManager), UsernamePasswordAuthenticationFilter.class);
-        // TODO: 2022-08-18 exception handling filter 추가
-        http.addFilterBefore(new IpBlockCheckingFilter(ipBlockManager),UsernamePasswordAuthenticationFilter.class);
+         * custom filter를 bean으로 등록해두면 websecurity configure설정에서 security filter chain에서는 제외되지만 defautl chain에는 포함되므로 직접 생성하여 등록해줌 - 블로깅, ip 차단이랑 같이
+         * https://stackoverflow.com/questions/39152803/spring-websecurity-ignoring-doesnt-ignore-custom-filter/40969780#40969780
+         * */
+        http.addFilterAt(
+            new JwtAuthenticationFilter(jwtTokenProvider, userRepository, ipBlockManager),
+            UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new IpBlockCheckingFilter(ipBlockManager),
+            UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new CustomExceptionHandlingFilter(), IpBlockCheckingFilter.class);
 
         http.anonymous().disable();
 
@@ -78,7 +82,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers("/", "/auth", "/app")
-                .antMatchers(HttpMethod.GET,"/v1/api/users/profile/nickname");
+            .antMatchers(HttpMethod.GET, "/v1/api/users/profile/nickname");
     }
 
 
