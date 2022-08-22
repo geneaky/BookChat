@@ -33,7 +33,12 @@ jobs:
       working-directory: ${{ env.working-directory }}
 
     - name: Build with Gradle
-      run: ./gradlew clean test build -x asciidoctor
+      run: ./gradlew clean build -x test -x asciidoctor
+      shell: bash
+      working-directory: ${{ env.working-directory }}
+      
+    - name: Test with Gradle
+      run: ./gradlew test
       shell: bash
       working-directory: ${{ env.working-directory }}
 
