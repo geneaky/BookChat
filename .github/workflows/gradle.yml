@@ -36,6 +36,11 @@ jobs:
       run: ./gradlew clean build -x test -x asciidoctor
       shell: bash
       working-directory: ${{ env.working-directory }}
+      
+    - name: Test with Gradle
+      run: ./gradlew test
+      shell: bash
+      working-directory: ${{ env.working-directory }}
 
     - name: Get Current Time
       uses: josStorer/get-current-time@v2.0.0
