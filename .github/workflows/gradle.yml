@@ -35,15 +35,15 @@ jobs:
       shell: bash
       working-directory: ${{ env.working-directory }}
       
+    - name: check pwd
+      run: echo ${pwd}
+      shell: bash
+      
     - name: Test Report
       uses: EnricoMi/publish-unit-test-result-action@v2
       if: always()
       with:
         junit_files: "build/test-results/test/**/*.xml"
-        
-    - name: check pwd
-      run: pwd
-      shell: bash
         
     - name: Build with Gradle
       run: ./gradlew clean build -x test -x asciidoctor
