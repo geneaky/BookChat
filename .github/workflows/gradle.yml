@@ -29,6 +29,10 @@ jobs:
       run: chmod +x ./gradlew
       shell: bash
       working-directory: ${{ env.working-directory }}
+      
+    - name: tt
+      run: cd back && cd build && ls -al
+      shell: bash
 
     - name: Test with Gradle
       run: ./gradlew clean test -x asciidoctor
@@ -39,7 +43,7 @@ jobs:
       uses: EnricoMi/publish-unit-test-result-action@v2
       if: always()
       with:
-        files: build/test-results/test/**/*.xml
+        junit_files: "build/test-results/test/**/*.xml"
         
     - name: Build with Gradle
       run: ./gradlew clean build -x test -x asciidoctor
