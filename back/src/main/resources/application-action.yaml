@@ -1,0 +1,63 @@
+spring:
+  config:
+    activate:
+      on-profile: local
+  #H2 Setting
+  datasource:
+    url: jdbc:h2:tcp://localhost/~/book-chat
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+    #Spring Data JPA Setting
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        show_sql: true
+    open-in-view: false
+  
+  #Spring Security Setting
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: test
+            client-secret: test
+            redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
+            scope:
+              - email
+              - profile
+          kakao:
+            client-id: test
+            redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
+            authorization-grant-type: authorization_code
+            scope:
+              - account_email
+              - profile_image
+            client-name: test
+        provider:
+          kakao:
+            authorization_uri: test
+            token_uri: test
+            user-info-uri: test
+            user_name_attribute: id
+  jackson:
+    parser:
+      allow-unquoted-control-chars: true
+
+token:
+  secret: 'test'
+  accessTokenExpiredTime: 1800000
+  refreshTokenExpiredTime: 1209600000
+  oauth2:
+    authorizaedRedirectUris:
+      - http://localhost:8080
+
+book:
+  api:
+    header: 'KakaoAK test'
+    uri: test
