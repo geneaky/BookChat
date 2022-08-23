@@ -10,14 +10,12 @@ permissions:
   contents: read
 
 jobs:
-  build:
-
+  backend:
     runs-on: ubuntu-latest
     env:
      working-directory: ./back
 
     steps:
-    
     - name: Check out
       uses: actions/checkout@v3
     
@@ -26,16 +24,6 @@ jobs:
       with:
         distribution: temurin
         java-version: '11'
-        
-    - name: Cache Gradle packages
-      uses: actions/cache@v2
-      with:
-        path: |
-          ~/.gradle/caches
-          ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradel-
         
     - name: Grant execute permission for gradlew
       run: chmod +x ./gradlew
@@ -59,12 +47,6 @@ jobs:
       run: ./gradlew clean build -x test -x asciidoctor
       shell: bash
       working-directory: ${{ env.working-directory }}
-      
-    - name: Cleanup Gradle Cache
-      if: ${{ always() }}
-      run: |
-        rm -f ~/.gradle/caches/modules-2/modules-2.lock
-        rm -f ~/.gradle/caches/modules-2/gc.properties
 
     - name: Get Current Time
       uses: josStorer/get-current-time@v2.0.0
