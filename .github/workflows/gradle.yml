@@ -44,6 +44,7 @@ jobs:
       if: always()
       with:
         junit_files: '**/build/test-results/test/TEST-*.xml'
+        token: ${{ secret.TOKEN }}
         
     - name: Build with Gradle
       run: ./gradlew clean build -x test -x asciidoctor
