@@ -10,14 +10,12 @@ permissions:
   contents: read
 
 jobs:
-  build:
-
+  backend:
     runs-on: ubuntu-latest
     env:
      working-directory: ./back
 
     steps:
-    
     - name: Check out
       uses: actions/checkout@v3
     
@@ -31,6 +29,19 @@ jobs:
       run: chmod +x ./gradlew
       shell: bash
       working-directory: ${{ env.working-directory }}
+
+    - name: Test with Gradle
+      run: ./gradlew clean test -x asciidoctor
+      shell: bash
+      working-directory: ${{ env.working-directory }}
+      
+    - name: Test Report
+      uses: dorny/test-reporter@v1.5.0
+      if: success() || failure()
+      with:
+        name: Unit Tests
+        path: '*.xml'
+        reporter: java-junit
 
     - name: Build with Gradle
       run: ./gradlew clean build -x test -x asciidoctor
