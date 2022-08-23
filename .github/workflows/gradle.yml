@@ -41,6 +41,14 @@ jobs:
     - name: cd back
       run: cd back
       shell: bash
+    
+    - name: check ls2
+      run: ls -al
+      shell: bash
+      
+    - name: cd build
+      run: cd build
+      shell: bash
 
     - name: Test with Gradle
       run: ./gradlew clean test -x asciidoctor
