@@ -10,14 +10,12 @@ permissions:
   contents: read
 
 jobs:
-  build:
-
+  backend:
     runs-on: ubuntu-latest
     env:
      working-directory: ./back
 
     steps:
-    
     - name: Check out
       uses: actions/checkout@v3
     
@@ -32,13 +30,13 @@ jobs:
       shell: bash
       working-directory: ${{ env.working-directory }}
 
-    - name: Build with Gradle
-      run: ./gradlew clean build -x test -x asciidoctor
+    - name: Test with Gradle
+      run: ./gradlew clean test -x asciidoctor
       shell: bash
       working-directory: ${{ env.working-directory }}
-      
-    - name: Test with Gradle
-      run: ./gradlew test
+
+    - name: Build with Gradle
+      run: ./gradlew clean build -x test -x asciidoctor
       shell: bash
       working-directory: ${{ env.working-directory }}
 
