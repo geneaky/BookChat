@@ -40,7 +40,7 @@ jobs:
       if: success() || failure()
       with:
         name: Unit Tests
-        path: '*.xml'
+        path: build/test-results/**/*.xml
         reporter: java-junit
 
     - name: Build with Gradle
