@@ -43,9 +43,7 @@ jobs:
       uses: EnricoMi/publish-unit-test-result-action@v2
       if: always()
       with:
-        junit_files: "test-results/test/*.xml"
-      env:
-        SOURCE_DIR: 'back/build'
+        junit_files: "build/test-results/test/*.xml"
         
     - name: Build with Gradle
       run: ./gradlew clean build -x test -x asciidoctor
