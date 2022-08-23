@@ -40,7 +40,10 @@ jobs:
       if: always()
       with:
         junit_files: "build/test-results/test/**/*.xml"
-      
+        
+    - name: check pwd
+      run: pwd
+      shell: bash
         
     - name: Build with Gradle
       run: ./gradlew clean build -x test -x asciidoctor
