@@ -29,15 +29,23 @@ jobs:
       run: chmod +x ./gradlew
       shell: bash
       working-directory: ${{ env.working-directory }}
+      
+    - name: check pwd
+      run: pwd
+      shell: bash
+      
+    - name: check ls
+      run: ls -al
+      shell: bash
+      
+    - name: cd back
+      run: cd back
+      shell: bash
 
     - name: Test with Gradle
       run: ./gradlew clean test -x asciidoctor
       shell: bash
       working-directory: ${{ env.working-directory }}
-      
-    - name: check pwd
-      run: pwd
-      shell: bash
       
     - name: Test Report
       uses: EnricoMi/publish-unit-test-result-action@v2
