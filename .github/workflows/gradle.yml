@@ -39,8 +39,8 @@ jobs:
       uses: EnricoMi/publish-unit-test-result-action@v2
       if: always()
       with:
-        junit_files: "build/test-results/junit/**/*.xml"
-
+        junit_files: "back/build/test-results/junit/**/*.xml"
+        
     - name: Build with Gradle
       run: ./gradlew clean build -x test -x asciidoctor
       shell: bash
