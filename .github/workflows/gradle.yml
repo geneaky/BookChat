@@ -36,7 +36,7 @@ jobs:
       working-directory: ${{ env.working-directory }}
       
     - name: tt
-      run: cd back && cd build && ls -al
+      run: cd back && cd build && ls -al && cd test-results && ls -al && cd test && ls -al
       shell: bash
       
     - name: Test Report
