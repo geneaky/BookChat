@@ -43,7 +43,7 @@ jobs:
       with:
         name: Unit Tests
         path: reports/junit-*.xml
-        reporter: java-juinit
+        reporter: java-junit
 
     - name: Build with Gradle
       run: ./gradlew clean build -x test -x asciidoctor
