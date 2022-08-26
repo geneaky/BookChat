@@ -1,23 +1,29 @@
 version: '3'
 
 services:
-  app:
-    container_name: spring
-    image: openjdk:11-jdk
-    ports:
-      - 8080:8080
-    working_dir: /app
-    volumes:
-      - .:/app
-    entrypoint: [ "/bin/bash", "-c" ]
-    command:
-      - ./gradlew bootRun
-    restart: always
+  #  app:
+  #    container_name: spring
+  #    image: openjdk:11-jdk
+  #    ports:
+  #      - 8080:8080
+  #    working_dir: /app
+  #    volumes:
+  #      - .:/app
+  #    entrypoint: [ "/bin/bash", "-c" ]
+  #    command:
+  #      - ./gradlew bootRun
+  #    restart: always
 
   nginx:
     container_name: nginx
-    image: nginx
+    image: geneaky/nginx
     ports:
       - 80:80
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    #      - ./nginx/geoip_update.sh:/
+    environment:
+      LISENCE_KEY:
+    entrypoint: [ "/bin/bash", "-c" ]
+    command:
+      - nginx -t && service nginx reload
