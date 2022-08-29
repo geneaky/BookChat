@@ -33,4 +33,10 @@ class UserServiceTest {
         boolean result = userService.isDuplicatedName("test");
         assertThat(result).isFalse();
     }
+
+    @Test
+    public void 회원가입_성공() throws Exception {
+
+    }
+
 }

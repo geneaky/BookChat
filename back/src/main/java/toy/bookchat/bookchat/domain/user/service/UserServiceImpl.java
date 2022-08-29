@@ -13,6 +13,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public boolean isDuplicatedName(String nickname) {
         return userRepository.existsByNickName(nickname);
     }
