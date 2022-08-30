@@ -46,6 +46,7 @@ public class UserServiceImpl implements UserService {
             # -> 해당 uuid로 s3에 업로드
             # -> 이미지 접근 url은 어떻게? -> s3 버킷 병목
             #-> https://m.blog.naver.com/naebon/221756312403 hex hash 프리픽스 방식으로 저장
+            # https://bcho.tistory.com/730
          */
     }
 
