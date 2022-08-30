@@ -24,8 +24,9 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    /* TODO: 2022-08-30 사용자 이름에 oauth2 회원번호 넣기
+     */
     private String name;
-    // TODO: 2022-08-17 front단에서 인증 구현 후 name property 제거 예정
     private String nickName;
     private String email;
     private String password;
