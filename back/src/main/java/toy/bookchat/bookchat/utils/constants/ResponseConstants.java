@@ -10,4 +10,8 @@ public class ResponseConstants {
 
     public static final ResponseEntity<String> USER_NOT_FOUND =
         new ResponseEntity<>("등록된 사용자가 아닙니다", HttpStatus.NOT_FOUND);
+
+    public static final ResponseEntity<String> NOT_VERIFIED_TOKEN =
+            ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).body("유효하지 않은 토큰입니다.");
+
 }

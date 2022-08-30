@@ -121,7 +121,8 @@ public class UserControllerTest extends AuthenticationTestExtension{
     public void 사용자_회원가입_요청시_header_인증정보_없을시_400반환() throws Exception {
         mockMvc.perform(post("/v1/api/users")
                         .param("nickname","nick")
-                        .param("userEmail", "kaktus418@gmail.com"))
+                        .param("userEmail", "kaktus418@gmail.com")
+                        .param("oauth2Provider", "kakao"))
                 .andExpect(status().isBadRequest());
     }
 
@@ -130,7 +131,8 @@ public class UserControllerTest extends AuthenticationTestExtension{
         mockMvc.perform(post("/v1/api/users")
                         .header("Authorization"," ")
                         .param("nickname","nick")
-                        .param("userEmail", "kaktus418@gmail.com"))
+                        .param("userEmail", "kaktus418@gmail.com")
+                        .param("oauth2Provider","kakao"))
                 .andExpect(status().isBadRequest());
     }
 
@@ -139,7 +141,8 @@ public class UserControllerTest extends AuthenticationTestExtension{
         mockMvc.perform(post("/v1/api/users")
                 .header("Authorization", "Bearer ")
                         .param("nickname","nick")
-                        .param("userEmail", "kaktus418@gmail.com"))
+                        .param("userEmail", "kaktus418@gmail.com")
+                        .param("oauth2Provider", "google"))
                 .andExpect(status().isBadRequest());
     }
 
@@ -153,6 +156,7 @@ public class UserControllerTest extends AuthenticationTestExtension{
                 .header("Authorization","Bearer " + testToken)
                         .param("nickname","nick")
                         .param("userEmail", "kaktus418@gmail.com")
+                                .param("oauth2Provider", "kakao")
                         )
                 .andExpect(status().isPreconditionFailed());
     }
@@ -166,16 +170,18 @@ public class UserControllerTest extends AuthenticationTestExtension{
         mockMvc.perform(post("/v1/api/users")
                         .header("Authorization","Bearer " + testToken)
                         .param("nickname","nick")
-                        .param("userEmail", "kaktus418@gmail.com"))
+                        .param("userEmail", "kaktus418@gmail.com")
+                        .param("oauth2Provider","kakao"))
                 .andExpect(status().isOk())
                         .andDo(document("user_sign_up",requestParameters(
                                 parameterWithName("nickname").description("닉네임"),
                                 parameterWithName("userEmail").description("이메일"),
+                                parameterWithName("oauth2Provider").description("원천 제공자"),
                                 parameterWithName("userProfileImage").optional().description("프로필 이미지"),
                                 parameterWithName("readingTastes").optional().description("독서 취향")
                         )));
 
-        verify(userService).registerNewUser(any(UserSignUpRequestDto.class));
+        verify(userService).registerNewUser(any(UserSignUpRequestDto.class), anyString());
     }
 
     @Test
@@ -187,7 +193,8 @@ public class UserControllerTest extends AuthenticationTestExtension{
         mockMvc.perform(post("/v1/api/users")
                         .header("Authorization","Bearer " + testToken)
                         .param("nickname","")
-                        .param("userEmail","abcdefg"))
+                        .param("userEmail","abcdefg")
+                        .param("oauth2Provider",""))
                 .andExpect(status().isBadRequest());
     }
 }

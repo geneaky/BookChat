@@ -45,12 +45,7 @@ public class UserController {
         return ResponseEntity.ok(null);
     }
 
-    /* TODO: 2022-08-29 사용자 회원가입
-        1. request header에 Authorization Bearer 있는지 확인
-        2.  jwt(openid)가 secret키로 열리는지 확인
-            2-1. 열리면 회원가입 진행
-            2-2. 안열리면 badrequest 응답
-        3. 가입 완료 후 200 응답
+    /* TODO: 2022-08-29
         추후: 사용자 프로필의 경우 프로필 수정을 누르지 않으면 동일한 데이터에 대해 read
         연산을 하므로 캐시할 수 있을듯 하다
      */
@@ -61,11 +56,9 @@ public class UserController {
             return ResponseEntity.badRequest().body(null);
         }
 
-        if(jwtTokenManager.isNotValidatedToken(getOpenIdToken(request))) {
-            return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).body(null);
-        }
+        String oauth2MemberNumber = jwtTokenManager.isNotValidatedToken(getOpenIdToken(request));
+        userService.registerNewUser(userSignUpRequestDto, oauth2MemberNumber);
 
-        userService.registerNewUser(userSignUpRequestDto);
         return ResponseEntity.ok(null);
     }
 

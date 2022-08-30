@@ -18,6 +18,8 @@ public class UserSignUpRequestDto {
     String nickname;
     @Email
     String userEmail;
+    @NotBlank
+    String oauth2Provider;
     MultipartFile userProfileImage;
     List<ReadingTaste> readingTastes;
 }
