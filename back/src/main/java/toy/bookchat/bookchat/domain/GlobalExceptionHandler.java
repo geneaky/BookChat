@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import toy.bookchat.bookchat.domain.book.exception.BookNotFoundException;
+import toy.bookchat.bookchat.domain.user.exception.ImageInputStreamException;
 import toy.bookchat.bookchat.domain.user.exception.UserNotFoundException;
 import toy.bookchat.bookchat.security.exception.DenidedTokenException;
 import toy.bookchat.bookchat.security.exception.ExpiredTokenException;
@@ -37,7 +38,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DenidedTokenException.class)
     public final ResponseEntity<String> handleDeniedTokenException(DenidedTokenException exception) {
-        log.info("message = {} :: cause ={}", exception.getMessage(), exception.getCause());
+        log.info("message = {} :: cause = {}", exception.getMessage(), exception.getCause());
         return NOT_VERIFIED_TOKEN;
+    }
+
+    @ExceptionHandler(ImageInputStreamException.class)
+    public final ResponseEntity<String> handelImageInputStreamException(ImageInputStreamException exception) {
+        log.info("message = {} :: cause = {}", exception.getMessage(), exception.getCause());
+        return IMAGE_PROCESSING_FAIL;
     }
 }
