@@ -5,7 +5,6 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import toy.bookchat.bookchat.config.JwtTokenConfig;
 import toy.bookchat.bookchat.security.exception.DenidedTokenException;
@@ -16,8 +15,7 @@ import toy.bookchat.bookchat.security.exception.ExpiredTokenException;
 @RequiredArgsConstructor
 public class JwtTokenManager {
 
-    @Autowired
-    JwtTokenConfig jwtTokenConfig;
+    private final JwtTokenConfig jwtTokenConfig;
 
     public String isNotValidatedToken(String openIdToken) {
         String oauth2MemberNumber;
