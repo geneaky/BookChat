@@ -36,7 +36,7 @@ class JwtTokenProviderTest {
         Map<String, Object> innerMap = new HashMap<>();
         innerMap.put(JwtTokenProvider.EMAIL, "kaktus418@gmail.com");
         innerMap.put(JwtTokenProvider.OAUTH2_PROVIDER, "kakao");
-        OAuth2Provider oAuth2Provider = OAuth2Provider.kakao;
+        OAuth2Provider oAuth2Provider = OAuth2Provider.KAKAO;
 
         Map<String, Object> outerMap = new HashMap<>();
         outerMap.put(KAKAO_ACCOUNT, innerMap);
@@ -75,7 +75,7 @@ class JwtTokenProviderTest {
 
         OAuth2Provider oauth2TokenProvider = tokenProvider.getOauth2TokenProviderFromToken(token);
 
-        assertThat(oauth2TokenProvider).isEqualTo(OAuth2Provider.kakao);
+        assertThat(oauth2TokenProvider).isEqualTo(OAuth2Provider.KAKAO);
     }
 
     @Test

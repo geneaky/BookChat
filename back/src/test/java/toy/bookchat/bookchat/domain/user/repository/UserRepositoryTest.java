@@ -24,23 +24,23 @@ class UserRepositoryTest {
         User user1 = User.builder()
             .name("user")
             .email("kaktus418@gmail.com")
-            .provider(OAuth2Provider.kakao)
+            .provider(OAuth2Provider.KAKAO)
             .build();
 
         User user2 = User.builder()
             .name("user")
             .email("kaktus418@gmail.com")
-            .provider(OAuth2Provider.google)
+            .provider(OAuth2Provider.GOOGLE)
             .build();
 
         userRepository.save(user1);
         userRepository.save(user2);
 
         Optional<User> kakaoUser = userRepository.findByEmailAndProvider(
-            "kaktus418@gmail.com", OAuth2Provider.kakao);
+            "kaktus418@gmail.com", OAuth2Provider.KAKAO);
 
         Optional<User> googleUser = userRepository.findByEmailAndProvider(
-            "kaktus418@gmail.com", OAuth2Provider.google);
+            "kaktus418@gmail.com", OAuth2Provider.GOOGLE);
 
         assertThat(kakaoUser).isNotEqualTo(googleUser);
     }
@@ -50,7 +50,7 @@ class UserRepositoryTest {
         User user = User.builder()
             .name("user")
             .email("kaktus418@gmail.com")
-            .provider(OAuth2Provider.kakao)
+            .provider(OAuth2Provider.KAKAO)
             .nickName("nickname")
             .build();
 

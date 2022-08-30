@@ -68,12 +68,11 @@ public class UserControllerTest extends AuthenticationTestExtension{
         );
         User user = User.builder()
             .email("test@gmail.com")
-            .password("password")
             .name("testUser")
             .profileImageUrl("somethingImageUrl@naver.com")
             .build();
 
-        return new UserPrincipal(1L, user.getEmail(), user.getPassword(),
+        return new UserPrincipal(1L, user.getEmail(),
             user.getName(), user.getProfileImageUrl(), authorities, user);
     }
 
@@ -171,7 +170,7 @@ public class UserControllerTest extends AuthenticationTestExtension{
                         .header("Authorization","Bearer " + testToken)
                         .param("nickname","nick")
                         .param("userEmail", "kaktus418@gmail.com")
-                        .param("oauth2Provider","kakao"))
+                        .param("oauth2Provider","google"))
                 .andExpect(status().isOk())
                         .andDo(document("user_sign_up",requestParameters(
                                 parameterWithName("nickname").description("닉네임"),

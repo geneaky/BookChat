@@ -1,8 +1,7 @@
 package toy.bookchat.bookchat.security.jwt;
 
 import static toy.bookchat.bookchat.security.jwt.JwtTokenValidationCode.*;
-import static toy.bookchat.bookchat.utils.constants.AuthConstants.AUTHORIZATION;
-import static toy.bookchat.bookchat.utils.constants.AuthConstants.BEARER;
+import static toy.bookchat.bookchat.utils.constants.AuthConstants.*;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -22,10 +21,10 @@ import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.security.ipblock.IpBlockManager;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
+import toy.bookchat.bookchat.utils.constants.AuthConstants;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    public static final int BEGIN_INDEX = 7;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
     private final IpBlockManager ipBlockManager;

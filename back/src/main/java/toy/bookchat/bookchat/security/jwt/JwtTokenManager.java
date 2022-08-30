@@ -19,10 +19,6 @@ public class JwtTokenManager {
     @Autowired
     JwtTokenConfig jwtTokenConfig;
 
-    /* TODO: 2022-08-30 jwt library에서 지정한 예외를 커스텀 예외로 변경해야 이후
-        라이브러리를 교체시 예외를 던지는 부분에서만 수정하면되고 global exception handler에서 직접적으로
-        예외를 수정할 필요가 없어짐
-     */
     public String isNotValidatedToken(String openIdToken) {
         String oauth2MemberNumber;
         try {
