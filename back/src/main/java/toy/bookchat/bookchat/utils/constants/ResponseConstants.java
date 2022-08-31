@@ -16,4 +16,7 @@ public class ResponseConstants {
 
     public static final ResponseEntity<String> IMAGE_PROCESSING_FAIL =
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이미지 처리 실패");
+
+    public static final ResponseEntity<String> IMAGE_UPLOAD_FAIL =
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이미지 업로드 실패");
 }
