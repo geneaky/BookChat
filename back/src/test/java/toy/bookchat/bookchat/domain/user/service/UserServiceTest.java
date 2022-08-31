@@ -10,15 +10,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 import toy.bookchat.bookchat.domain.storage.StorageService;
-import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.domain.user.service.dto.UserSignUpRequestDto;
-
-import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -48,12 +44,13 @@ class UserServiceTest {
     @Test
     public void 회원가입_성공() throws Exception {
         UserSignUpRequestDto userSignUpRequestDto = mock(UserSignUpRequestDto.class);
-
+        User mockUser = mock(User.class);
         when(userSignUpRequestDto.hasValidImage()).thenReturn(true);
+        when(userSignUpRequestDto.getUser(any(),any())).thenReturn(mockUser);
         userService.registerNewUser(userSignUpRequestDto, "memberNumber");
 
         verify(userRepository).save(any(User.class));
-        verify(storageService).upload(userSignUpRequestDto.getUserProfileImage());
+        verify(storageService).upload(any(), any());
     }
 
 }

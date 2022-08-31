@@ -26,6 +26,7 @@ public class User {
     private String email;
     private String profileImageUrl;
     private ROLE role;
+    private Integer defaultProfileImageType;
     @Enumerated(EnumType.STRING)
     private OAuth2Provider provider;
     @OneToMany(mappedBy = "user")
@@ -35,7 +36,7 @@ public class User {
 
     @Builder
     public User(String name, String email, String profileImageUrl, ROLE role,
-        OAuth2Provider provider, String nickName, List<ReadingTaste> readingTastes) {
+        OAuth2Provider provider, String nickName, List<ReadingTaste> readingTastes, Integer defaultProfileImageType) {
         this.name = name;
         this.email = email;
         this.profileImageUrl = profileImageUrl;
@@ -43,6 +44,7 @@ public class User {
         this.provider = provider;
         this.nickName = nickName;
         this.readingTastes = readingTastes;
+        this.defaultProfileImageType = defaultProfileImageType;
     }
 
     public void setBookShelf(BookShelf bookShelf) {

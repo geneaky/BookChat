@@ -121,7 +121,8 @@ public class UserControllerTest extends AuthenticationTestExtension{
         mockMvc.perform(post("/v1/api/users")
                         .param("nickname","nick")
                         .param("userEmail", "kaktus418@gmail.com")
-                        .param("oauth2Provider", "kakao"))
+                        .param("oauth2Provider", "kakao")
+                        .param("defaultProfileImageType","2"))
                 .andExpect(status().isBadRequest());
     }
 
@@ -131,7 +132,8 @@ public class UserControllerTest extends AuthenticationTestExtension{
                         .header("Authorization"," ")
                         .param("nickname","nick")
                         .param("userEmail", "kaktus418@gmail.com")
-                        .param("oauth2Provider","kakao"))
+                        .param("oauth2Provider","kakao")
+                        .param("defaultProfileImageType","2"))
                 .andExpect(status().isBadRequest());
     }
 
@@ -141,7 +143,8 @@ public class UserControllerTest extends AuthenticationTestExtension{
                 .header("Authorization", "Bearer ")
                         .param("nickname","nick")
                         .param("userEmail", "kaktus418@gmail.com")
-                        .param("oauth2Provider", "google"))
+                        .param("oauth2Provider", "google")
+                        .param("defaultProfileImageType","2"))
                 .andExpect(status().isBadRequest());
     }
 
@@ -155,8 +158,8 @@ public class UserControllerTest extends AuthenticationTestExtension{
                 .header("Authorization","Bearer " + testToken)
                         .param("nickname","nick")
                         .param("userEmail", "kaktus418@gmail.com")
-                                .param("oauth2Provider", "kakao")
-                        )
+                        .param("oauth2Provider", "kakao")
+                        .param("defaultProfileImageType","2"))
                 .andExpect(status().isPreconditionFailed());
     }
 
@@ -170,12 +173,14 @@ public class UserControllerTest extends AuthenticationTestExtension{
                         .header("Authorization","Bearer " + testToken)
                         .param("nickname","nick")
                         .param("userEmail", "kaktus418@gmail.com")
-                        .param("oauth2Provider","google"))
+                        .param("oauth2Provider","google")
+                        .param("defaultProfileImageType", "1"))
                 .andExpect(status().isOk())
                         .andDo(document("user_sign_up",requestParameters(
                                 parameterWithName("nickname").description("닉네임"),
                                 parameterWithName("userEmail").description("이메일"),
                                 parameterWithName("oauth2Provider").description("원천 제공자"),
+                                parameterWithName("defaultProfileImageType").description("기본 이미지 타입"),
                                 parameterWithName("userProfileImage").optional().description("프로필 이미지"),
                                 parameterWithName("readingTastes").optional().description("독서 취향")
                         )));

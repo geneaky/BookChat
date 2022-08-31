@@ -2,12 +2,16 @@ package toy.bookchat.bookchat.domain.user.service.dto;
 
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
+import toy.bookchat.bookchat.domain.user.ROLE;
 import toy.bookchat.bookchat.domain.user.ReadingTaste;
+import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.exception.ImageInputStreamException;
+import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
 import javax.imageio.ImageIO;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -35,6 +39,8 @@ public class UserSignUpRequestDto {
     String oauth2Provider;
     MultipartFile userProfileImage;
     List<ReadingTaste> readingTastes;
+    @NotNull
+    Integer defaultProfileImageType;
 
     public boolean hasValidImage() {
 
@@ -47,5 +53,9 @@ public class UserSignUpRequestDto {
             throw new ImageInputStreamException(exception.getMessage(), exception.getCause());
         }
         return false;
+    }
+
+    public User getUser(String oauth2MemberNumber, String profileImageUrl) {
+        return new User(oauth2MemberNumber, this.getUserEmail(), profileImageUrl, ROLE.USER, OAuth2Provider.from(this.getOauth2Provider()), this.getNickname(), this.getReadingTastes(), this.getDefaultProfileImageType());
     }
 }
