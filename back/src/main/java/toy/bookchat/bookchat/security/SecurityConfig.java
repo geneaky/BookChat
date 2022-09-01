@@ -3,9 +3,7 @@ package toy.bookchat.bookchat.security;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -57,6 +55,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.anonymous().disable();
 
         http.authorizeHttpRequests()
+            .antMatchers("/").permitAll()
+            .antMatchers(HttpMethod.GET, "/v1/api/users/profile/nickname").permitAll()
+            .antMatchers(HttpMethod.POST, "/v1/api/users").permitAll();
+
+        http.authorizeHttpRequests()
             .anyRequest().authenticated()
             .and()
             .exceptionHandling()
@@ -77,14 +80,4 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .successHandler(customAuthenticationSuccessHandler)
             .failureHandler(customAuthenticationFailureHandler);
     }
-
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring()
-            .antMatchers("/", "/auth", "/app")
-            .antMatchers(HttpMethod.GET, "/v1/api/users/profile/nickname")
-            .antMatchers(HttpMethod.POST, "/v1/api/users");
-    }
-
-
 }
