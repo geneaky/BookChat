@@ -1,21 +1,31 @@
 package toy.bookchat.bookchat.domain.user.service;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import toy.bookchat.bookchat.domain.storage.StorageService;
+import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.exception.UserAlreadySignUpException;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
+import toy.bookchat.bookchat.domain.user.service.dto.UserSignUpRequestDto;
+
+import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
     @Mock
     UserRepository userRepository;
+    @Mock
+    StorageService storageService;
     @InjectMocks
     UserServiceImpl userService;
 
@@ -32,5 +42,27 @@ class UserServiceTest {
         when(userRepository.existsByNickName(anyString())).thenReturn(false);
         boolean result = userService.isDuplicatedName("test");
         assertThat(result).isFalse();
+    }
+
+    @Test
+    public void 처음_가입하는_회원의_경우_회원가입_성공() throws Exception {
+        UserSignUpRequestDto userSignUpRequestDto = mock(UserSignUpRequestDto.class);
+        User mockUser = mock(User.class);
+        when(userSignUpRequestDto.hasValidImage()).thenReturn(true);
+        when(userSignUpRequestDto.getUser(any(),any())).thenReturn(mockUser);
+        userService.registerNewUser(userSignUpRequestDto, "memberNumber");
+
+        verify(userRepository).save(any(User.class));
+        verify(storageService).upload(any(), any());
+    }
+
+    @Test
+    public void 이미_가입된_사용자일경우_예외발생() throws Exception {
+        UserSignUpRequestDto userSignUpRequestDto = mock(UserSignUpRequestDto.class);
+        User mockUser = mock(User.class);
+        when(userRepository.findByEmailAndProvider(any(),any())).thenReturn(Optional.of(mockUser));
+        assertThatThrownBy(() -> {
+            userService.registerNewUser(userSignUpRequestDto, "testMemberNumber");
+        }).isInstanceOf(UserAlreadySignUpException.class);
     }
 }

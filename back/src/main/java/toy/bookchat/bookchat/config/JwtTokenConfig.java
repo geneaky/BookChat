@@ -1,38 +1,22 @@
 package toy.bookchat.bookchat.config;
 
+import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.ConstructorBinding;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration
+@Getter
+@ConstructorBinding
 @ConfigurationProperties("token")
 public class JwtTokenConfig {
 
-    private String secret;
-    private long accessTokenExpiredTime;
-    private long refreshTokenExpiredTime;
+    private final String secret;
+    private final long accessTokenExpiredTime;
+    private final long refreshTokenExpiredTime;
 
-
-    public String getSecret() {
-        return secret;
-    }
-
-    public void setSecret(String secret) {
+    public JwtTokenConfig(String secret, long accessTokenExpiredTime, long refreshTokenExpiredTime) {
         this.secret = secret;
-    }
-
-    public long getAccessTokenExpiredTime() {
-        return accessTokenExpiredTime;
-    }
-
-    public void setAccessTokenExpiredTime(long accessTokenExpiredTime) {
         this.accessTokenExpiredTime = accessTokenExpiredTime;
-    }
-
-    public long getRefreshTokenExpiredTime() {
-        return refreshTokenExpiredTime;
-    }
-
-    public void setRefreshTokenExpiredTime(long refreshTokenExpiredTime) {
         this.refreshTokenExpiredTime = refreshTokenExpiredTime;
     }
 }

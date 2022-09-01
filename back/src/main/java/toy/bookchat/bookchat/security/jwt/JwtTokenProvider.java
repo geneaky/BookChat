@@ -56,7 +56,7 @@ public class JwtTokenProvider {
 
     private String extractEmailInAuthenticationByOAuth2Provider(Authentication authentication,
         OAuth2Provider oAuth2Provider) {
-        if (oAuth2Provider == OAuth2Provider.kakao) {
+        if (oAuth2Provider == OAuth2Provider.KAKAO) {
             return (String) ((Map<String, Object>) ((UserPrincipal) authentication.getPrincipal()).getAttributes()
                 .get(KAKAO_ACCOUNT)).get(EMAIL);
         }

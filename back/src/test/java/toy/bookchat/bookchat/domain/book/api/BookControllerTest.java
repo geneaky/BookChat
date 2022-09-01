@@ -58,13 +58,11 @@ public class BookControllerTest extends AuthenticationTestExtension {
 
         User user = User.builder()
             .email("test@gmail.com")
-            .password("password")
             .name("testUser")
             .profileImageUrl("somethingImageUrl@naver.com")
             .build();
 
-        return new UserPrincipal(1L, user.getEmail(), user.getPassword(),
-            user.getName(), user.getProfileImageUrl(), authorities, user);
+        return new UserPrincipal(1L, user.getEmail(), user.getName(), user.getProfileImageUrl(), authorities, user);
 
     }
 

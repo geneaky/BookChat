@@ -3,6 +3,7 @@ package toy.bookchat.bookchat.domain;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.security.handler.CustomAuthenticationFailureHandler;
 import toy.bookchat.bookchat.security.handler.CustomAuthenticationSuccessHandler;
@@ -34,7 +35,6 @@ public abstract class AuthenticationTestExtension {
     UserRepository userRepository;
     @MockBean
     HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
-
     @BeforeEach
     public void setUp() {
         when(ipBlockManager.validateRequest(any())).thenReturn(true);

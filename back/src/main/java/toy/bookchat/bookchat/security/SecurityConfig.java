@@ -24,7 +24,6 @@ import toy.bookchat.bookchat.security.oauth.HttpCookieOAuth2AuthorizationRequest
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
@@ -81,8 +80,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/", "/auth", "/app")
-            .antMatchers(HttpMethod.GET, "/v1/api/users/profile/nickname");
+        web.ignoring()
+            .antMatchers("/", "/auth", "/app")
+            .antMatchers(HttpMethod.GET, "/v1/api/users/profile/nickname")
+            .antMatchers(HttpMethod.POST, "/v1/api/users");
     }
 
 
