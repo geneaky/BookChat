@@ -19,4 +19,7 @@ public class ResponseConstants {
 
     public static final ResponseEntity<String> IMAGE_UPLOAD_FAIL =
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이미지 업로드 실패");
+
+    public static final ResponseEntity<String> USER_ALREADY_EXISTED =
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 가입된 사용자입니다");
 }

@@ -4,14 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import toy.bookchat.bookchat.domain.storage.StorageService;
-import toy.bookchat.bookchat.domain.user.ROLE;
 import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.exception.UserAlreadySignUpException;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.domain.user.service.dto.UserSignUpRequestDto;
-import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -55,7 +55,12 @@ public class UserServiceImpl implements UserService {
     }
 
     private void saveUser(String oauth2MemberNumber, UserSignUpRequestDto userSignUpRequestDto, String profileImageUrl) {
-        User user = userSignUpRequestDto.getUser(oauth2MemberNumber,profileImageUrl);
-        userRepository.save(user);
+        Optional<User> optionalUser = userRepository.findByEmailAndProvider(userSignUpRequestDto.getUserEmail(), userSignUpRequestDto.getOAuth2Provider());
+        optionalUser.ifPresentOrElse((u) -> {
+            throw new UserAlreadySignUpException("user already sign up");
+        },() -> {
+            User user = userSignUpRequestDto.getUser(oauth2MemberNumber,profileImageUrl);
+            userRepository.save(user);
+        });
     }
 }

@@ -19,8 +19,6 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    /* TODO: 2022-08-30 사용자 이름에 oauth2 회원번호 넣기
-     */
     private String name;
     private String nickName;
     private String email;

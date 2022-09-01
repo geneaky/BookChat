@@ -56,6 +56,10 @@ public class UserSignUpRequestDto {
     }
 
     public User getUser(String oauth2MemberNumber, String profileImageUrl) {
-        return new User(oauth2MemberNumber, this.getUserEmail(), profileImageUrl, ROLE.USER, OAuth2Provider.from(this.getOauth2Provider()), this.getNickname(), this.getReadingTastes(), this.getDefaultProfileImageType());
+        return new User(oauth2MemberNumber, this.getUserEmail(), profileImageUrl, ROLE.USER, this.getOAuth2Provider(), this.getNickname(), this.getReadingTastes(), this.getDefaultProfileImageType());
+    }
+
+    public OAuth2Provider getOAuth2Provider() {
+        return OAuth2Provider.from(this.oauth2Provider);
     }
 }
