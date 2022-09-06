@@ -17,8 +17,6 @@ import toy.bookchat.bookchat.security.ipblock.IpBlockCheckingFilter;
 import toy.bookchat.bookchat.security.ipblock.IpBlockManager;
 import toy.bookchat.bookchat.security.jwt.JwtAuthenticationFilter;
 import toy.bookchat.bookchat.security.jwt.JwtTokenProvider;
-import toy.bookchat.bookchat.security.oauth.CustomOAuth2UserService;
-import toy.bookchat.bookchat.security.oauth.HttpCookieOAuth2AuthorizationRequestRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -27,8 +25,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
     private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
-    private final CustomOAuth2UserService customOAuth2UserService;
-    private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
     private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
     private final IpBlockManager ipBlockManager;
     private final JwtTokenProvider jwtTokenProvider;
@@ -66,17 +62,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .authenticationEntryPoint(restAuthenticationEntryPoint)
             .and()
             .formLogin().disable()
-            .oauth2Login()
-            .authorizationEndpoint()
-            .baseUri("/oauth2/authorize")
-            .authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository)
-            .and()
-            .redirectionEndpoint()
-            .baseUri("/oauth2/callback/*")
-            .and()
-            .userInfoEndpoint()
-            .userService(customOAuth2UserService)
-            .and()
+            .userDetailsService(customUserDetailsService)
             .successHandler(customAuthenticationSuccessHandler)
             .failureHandler(customAuthenticationFailureHandler);
     }
