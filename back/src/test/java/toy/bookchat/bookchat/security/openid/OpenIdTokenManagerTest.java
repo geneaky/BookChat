@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.security.jwt;
+package toy.bookchat.bookchat.security.openid;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -67,4 +67,5 @@ class OpenIdTokenManagerTest {
             openIdTokenManager.isNotValidatedToken(token+"test");
         }).isInstanceOf(DenidedTokenException.class);
     }
+
 }
