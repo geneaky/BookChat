@@ -17,20 +17,20 @@ public class OpenIdTokenManager {
 
     private final JwtTokenConfig jwtTokenConfig;
 
-    public String isNotValidatedToken(String openIdToken) {
+    public String getOauth2MemberNumberFromRequest(String openIdToken) {
         String oauth2MemberNumber;
         try {
             oauth2MemberNumber = Jwts.parser()
-                    .setSigningKey(jwtTokenConfig.getSecret())
-                    .parseClaimsJws(openIdToken)
-                    .getBody()
-                    .getSubject();
+                .setSigningKey(jwtTokenConfig.getSecret())
+                .parseClaimsJws(openIdToken)
+                .getBody()
+                .getSubject();
         } catch (ExpiredJwtException exception) {
             log.info("Token :: {} :: is expired", openIdToken);
-            throw new ExpiredTokenException(exception.getMessage(),exception);
+            throw new ExpiredTokenException(exception.getMessage(), exception);
         } catch (JwtException exception) {
             log.info("Token :: {} :: is denied", openIdToken);
-            throw new DenidedTokenException(exception.getMessage(),exception);
+            throw new DenidedTokenException(exception.getMessage(), exception);
         }
         return oauth2MemberNumber;
     }

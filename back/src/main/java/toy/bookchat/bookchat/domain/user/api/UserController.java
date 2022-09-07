@@ -1,22 +1,27 @@
 package toy.bookchat.bookchat.domain.user.api;
 
+import static toy.bookchat.bookchat.utils.constants.AuthConstants.AUTHORIZATION;
+import static toy.bookchat.bookchat.utils.constants.AuthConstants.BEARER;
+import static toy.bookchat.bookchat.utils.constants.AuthConstants.BEGIN_INDEX;
+
+import java.util.Optional;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import toy.bookchat.bookchat.domain.user.api.dto.UserProfileResponse;
 import toy.bookchat.bookchat.domain.user.service.UserService;
 import toy.bookchat.bookchat.domain.user.service.dto.UserSignUpRequestDto;
 import toy.bookchat.bookchat.security.openid.OpenIdTokenManager;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import java.util.Optional;
-
-import static toy.bookchat.bookchat.utils.constants.AuthConstants.*;
 
 @RestController
 @RequestMapping("/v1/api")
@@ -42,20 +47,23 @@ public class UserController {
      */
     @GetMapping("/users/profile/nickname")
     public ResponseEntity<Void> checkDuplicatedNickname(String nickname) {
-        if(userService.isDuplicatedName(nickname)) {
+        if (userService.isDuplicatedName(nickname)) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
         }
         return ResponseEntity.ok(null);
     }
 
     @PostMapping("/users")
-    public ResponseEntity<Void> userSignUp(@Valid @ModelAttribute UserSignUpRequestDto userSignUpRequestDto, HttpServletRequest request) {
+    public ResponseEntity<Void> userSignUp(
+        @Valid @ModelAttribute UserSignUpRequestDto userSignUpRequestDto,
+        HttpServletRequest request) {
 
-        if(isNotValidatedRequest(request)) {
+        if (isNotValidatedRequest(request)) {
             return ResponseEntity.badRequest().body(null);
         }
 
-        String oauth2MemberNumber = openIdTokenManager.isNotValidatedToken(getOpenIdToken(request));
+        String oauth2MemberNumber = openIdTokenManager.getOauth2MemberNumberFromRequest(
+            getOpenIdToken(request));
         userService.registerNewUser(userSignUpRequestDto, oauth2MemberNumber);
 
         return ResponseEntity.ok(null);
@@ -67,7 +75,8 @@ public class UserController {
 
     public boolean isNotValidatedRequest(HttpServletRequest request) {
         Optional<String> authorization = Optional.ofNullable(request.getHeader(AUTHORIZATION));
-        return authorization.isEmpty() || !authorization.get().startsWith(BEARER) || !StringUtils.hasText(authorization.get().substring(BEGIN_INDEX));
+        return authorization.isEmpty() || !authorization.get().startsWith(BEARER)
+            || !StringUtils.hasText(authorization.get().substring(BEGIN_INDEX));
     }
 
 }
