@@ -34,9 +34,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-        http.csrf().disable();
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
         /*
          * custom filter를 bean으로 등록해두면 websecurity configure설정에서 security filter chain에서는 제외되지만 defautl chain에는 포함되므로 직접 생성하여 등록해줌 - 블로깅, ip 차단이랑 같이
          * https://stackoverflow.com/questions/39152803/spring-websecurity-ignoring-doesnt-ignore-custom-filter/40969780#40969780
@@ -48,22 +45,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(new CustomExceptionHandlingFilter(), IpBlockCheckingFilter.class);
 
+        http.csrf().disable();
         http.anonymous().disable();
+        http.formLogin().disable();
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http.authorizeHttpRequests()
             .antMatchers("/").permitAll()
             .antMatchers(HttpMethod.GET, "/v1/api/users/profile/nickname").permitAll()
             .antMatchers(HttpMethod.POST, "/v1/api/users").permitAll();
 
+        /* TODO: 2022-09-07 이부분 정상 동작 테스트
+         */
         http.authorizeHttpRequests()
-            .anyRequest().authenticated()
-            .and()
-            .exceptionHandling()
-            .authenticationEntryPoint(restAuthenticationEntryPoint)
-            .and()
-            .formLogin().disable()
-            .userDetailsService(customUserDetailsService)
-            .successHandler(customAuthenticationSuccessHandler)
-            .failureHandler(customAuthenticationFailureHandler);
+                .anyRequest().authenticated()
+                .and()
+                .exceptionHandling()
+                .authenticationEntryPoint(restAuthenticationEntryPoint);
     }
 }
