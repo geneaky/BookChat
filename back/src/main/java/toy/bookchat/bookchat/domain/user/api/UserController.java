@@ -9,9 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import toy.bookchat.bookchat.domain.user.api.dto.UserProfileResponse;
 import toy.bookchat.bookchat.domain.user.service.UserService;
 import toy.bookchat.bookchat.domain.user.service.dto.UserSignUpRequestDto;
-import toy.bookchat.bookchat.security.jwt.JwtTokenManager;
+import toy.bookchat.bookchat.security.openid.OpenIdTokenManager;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
-import toy.bookchat.bookchat.utils.constants.AuthConstants;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -25,7 +24,7 @@ import static toy.bookchat.bookchat.utils.constants.AuthConstants.*;
 public class UserController {
 
     private final UserService userService;
-    private final JwtTokenManager jwtTokenManager;
+    private final OpenIdTokenManager openIdTokenManager;
 
     /* TODO: 2022-08-29
         추후: 사용자 프로필의 경우 프로필 수정을 누르지 않으면 동일한 데이터에 대해 read
@@ -56,7 +55,7 @@ public class UserController {
             return ResponseEntity.badRequest().body(null);
         }
 
-        String oauth2MemberNumber = jwtTokenManager.isNotValidatedToken(getOpenIdToken(request));
+        String oauth2MemberNumber = openIdTokenManager.isNotValidatedToken(getOpenIdToken(request));
         userService.registerNewUser(userSignUpRequestDto, oauth2MemberNumber);
 
         return ResponseEntity.ok(null);

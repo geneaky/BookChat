@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.security.jwt;
+package toy.bookchat.bookchat.security.openid;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -13,7 +13,7 @@ import toy.bookchat.bookchat.security.exception.ExpiredTokenException;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class JwtTokenManager {
+public class OpenIdTokenManager {
 
     private final JwtTokenConfig jwtTokenConfig;
 

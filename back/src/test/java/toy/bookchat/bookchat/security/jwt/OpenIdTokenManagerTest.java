@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import toy.bookchat.bookchat.config.JwtTokenConfig;
 import toy.bookchat.bookchat.security.exception.DenidedTokenException;
 import toy.bookchat.bookchat.security.exception.ExpiredTokenException;
+import toy.bookchat.bookchat.security.openid.OpenIdTokenManager;
 
 import java.util.Date;
 
@@ -17,13 +18,13 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class JwtTokenManagerTest {
+class OpenIdTokenManagerTest {
 
     @Mock
     JwtTokenConfig jwtTokenConfig;
 
     @InjectMocks
-    JwtTokenManager jwtTokenManager;
+    OpenIdTokenManager openIdTokenManager;
 
     @Test
     public void 토큰에서_사용자_원천_회원번호_추출_성공() throws Exception {
@@ -35,7 +36,7 @@ class JwtTokenManagerTest {
 
         when(jwtTokenConfig.getSecret()).thenReturn("test_secret");
 
-        assertThat(jwtTokenManager.isNotValidatedToken(token)).isEqualTo("1234");
+        assertThat(openIdTokenManager.isNotValidatedToken(token)).isEqualTo("1234");
     }
 
     @Test
@@ -49,7 +50,7 @@ class JwtTokenManagerTest {
         when(jwtTokenConfig.getSecret()).thenReturn("test_secret");
 
         assertThatThrownBy(() -> {
-            jwtTokenManager.isNotValidatedToken(token);
+            openIdTokenManager.isNotValidatedToken(token);
         }).isInstanceOf(ExpiredTokenException.class);
     }
 
@@ -63,7 +64,7 @@ class JwtTokenManagerTest {
         when(jwtTokenConfig.getSecret()).thenReturn("test_secret");
 
         assertThatThrownBy(() -> {
-            jwtTokenManager.isNotValidatedToken(token+"test");
+            openIdTokenManager.isNotValidatedToken(token+"test");
         }).isInstanceOf(DenidedTokenException.class);
     }
 }
