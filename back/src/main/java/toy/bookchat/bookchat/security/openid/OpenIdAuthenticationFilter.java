@@ -19,7 +19,6 @@ public class OpenIdAuthenticationFilter extends OncePerRequestFilter {
     private final OpenIdTokenManager openIdTokenManager;
     private final UserRepository userRepository;
     private final IpBlockManager ipBlockManager;
-
     public OpenIdAuthenticationFilter(OpenIdTokenManager openIdTokenManager,
         UserRepository userRepository, IpBlockManager ipBlockManager) {
         this.openIdTokenManager = openIdTokenManager;
@@ -35,6 +34,8 @@ public class OpenIdAuthenticationFilter extends OncePerRequestFilter {
         //사용자 resource server 회원번호와 resource server 이름(카카오, 구글)로
         //조회해서 나오면 통과 없으면 exception
         //   validUserRequestUsingOpenIdToken(opendIdToken);
+
+        filterChain.doFilter(request,response);
     }
 
     private String getOpenIdTokenFromRequest(HttpServletRequest request) {
