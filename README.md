@@ -36,8 +36,8 @@
 
 ***
 ### App Design 초안
-![image](https://user-images.githubusercontent.com/81726145/159914048-e2c96cda-b956-4d57-be63-5f66f6c5e0d0.png)
-링크 : https://www.figma.com/file/h6ZwMa9QzWDn1TyCJmawsb/BookChat?node-id=0%3A1
+![image](https://user-images.githubusercontent.com/81726145/189527767-3209755c-0a55-4b55-9708-ad7045225fa9.png)
+링크 : https://www.figma.com/file/h6ZwMa9QzWDn1TyCJmawsb/BookChat?node-id=693%3A2079
 
 ***
 ### ERD
