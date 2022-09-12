@@ -23,10 +23,20 @@ public class CustomExceptionHandlingFilter extends OncePerRequestFilter {
             response.setCharacterEncoding("utf-8");
             response.getWriter().write("Not Registered User Request");
         } catch (BlockedIpException exception) {
-            response.setStatus(401);
+            response.setStatus(403);
             response.setContentType("text/plain");
             response.setCharacterEncoding("utf-8");
             response.getWriter().write("You Are Blocked");
+        } catch (ExpiredTokenException exception) {
+            response.setStatus(400);
+            response.setContentType("text/plain");
+            response.setCharacterEncoding("utf-8");
+            response.getWriter().write("Token Expired");
+        } catch (DenidedTokenException exception) {
+            response.setStatus(400);
+            response.setContentType("text/plain");
+            response.setCharacterEncoding("utf-8");
+            response.getWriter().write("Not Valid Token Request");
         }
     }
 }

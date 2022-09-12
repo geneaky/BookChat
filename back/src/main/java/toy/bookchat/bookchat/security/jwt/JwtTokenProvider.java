@@ -10,7 +10,6 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -50,7 +49,7 @@ public class JwtTokenProvider {
             .setClaims(createClaims(oAuth2Provider, email))
             .setIssuedAt(new Date())
             .setExpiration(expiredDate)
-            .signWith(SignatureAlgorithm.HS256, jwtTokenConfig.getSecret())
+            .signWith(SignatureAlgorithm.RS256, jwtTokenConfig.getSecret())
             .compact();
     }
 

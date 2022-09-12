@@ -5,6 +5,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static toy.bookchat.bookchat.security.jwt.JwtTokenProvider.KAKAO_ACCOUNT;
 
+import java.io.IOException;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -14,9 +22,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.util.Base64Utils;
 import toy.bookchat.bookchat.config.JwtTokenConfig;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
+import toy.bookchat.bookchat.security.openid.OpenIdTestUtil;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
@@ -28,7 +38,25 @@ class JwtTokenProviderTest {
     @InjectMocks
     JwtTokenProvider tokenProvider = new JwtTokenProvider();
 
-    private String getKakaoToken(Long expiredTime) {
+    private X509EncodedKeySpec getPublicPkcs8EncodedKeySpec(OpenIdTestUtil openIdTestUtil)
+        throws IOException {
+        String publicKey = openIdTestUtil.getPublicKey(9);
+        byte[] decodePublicKey = Base64Utils.decode(publicKey.getBytes());
+        X509EncodedKeySpec spec = new X509EncodedKeySpec(publicKey.getBytes());
+        return spec;
+    }
+
+    private PKCS8EncodedKeySpec getPrivatePkcs8EncodedKeySpec(OpenIdTestUtil openIdTestUtil)
+        throws IOException {
+        String privateKey = openIdTestUtil.getPrivateKey(28);
+        byte[] decodePrivateKey = Base64Utils.decode(privateKey.getBytes());
+        PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(
+            decodePrivateKey);
+        return spec;
+    }
+
+    private String getKakaoToken(Long expiredTime)
+        throws IOException, InvalidKeySpecException, NoSuchAlgorithmException {
         Authentication authentication = mock(Authentication.class);
         UserPrincipal userPrincipal = mock(UserPrincipal.class);
         User user = mock(User.class);
@@ -41,7 +69,21 @@ class JwtTokenProviderTest {
         Map<String, Object> outerMap = new HashMap<>();
         outerMap.put(KAKAO_ACCOUNT, innerMap);
 
-        when(jwtTokenConfig.getSecret()).thenReturn("hihi");
+        OpenIdTestUtil openIdTestUtil = new OpenIdTestUtil(
+            "src/test/java/toy/bookchat/bookchat/security/openid/token_key.pem",
+            "src/test/java/toy/bookchat/bookchat/security/openid/openidRSA256-public.pem");
+
+        PKCS8EncodedKeySpec spec = getPrivatePkcs8EncodedKeySpec(openIdTestUtil);
+
+        X509EncodedKeySpec pspec = getPublicPkcs8EncodedKeySpec(openIdTestUtil);
+
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+
+        PrivateKey pk = keyFactory.generatePrivate(spec);
+        PublicKey publicKey1 = keyFactory.generatePublic(pspec);
+
+        when(jwtTokenConfig.getSecret()).thenReturn(publicKey1);
+
         when(jwtTokenConfig.getAccessTokenExpiredTime()).thenReturn(expiredTime);
         when(authentication.getPrincipal()).thenReturn(userPrincipal);
         when(userPrincipal.getUser()).thenReturn(user);
