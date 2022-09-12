@@ -10,8 +10,8 @@ public class OpenIdTestUtil {
     private BufferedReader privateKeyReader;
     private BufferedReader publicKeyReader;
 
-    public OpenIdTestUtil(String privagteKey, String publicKey) throws FileNotFoundException {
-        this.privateKeyReader = new BufferedReader(new FileReader(privagteKey));
+    public OpenIdTestUtil(String privateKey, String publicKey) throws FileNotFoundException {
+        this.privateKeyReader = new BufferedReader(new FileReader(privateKey));
         this.publicKeyReader = new BufferedReader(new FileReader(publicKey));
     }
 
@@ -21,7 +21,6 @@ public class OpenIdTestUtil {
         for (int i = 0; i < lineSize - 2; i++) {
             stringBuilder.append(this.privateKeyReader.readLine());
         }
-
         return stringBuilder.toString();
     }
 
