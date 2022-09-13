@@ -63,7 +63,7 @@ public class UserController {
         }
 
         String oauth2MemberNumber = openIdTokenManager.getOAuth2MemberNumberFromRequest(
-            getOpenIdToken(request));
+            userSignUpRequestDto.getOAuth2Provider().getValue(), getOpenIdToken(request));
         userService.registerNewUser(userSignUpRequestDto, oauth2MemberNumber);
 
         return ResponseEntity.ok(null);

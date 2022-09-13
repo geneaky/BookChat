@@ -37,6 +37,11 @@ public class CustomExceptionHandlingFilter extends OncePerRequestFilter {
             response.setContentType("text/plain");
             response.setCharacterEncoding("utf-8");
             response.getWriter().write("Not Valid Token Request");
+        } catch (NotVerifiedRequestFormatException exception) {
+            response.setStatus(400);
+            response.setContentType("text/plain");
+            response.setCharacterEncoding("utf-8");
+            response.getWriter().write("Empty Provider Type");
         }
     }
 }
