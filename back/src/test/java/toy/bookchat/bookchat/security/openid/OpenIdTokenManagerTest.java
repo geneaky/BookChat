@@ -2,18 +2,26 @@ package toy.bookchat.bookchat.security.openid;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import io.jsonwebtoken.impl.DefaultHeader;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -71,9 +79,9 @@ class OpenIdTokenManagerTest {
             .signWith(SignatureAlgorithm.RS256, privateKey)
             .compact();
 
-        when(openIdTokenConfig.getSecret()).thenReturn(publicKey);
+        when(openIdTokenConfig.getPublicKey(any(),any())).thenReturn(publicKey);
 
-        assertThat(openIdTokenManager.getOAuth2MemberNumberFromRequest(token)).isEqualTo(
+        assertThat(openIdTokenManager.getOAuth2MemberNumberFromRequest(token,"kakao")).isEqualTo(
             "1234kakao");
     }
 
@@ -95,10 +103,10 @@ class OpenIdTokenManagerTest {
             .signWith(SignatureAlgorithm.RS256, privateKey)
             .compact();
 
-        when(openIdTokenConfig.getSecret()).thenReturn(publicKey);
+        when(openIdTokenConfig.getPublicKey(any(),any())).thenReturn(publicKey);
 
         assertThatThrownBy(() -> {
-            openIdTokenManager.getOAuth2MemberNumberFromRequest(token);
+            openIdTokenManager.getOAuth2MemberNumberFromRequest(token, "kakao");
         }).isInstanceOf(ExpiredTokenException.class);
     }
 
@@ -119,10 +127,10 @@ class OpenIdTokenManagerTest {
             .signWith(SignatureAlgorithm.RS256, privateKey)
             .compact();
 
-        when(openIdTokenConfig.getSecret()).thenReturn(publicKey);
+        when(openIdTokenConfig.getPublicKey(any(),any())).thenReturn(publicKey);
 
         assertThatThrownBy(() -> {
-            openIdTokenManager.getOAuth2MemberNumberFromRequest(token + "test");
+            openIdTokenManager.getOAuth2MemberNumberFromRequest(token + "test","kakao");
         }).isInstanceOf(DenidedTokenException.class);
     }
 
@@ -142,10 +150,10 @@ class OpenIdTokenManagerTest {
             .signWith(SignatureAlgorithm.RS256, privateKey)
             .compact();
 
-        when(openIdTokenConfig.getSecret()).thenReturn(publicKey);
+        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
 
         assertThatThrownBy(() -> {
-            openIdTokenManager.getOAuth2MemberNumberFromRequest(token);
+            openIdTokenManager.getOAuth2MemberNumberFromRequest(token,"kakao");
         }).isInstanceOf(DenidedTokenException.class);
     }
 }

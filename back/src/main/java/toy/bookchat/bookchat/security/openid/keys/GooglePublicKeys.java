@@ -1,5 +1,7 @@
 package toy.bookchat.bookchat.security.openid.keys;
 
-public class GooglePublicKeys {
+import toy.bookchat.bookchat.config.openid.PublicKeys;
+
+public class GooglePublicKeys implements PublicKeys {
 
 }

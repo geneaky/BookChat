@@ -8,6 +8,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Base64Utils;
 import toy.bookchat.bookchat.config.OpenIdTokenConfig;
 import toy.bookchat.bookchat.security.exception.DenidedTokenException;
 import toy.bookchat.bookchat.security.exception.ExpiredTokenException;
@@ -20,21 +21,21 @@ public class OpenIdTokenManager {
 
     private final OpenIdTokenConfig openIdTokenConfig;
 
-    public String getOAuth2MemberNumberFromRequest(String openIdToken) {
+    public String getOAuth2MemberNumberFromRequest(String openIdToken, String tokenProvider) {
         StringBuilder stringBuilder = new StringBuilder();
 
-        getOAuth2MemberNumberFromOpenIdToken(openIdToken, stringBuilder);
+        getOAuth2MemberNumberFromOpenIdToken(tokenProvider, openIdToken, stringBuilder);
 
         return stringBuilder.toString();
     }
 
-    private void getOAuth2MemberNumberFromOpenIdToken(String openIdToken,
+    private void getOAuth2MemberNumberFromOpenIdToken(String tokenProvider, String openIdToken,
         StringBuilder stringBuilder) {
         try {
             String keyId = Jwts.parser().parseClaimsJws(openIdToken).getHeader().getKeyId();
 
             Claims body = Jwts.parser()
-                .setSigningKey(openIdTokenConfig.getSecret(keyId))
+                .setSigningKey(Base64Utils.encodeToString(openIdTokenConfig.getPublicKey(keyId, tokenProvider).getEncoded()))
                 .parseClaimsJws(openIdToken)
                 .getBody();
 
