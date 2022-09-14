@@ -11,15 +11,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Component;
 import toy.bookchat.bookchat.config.JwtTokenConfig;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @Slf4j
-@Component
 public class JwtTokenProvider {
     /*@todo
      *   외부 의존성인 io.jwts를 사용하는 것이 아니라 인터페이스를 만들고 그 구현체에서 사용하는 방식으로
@@ -31,7 +28,7 @@ public class JwtTokenProvider {
     public static final String EMAIL = "email";
     public static final String KAKAO_ACCOUNT = "kakao_account";
     public static final String OAUTH2_PROVIDER = "oAuth2Provider";
-    @Autowired
+
     private JwtTokenConfig jwtTokenConfig;
 
     public String createToken(Authentication authentication) {

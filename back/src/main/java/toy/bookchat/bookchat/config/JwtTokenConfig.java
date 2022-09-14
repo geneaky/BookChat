@@ -6,8 +6,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
 
 @Getter
-@ConstructorBinding
-@ConfigurationProperties("token")
 public class JwtTokenConfig {
 
     private final Key secret;
