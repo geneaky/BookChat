@@ -42,6 +42,7 @@ class OpenIdTokenManagerTest {
 
     @BeforeEach
     public void init() throws FileNotFoundException {
+        //openssl pkcs8 -topk8 -inform PEM -in private_key.pem -out token_key.pem -nocrypt 생성
         openIdTestUtil = new OpenIdTestUtil(
                 "src/test/java/toy/bookchat/bookchat/security/openid/token_key.pem",
                 "src/test/java/toy/bookchat/bookchat/security/openid/openidRSA256-public.pem");

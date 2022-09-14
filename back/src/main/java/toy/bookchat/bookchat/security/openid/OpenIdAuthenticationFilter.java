@@ -53,7 +53,10 @@ public class OpenIdAuthenticationFilter extends OncePerRequestFilter {
 
     private OAuth2Provider getOpenIdTokenProviderFromRequest(HttpServletRequest request) {
         return Optional.ofNullable(OAuth2Provider.from(request.getHeader(PROVIDER_TYPE)))
-                .orElseThrow(() -> {throw new NotVerifiedRequestFormatException("Empty Provider Type");});
+                .orElseThrow(() -> {
+                    ipBlockManager.increase(request);
+                    throw new NotVerifiedRequestFormatException("Empty Provider Type");
+                });
     }
 
     private void registerUserAuthenticationOnSecurityContext(Optional<User> optionalUser) {
@@ -74,6 +77,7 @@ public class OpenIdAuthenticationFilter extends OncePerRequestFilter {
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER)) {
             return bearerToken.substring(BEGIN_INDEX);
         }
+        ipBlockManager.increase(request);
         throw new DenidedTokenException("Not Allowed Format Request Exception");
     }
 
