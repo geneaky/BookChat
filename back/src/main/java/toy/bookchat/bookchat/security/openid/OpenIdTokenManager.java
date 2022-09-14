@@ -1,14 +1,11 @@
 package toy.bookchat.bookchat.security.openid;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
+
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Base64Utils;
 import toy.bookchat.bookchat.config.OpenIdTokenConfig;
 import toy.bookchat.bookchat.security.exception.DenidedTokenException;
 import toy.bookchat.bookchat.security.exception.ExpiredTokenException;
@@ -21,31 +18,11 @@ public class OpenIdTokenManager {
 
     private final OpenIdTokenConfig openIdTokenConfig;
 
-    public String getOAuth2MemberNumberFromRequest(String openIdToken, String tokenProvider) {
+    public String getOAuth2MemberNumberFromOpenIdToken(String openIdToken, String tokenProvider) {
         StringBuilder stringBuilder = new StringBuilder();
 
-        getOAuth2MemberNumberFromOpenIdToken(tokenProvider, openIdToken, stringBuilder);
-
-        return stringBuilder.toString();
-    }
-
-    private void getOAuth2MemberNumberFromOpenIdToken(String tokenProvider, String openIdToken,
-        StringBuilder stringBuilder) {
         try {
-            String keyId = Jwts.parser().parseClaimsJws(openIdToken).getHeader().getKeyId();
-
-            Claims body = Jwts.parser()
-                .setSigningKey(Base64Utils.encodeToString(openIdTokenConfig.getPublicKey(keyId, tokenProvider).getEncoded()))
-                .parseClaimsJws(openIdToken)
-                .getBody();
-
-            String issuer = Optional.ofNullable(body.getIssuer())
-                .orElseThrow(() -> {
-                    throw new DenidedTokenException("Not Allowed Format Token Exception");
-                });
-
-            getOAuth2MemberNumberFromClaims(stringBuilder, body, issuer);
-
+            extractProviderMemberNumberFromOpenIdToken(tokenProvider, openIdToken, stringBuilder);
         } catch (ExpiredJwtException exception) {
             log.info("Token :: {} :: is expired", openIdToken);
             throw new ExpiredTokenException(exception.getMessage(), exception);
@@ -53,6 +30,42 @@ public class OpenIdTokenManager {
             log.info("Token :: {} :: is denied", openIdToken);
             throw new DenidedTokenException(exception.getMessage(), exception);
         }
+
+        return stringBuilder.toString();
+    }
+
+    private void extractProviderMemberNumberFromOpenIdToken(String tokenProvider, String openIdToken, StringBuilder stringBuilder) {
+
+        Claims body = Jwts.parser()
+            .setSigningKey(openIdTokenConfig.getPublicKey(extractKeyIdFromOpenIdToken(openIdToken), tokenProvider))
+            .parseClaimsJws(openIdToken)
+            .getBody();
+
+        String issuer = Optional.ofNullable(body.getIssuer())
+            .orElseThrow(() -> {
+                throw new DenidedTokenException("Not Allowed Format Token Exception");
+            });
+
+        getOAuth2MemberNumberFromClaims(stringBuilder, body, issuer);
+    }
+
+    private String extractKeyIdFromOpenIdToken(String openIdToken) {
+        return (String) Jwts.parser()
+                .parseClaimsJwt(getUnsignedTokenBuilder(openIdToken).toString())
+                .getHeader()
+                .get("kid");
+    }
+
+    private StringBuilder getUnsignedTokenBuilder(String openIdToken) {
+        String[] splitToken = openIdToken.split("\\.");
+
+        StringBuilder unsignedTokenBuilder = new StringBuilder();
+        unsignedTokenBuilder.append(splitToken[0]);
+        unsignedTokenBuilder.append(".");
+        unsignedTokenBuilder.append(splitToken[1]);
+        unsignedTokenBuilder.append(".");
+
+        return unsignedTokenBuilder;
     }
 
     private void getOAuth2MemberNumberFromClaims(StringBuilder stringBuilder, Claims body,
