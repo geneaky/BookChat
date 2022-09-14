@@ -16,14 +16,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
@@ -31,24 +38,26 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.Base64Utils;
-import toy.bookchat.bookchat.config.JwtTokenConfig;
+import toy.bookchat.bookchat.config.OpenIdTokenConfig;
 import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.api.dto.UserProfileResponse;
 import toy.bookchat.bookchat.domain.user.service.UserService;
 import toy.bookchat.bookchat.domain.user.service.dto.UserSignUpRequestDto;
+import toy.bookchat.bookchat.security.SecurityConfig;
 import toy.bookchat.bookchat.security.openid.OpenIdTestUtil;
 import toy.bookchat.bookchat.security.openid.OpenIdTokenManager;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @WebMvcTest(controllers = UserController.class,
-    includeFilters = @ComponentScan.Filter(classes = {EnableWebSecurity.class}))
+    includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {SecurityConfig.class}))
 @AutoConfigureRestDocs
 public class UserControllerTest extends AuthenticationTestExtension {
 
@@ -59,13 +68,22 @@ public class UserControllerTest extends AuthenticationTestExtension {
     OpenIdTokenManager openIdTokenManager;
 
     @MockBean
-    JwtTokenConfig jwtTokenConfig;
+    OpenIdTokenConfig openIdTokenConfig;
 
     @Autowired
     ObjectMapper objectMapper;
 
     @Autowired
     private MockMvc mockMvc;
+
+    OpenIdTestUtil openIdTestUtil;
+
+    @BeforeEach
+    public void init() throws FileNotFoundException {
+        openIdTestUtil = new OpenIdTestUtil(
+                "src/test/java/toy/bookchat/bookchat/security/openid/token_key.pem",
+                "src/test/java/toy/bookchat/bookchat/security/openid/openidRSA256-public.pem");
+    }
 
     private UserPrincipal getUserPrincipal() {
         List<GrantedAuthority> authorities = Collections.singletonList(
@@ -84,7 +102,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
     @Test
     public void 인증받지_않은_사용자_요청_401응답() throws Exception {
         mockMvc.perform(get("/v1/api/users/profile"))
-            .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -153,25 +171,46 @@ public class UserControllerTest extends AuthenticationTestExtension {
             .andExpect(status().isBadRequest());
     }
 
+    private X509EncodedKeySpec getPublicPkcs8EncodedKeySpec(OpenIdTestUtil openIdTestUtil)
+            throws IOException {
+        String publicKey = openIdTestUtil.getPublicKey(9);
+        byte[] decodePublicKey = Base64Utils.decode(publicKey.getBytes());
+        return new X509EncodedKeySpec(decodePublicKey);
+    }
+
+    private PKCS8EncodedKeySpec getPrivatePkcs8EncodedKeySpec(OpenIdTestUtil openIdTestUtil)
+            throws IOException {
+        String privateKey = openIdTestUtil.getPrivateKey(28);
+        byte[] decodePrivateKey = Base64Utils.decode(privateKey.getBytes());
+        return new PKCS8EncodedKeySpec(
+                decodePrivateKey);
+    }
+
+    private PublicKey getPublicKey() throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        X509EncodedKeySpec publicKeySpec = getPublicPkcs8EncodedKeySpec(openIdTestUtil);
+        PublicKey publicKey = keyFactory.generatePublic(publicKeySpec);
+        return publicKey;
+    }
+
+    private PrivateKey getPrivateKey() throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        PKCS8EncodedKeySpec privateKeySpec = getPrivatePkcs8EncodedKeySpec(openIdTestUtil);
+        PrivateKey privateKey = keyFactory.generatePrivate(privateKeySpec);
+        return privateKey;
+    }
+
     @Test
     public void 사용자_회원가입_요청시_header_openid가_유효하지않은_경우_412반환() throws Exception {
-        OpenIdTestUtil openIdTestUtil = new OpenIdTestUtil(
-            "src/test/java/toy/bookchat/bookchat/security/openid/token_key.pem",
-            "src/test/java/toy/bookchat/bookchat/security/openid/openidRSA256-public.pem");
+        PrivateKey privateKey = getPrivateKey();
+        PublicKey publicKey = getPublicKey();
 
-        PKCS8EncodedKeySpec spec = getPrivatePkcs8EncodedKeySpec(openIdTestUtil);
+        when(openIdTokenConfig.getPublicKey(any(),any())).thenReturn(publicKey);
 
-        X509EncodedKeySpec pspec = getPublicPkcs8EncodedKeySpec(openIdTestUtil);
-
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-
-        PrivateKey pk = keyFactory.generatePrivate(spec);
-        PublicKey publicKey1 = keyFactory.generatePublic(pspec);
-
-        when(jwtTokenConfig.getSecret()).thenReturn(publicKey1);
-
-        String testToken = Jwts.builder().setSubject("test")
-            .signWith(SignatureAlgorithm.HS256, "other_test_secret").compact();
+        String testToken = Jwts.builder()
+                .setSubject("test")
+                .setExpiration(new Date(0))
+                .signWith(SignatureAlgorithm.RS256, privateKey).compact();
 
         mockMvc.perform(post("/v1/api/users")
                 .header("Authorization", "Bearer " + testToken)
@@ -184,30 +223,17 @@ public class UserControllerTest extends AuthenticationTestExtension {
 
     @Test
     public void 사용자_회원가입_요청시_header_openid가_유효한경우_회원가입진행() throws Exception {
-        //openssl pkcs8 -topk8 -inform PEM -in private_key.pem -out token_key.pem -nocrypt 생성
-        OpenIdTestUtil openIdTestUtil = new OpenIdTestUtil(
-            "src/test/java/toy/bookchat/bookchat/security/openid/token_key.pem",
-            "src/test/java/toy/bookchat/bookchat/security/openid/openidRSA256-public.pem");
+        PrivateKey privateKey = getPrivateKey();
+        PublicKey publicKey = getPublicKey();
 
-        PKCS8EncodedKeySpec privateKeySpec = getPrivatePkcs8EncodedKeySpec(openIdTestUtil);
+        when(openIdTokenConfig.getPublicKey(any(),any())).thenReturn(publicKey);
 
-        X509EncodedKeySpec publicKeySpec = getPublicPkcs8EncodedKeySpec(openIdTestUtil);
-
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-
-        PrivateKey privateKey = keyFactory.generatePrivate(privateKeySpec);
-        PublicKey publicKey = keyFactory.generatePublic(publicKeySpec);
-
-        when(jwtTokenConfig.getSecret()).thenReturn(publicKey);
-
-        String testToken = Jwts.builder().setSubject("test").setIssuer("testIssuerkakao")
+        String testToken = Jwts.builder()
+            .setSubject("test")
+            .setHeaderParam("kid","abcedf")
+            .setIssuer(" https://kauth.kakao.com")
             .signWith(SignatureAlgorithm.RS256, privateKey)
             .compact();
-
-        String subject = Jwts.parser().setSigningKey(publicKey).parseClaimsJws(testToken).getBody()
-            .getSubject();
-
-        System.out.println(subject);
 
         mockMvc.perform(post("/v1/api/users")
                 .header("Authorization", "Bearer " + testToken)
@@ -228,40 +254,12 @@ public class UserControllerTest extends AuthenticationTestExtension {
         verify(userService).registerNewUser(any(UserSignUpRequestDto.class), anyString());
     }
 
-    private X509EncodedKeySpec getPublicPkcs8EncodedKeySpec(OpenIdTestUtil openIdTestUtil)
-        throws IOException {
-        String publicKey = openIdTestUtil.getPublicKey(9);
-        byte[] decodePublicKey = Base64Utils.decode(publicKey.getBytes());
-        return new X509EncodedKeySpec(decodePublicKey);
-    }
-
-    private PKCS8EncodedKeySpec getPrivatePkcs8EncodedKeySpec(OpenIdTestUtil openIdTestUtil)
-        throws IOException {
-        String privateKey = openIdTestUtil.getPrivateKey(28);
-        byte[] decodePrivateKey = Base64Utils.decode(privateKey.getBytes());
-        return new PKCS8EncodedKeySpec(
-            decodePrivateKey);
-    }
-
     @Test
     public void 사용자_회원가입_요청시_올바르지않은_파라미터형식_예외처리() throws Exception {
-        OpenIdTestUtil openIdTestUtil = new OpenIdTestUtil(
-            "src/test/java/toy/bookchat/bookchat/security/openid/token_key.pem",
-            "src/test/java/toy/bookchat/bookchat/security/openid/openidRSA256-public.pem");
-
-        PKCS8EncodedKeySpec spec = getPrivatePkcs8EncodedKeySpec(openIdTestUtil);
-
-        X509EncodedKeySpec pspec = getPublicPkcs8EncodedKeySpec(openIdTestUtil);
-
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-
-        PrivateKey pk = keyFactory.generatePrivate(spec);
-        PublicKey publicKey1 = keyFactory.generatePublic(pspec);
-
-        when(jwtTokenConfig.getSecret()).thenReturn(publicKey1);
+        PrivateKey privateKey = getPrivateKey();
 
         String testToken = Jwts.builder().setSubject("test")
-            .signWith(SignatureAlgorithm.HS256, "test_secret").compact();
+            .signWith(SignatureAlgorithm.RS256, privateKey).compact();
 
         mockMvc.perform(post("/v1/api/users")
                 .header("Authorization", "Bearer " + testToken)

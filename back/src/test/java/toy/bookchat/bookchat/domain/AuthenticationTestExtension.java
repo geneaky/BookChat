@@ -11,9 +11,8 @@ import toy.bookchat.bookchat.security.handler.RestAuthenticationEntryPoint;
 import toy.bookchat.bookchat.security.ipblock.IpBlockCheckingFilter;
 import toy.bookchat.bookchat.security.ipblock.IpBlockManager;
 import toy.bookchat.bookchat.security.openid.OpenIdAuthenticationFilter;
+import toy.bookchat.bookchat.security.openid.OpenIdTokenManager;
 
-@Import({IpBlockCheckingFilter.class, OpenIdAuthenticationFilter.class,
-    RestAuthenticationEntryPoint.class})
 public abstract class AuthenticationTestExtension {
 
     @MockBean
