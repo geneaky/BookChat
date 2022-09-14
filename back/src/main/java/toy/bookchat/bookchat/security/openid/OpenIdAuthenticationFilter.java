@@ -38,15 +38,10 @@ public class OpenIdAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
         FilterChain filterChain) throws ServletException, IOException {
 
-        OAuth2Provider openIdTokenProvider = getOpenIdTokenProviderFromRequest(request);
-        String openIdToken = getOpenIdTokenFromRequest(request);
-
         String oAuth2MemberNumber = openIdTokenManager.getOAuth2MemberNumberFromOpenIdToken(
-            openIdTokenProvider.getValue(), openIdToken);
+            getOpenIdTokenProviderFromRequest(request).getValue(), getOpenIdTokenFromRequest(request));
 
-        Optional<User> optionalUser = userRepository.findByName(oAuth2MemberNumber);
-
-        registerUserAuthenticationOnSecurityContext(optionalUser);
+        registerUserAuthenticationOnSecurityContext(userRepository.findByName(oAuth2MemberNumber));
 
         filterChain.doFilter(request, response);
     }
