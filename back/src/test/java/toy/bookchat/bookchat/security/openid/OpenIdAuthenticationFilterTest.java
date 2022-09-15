@@ -1,6 +1,6 @@
 package toy.bookchat.bookchat.security.openid;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -12,7 +12,6 @@ import java.util.Optional;
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -45,10 +44,13 @@ class OpenIdAuthenticationFilterTest {
         HttpServletResponse httpServletResponse = mock(HttpServletResponse.class);
         FilterChain filterChain = mock(FilterChain.class);
 
+        String randomBearerToken = "Bearer tLA7p";
+        when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(randomBearerToken);
         when(httpServletRequest.getHeader("provider_type")).thenReturn(null);
 
         assertThatThrownBy(() -> {
-            openIdAuthenticationFilter.doFilterInternal(httpServletRequest,httpServletResponse, filterChain);
+            openIdAuthenticationFilter.doFilterInternal(httpServletRequest, httpServletResponse,
+                filterChain);
         }).isInstanceOf(NotVerifiedRequestFormatException.class);
     }
 
@@ -83,12 +85,14 @@ class OpenIdAuthenticationFilterTest {
         HttpServletResponse httpServletResponse = mock(HttpServletResponse.class);
         FilterChain filterChain = mock(FilterChain.class);
 
-        when(httpServletRequest.getHeader(PROVIDER_TYPE)).thenReturn("kakao");
+        when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(null);
 
         assertThatThrownBy(() -> {
             openIdAuthenticationFilter.doFilterInternal(httpServletRequest, httpServletResponse,
                 filterChain);
         }).isInstanceOf(DenidedTokenException.class);
+
+        verify(ipBlockManager).increase(httpServletRequest);
     }
 
     /* TODO: 2022-09-08 양방향 rsa256 utill class를 만들어서 openidconnect를 테스트 / 블로깅
