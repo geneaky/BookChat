@@ -1,5 +1,10 @@
 package toy.bookchat.bookchat.security.openid;
 
+import static toy.bookchat.bookchat.utils.constants.AuthConstants.AUTHORIZATION;
+import static toy.bookchat.bookchat.utils.constants.AuthConstants.BEARER;
+import static toy.bookchat.bookchat.utils.constants.AuthConstants.BEGIN_INDEX;
+import static toy.bookchat.bookchat.utils.constants.AuthConstants.PROVIDER_TYPE;
+
 import java.io.IOException;
 import java.util.Optional;
 import javax.servlet.FilterChain;
@@ -19,8 +24,6 @@ import toy.bookchat.bookchat.security.ipblock.IpBlockManager;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
-import static toy.bookchat.bookchat.utils.constants.AuthConstants.*;
-
 public class OpenIdAuthenticationFilter extends OncePerRequestFilter {
 
     private final OpenIdTokenManager openIdTokenManager;
@@ -38,24 +41,21 @@ public class OpenIdAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
         FilterChain filterChain) throws ServletException, IOException {
 
-//        String oAuth2MemberNumber = openIdTokenManager.getOAuth2MemberNumberFromOpenIdToken(
-//            getOpenIdTokenProviderFromRequest(request).getValue(), getOpenIdTokenFromRequest(request));
-//
-//        registerUserAuthenticationOnSecurityContext(userRepository.findByName(oAuth2MemberNumber));
+        String oAuth2MemberNumber = openIdTokenManager.getOAuth2MemberNumberFromOpenIdToken(
+            getOpenIdTokenFromRequest(request),
+            getOpenIdTokenProviderFromRequest(request).getValue());
 
-        SecurityContextHolder
-                .getContext()
-                .setAuthentication(null);
+        registerUserAuthenticationOnSecurityContext(userRepository.findByName(oAuth2MemberNumber));
 
         filterChain.doFilter(request, response);
     }
 
     private OAuth2Provider getOpenIdTokenProviderFromRequest(HttpServletRequest request) {
         return Optional.ofNullable(OAuth2Provider.from(request.getHeader(PROVIDER_TYPE)))
-                .orElseThrow(() -> {
-                    ipBlockManager.increase(request);
-                    throw new NotVerifiedRequestFormatException("Empty Provider Type");
-                });
+            .orElseThrow(() -> {
+                ipBlockManager.increase(request);
+                throw new NotVerifiedRequestFormatException("Empty Provider Type");
+            });
     }
 
     private void registerUserAuthenticationOnSecurityContext(Optional<User> optionalUser) {

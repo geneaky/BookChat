@@ -53,9 +53,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .authenticationEntryPoint(new RestAuthenticationEntryPoint())
             .and()
             .authorizeRequests()
-            .antMatchers("/").permitAll()
-            .antMatchers(HttpMethod.GET, "/v1/api/users/profile/nickname").permitAll()
-            .antMatchers(HttpMethod.POST, "/v1/api/users").permitAll()
             .anyRequest().authenticated();
+    }
+
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring()
+            .antMatchers("/")
+            .antMatchers(HttpMethod.GET, "/v1/api/users/profile/nickname")
+            .antMatchers(HttpMethod.POST, "/v1/api/users");
     }
 }

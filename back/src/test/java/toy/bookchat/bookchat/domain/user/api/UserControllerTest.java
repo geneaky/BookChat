@@ -16,7 +16,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.KeyFactory;
@@ -29,7 +28,7 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +38,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
@@ -47,8 +45,10 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.Base64Utils;
 import toy.bookchat.bookchat.config.OpenIdTokenConfig;
 import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
+import toy.bookchat.bookchat.domain.user.ROLE;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.api.dto.UserProfileResponse;
+import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.domain.user.service.UserService;
 import toy.bookchat.bookchat.domain.user.service.dto.UserSignUpRequestDto;
 import toy.bookchat.bookchat.security.SecurityConfig;
@@ -57,12 +57,16 @@ import toy.bookchat.bookchat.security.openid.OpenIdTokenManager;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @WebMvcTest(controllers = UserController.class,
-    includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {SecurityConfig.class}))
+    includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {
+        SecurityConfig.class}))
 @AutoConfigureRestDocs
 public class UserControllerTest extends AuthenticationTestExtension {
 
     @MockBean
     UserService userService;
+
+    @MockBean
+    UserRepository userRepository;
 
     @SpyBean
     OpenIdTokenManager openIdTokenManager;
@@ -72,17 +76,15 @@ public class UserControllerTest extends AuthenticationTestExtension {
 
     @Autowired
     ObjectMapper objectMapper;
-
+    OpenIdTestUtil openIdTestUtil;
     @Autowired
     private MockMvc mockMvc;
-
-    OpenIdTestUtil openIdTestUtil;
 
     @BeforeEach
     public void init() throws FileNotFoundException {
         openIdTestUtil = new OpenIdTestUtil(
-                "src/test/java/toy/bookchat/bookchat/security/openid/token_key.pem",
-                "src/test/java/toy/bookchat/bookchat/security/openid/openidRSA256-public.pem");
+            "src/test/java/toy/bookchat/bookchat/security/openid/token_key.pem",
+            "src/test/java/toy/bookchat/bookchat/security/openid/openidRSA256-public.pem");
     }
 
     private UserPrincipal getUserPrincipal() {
@@ -91,7 +93,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
         );
         User user = User.builder()
             .email("test@gmail.com")
-            .name("testUser")
+            .name("testkakao")
             .profileImageUrl("somethingImageUrl@naver.com")
             .build();
 
@@ -102,19 +104,42 @@ public class UserControllerTest extends AuthenticationTestExtension {
     @Test
     public void 인증받지_않은_사용자_요청_401응답() throws Exception {
         mockMvc.perform(get("/v1/api/users/profile"))
-                .andExpect(status().isUnauthorized());
+            .andExpect(status().isBadRequest());
     }
 
     @Test
     public void 사용자_프로필_정보_반환() throws Exception {
+        PrivateKey privateKey = getPrivateKey();
+        PublicKey publicKey = getPublicKey();
+
+        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
+
+        String testToken = Jwts.builder()
+            .setSubject("test")
+            .setHeaderParam("kid", "abcedf")
+            .setIssuer(" https://kauth.kakao.com")
+            .signWith(SignatureAlgorithm.RS256, privateKey)
+            .compact();
+
         String real = objectMapper.writeValueAsString(UserProfileResponse.builder()
             .userEmail("test@gmail.com")
-            .userName("testUser")
+            .userName("testkakao")
             .userProfileImageUri("somethingImageUrl@naver.com")
             .build());
 
+        User user = User.builder()
+            .email("test@gmail.com")
+            .name("testkakao")
+            .role(ROLE.USER)
+            .profileImageUrl("somethingImageUrl@naver.com")
+            .build();
+
+        when(userRepository.findByName(any())).thenReturn(Optional.of(user));
+
         MvcResult mvcResult = mockMvc.perform(get("/v1/api/users/profile")
-                .with(user(getUserPrincipal())))
+                .with(user(getUserPrincipal()))
+                .header("Authorization", "Bearer " + testToken)
+                .header("provider_type", "kakao"))
             .andExpect(status().isOk())
             .andDo(document("user"))
             .andReturn();
@@ -172,28 +197,30 @@ public class UserControllerTest extends AuthenticationTestExtension {
     }
 
     private X509EncodedKeySpec getPublicPkcs8EncodedKeySpec(OpenIdTestUtil openIdTestUtil)
-            throws IOException {
+        throws IOException {
         String publicKey = openIdTestUtil.getPublicKey(9);
         byte[] decodePublicKey = Base64Utils.decode(publicKey.getBytes());
         return new X509EncodedKeySpec(decodePublicKey);
     }
 
     private PKCS8EncodedKeySpec getPrivatePkcs8EncodedKeySpec(OpenIdTestUtil openIdTestUtil)
-            throws IOException {
+        throws IOException {
         String privateKey = openIdTestUtil.getPrivateKey(28);
         byte[] decodePrivateKey = Base64Utils.decode(privateKey.getBytes());
         return new PKCS8EncodedKeySpec(
-                decodePrivateKey);
+            decodePrivateKey);
     }
 
-    private PublicKey getPublicKey() throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
+    private PublicKey getPublicKey()
+        throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         X509EncodedKeySpec publicKeySpec = getPublicPkcs8EncodedKeySpec(openIdTestUtil);
         PublicKey publicKey = keyFactory.generatePublic(publicKeySpec);
         return publicKey;
     }
 
-    private PrivateKey getPrivateKey() throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
+    private PrivateKey getPrivateKey()
+        throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         PKCS8EncodedKeySpec privateKeySpec = getPrivatePkcs8EncodedKeySpec(openIdTestUtil);
         PrivateKey privateKey = keyFactory.generatePrivate(privateKeySpec);
@@ -205,12 +232,14 @@ public class UserControllerTest extends AuthenticationTestExtension {
         PrivateKey privateKey = getPrivateKey();
         PublicKey publicKey = getPublicKey();
 
-        when(openIdTokenConfig.getPublicKey(any(),any())).thenReturn(publicKey);
+        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
 
         String testToken = Jwts.builder()
-                .setSubject("test")
-                .setExpiration(new Date(0))
-                .signWith(SignatureAlgorithm.RS256, privateKey).compact();
+            .setHeaderParam("kid", "abcdefg")
+            .setSubject("test")
+            .setIssuer(" https://kauth.kakao.com")
+            .setExpiration(new Date(0))
+            .signWith(SignatureAlgorithm.RS256, privateKey).compact();
 
         mockMvc.perform(post("/v1/api/users")
                 .header("Authorization", "Bearer " + testToken)
@@ -222,15 +251,20 @@ public class UserControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
+    public void openid의_길이가_완전하지않은경우_400응답() throws Exception {
+
+    }
+
+    @Test
     public void 사용자_회원가입_요청시_header_openid가_유효한경우_회원가입진행() throws Exception {
         PrivateKey privateKey = getPrivateKey();
         PublicKey publicKey = getPublicKey();
 
-        when(openIdTokenConfig.getPublicKey(any(),any())).thenReturn(publicKey);
+        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
 
         String testToken = Jwts.builder()
             .setSubject("test")
-            .setHeaderParam("kid","abcedf")
+            .setHeaderParam("kid", "abcedf")
             .setIssuer(" https://kauth.kakao.com")
             .signWith(SignatureAlgorithm.RS256, privateKey)
             .compact();
@@ -239,7 +273,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
                 .header("Authorization", "Bearer " + testToken)
                 .param("nickname", "nick")
                 .param("userEmail", "kaktus418@gmail.com")
-                .param("oauth2Provider", "google")
+                .param("oauth2Provider", "kakao")
                 .param("defaultProfileImageType", "1"))
             .andExpect(status().isOk())
             .andDo(document("user_sign_up", requestParameters(
