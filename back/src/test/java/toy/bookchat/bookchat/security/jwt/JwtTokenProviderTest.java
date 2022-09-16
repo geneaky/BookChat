@@ -15,6 +15,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.HashMap;
 import java.util.Map;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -29,6 +30,7 @@ import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.openid.OpenIdTestUtil;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
+@Disabled
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
 class JwtTokenProviderTest {
 
