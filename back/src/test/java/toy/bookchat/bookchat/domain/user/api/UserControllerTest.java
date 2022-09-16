@@ -245,7 +245,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
                 .header("Authorization", "Bearer " + testToken)
                 .param("nickname", "nick")
                 .param("userEmail", "kaktus418@gmail.com")
-                .param("oauth2Provider", "kakao")
+                .param("oauth2Provider", "KAKAO")
                 .param("defaultProfileImageType", "2"))
             .andExpect(status().isPreconditionFailed());
     }
@@ -273,8 +273,9 @@ public class UserControllerTest extends AuthenticationTestExtension {
                 .header("Authorization", "Bearer " + testToken)
                 .param("nickname", "nick")
                 .param("userEmail", "kaktus418@gmail.com")
-                .param("oauth2Provider", "kakao")
-                .param("defaultProfileImageType", "1"))
+                .param("oauth2Provider", "KAKAO")
+                .param("defaultProfileImageType", "1")
+                .param("readingTastes", "PHILOSOPHY", "DEVELOPMENT", "DESIGN"))
             .andExpect(status().isOk())
             .andDo(document("user_sign_up", requestParameters(
                 parameterWithName("nickname").description("닉네임"),

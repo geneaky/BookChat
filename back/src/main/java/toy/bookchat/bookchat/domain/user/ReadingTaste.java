@@ -1,9 +1,9 @@
 package toy.bookchat.bookchat.domain.user;
 
 public enum ReadingTaste {
-    Economy("경제"), Philosophy("철학"), History("역사"), Travel("여행"), Health("건상"), Hobby("취미"),
-    Humanities("인문"), Novel("소설"), Art("예술"), Design("디자인"), Development("개발"), Science("과학"),
-    Magazine("잡지"), Religion("종교"), Character("인물");
+    ECONOMY("경제"), PHILOSOPHY("철학"), HISTORY("역사"), TRAVEL("여행"), HEALTH("건상"), HOBBY("취미"),
+    HUMANITIES("인문"), NOVEL("소설"), ART("예술"), DESIGN("디자인"), DEVELOPMENT("개발"), SCIENCE("과학"),
+    MAGAZINE("잡지"), RELIGION("종교"), CHARACTER("인물");
 
     final private String readingTaste;
 
