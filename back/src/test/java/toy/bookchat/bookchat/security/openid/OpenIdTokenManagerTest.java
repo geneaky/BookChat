@@ -29,6 +29,8 @@ import org.springframework.util.Base64Utils;
 import toy.bookchat.bookchat.config.OpenIdTokenConfig;
 import toy.bookchat.bookchat.security.exception.DenidedTokenException;
 import toy.bookchat.bookchat.security.exception.ExpiredTokenException;
+import toy.bookchat.bookchat.security.exception.IllegalStandardTokenException;
+import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
 @ExtendWith(MockitoExtension.class)
 class OpenIdTokenManagerTest {
@@ -134,6 +136,30 @@ class OpenIdTokenManagerTest {
         assertThatThrownBy(() -> {
             openIdTokenManager.getOAuth2MemberNumberFromOpenIdToken(token,"kakao");
         }).isInstanceOf(DenidedTokenException.class);
+    }
+
+    @Test
+    public void 토큰_포맷_검증으로_header_payload_signature로_작성되었는지_확인() throws Exception {
+        PrivateKey privateKey = getPrivateKey();
+
+        String token = Jwts.builder()
+                .setHeaderParam(KEY_ID, "abcdedf")
+                .setSubject("test")
+                .signWith(SignatureAlgorithm.RS256, privateKey)
+                .compact();
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        String[] split = token.split("\\.");
+
+        stringBuilder.append(split[0]);
+        stringBuilder.append(".");
+        stringBuilder.append(split[2]);
+        stringBuilder.append(".");
+
+        assertThatThrownBy(() -> {
+            openIdTokenManager.getOAuth2MemberNumberFromOpenIdToken(stringBuilder.toString(), OAuth2Provider.KAKAO.getValue());
+        }).isInstanceOf(IllegalStandardTokenException.class);
     }
 
     private PublicKey getPublicKey() throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
