@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import toy.bookchat.bookchat.config.OpenIdTokenConfig;
 import toy.bookchat.bookchat.security.exception.DenidedTokenException;
 import toy.bookchat.bookchat.security.exception.ExpiredTokenException;
+import toy.bookchat.bookchat.security.exception.IllegalStandardTokenException;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
 @Slf4j
@@ -16,12 +17,18 @@ import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 @RequiredArgsConstructor
 public class OpenIdTokenManager {
 
+    /* TODO: 2022-09-16 토큰 검증 로직들 리팩토링 다시 해보기
+        openidtokenmanager는 usercontroller에서도 사용하기 때문에 예외 처리부분 좀 더 고려해보기
+     */
+
+    public static final int STANDARD_TOKEN_LENGTH = 3;
     private final OpenIdTokenConfig openIdTokenConfig;
 
     public String getOAuth2MemberNumberFromOpenIdToken(String openIdToken, String tokenProvider) {
         StringBuilder stringBuilder = new StringBuilder();
 
         try {
+            divideTokenIntoParts(openIdToken);
             extractProviderMemberNumberFromOpenIdToken(tokenProvider, openIdToken, stringBuilder);
         } catch (ExpiredJwtException exception) {
             log.info("Token :: {} :: is expired", openIdToken);
@@ -57,12 +64,12 @@ public class OpenIdTokenManager {
     }
 
     private StringBuilder getUnsignedTokenBuilder(String openIdToken) {
-        String[] splitToken = openIdToken.split("\\.");
+        String[] tokenParts = divideTokenIntoParts(openIdToken);
 
         StringBuilder unsignedTokenBuilder = new StringBuilder();
-        unsignedTokenBuilder.append(splitToken[0]);
+        unsignedTokenBuilder.append(tokenParts[0]);
         unsignedTokenBuilder.append(".");
-        unsignedTokenBuilder.append(splitToken[1]);
+        unsignedTokenBuilder.append(tokenParts[1]);
         unsignedTokenBuilder.append(".");
 
         return unsignedTokenBuilder;
@@ -79,5 +86,13 @@ public class OpenIdTokenManager {
         } else {
             throw new DenidedTokenException("Not AllowedFormat Token Exception");
         }
+    }
+
+    private String[] divideTokenIntoParts(String openIdToken) {
+        String[] splitToken = openIdToken.split("\\.");
+        if(splitToken.length != STANDARD_TOKEN_LENGTH) {
+            throw new IllegalStandardTokenException("Illegal Standard Token Format");
+        }
+        return splitToken;
     }
 }
