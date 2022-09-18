@@ -10,23 +10,39 @@ import static org.springframework.restdocs.request.RequestDocumentation.requestP
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static toy.bookchat.bookchat.domain.user.ROLE.USER;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.util.Base64Utils;
+import toy.bookchat.bookchat.config.OpenIdTokenConfig;
 import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
 import toy.bookchat.bookchat.domain.book.dto.BookDto;
 import toy.bookchat.bookchat.domain.book.dto.BookSearchRequestDto;
@@ -35,21 +51,71 @@ import toy.bookchat.bookchat.domain.book.dto.Meta;
 import toy.bookchat.bookchat.domain.book.exception.BookNotFoundException;
 import toy.bookchat.bookchat.domain.book.service.BookSearchService;
 import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.repository.UserRepository;
+import toy.bookchat.bookchat.security.SecurityConfig;
+import toy.bookchat.bookchat.security.openid.OpenIdTestUtil;
+import toy.bookchat.bookchat.security.openid.OpenIdTokenManager;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @WebMvcTest(controllers = BookController.class,
-    includeFilters = @ComponentScan.Filter(classes = {EnableWebSecurity.class}))
+    includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {
+        SecurityConfig.class}))
 @AutoConfigureRestDocs
 public class BookControllerTest extends AuthenticationTestExtension {
 
+
+    @MockBean
+    OpenIdTokenManager openIdTokenManager;
+
+    @MockBean
+    OpenIdTokenConfig openIdTokenConfig;
     @MockBean
     BookSearchService bookSearchService;
-
+    @MockBean
+    UserRepository userRepository;
     @Autowired
     ObjectMapper objectMapper;
-
+    OpenIdTestUtil openIdTestUtil;
     @Autowired
     private MockMvc mockMvc;
+
+    @BeforeEach
+    public void init() throws FileNotFoundException {
+        openIdTestUtil = new OpenIdTestUtil(
+            "src/test/java/toy/bookchat/bookchat/security/openid/token_key.pem",
+            "src/test/java/toy/bookchat/bookchat/security/openid/openidRSA256-public.pem");
+    }
+
+    private X509EncodedKeySpec getPublicPkcs8EncodedKeySpec(OpenIdTestUtil openIdTestUtil)
+        throws IOException {
+        String publicKey = openIdTestUtil.getPublicKey(9);
+        byte[] decodePublicKey = Base64Utils.decode(publicKey.getBytes());
+        return new X509EncodedKeySpec(decodePublicKey);
+    }
+
+    private PKCS8EncodedKeySpec getPrivatePkcs8EncodedKeySpec(OpenIdTestUtil openIdTestUtil)
+        throws IOException {
+        String privateKey = openIdTestUtil.getPrivateKey(28);
+        byte[] decodePrivateKey = Base64Utils.decode(privateKey.getBytes());
+        return new PKCS8EncodedKeySpec(
+            decodePrivateKey);
+    }
+
+    private PublicKey getPublicKey()
+        throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        X509EncodedKeySpec publicKeySpec = getPublicPkcs8EncodedKeySpec(openIdTestUtil);
+        PublicKey publicKey = keyFactory.generatePublic(publicKeySpec);
+        return publicKey;
+    }
+
+    private PrivateKey getPrivateKey()
+        throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        PKCS8EncodedKeySpec privateKeySpec = getPrivatePkcs8EncodedKeySpec(openIdTestUtil);
+        PrivateKey privateKey = keyFactory.generatePrivate(privateKeySpec);
+        return privateKey;
+    }
 
     private UserPrincipal getUserPrincipal() {
         List<GrantedAuthority> authorities = Collections.singletonList(
@@ -58,12 +124,23 @@ public class BookControllerTest extends AuthenticationTestExtension {
 
         User user = User.builder()
             .email("test@gmail.com")
-            .name("testUser")
+            .name("testKakao")
+            .role(USER)
             .profileImageUrl("somethingImageUrl@naver.com")
             .build();
 
-        return new UserPrincipal(1L, user.getEmail(), user.getName(), user.getProfileImageUrl(), authorities, user);
+        return new UserPrincipal(1L, user.getEmail(), user.getName(), user.getProfileImageUrl(),
+            authorities, user);
 
+    }
+
+    private User getUser() {
+        return User.builder()
+            .email("test@gmail.com")
+            .role(USER)
+            .name("testUser")
+            .profileImageUrl("somethingImageUrl@naver.com")
+            .build();
     }
 
     private BookDto getBookDto(String isbn, String title, List<String> author) {
@@ -86,18 +163,32 @@ public class BookControllerTest extends AuthenticationTestExtension {
 
     @Test
     public void 사용자가_isbn으로_책_검색_요청시_성공() throws Exception {
+        PrivateKey privateKey = getPrivateKey();
+        PublicKey publicKey = getPublicKey();
+
+        String testToken = Jwts.builder()
+            .setSubject("test")
+            .setHeaderParam("kid", "abcedf")
+            .setIssuer(" https://kauth.kakao.com")
+            .signWith(SignatureAlgorithm.RS256, privateKey)
+            .compact();
+
         List<BookDto> bookDtos = new ArrayList<>();
         bookDtos.add(getBookDto("213123", "effectiveJava", List.of("Joshua")));
         BookSearchResponseDto bookSearchResponseDto = BookSearchResponseDto.builder()
             .bookDtos(bookDtos)
             .build();
 
+        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
+        when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
         when(bookSearchService.searchByIsbn(any(BookSearchRequestDto.class))).thenReturn(
             bookSearchResponseDto);
 
         String result = objectMapper.writeValueAsString(bookSearchResponseDto);
 
         MvcResult mvcResult = mockMvc.perform(RestDocumentationRequestBuilders.get("/v1/api/books")
+                .header("Authorization", "Bearer " + testToken)
+                .header("provider_type", "kakao")
                 .param("isbn", "1231513")
                 .with(user(getUserPrincipal())))
             .andExpect(status().isOk())

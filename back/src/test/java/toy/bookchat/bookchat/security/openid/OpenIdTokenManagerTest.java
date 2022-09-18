@@ -18,7 +18,6 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Date;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,8 +43,8 @@ class OpenIdTokenManagerTest {
     public void init() throws FileNotFoundException {
         //openssl pkcs8 -topk8 -inform PEM -in private_key.pem -out token_key.pem -nocrypt 생성
         openIdTestUtil = new OpenIdTestUtil(
-                "src/test/java/toy/bookchat/bookchat/security/openid/token_key.pem",
-                "src/test/java/toy/bookchat/bookchat/security/openid/openidRSA256-public.pem");
+            "src/test/java/toy/bookchat/bookchat/security/openid/token_key.pem",
+            "src/test/java/toy/bookchat/bookchat/security/openid/openidRSA256-public.pem");
     }
 
     private X509EncodedKeySpec getPublicPkcs8EncodedKeySpec(OpenIdTestUtil openIdTestUtil)
@@ -70,9 +69,10 @@ class OpenIdTokenManagerTest {
 
         String token = getMockOpenIdToken(privateKey);
 
-        when(openIdTokenConfig.getPublicKey(any(),any())).thenReturn(publicKey);
+        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
 
-        assertThat(openIdTokenManager.getOAuth2MemberNumberFromOpenIdToken(token,"kakao")).isEqualTo(
+        assertThat(
+            openIdTokenManager.getOAuth2MemberNumberFromOpenIdToken(token, "kakao")).isEqualTo(
             "1234kakao");
     }
 
@@ -111,10 +111,10 @@ class OpenIdTokenManagerTest {
 
         String token = getMockOpenIdToken(privateKey);
 
-        when(openIdTokenConfig.getPublicKey(any(),any())).thenReturn(publicKey);
+        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
 
         assertThatThrownBy(() -> {
-            openIdTokenManager.getOAuth2MemberNumberFromOpenIdToken(token + "test","kakao");
+            openIdTokenManager.getOAuth2MemberNumberFromOpenIdToken(token + "test", "kakao");
         }).isInstanceOf(DenidedTokenException.class);
     }
 
@@ -132,17 +132,21 @@ class OpenIdTokenManagerTest {
         when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
 
         assertThatThrownBy(() -> {
-            openIdTokenManager.getOAuth2MemberNumberFromOpenIdToken(token,"kakao");
+            openIdTokenManager.getOAuth2MemberNumberFromOpenIdToken(token, "kakao");
         }).isInstanceOf(DenidedTokenException.class);
     }
 
-    private PublicKey getPublicKey() throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
+    // TODO: 2022/09/16 token길이 테스트 3part가 있어야함 header payload signature
+
+    private PublicKey getPublicKey()
+        throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         X509EncodedKeySpec publicKeySpec = getPublicPkcs8EncodedKeySpec(openIdTestUtil);
         return keyFactory.generatePublic(publicKeySpec);
     }
 
-    private PrivateKey getPrivateKey() throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
+    private PrivateKey getPrivateKey()
+        throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         PKCS8EncodedKeySpec privateKeySpec = getPrivatePkcs8EncodedKeySpec(openIdTestUtil);
         return keyFactory.generatePrivate(privateKeySpec);

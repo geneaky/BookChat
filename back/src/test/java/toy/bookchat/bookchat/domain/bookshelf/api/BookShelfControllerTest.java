@@ -25,14 +25,13 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
+import toy.bookchat.bookchat.config.OpenIdTokenConfig;
 import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.Star;
@@ -40,18 +39,28 @@ import toy.bookchat.bookchat.domain.bookshelf.service.BookShelfService;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfRequestDto;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfSearchResponseDto;
 import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.repository.UserRepository;
+import toy.bookchat.bookchat.security.SecurityConfig;
+import toy.bookchat.bookchat.security.openid.OpenIdTokenManager;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @WebMvcTest(controllers = BookShelfController.class,
-    includeFilters = @ComponentScan.Filter(classes = {EnableWebSecurity.class}))
+    includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {
+        SecurityConfig.class}))
 @AutoConfigureRestDocs
 public class BookShelfControllerTest extends AuthenticationTestExtension {
 
     @Autowired
     ObjectMapper objectMapper;
-
+    @MockBean
+    OpenIdTokenManager openIdTokenManager;
+    @MockBean
+    OpenIdTokenConfig openIdTokenConfig;
+    @MockBean
+    UserRepository userRepository;
     @MockBean
     BookShelfService bookShelfService;
+
 
     @Autowired
     private MockMvc mockMvc;
@@ -66,7 +75,8 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
             .profileImageUrl("somethingImageUrl@naver.com")
             .build();
 
-        return new UserPrincipal(1L, user.getEmail(), user.getName(), user.getProfileImageUrl(), authorities, user);
+        return new UserPrincipal(1L, user.getEmail(), user.getName(), user.getProfileImageUrl(),
+            authorities, user);
     }
 
     private BookShelfRequestDto getBookShelfRequestDto(ReadingStatus readingStatus) {
