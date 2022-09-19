@@ -1,28 +1,29 @@
 package toy.bookchat.bookchat.domain.user.api;
 
-import static toy.bookchat.bookchat.utils.constants.AuthConstants.AUTHORIZATION;
-import static toy.bookchat.bookchat.utils.constants.AuthConstants.BEARER;
-import static toy.bookchat.bookchat.utils.constants.AuthConstants.BEGIN_INDEX;
-
 import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 import toy.bookchat.bookchat.domain.user.api.dto.UserProfileResponse;
 import toy.bookchat.bookchat.domain.user.service.UserService;
 import toy.bookchat.bookchat.domain.user.service.dto.UserSignUpRequestDto;
+import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.openid.OpenIdTokenManager;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
+import static toy.bookchat.bookchat.utils.constants.AuthConstants.*;
+
+@Validated
 @RestController
 @RequestMapping("/v1/api")
 @RequiredArgsConstructor
@@ -56,28 +57,20 @@ public class UserController {
     @PostMapping("/users")
     public ResponseEntity<Void> userSignUp(
         @Valid @ModelAttribute UserSignUpRequestDto userSignUpRequestDto,
-        HttpServletRequest request) {
-
-        if (isNotValidatedRequest(request)) {
-            return ResponseEntity.badRequest().body(null);
-        }
+        @RequestHeader(AUTHORIZATION) @NotBlank @Pattern(regexp = "^(Bearer)\\s.+") String bearerToken,
+        @RequestHeader(PROVIDER_TYPE) @NotNull OAuth2Provider oAuth2Provider) {
 
         String oauth2MemberNumber = openIdTokenManager.getOAuth2MemberNumberFromOpenIdToken(
-            getOpenIdToken(request), userSignUpRequestDto.getOAuth2Provider().getValue());
+            getOpenIdToken(bearerToken), oAuth2Provider);
 
-        userService.registerNewUser(userSignUpRequestDto, oauth2MemberNumber);
+        String userEmail = openIdTokenManager.getUserEmailFromOpenIdToken(getOpenIdToken(bearerToken), oAuth2Provider);
+
+        userService.registerNewUser(userSignUpRequestDto, oauth2MemberNumber, userEmail, oAuth2Provider);
 
         return ResponseEntity.ok(null);
     }
 
-    private String getOpenIdToken(HttpServletRequest request) {
-        return request.getHeader(AUTHORIZATION).substring(BEGIN_INDEX);
+    private String getOpenIdToken(String bearerToken) {
+        return bearerToken.substring(BEGIN_INDEX);
     }
-
-    public boolean isNotValidatedRequest(HttpServletRequest request) {
-        Optional<String> authorization = Optional.ofNullable(request.getHeader(AUTHORIZATION));
-        return authorization.isEmpty() || !authorization.get().startsWith(BEARER)
-            || !StringUtils.hasText(authorization.get().substring(BEGIN_INDEX));
-    }
-
 }

@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
+import static toy.bookchat.bookchat.security.oauth.OAuth2Provider.KAKAO;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +17,7 @@ import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.exception.UserAlreadySignUpException;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.domain.user.service.dto.UserSignUpRequestDto;
+import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
 import java.util.Optional;
 
@@ -49,8 +51,8 @@ class UserServiceTest {
         UserSignUpRequestDto userSignUpRequestDto = mock(UserSignUpRequestDto.class);
         User mockUser = mock(User.class);
         when(userSignUpRequestDto.hasValidImage()).thenReturn(true);
-        when(userSignUpRequestDto.getUser(any(),any())).thenReturn(mockUser);
-        userService.registerNewUser(userSignUpRequestDto, "memberNumber");
+        when(userSignUpRequestDto.getUser(any(), any(), any(), any())).thenReturn(mockUser);
+        userService.registerNewUser(userSignUpRequestDto, "memberNumber","test@gmail.com", KAKAO);
 
         verify(userRepository).save(any(User.class));
         verify(storageService).upload(any(), any());
@@ -60,9 +62,9 @@ class UserServiceTest {
     public void 이미_가입된_사용자일경우_예외발생() throws Exception {
         UserSignUpRequestDto userSignUpRequestDto = mock(UserSignUpRequestDto.class);
         User mockUser = mock(User.class);
-        when(userRepository.findByEmailAndProvider(any(),any())).thenReturn(Optional.of(mockUser));
+        when(userRepository.findByName(any())).thenReturn(Optional.of(mockUser));
         assertThatThrownBy(() -> {
-            userService.registerNewUser(userSignUpRequestDto, "testMemberNumber");
+            userService.registerNewUser(userSignUpRequestDto, "testMemberNumber","test@gmail.com", KAKAO);
         }).isInstanceOf(UserAlreadySignUpException.class);
     }
 }

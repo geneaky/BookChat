@@ -32,9 +32,6 @@ public class UserSignUpRequestDto {
     String nickname;
     // TODO: 2022/09/16 userEmail, oauth2Provider는 openidtoken이랑
     //  request header에 넣어주기로 했었는데 생각해보니 그럼 여기서는 지워도되네
-    @Email
-    String userEmail;
-    OAuth2Provider oauth2Provider;
     MultipartFile userProfileImage;
     List<ReadingTaste> readingTastes;
     @NotNull
@@ -54,13 +51,10 @@ public class UserSignUpRequestDto {
         return false;
     }
 
-    public User getUser(String oauth2MemberNumber, String profileImageUrl) {
-        return new User(oauth2MemberNumber, this.getUserEmail(), profileImageUrl, ROLE.USER,
-            this.getOAuth2Provider(), this.getNickname(), this.getReadingTastes(),
+    public User getUser(String oauth2MemberNumber, String email, String profileImageUrl, OAuth2Provider providerType) {
+        return new User(oauth2MemberNumber, email, profileImageUrl, ROLE.USER,
+            providerType, this.getNickname(), this.getReadingTastes(),
             this.getDefaultProfileImageType());
     }
 
-    public OAuth2Provider getOAuth2Provider() {
-        return this.oauth2Provider;
-    }
 }

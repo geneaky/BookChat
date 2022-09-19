@@ -5,6 +5,8 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
@@ -25,10 +27,8 @@ import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +52,7 @@ import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.domain.user.service.UserService;
 import toy.bookchat.bookchat.domain.user.service.dto.UserSignUpRequestDto;
 import toy.bookchat.bookchat.security.SecurityConfig;
+import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.openid.OpenIdTestUtil;
 import toy.bookchat.bookchat.security.openid.OpenIdTokenManager;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
@@ -176,12 +177,11 @@ public class UserControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void 사용자_회원가입_요청시_header_openid없는_인증정보_400반환() throws Exception {
+    public void     사용자_회원가입_요청시_header_openid없는_인증정보_400반환() throws Exception {
         mockMvc.perform(post("/v1/api/users")
                 .header("Authorization", "Bearer ")
+                .header("provider_type", "KAKAO")
                 .param("nickname", "nick")
-                .param("userEmail", "kaktus418@gmail.com")
-                .param("oauth2Provider", "google")
                 .param("defaultProfileImageType", "2"))
             .andExpect(status().isBadRequest());
     }
@@ -233,9 +233,8 @@ public class UserControllerTest extends AuthenticationTestExtension {
 
         mockMvc.perform(post("/v1/api/users")
                 .header("Authorization", "Bearer " + testToken)
+                        .header("provider_type", "KAKAO")
                 .param("nickname", "nick")
-                .param("userEmail", "kaktus418@gmail.com")
-                .param("oauth2Provider", "KAKAO")
                 .param("defaultProfileImageType", "2"))
             .andExpect(status().isPreconditionFailed());
     }
@@ -247,31 +246,67 @@ public class UserControllerTest extends AuthenticationTestExtension {
 
         when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
 
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("email", "test@gmail.com");
+        claims.put("iss", "https://kauth.kakao.com");
+
         String testToken = Jwts.builder()
             .setSubject("test")
             .setHeaderParam("kid", "abcedf")
-            .setIssuer(" https://kauth.kakao.com")
+            .setClaims(claims)
             .signWith(SignatureAlgorithm.RS256, privateKey)
             .compact();
 
         mockMvc.perform(post("/v1/api/users")
                 .header("Authorization", "Bearer " + testToken)
+                .header("provider_type", "KAKAO")
                 .param("nickname", "nick")
-                .param("userEmail", "kaktus418@gmail.com")
-                .param("oauth2Provider", "KAKAO")
                 .param("defaultProfileImageType", "1")
                 .param("readingTastes", "PHILOSOPHY", "DEVELOPMENT", "DESIGN"))
             .andExpect(status().isOk())
-            .andDo(document("user_sign_up", requestParameters(
+            .andDo(document("user_sign_up", requestHeaders(
+                    headerWithName("Authorization").description("Bearer [openid token]"),
+                    headerWithName("provider_type").description("프로바이더 타입 [KAKAO / GOOGLE]")
+                    ),
+                    requestParameters(
                 parameterWithName("nickname").description("닉네임"),
-                parameterWithName("userEmail").description("이메일"),
-                parameterWithName("oauth2Provider").description("원천 제공자"),
                 parameterWithName("defaultProfileImageType").description("기본 이미지 타입"),
                 parameterWithName("userProfileImage").optional().description("프로필 이미지"),
                 parameterWithName("readingTastes").optional().description("독서 취향")
             )));
 
-        verify(userService).registerNewUser(any(UserSignUpRequestDto.class), anyString());
+        verify(userService).registerNewUser(any(UserSignUpRequestDto.class), anyString(), anyString(), any(OAuth2Provider.class));
+    }
+
+    @Test
+    public void 토큰형식_정규표현식_확인() throws Exception {
+        PrivateKey privateKey = getPrivateKey();
+
+        String testToken = Jwts.builder().setSubject("test")
+                .signWith(SignatureAlgorithm.RS256, privateKey).compact();
+
+        String A = "Tearer " + testToken;
+
+        String B = "Bearer " + testToken;
+
+        assertThat(A.matches("^(Bearer)\\s.+")).isFalse();
+        assertThat(B.matches("^(Bearer)\\s.+")).isTrue();
+
+    }
+
+    @Test
+    public void 사용자_회원가입_요청시_올바르지않은_토큰_요청규격_예외처리() throws Exception {
+        PrivateKey privateKey = getPrivateKey();
+
+        String testToken = Jwts.builder().setSubject("test")
+                .signWith(SignatureAlgorithm.RS256, privateKey).compact();
+
+        mockMvc.perform(post("/v1/api/users")
+                        .header("Authorization", "Tearer" + testToken)
+                        .header("provider_type", "KAKAO")
+                        .param("defaultProfileImageType", "1")
+                        .param("nickname", "testName"))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
