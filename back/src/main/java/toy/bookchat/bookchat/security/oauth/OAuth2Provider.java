@@ -12,7 +12,7 @@ public enum OAuth2Provider {
 
     public static OAuth2Provider from(String provider) {
         for (OAuth2Provider oAuth2Provider : OAuth2Provider.values()) {
-            if (oAuth2Provider.getValue().equals(provider)) {
+            if (oAuth2Provider.name().equals(provider)) {
                 return oAuth2Provider;
             }
         }

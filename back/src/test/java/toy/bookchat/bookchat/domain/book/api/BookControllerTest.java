@@ -188,7 +188,7 @@ public class BookControllerTest extends AuthenticationTestExtension {
 
         MvcResult mvcResult = mockMvc.perform(RestDocumentationRequestBuilders.get("/v1/api/books")
                 .header("Authorization", "Bearer " + testToken)
-                .header("provider_type", "kakao")
+                .header("provider_type", "KAKAO")
                 .param("isbn", "1231513")
                 .with(user(getUserPrincipal())))
             .andExpect(status().isOk())
@@ -203,7 +203,22 @@ public class BookControllerTest extends AuthenticationTestExtension {
 
     @Test
     public void 사용자가_잘못된_isbn으로_책_검색_요청시_실패() throws Exception {
+        PrivateKey privateKey = getPrivateKey();
+        PublicKey publicKey = getPublicKey();
+
+        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
+        when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
+
+        String testToken = Jwts.builder()
+            .setSubject("test")
+            .setHeaderParam("kid", "abcedf")
+            .setIssuer(" https://kauth.kakao.com")
+            .signWith(SignatureAlgorithm.RS256, privateKey)
+            .compact();
+
         mockMvc.perform(get("/v1/api/books")
+                .header("Authorization", "Bearer " + testToken)
+                .header("provider_type", "KAKAO")
                 .param("isbn", "")
                 .with(user(getUserPrincipal())))
             .andExpect(status().isBadRequest());
@@ -211,10 +226,24 @@ public class BookControllerTest extends AuthenticationTestExtension {
 
     @Test
     public void 외부api_isbn_검색_요청_실패시_404() throws Exception {
+        PrivateKey privateKey = getPrivateKey();
+        PublicKey publicKey = getPublicKey();
+
+        String testToken = Jwts.builder()
+            .setSubject("test")
+            .setHeaderParam("kid", "abcedf")
+            .setIssuer(" https://kauth.kakao.com")
+            .signWith(SignatureAlgorithm.RS256, privateKey)
+            .compact();
+
+        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
         when(bookSearchService.searchByIsbn(any(BookSearchRequestDto.class))).thenThrow(
             BookNotFoundException.class);
+        when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
 
         mockMvc.perform(get("/v1/api/books")
+                .header("Authorization", "Bearer " + testToken)
+                .header("provider_type", "KAKAO")
                 .param("isbn", "123456")
                 .with(user(getUserPrincipal())))
             .andExpect(status().isNotFound());
@@ -222,6 +251,16 @@ public class BookControllerTest extends AuthenticationTestExtension {
 
     @Test
     public void 사용자가_도서명_검색_요청시_성공() throws Exception {
+        PrivateKey privateKey = getPrivateKey();
+        PublicKey publicKey = getPublicKey();
+
+        String testToken = Jwts.builder()
+            .setSubject("test")
+            .setHeaderParam("kid", "abcedf")
+            .setIssuer(" https://kauth.kakao.com")
+            .signWith(SignatureAlgorithm.RS256, privateKey)
+            .compact();
+
         List<BookDto> bookDtos = new ArrayList<>();
         bookDtos.add(getBookDto("213123", "effectiveJava", List.of("Joshua")));
 
@@ -231,10 +270,14 @@ public class BookControllerTest extends AuthenticationTestExtension {
 
         when(bookSearchService.searchByTitle(any(BookSearchRequestDto.class))).thenReturn(
             bookSearchResponseDto);
+        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
+        when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
 
         String result = objectMapper.writeValueAsString(bookSearchResponseDto);
 
         MvcResult mvcResult = mockMvc.perform(get("/v1/api/books")
+                .header("Authorization", "Bearer " + testToken)
+                .header("provider_type", "KAKAO")
                 .param("title", "effectiveJava")
                 .with(user(getUserPrincipal())))
             .andExpect(status().isOk())
@@ -248,7 +291,22 @@ public class BookControllerTest extends AuthenticationTestExtension {
 
     @Test
     public void 사용자가_빈_도서명_검색_요청시_실패() throws Exception {
+        PrivateKey privateKey = getPrivateKey();
+        PublicKey publicKey = getPublicKey();
+
+        String testToken = Jwts.builder()
+            .setSubject("test")
+            .setHeaderParam("kid", "abcedf")
+            .setIssuer(" https://kauth.kakao.com")
+            .signWith(SignatureAlgorithm.RS256, privateKey)
+            .compact();
+
+        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
+        when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
+
         mockMvc.perform(get("/v1/api/books")
+                .header("Authorization", "Bearer " + testToken)
+                .header("provider_type", "KAKAO")
                 .param("title", "")
                 .with(user(getUserPrincipal())))
             .andExpect(status().isBadRequest());
