@@ -140,7 +140,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
         MvcResult mvcResult = mockMvc.perform(get("/v1/api/users/profile")
                 .with(user(getUserPrincipal()))
                 .header("Authorization", "Bearer " + testToken)
-                .header("provider_type", "kakao"))
+                .header("provider_type", "KAKAO"))
             .andExpect(status().isOk())
             .andDo(document("user"))
             .andReturn();
