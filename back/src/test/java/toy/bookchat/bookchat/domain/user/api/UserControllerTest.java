@@ -167,16 +167,6 @@ public class UserControllerTest extends AuthenticationTestExtension {
     @Test
     public void 사용자_회원가입_요청시_header_인증정보_없을시_400반환() throws Exception {
         mockMvc.perform(post("/v1/api/users")
-                .param("nickname", "nick")
-                .param("userEmail", "kaktus418@gmail.com")
-                .param("oauth2Provider", "kakao")
-                .param("defaultProfileImageType", "2"))
-            .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    public void 사용자_회원가입_요청시_header_유효하지않은_인증정보_400반환() throws Exception {
-        mockMvc.perform(post("/v1/api/users")
                 .header("Authorization", " ")
                 .param("nickname", "nick")
                 .param("userEmail", "kaktus418@gmail.com")
@@ -248,11 +238,6 @@ public class UserControllerTest extends AuthenticationTestExtension {
                 .param("oauth2Provider", "KAKAO")
                 .param("defaultProfileImageType", "2"))
             .andExpect(status().isPreconditionFailed());
-    }
-
-    @Test
-    public void openid의_길이가_완전하지않은경우_400응답() throws Exception {
-
     }
 
     @Test
