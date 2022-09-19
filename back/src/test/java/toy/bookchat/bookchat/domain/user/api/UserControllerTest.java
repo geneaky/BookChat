@@ -104,7 +104,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
     @Test
     public void 인증받지_않은_사용자_요청_401응답() throws Exception {
         mockMvc.perform(get("/v1/api/users/profile"))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isUnauthorized());
     }
 
     @Test
