@@ -24,6 +24,8 @@ import toy.bookchat.bookchat.security.exception.DenidedTokenException;
 import toy.bookchat.bookchat.security.exception.NotVerifiedRequestFormatException;
 import toy.bookchat.bookchat.security.ipblock.IpBlockManager;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
+import toy.bookchat.bookchat.security.token.openid.OpenIdAuthenticationFilter;
+import toy.bookchat.bookchat.security.token.openid.OpenIdTokenManager;
 
 @ExtendWith(MockitoExtension.class)
 class OpenIdAuthenticationFilterTest {

@@ -3,7 +3,7 @@ package toy.bookchat.bookchat.security.jwt;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static toy.bookchat.bookchat.security.jwt.JwtTokenProvider.KAKAO_ACCOUNT;
+import static toy.bookchat.bookchat.security.token.jwt.JwtTokenProvider.KAKAO_ACCOUNT;
 
 import java.io.IOException;
 import java.security.KeyFactory;
@@ -28,6 +28,8 @@ import toy.bookchat.bookchat.config.JwtTokenConfig;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.openid.OpenIdTestUtil;
+import toy.bookchat.bookchat.security.token.jwt.JwtTokenProvider;
+import toy.bookchat.bookchat.security.token.jwt.JwtTokenValidationCode;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @Disabled

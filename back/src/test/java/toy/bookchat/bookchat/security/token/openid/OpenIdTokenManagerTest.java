@@ -30,6 +30,7 @@ import toy.bookchat.bookchat.security.exception.DenidedTokenException;
 import toy.bookchat.bookchat.security.exception.ExpiredTokenException;
 import toy.bookchat.bookchat.security.exception.IllegalStandardTokenException;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
+import toy.bookchat.bookchat.security.token.openid.OpenIdTokenManager;
 
 @ExtendWith(MockitoExtension.class)
 class OpenIdTokenManagerTest {
@@ -74,7 +75,7 @@ class OpenIdTokenManagerTest {
         when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
 
         assertThat(
-            openIdTokenManager.getOAuth2MemberNumberFromOpenIdToken(token, OAuth2Provider.KAKAO)).isEqualTo(
+            openIdTokenManager.getOAuth2MemberNumberFromToken(token, OAuth2Provider.KAKAO)).isEqualTo(
             "1234kakao");
     }
 
@@ -102,7 +103,7 @@ class OpenIdTokenManagerTest {
             .compact();
 
         assertThatThrownBy(() -> {
-            openIdTokenManager.getOAuth2MemberNumberFromOpenIdToken(token, OAuth2Provider.KAKAO);
+            openIdTokenManager.getOAuth2MemberNumberFromToken(token, OAuth2Provider.KAKAO);
         }).isInstanceOf(ExpiredTokenException.class);
     }
 
@@ -116,7 +117,7 @@ class OpenIdTokenManagerTest {
         when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
 
         assertThatThrownBy(() -> {
-            openIdTokenManager.getOAuth2MemberNumberFromOpenIdToken(token + "test", OAuth2Provider.KAKAO);
+            openIdTokenManager.getOAuth2MemberNumberFromToken(token + "test", OAuth2Provider.KAKAO);
         }).isInstanceOf(DenidedTokenException.class);
     }
 
@@ -134,7 +135,7 @@ class OpenIdTokenManagerTest {
         when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
 
         assertThatThrownBy(() -> {
-            openIdTokenManager.getOAuth2MemberNumberFromOpenIdToken(token, OAuth2Provider.KAKAO);
+            openIdTokenManager.getOAuth2MemberNumberFromToken(token, OAuth2Provider.KAKAO);
         }).isInstanceOf(DenidedTokenException.class);
     }
 
@@ -158,7 +159,7 @@ class OpenIdTokenManagerTest {
         stringBuilder.append(".");
 
         assertThatThrownBy(() -> {
-            openIdTokenManager.getOAuth2MemberNumberFromOpenIdToken(stringBuilder.toString(),
+            openIdTokenManager.getOAuth2MemberNumberFromToken(stringBuilder.toString(),
                 OAuth2Provider.KAKAO);
         }).isInstanceOf(IllegalStandardTokenException.class);
     }
