@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
@@ -36,7 +38,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
@@ -188,13 +189,16 @@ public class BookControllerTest extends AuthenticationTestExtension {
 
         String result = objectMapper.writeValueAsString(bookSearchResponseDto);
 
-        MvcResult mvcResult = mockMvc.perform(RestDocumentationRequestBuilders.get("/v1/api/books")
+        MvcResult mvcResult = mockMvc.perform(get("/v1/api/books")
                 .header("Authorization", "Bearer " + getTestToken())
                 .header("provider_type", "KAKAO")
                 .param("isbn", "1231513")
                 .with(user(getUserPrincipal())))
             .andExpect(status().isOk())
             .andDo(document("book-search-isbn",
+                requestHeaders(
+                        headerWithName("Authorization").description("Bearer [openid token]"),
+                        headerWithName("provider_type").description("프로바이더 타입 [KAKAO / GOOGLE]")),
                 requestParameters(parameterWithName("isbn").description("isbn  번호"))
             ))
             .andReturn();
@@ -254,6 +258,9 @@ public class BookControllerTest extends AuthenticationTestExtension {
                 .with(user(getUserPrincipal())))
             .andExpect(status().isOk())
             .andDo(document("book-search-title",
+                requestHeaders(
+                        headerWithName("Authorization").description("Bearer [openid token]"),
+                        headerWithName("provider_type").description("프로바이더 타입 [KAKAO / GOOGLE]")),
                 requestParameters(parameterWithName("title").description("도서 제목"))))
             .andReturn();
 
@@ -312,6 +319,9 @@ public class BookControllerTest extends AuthenticationTestExtension {
                 .with(user(getUserPrincipal())))
             .andExpect(status().isOk())
             .andDo(document("book-search-author",
+                requestHeaders(
+                        headerWithName("Authorization").description("Bearer [openid token]"),
+                        headerWithName("provider_type").description("프로바이더 타입 [KAKAO / GOOGLE]")),
                 requestParameters(parameterWithName("author").description("작가"))))
             .andReturn();
 
@@ -371,7 +381,7 @@ public class BookControllerTest extends AuthenticationTestExtension {
 
         String result = objectMapper.writeValueAsString(bookSearchResponseDto);
 
-        MvcResult mvcResult = mockMvc.perform(RestDocumentationRequestBuilders.get("/v1/api/books")
+        MvcResult mvcResult = mockMvc.perform(get("/v1/api/books")
                 .header("Authorization", "Bearer " + getTestToken())
                 .header("provider_type", "KAKAO")
                 .param("isbn", "1231513")
@@ -381,6 +391,9 @@ public class BookControllerTest extends AuthenticationTestExtension {
                 .with(user(getUserPrincipal())))
             .andExpect(status().isOk())
             .andDo(document("book-search-isbn-paging",
+                requestHeaders(
+                    headerWithName("Authorization").description("Bearer [openid token]"),
+                    headerWithName("provider_type").description("프로바이더 타입 [KAKAO / GOOGLE]")),
                 requestParameters(parameterWithName("isbn").description("isbn  번호"),
                     parameterWithName("size").description("한 번에 조회할 책의 수 - page 당 size"),
                     parameterWithName("page").description("한 번에 조회할 page 수"),
@@ -416,7 +429,7 @@ public class BookControllerTest extends AuthenticationTestExtension {
 
         String result = objectMapper.writeValueAsString(bookSearchResponseDto);
 
-        MvcResult mvcResult = mockMvc.perform(RestDocumentationRequestBuilders.get("/v1/api/books")
+        MvcResult mvcResult = mockMvc.perform(get("/v1/api/books")
                 .header("Authorization", "Bearer " + getTestToken())
                 .header("provider_type", "KAKAO")
                 .param("title", "effectiveJava")
@@ -426,6 +439,9 @@ public class BookControllerTest extends AuthenticationTestExtension {
                 .with(user(getUserPrincipal())))
             .andExpect(status().isOk())
             .andDo(document("book-search-title-paging",
+                requestHeaders(
+                    headerWithName("Authorization").description("Bearer [openid token]"),
+                    headerWithName("provider_type").description("프로바이더 타입 [KAKAO / GOOGLE]")),
                 requestParameters(parameterWithName("title").description("도서명"),
                     parameterWithName("size").description("한 번에 조회할 책의 수 - page 당 size"),
                     parameterWithName("page").description("한 번에 조회할 page 수"),
@@ -460,7 +476,7 @@ public class BookControllerTest extends AuthenticationTestExtension {
 
         String result = objectMapper.writeValueAsString(bookSearchResponseDto);
 
-        MvcResult mvcResult = mockMvc.perform(RestDocumentationRequestBuilders.get("/v1/api/books")
+        MvcResult mvcResult = mockMvc.perform(get("/v1/api/books")
                 .header("Authorization", "Bearer " + getTestToken())
                 .header("provider_type", "KAKAO")
                 .param("author", "Joshua")
@@ -470,6 +486,9 @@ public class BookControllerTest extends AuthenticationTestExtension {
                 .with(user(getUserPrincipal())))
             .andExpect(status().isOk())
             .andDo(document("book-search-author-paging",
+                requestHeaders(
+                    headerWithName("Authorization").description("Bearer [openid token]"),
+                    headerWithName("provider_type").description("프로바이더 타입 [KAKAO / GOOGLE]")),
                 requestParameters(parameterWithName("author").description("작가명"),
                     parameterWithName("size").description("한 번에 조회할 책의 수 - page 당 size"),
                     parameterWithName("page").description("한 번에 조회할 page 수"),

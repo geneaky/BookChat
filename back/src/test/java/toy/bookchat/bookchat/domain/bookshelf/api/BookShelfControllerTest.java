@@ -3,6 +3,8 @@ package toy.bookchat.bookchat.domain.bookshelf.api;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
@@ -186,6 +188,9 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
                 .with(user(getUserPrincipal())))
             .andExpect(status().isCreated())
             .andDo(document("bookshelf_reading",
+                requestHeaders(
+                    headerWithName("Authorization").description("Bearer [openid token]"),
+                    headerWithName("provider_type").description("프로바이더 타입 [KAKAO / GOOGLE]")),
                 requestFields(fieldWithPath("isbn").description("isbn"),
                     fieldWithPath("title").description("title"),
                     fieldWithPath("authors.[]").description("authors"),
@@ -211,6 +216,10 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
                 .with(user(getUserPrincipal())))
             .andExpect(status().isCreated())
             .andDo(document("bookshelf_complete",
+                requestHeaders(
+                    headerWithName("Authorization").description("Bearer [openid token]"),
+                    headerWithName("provider_type").description("프로바이더 타입 [KAKAO / GOOGLE]")
+                ),
                 requestFields(fieldWithPath("isbn").description("isbn"),
                     fieldWithPath("title").description("title"),
                     fieldWithPath("authors.[]").description("authors"),
@@ -235,6 +244,10 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
                 .with(user(getUserPrincipal())))
             .andExpect(status().isCreated())
             .andDo(document("bookshelf_wish",
+                requestHeaders(
+                    headerWithName("Authorization").description("Bearer [openid token]"),
+                    headerWithName("provider_type").description("프로바이더 타입 [KAKAO / GOOGLE]")
+                ),
                 requestFields(fieldWithPath("isbn").description("isbn"),
                     fieldWithPath("title").description("title"),
                     fieldWithPath("authors.[]").description("author"),
@@ -515,6 +528,10 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
             .andExpect(status().isOk())
             .andDo(print())
             .andDo(document("get_bookshelf_reading",
+                requestHeaders(
+                    headerWithName("Authorization").description("Bearer [openid token]"),
+                    headerWithName("provider_type").description("프로바이더 타입 [KAKAO / GOOGLE]")
+                ),
                 requestParameters(
                     parameterWithName("readingStatus").description("READING"),
                     parameterWithName("size").description("page 당 size"),
@@ -557,6 +574,10 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
             .andExpect(status().isOk())
             .andDo(print())
             .andDo(document("get_bookshelf_complete",
+                requestHeaders(
+                    headerWithName("Authorization").description("Bearer [openid token]"),
+                    headerWithName("provider_type").description("프로바이더 타입 [KAKAO / GOOGLE]")
+                ),
                 requestParameters(
                     parameterWithName("readingStatus").description("COMPLETE"),
                     parameterWithName("size").description("page 당 size"),
@@ -599,6 +620,10 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
             .andExpect(status().isOk())
             .andDo(print())
             .andDo(document("get_bookshelf_wish",
+                requestHeaders(
+                    headerWithName("Authorization").description("Bearer [openid token]"),
+                    headerWithName("provider_type").description("프로바이더 타입 [KAKAO / GOOGLE]")
+                ),
                 requestParameters(
                     parameterWithName("readingStatus").description("WISH"),
                     parameterWithName("size").description("page 당 size"),

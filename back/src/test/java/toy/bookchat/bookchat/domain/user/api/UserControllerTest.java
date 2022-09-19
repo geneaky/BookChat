@@ -142,7 +142,11 @@ public class UserControllerTest extends AuthenticationTestExtension {
                 .header("Authorization", "Bearer " + testToken)
                 .header("provider_type", "KAKAO"))
             .andExpect(status().isOk())
-            .andDo(document("user"))
+            .andDo(document("user",
+                    requestHeaders(
+                            headerWithName("Authorization").description("Bearer [openid token]"),
+                            headerWithName("provider_type").description("프로바이더 타입 [KAKAO / GOOGLE]")
+                    )))
             .andReturn();
 
         assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo(real);
