@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.security.openid;
+package toy.bookchat.bookchat.security.token.openid;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;

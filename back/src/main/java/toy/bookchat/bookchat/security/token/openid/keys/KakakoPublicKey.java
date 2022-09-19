@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.security.openid.keys;
+package toy.bookchat.bookchat.security.token.openid.keys;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

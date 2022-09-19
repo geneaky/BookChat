@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.security.openid;
+package toy.bookchat.bookchat.security.token.openid;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;

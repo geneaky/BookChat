@@ -14,8 +14,8 @@ import toy.bookchat.bookchat.security.exception.CustomExceptionHandlingFilter;
 import toy.bookchat.bookchat.security.handler.RestAuthenticationEntryPoint;
 import toy.bookchat.bookchat.security.ipblock.IpBlockCheckingFilter;
 import toy.bookchat.bookchat.security.ipblock.IpBlockManager;
-import toy.bookchat.bookchat.security.openid.OpenIdAuthenticationFilter;
-import toy.bookchat.bookchat.security.openid.OpenIdTokenManager;
+import toy.bookchat.bookchat.security.token.openid.OpenIdAuthenticationFilter;
+import toy.bookchat.bookchat.security.token.openid.OpenIdTokenManager;
 
 @Configuration
 @EnableWebSecurity

@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.security.jwt;
+package toy.bookchat.bookchat.security.token.jwt;
 
 public enum JwtTokenValidationCode {
 

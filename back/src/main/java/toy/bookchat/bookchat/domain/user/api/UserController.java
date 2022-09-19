@@ -1,7 +1,5 @@
 package toy.bookchat.bookchat.domain.user.api;
 
-import java.util.Optional;
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -11,14 +9,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import toy.bookchat.bookchat.domain.user.api.dto.UserProfileResponse;
 import toy.bookchat.bookchat.domain.user.service.UserService;
 import toy.bookchat.bookchat.domain.user.service.dto.UserSignUpRequestDto;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
-import toy.bookchat.bookchat.security.openid.OpenIdTokenManager;
+import toy.bookchat.bookchat.security.token.openid.OpenIdTokenManager;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 import static toy.bookchat.bookchat.utils.constants.AuthConstants.*;
@@ -60,10 +57,10 @@ public class UserController {
         @RequestHeader(AUTHORIZATION) @NotBlank @Pattern(regexp = "^(Bearer)\\s.+") String bearerToken,
         @RequestHeader(PROVIDER_TYPE) @NotNull OAuth2Provider oAuth2Provider) {
 
-        String oauth2MemberNumber = openIdTokenManager.getOAuth2MemberNumberFromOpenIdToken(
+        String oauth2MemberNumber = openIdTokenManager.getOAuth2MemberNumberFromToken(
             getOpenIdToken(bearerToken), oAuth2Provider);
 
-        String userEmail = openIdTokenManager.getUserEmailFromOpenIdToken(getOpenIdToken(bearerToken), oAuth2Provider);
+        String userEmail = openIdTokenManager.getUserEmailFromToken(getOpenIdToken(bearerToken), oAuth2Provider);
 
         userService.registerNewUser(userSignUpRequestDto, oauth2MemberNumber, userEmail, oAuth2Provider);
 

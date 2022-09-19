@@ -1,8 +1,5 @@
-package toy.bookchat.bookchat.security.jwt;
+package toy.bookchat.bookchat.security.token.jwt;
 
-import static toy.bookchat.bookchat.security.jwt.JwtTokenValidationCode.ACCESS;
-import static toy.bookchat.bookchat.security.jwt.JwtTokenValidationCode.DENIED;
-import static toy.bookchat.bookchat.security.jwt.JwtTokenValidationCode.EXPIRED;
 import static toy.bookchat.bookchat.utils.constants.AuthConstants.AUTHORIZATION;
 import static toy.bookchat.bookchat.utils.constants.AuthConstants.BEARER;
 import static toy.bookchat.bookchat.utils.constants.AuthConstants.BEGIN_INDEX;
@@ -59,7 +56,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void validUserRequestByJwt(HttpServletRequest request, String jwt) {
-        if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt) == ACCESS) {
+        if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt) == JwtTokenValidationCode.ACCESS) {
             String email = jwtTokenProvider.getEmailFromToken(jwt);
             OAuth2Provider oAuth2TokenProvider = jwtTokenProvider.getOauth2TokenProviderFromToken(
                 jwt);
@@ -72,11 +69,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 });
         }
 
-        if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt) == EXPIRED) {
+        if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt) == JwtTokenValidationCode.EXPIRED) {
             ipBlockManager.increase(request);
         }
 
-        if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt) == DENIED) {
+        if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt) == JwtTokenValidationCode.DENIED) {
             ipBlockManager.increase(request);
         }
 

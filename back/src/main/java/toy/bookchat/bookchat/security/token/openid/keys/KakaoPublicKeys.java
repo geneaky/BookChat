@@ -1,6 +1,5 @@
-package toy.bookchat.bookchat.security.openid.keys;
+package toy.bookchat.bookchat.security.token.openid.keys;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

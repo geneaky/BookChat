@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.security.openid;
+package toy.bookchat.bookchat.security.token.openid;
 
 import static io.jsonwebtoken.JwsHeader.KEY_ID;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,7 +30,6 @@ import toy.bookchat.bookchat.security.exception.DenidedTokenException;
 import toy.bookchat.bookchat.security.exception.ExpiredTokenException;
 import toy.bookchat.bookchat.security.exception.IllegalStandardTokenException;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
-import toy.bookchat.bookchat.security.token.openid.OpenIdTokenManager;
 
 @ExtendWith(MockitoExtension.class)
 class OpenIdTokenManagerTest {
@@ -46,8 +45,8 @@ class OpenIdTokenManagerTest {
     public void init() throws FileNotFoundException {
         //openssl pkcs8 -topk8 -inform PEM -in private_key.pem -out token_key.pem -nocrypt 생성
         openIdTestUtil = new OpenIdTestUtil(
-            "src/test/java/toy/bookchat/bookchat/security/openid/token_key.pem",
-            "src/test/java/toy/bookchat/bookchat/security/openid/openidRSA256-public.pem");
+            "src/test/java/toy/bookchat/bookchat/security/token/openid/token_key.pem",
+            "src/test/java/toy/bookchat/bookchat/security/token/openid/openidRSA256-public.pem");
     }
 
     private X509EncodedKeySpec getPublicPkcs8EncodedKeySpec(OpenIdTestUtil openIdTestUtil)
@@ -101,6 +100,8 @@ class OpenIdTokenManagerTest {
             .setExpiration(new Date(0))
             .signWith(SignatureAlgorithm.RS256, privateKey)
             .compact();
+
+        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
 
         assertThatThrownBy(() -> {
             openIdTokenManager.getOAuth2MemberNumberFromToken(token, OAuth2Provider.KAKAO);

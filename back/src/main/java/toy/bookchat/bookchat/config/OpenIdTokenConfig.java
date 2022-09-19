@@ -4,20 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Base64Utils;
 import org.springframework.web.client.RestTemplate;
-import toy.bookchat.bookchat.config.openid.PublicKeys;
 import toy.bookchat.bookchat.security.exception.NotVerifiedRequestFormatException;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
-import toy.bookchat.bookchat.security.openid.keys.GooglePublicKeys;
-import toy.bookchat.bookchat.security.openid.keys.KakakoPublicKey;
-import toy.bookchat.bookchat.security.openid.keys.KakaoPublicKeys;
+import toy.bookchat.bookchat.security.token.openid.keys.GooglePublicKeys;
+import toy.bookchat.bookchat.security.token.openid.keys.KakakoPublicKey;
+import toy.bookchat.bookchat.security.token.openid.keys.KakaoPublicKeys;
 
 import java.math.BigInteger;
 import java.security.Key;
-import java.security.KeyFactory;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.spec.RSAPublicKeySpec;
-import java.security.spec.X509EncodedKeySpec;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +29,7 @@ public class OpenIdTokenConfig {
     private final GooglePublicKeys googlePublicKeys;
 
 
-    public Key getPublicKey(String keyId, String tokenProvider) {
+    public Key getPublicKey(String keyId, OAuth2Provider oAuth2Provider) {
         if(OAuth2Provider.KAKAO.getValue().equals(keyId)) {
             for(KakakoPublicKey publicKey : this.kakaoPublicKeys.getKeys()) {
                 return null;

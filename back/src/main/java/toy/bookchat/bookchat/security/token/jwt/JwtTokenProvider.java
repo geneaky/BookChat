@@ -1,8 +1,4 @@
-package toy.bookchat.bookchat.security.jwt;
-
-import static toy.bookchat.bookchat.security.jwt.JwtTokenValidationCode.ACCESS;
-import static toy.bookchat.bookchat.security.jwt.JwtTokenValidationCode.DENIED;
-import static toy.bookchat.bookchat.security.jwt.JwtTokenValidationCode.EXPIRED;
+package toy.bookchat.bookchat.security.token.jwt;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -85,14 +81,14 @@ public class JwtTokenProvider {
     public JwtTokenValidationCode validateToken(String token) {
         try {
             Jwts.parser().setSigningKey(jwtTokenConfig.getSecret()).parseClaimsJws(token);
-            return ACCESS;
+            return JwtTokenValidationCode.ACCESS;
         } catch (ExpiredJwtException ex) {
             log.debug("Token :: {} :: is expired token", token);
-            return EXPIRED;
+            return JwtTokenValidationCode.EXPIRED;
         } catch (Exception ex) {
             log.debug("Token :: {} :: is denied", token);
         }
-        return DENIED;
+        return JwtTokenValidationCode.DENIED;
     }
 
 }

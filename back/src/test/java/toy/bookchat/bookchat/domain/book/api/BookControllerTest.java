@@ -54,8 +54,8 @@ import toy.bookchat.bookchat.domain.book.service.BookSearchService;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.security.SecurityConfig;
-import toy.bookchat.bookchat.security.openid.OpenIdTestUtil;
-import toy.bookchat.bookchat.security.openid.OpenIdTokenManager;
+import toy.bookchat.bookchat.security.token.openid.OpenIdTestUtil;
+import toy.bookchat.bookchat.security.token.openid.OpenIdTokenManager;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @WebMvcTest(controllers = BookController.class,
@@ -83,8 +83,8 @@ public class BookControllerTest extends AuthenticationTestExtension {
     @BeforeEach
     public void init() throws FileNotFoundException {
         openIdTestUtil = new OpenIdTestUtil(
-            "src/test/java/toy/bookchat/bookchat/security/openid/token_key.pem",
-            "src/test/java/toy/bookchat/bookchat/security/openid/openidRSA256-public.pem");
+            "src/test/java/toy/bookchat/bookchat/security/token/openid/token_key.pem",
+            "src/test/java/toy/bookchat/bookchat/security/token/openid/openidRSA256-public.pem");
     }
 
     private X509EncodedKeySpec getPublicPkcs8EncodedKeySpec(OpenIdTestUtil openIdTestUtil)

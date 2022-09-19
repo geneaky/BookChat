@@ -53,8 +53,8 @@ import toy.bookchat.bookchat.domain.user.service.UserService;
 import toy.bookchat.bookchat.domain.user.service.dto.UserSignUpRequestDto;
 import toy.bookchat.bookchat.security.SecurityConfig;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
-import toy.bookchat.bookchat.security.openid.OpenIdTestUtil;
-import toy.bookchat.bookchat.security.openid.OpenIdTokenManager;
+import toy.bookchat.bookchat.security.token.openid.OpenIdTestUtil;
+import toy.bookchat.bookchat.security.token.openid.OpenIdTokenManager;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @WebMvcTest(controllers = UserController.class,
@@ -84,8 +84,8 @@ public class UserControllerTest extends AuthenticationTestExtension {
     @BeforeEach
     public void init() throws FileNotFoundException {
         openIdTestUtil = new OpenIdTestUtil(
-            "src/test/java/toy/bookchat/bookchat/security/openid/token_key.pem",
-            "src/test/java/toy/bookchat/bookchat/security/openid/openidRSA256-public.pem");
+            "src/test/java/toy/bookchat/bookchat/security/token/openid/token_key.pem",
+            "src/test/java/toy/bookchat/bookchat/security/token/openid/openidRSA256-public.pem");
     }
 
     private UserPrincipal getUserPrincipal() {

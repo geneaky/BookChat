@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.security.openid;
+package toy.bookchat.bookchat.security.token.openid;
 
 import static toy.bookchat.bookchat.utils.constants.AuthConstants.AUTHORIZATION;
 import static toy.bookchat.bookchat.utils.constants.AuthConstants.BEARER;
@@ -41,7 +41,7 @@ public class OpenIdAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
         FilterChain filterChain) throws ServletException, IOException {
 
-        String oAuth2MemberNumber = openIdTokenManager.getOAuth2MemberNumberFromOpenIdToken(
+        String oAuth2MemberNumber = openIdTokenManager.getOAuth2MemberNumberFromToken(
             getOpenIdTokenFromRequest(request),
             getOpenIdTokenProviderFromRequest(request));
 

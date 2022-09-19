@@ -15,7 +15,7 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 import toy.bookchat.bookchat.security.CookieUtils;
-import toy.bookchat.bookchat.security.jwt.JwtTokenProvider;
+import toy.bookchat.bookchat.security.token.jwt.JwtTokenProvider;
 import toy.bookchat.bookchat.security.oauth.HttpCookieOAuth2AuthorizationRequestRepository;
 
 @Slf4j
