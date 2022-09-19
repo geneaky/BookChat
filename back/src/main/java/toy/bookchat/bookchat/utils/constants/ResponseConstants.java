@@ -22,4 +22,7 @@ public class ResponseConstants {
 
     public static final ResponseEntity<String> USER_ALREADY_EXISTED =
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 가입된 사용자입니다");
+
+    public static final ResponseEntity<String> CONSTRAINT_VIOLATION =
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body("유요하지 않은 요청입니다.");
 }

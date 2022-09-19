@@ -12,6 +12,8 @@ import toy.bookchat.bookchat.domain.user.exception.UserNotFoundException;
 import toy.bookchat.bookchat.security.exception.DenidedTokenException;
 import toy.bookchat.bookchat.security.exception.ExpiredTokenException;
 
+import javax.validation.ConstraintViolationException;
+
 import static toy.bookchat.bookchat.utils.constants.ResponseConstants.*;
 
 @Slf4j
@@ -60,5 +62,11 @@ public class GlobalExceptionHandler {
     public final ResponseEntity<String> handleUserAlreadyExistedException(UserAlreadySignUpException exception) {
         log.info("message = {} :: cause = {}", exception.getMessage(), exception.getCause());
         return USER_ALREADY_EXISTED;
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public final ResponseEntity<String> handleConstraintViolationException(ConstraintViolationException exception) {
+        log.info("message = {} :: cause = {}", exception.getMessage(), exception.getCause());
+        return CONSTRAINT_VIOLATION;
     }
 }
