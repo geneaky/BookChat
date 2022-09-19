@@ -74,7 +74,7 @@ class OpenIdTokenManagerTest {
         when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
 
         assertThat(
-            openIdTokenManager.getOAuth2MemberNumberFromOpenIdToken(token, "kakao")).isEqualTo(
+            openIdTokenManager.getOAuth2MemberNumberFromOpenIdToken(token, OAuth2Provider.KAKAO)).isEqualTo(
             "1234kakao");
     }
 
@@ -102,7 +102,7 @@ class OpenIdTokenManagerTest {
             .compact();
 
         assertThatThrownBy(() -> {
-            openIdTokenManager.getOAuth2MemberNumberFromOpenIdToken(token, "kakao");
+            openIdTokenManager.getOAuth2MemberNumberFromOpenIdToken(token, OAuth2Provider.KAKAO);
         }).isInstanceOf(ExpiredTokenException.class);
     }
 
@@ -116,7 +116,7 @@ class OpenIdTokenManagerTest {
         when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
 
         assertThatThrownBy(() -> {
-            openIdTokenManager.getOAuth2MemberNumberFromOpenIdToken(token + "test", "kakao");
+            openIdTokenManager.getOAuth2MemberNumberFromOpenIdToken(token + "test", OAuth2Provider.KAKAO);
         }).isInstanceOf(DenidedTokenException.class);
     }
 
@@ -134,7 +134,7 @@ class OpenIdTokenManagerTest {
         when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
 
         assertThatThrownBy(() -> {
-            openIdTokenManager.getOAuth2MemberNumberFromOpenIdToken(token, "kakao");
+            openIdTokenManager.getOAuth2MemberNumberFromOpenIdToken(token, OAuth2Provider.KAKAO);
         }).isInstanceOf(DenidedTokenException.class);
     }
 
@@ -159,7 +159,7 @@ class OpenIdTokenManagerTest {
 
         assertThatThrownBy(() -> {
             openIdTokenManager.getOAuth2MemberNumberFromOpenIdToken(stringBuilder.toString(),
-                OAuth2Provider.KAKAO.getValue());
+                OAuth2Provider.KAKAO);
         }).isInstanceOf(IllegalStandardTokenException.class);
     }
 

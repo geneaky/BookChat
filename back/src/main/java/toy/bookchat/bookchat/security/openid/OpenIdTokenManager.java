@@ -19,17 +19,18 @@ public class OpenIdTokenManager {
 
     /* TODO: 2022-09-16 토큰 검증 로직들 리팩토링 다시 해보기
         openidtokenmanager는 usercontroller에서도 사용하기 때문에 예외 처리부분 좀 더 고려해보기
+        template method pattern?
      */
 
     public static final int STANDARD_TOKEN_LENGTH = 3;
     private final OpenIdTokenConfig openIdTokenConfig;
 
-    public String getOAuth2MemberNumberFromOpenIdToken(String openIdToken, String tokenProvider) {
+    public String getOAuth2MemberNumberFromOpenIdToken(String openIdToken, OAuth2Provider oAuth2Provider) {
         StringBuilder stringBuilder = new StringBuilder();
 
         try {
             divideTokenIntoParts(openIdToken);
-            extractProviderMemberNumberFromOpenIdToken(tokenProvider, openIdToken, stringBuilder);
+            extractProviderMemberNumberFromOpenIdToken(oAuth2Provider, openIdToken, stringBuilder);
         } catch (ExpiredJwtException exception) {
             log.info("Token :: {} :: is expired", openIdToken);
             throw new ExpiredTokenException(exception.getMessage(), exception);
@@ -41,10 +42,10 @@ public class OpenIdTokenManager {
         return stringBuilder.toString();
     }
 
-    private void extractProviderMemberNumberFromOpenIdToken(String tokenProvider, String openIdToken, StringBuilder stringBuilder) {
+    private void extractProviderMemberNumberFromOpenIdToken(OAuth2Provider oAuth2Provider, String openIdToken, StringBuilder stringBuilder) {
 
         Claims body = Jwts.parser()
-            .setSigningKey(openIdTokenConfig.getPublicKey(extractKeyIdFromOpenIdToken(openIdToken), tokenProvider))
+            .setSigningKey(openIdTokenConfig.getPublicKey(extractKeyIdFromOpenIdToken(openIdToken), oAuth2Provider.getValue()))
             .parseClaimsJws(openIdToken)
             .getBody();
 
@@ -84,7 +85,7 @@ public class OpenIdTokenManager {
             stringBuilder.append(body.getSubject());
             stringBuilder.append(OAuth2Provider.GOOGLE.getValue());
         } else {
-            throw new DenidedTokenException("Not AllowedFormat Token Exception");
+            throw new DenidedTokenException("Not Allowed Format Token Exception");
         }
     }
 
@@ -94,5 +95,23 @@ public class OpenIdTokenManager {
             throw new IllegalStandardTokenException("Illegal Standard Token Format");
         }
         return splitToken;
+    }
+
+    public String getUserEmailFromOpenIdToken(String openIdToken, OAuth2Provider oAuth2Provider) {
+        try {
+            divideTokenIntoParts(openIdToken);
+            Claims body = Jwts.parser()
+                    .setSigningKey(openIdTokenConfig.getPublicKey(extractKeyIdFromOpenIdToken(openIdToken), oAuth2Provider.getValue()))
+                    .parseClaimsJws(openIdToken)
+                    .getBody();
+
+            return (String) body.get("email");
+        } catch (ExpiredJwtException exception) {
+            log.info("Token :: {} :: is expired", openIdToken);
+            throw new ExpiredTokenException(exception.getMessage(), exception);
+        } catch (JwtException exception) {
+            log.info("Token :: {} :: is denied", openIdToken);
+            throw new DenidedTokenException(exception.getMessage(), exception);
+        }
     }
 }

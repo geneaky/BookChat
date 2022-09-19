@@ -43,7 +43,7 @@ public class OpenIdAuthenticationFilter extends OncePerRequestFilter {
 
         String oAuth2MemberNumber = openIdTokenManager.getOAuth2MemberNumberFromOpenIdToken(
             getOpenIdTokenFromRequest(request),
-            getOpenIdTokenProviderFromRequest(request).getValue());
+            getOpenIdTokenProviderFromRequest(request));
 
         registerUserAuthenticationOnSecurityContext(userRepository.findByName(oAuth2MemberNumber));
 
