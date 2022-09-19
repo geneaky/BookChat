@@ -16,6 +16,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.io.FileNotFoundException;
@@ -27,8 +28,12 @@ import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.*;
-
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -143,10 +148,10 @@ public class UserControllerTest extends AuthenticationTestExtension {
                 .header("provider_type", "KAKAO"))
             .andExpect(status().isOk())
             .andDo(document("user",
-                    requestHeaders(
-                            headerWithName("Authorization").description("Bearer [openid token]"),
-                            headerWithName("provider_type").description("프로바이더 타입 [KAKAO / GOOGLE]")
-                    )))
+                requestHeaders(
+                    headerWithName("Authorization").description("Bearer [openid token]"),
+                    headerWithName("provider_type").description("프로바이더 타입 [KAKAO / GOOGLE]")
+                )))
             .andReturn();
 
         assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo(real);
@@ -181,7 +186,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void     사용자_회원가입_요청시_header_openid없는_인증정보_400반환() throws Exception {
+    public void 사용자_회원가입_요청시_header_openid없는_인증정보_400반환() throws Exception {
         mockMvc.perform(post("/v1/api/users")
                 .header("Authorization", "Bearer ")
                 .header("provider_type", "KAKAO")
@@ -228,16 +233,16 @@ public class UserControllerTest extends AuthenticationTestExtension {
 
         when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
 
+        Claims claims = Jwts.claims().setIssuer("https://kauth.kakao.com")
+            .setSubject("test").setExpiration(new Date(0));
         String testToken = Jwts.builder()
             .setHeaderParam("kid", "abcdefg")
-            .setSubject("test")
-            .setIssuer(" https://kauth.kakao.com")
-            .setExpiration(new Date(0))
+            .setClaims(claims)
             .signWith(SignatureAlgorithm.RS256, privateKey).compact();
 
         mockMvc.perform(post("/v1/api/users")
                 .header("Authorization", "Bearer " + testToken)
-                        .header("provider_type", "KAKAO")
+                .header("provider_type", "KAKAO")
                 .param("nickname", "nick")
                 .param("defaultProfileImageType", "2"))
             .andExpect(status().isPreconditionFailed());
@@ -253,9 +258,9 @@ public class UserControllerTest extends AuthenticationTestExtension {
         Map<String, Object> claims = new HashMap<>();
         claims.put("email", "test@gmail.com");
         claims.put("iss", "https://kauth.kakao.com");
+        claims.put("sub", "test");
 
         String testToken = Jwts.builder()
-            .setSubject("test")
             .setHeaderParam("kid", "abcedf")
             .setClaims(claims)
             .signWith(SignatureAlgorithm.RS256, privateKey)
@@ -271,15 +276,16 @@ public class UserControllerTest extends AuthenticationTestExtension {
             .andDo(document("user_sign_up", requestHeaders(
                     headerWithName("Authorization").description("Bearer [openid token]"),
                     headerWithName("provider_type").description("프로바이더 타입 [KAKAO / GOOGLE]")
-                    ),
-                    requestParameters(
-                parameterWithName("nickname").description("닉네임"),
-                parameterWithName("defaultProfileImageType").description("기본 이미지 타입"),
-                parameterWithName("userProfileImage").optional().description("프로필 이미지"),
-                parameterWithName("readingTastes").optional().description("독서 취향")
-            )));
+                ),
+                requestParameters(
+                    parameterWithName("nickname").description("닉네임"),
+                    parameterWithName("defaultProfileImageType").description("기본 이미지 타입"),
+                    parameterWithName("userProfileImage").optional().description("프로필 이미지"),
+                    parameterWithName("readingTastes").optional().description("독서 취향")
+                )));
 
-        verify(userService).registerNewUser(any(UserSignUpRequestDto.class), anyString(), anyString(), any(OAuth2Provider.class));
+        verify(userService).registerNewUser(any(UserSignUpRequestDto.class), anyString(),
+            anyString(), any(OAuth2Provider.class));
     }
 
     @Test
@@ -287,7 +293,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
         PrivateKey privateKey = getPrivateKey();
 
         String testToken = Jwts.builder().setSubject("test")
-                .signWith(SignatureAlgorithm.RS256, privateKey).compact();
+            .signWith(SignatureAlgorithm.RS256, privateKey).compact();
 
         String A = "Tearer " + testToken;
 
@@ -303,14 +309,14 @@ public class UserControllerTest extends AuthenticationTestExtension {
         PrivateKey privateKey = getPrivateKey();
 
         String testToken = Jwts.builder().setSubject("test")
-                .signWith(SignatureAlgorithm.RS256, privateKey).compact();
+            .signWith(SignatureAlgorithm.RS256, privateKey).compact();
 
         mockMvc.perform(post("/v1/api/users")
-                        .header("Authorization", "Tearer" + testToken)
-                        .header("provider_type", "KAKAO")
-                        .param("defaultProfileImageType", "1")
-                        .param("nickname", "testName"))
-                .andExpect(status().isBadRequest());
+                .header("Authorization", "Tearer" + testToken)
+                .header("provider_type", "KAKAO")
+                .param("defaultProfileImageType", "1")
+                .param("nickname", "testName"))
+            .andExpect(status().isBadRequest());
     }
 
     @Test

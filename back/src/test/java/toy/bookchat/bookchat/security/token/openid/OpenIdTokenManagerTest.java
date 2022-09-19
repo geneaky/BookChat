@@ -74,7 +74,8 @@ class OpenIdTokenManagerTest {
         when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
 
         assertThat(
-            openIdTokenManager.getOAuth2MemberNumberFromToken(token, OAuth2Provider.KAKAO)).isEqualTo(
+            openIdTokenManager.getOAuth2MemberNumberFromToken(token,
+                OAuth2Provider.KAKAO)).isEqualTo(
             "1234kakao");
     }
 
@@ -91,7 +92,6 @@ class OpenIdTokenManagerTest {
     @Test
     public void 만료된_토큰으로_처리_요청시_예외발생() throws Exception {
         PrivateKey privateKey = getPrivateKey();
-        PublicKey publicKey = getPublicKey();
 
         String token = Jwts.builder()
             .setSubject("1234")
@@ -100,8 +100,6 @@ class OpenIdTokenManagerTest {
             .setExpiration(new Date(0))
             .signWith(SignatureAlgorithm.RS256, privateKey)
             .compact();
-
-        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
 
         assertThatThrownBy(() -> {
             openIdTokenManager.getOAuth2MemberNumberFromToken(token, OAuth2Provider.KAKAO);
@@ -137,7 +135,7 @@ class OpenIdTokenManagerTest {
 
         assertThatThrownBy(() -> {
             openIdTokenManager.getOAuth2MemberNumberFromToken(token, OAuth2Provider.KAKAO);
-        }).isInstanceOf(DenidedTokenException.class);
+        }).isInstanceOf(IllegalStandardTokenException.class);
     }
 
     @Test

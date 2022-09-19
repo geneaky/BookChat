@@ -4,6 +4,8 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import java.security.Key;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,9 +13,6 @@ import toy.bookchat.bookchat.security.exception.DenidedTokenException;
 import toy.bookchat.bookchat.security.exception.ExpiredTokenException;
 import toy.bookchat.bookchat.security.exception.IllegalStandardTokenException;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
-
-import java.security.Key;
-import java.util.Optional;
 
 @Slf4j
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -56,9 +55,9 @@ public class OpenIdToken {
     private Claims getBody(Key publicKey) {
         try {
             return Jwts.parser()
-                    .setSigningKey(publicKey)
-                    .parseClaimsJws(this.openidToken)
-                    .getBody();
+                .setSigningKey(publicKey)
+                .parseClaimsJws(this.openidToken)
+                .getBody();
         } catch (ExpiredJwtException exception) {
             log.info("Token :: {} :: is expired", this.openidToken);
             throw new ExpiredTokenException(exception.getMessage(), exception);
@@ -70,9 +69,9 @@ public class OpenIdToken {
 
     private String getIssuer(Key publicKey) {
         return Optional.ofNullable(getBody(publicKey).getIssuer())
-                .orElseThrow(() -> {
-                    throw new IllegalStandardTokenException("Issuer is not existed");
-                });
+            .orElseThrow(() -> {
+                throw new IllegalStandardTokenException("Issuer is not existed");
+            });
     }
 
     private String getSubject(Key publicKey) {
@@ -83,21 +82,29 @@ public class OpenIdToken {
 
     public String getKeyId() {
         validateTokenLength();
-        return (String) Optional.ofNullable(Jwts.parser()
-                .parseClaimsJwt(getUnsignedTokenBuilder(this.openidToken).toString())
+        try {
+            return (String) Optional.ofNullable(Jwts.parser()
+                .parse(getUnsignedTokenBuilder(this.openidToken))
                 .getHeader()
                 .get(KID)).orElseThrow(() -> {
-                    throw new IllegalStandardTokenException("KeyId is not existed");
-                });
+                throw new IllegalStandardTokenException("KeyId is not existed");
+            });
+        } catch (ExpiredJwtException exception) {
+            log.info("Token :: {} :: is expired", this.openidToken);
+            throw new ExpiredTokenException(exception.getMessage(), exception);
+        } catch (JwtException exception) {
+            log.info("Token :: {} :: is denied", this.openidToken);
+            throw new DenidedTokenException(exception.getMessage(), exception);
+        }
     }
 
     private void validateTokenLength() {
-        if(this.openidToken.split("\\.").length != STANDARD_TOKEN_LENGTH) {
+        if (this.openidToken.split("\\.").length != STANDARD_TOKEN_LENGTH) {
             throw new IllegalStandardTokenException("Illegal Standard Token Length");
         }
     }
 
-    private StringBuilder getUnsignedTokenBuilder(String openIdToken) {
+    private String getUnsignedTokenBuilder(String openIdToken) {
         String[] tokenParts = divideTokenIntoParts(openIdToken);
 
         StringBuilder unsignedTokenBuilder = new StringBuilder();
@@ -106,7 +113,7 @@ public class OpenIdToken {
         unsignedTokenBuilder.append(tokenParts[PAYLOAD]);
         unsignedTokenBuilder.append(".");
 
-        return unsignedTokenBuilder;
+        return unsignedTokenBuilder.toString();
     }
 
     private String[] divideTokenIntoParts(String openIdToken) {
