@@ -2,6 +2,7 @@ package toy.bookchat.bookchat.security.token.openid;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Header;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import java.security.Key;
@@ -81,14 +82,18 @@ public class OpenIdToken {
     }
 
     public String getKeyId() {
+        return (String) Optional.ofNullable(getHeader()
+            .get(KID)).orElseThrow(() -> {
+            throw new IllegalStandardTokenException("KeyId is not existed");
+        });
+    }
+
+    private Header getHeader() {
         validateTokenLength();
         try {
-            return (String) Optional.ofNullable(Jwts.parser()
+            return Jwts.parser()
                 .parse(getUnsignedTokenBuilder(this.openidToken))
-                .getHeader()
-                .get(KID)).orElseThrow(() -> {
-                throw new IllegalStandardTokenException("KeyId is not existed");
-            });
+                .getHeader();
         } catch (ExpiredJwtException exception) {
             log.info("Token :: {} :: is expired", this.openidToken);
             throw new ExpiredTokenException(exception.getMessage(), exception);
