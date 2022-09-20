@@ -1,6 +1,10 @@
 package toy.bookchat.bookchat.config;
 
-import lombok.RequiredArgsConstructor;
+import java.math.BigInteger;
+import java.security.Key;
+import java.time.LocalDateTime;
+import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Base64Utils;
 import org.springframework.web.client.RestTemplate;
@@ -10,31 +14,40 @@ import toy.bookchat.bookchat.security.token.openid.keys.GooglePublicKeys;
 import toy.bookchat.bookchat.security.token.openid.keys.KakakoPublicKey;
 import toy.bookchat.bookchat.security.token.openid.keys.KakaoPublicKeys;
 
-import java.math.BigInteger;
-import java.security.Key;
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-
 @Component
-@RequiredArgsConstructor
 public class OpenIdTokenConfig {
 
     private final RestTemplate restTemplate;
-
-    private Map<String, LocalDateTime> publicKeysCachedTime = new HashMap<>();
-
     private final KakaoPublicKeys kakaoPublicKeys;
-
     private final GooglePublicKeys googlePublicKeys;
+    private final ConcurrentHashMap<String, LocalDateTime> publicKeysCachedTime;
 
+    public OpenIdTokenConfig(RestTemplateBuilder restTemplateBuilder) {
+        this.restTemplate = restTemplateBuilder.build();
+        this.publicKeysCachedTime = new ConcurrentHashMap<>();
+        this.googlePublicKeys = searchGooglePublicKeys();
+        this.kakaoPublicKeys = searchKakaoPublicKeys();
+    }
+
+    private KakaoPublicKeys searchKakaoPublicKeys() {
+        publicKeysCachedTime.put("KAKAO", LocalDateTime.now());
+        return null;
+    }
+
+    private GooglePublicKeys searchGooglePublicKeys() {
+        publicKeysCachedTime.put("GOOGLE", LocalDateTime.now());
+        return null;
+    }
 
     public Key getPublicKey(String keyId, OAuth2Provider oAuth2Provider) {
-        if(OAuth2Provider.KAKAO.getValue().equals(keyId)) {
-            for(KakakoPublicKey publicKey : this.kakaoPublicKeys.getKeys()) {
+
+        if (OAuth2Provider.KAKAO.equals(oAuth2Provider)) {
+            for (KakakoPublicKey publicKey : this.kakaoPublicKeys.getKeys()) {
                 return null;
             }
-        } else if (OAuth2Provider.GOOGLE.getValue().equals(keyId)) {
+        }
+
+        if (OAuth2Provider.GOOGLE.equals(oAuth2Provider)) {
             return null;
         }
 
