@@ -28,6 +28,7 @@
 ### Commit Message
 * **feat** (feature)                              : 새로운 기능에 대한 커밋
 * **fix** (bug fix)                               : 버그 수정에 대한 커밋
+* **config** (configuration)                      : 설정 정보에 대한 커밋
 * **docs** (documentation)                        : 문서 수정에 대한 커밋
 * **style** (formatting, missing semi colons, …)  : 코드 스타일 혹은 포맷 등에 관한 커밋
 * **refactor**                                    : 코드 리팩토링에 대한 커밋
