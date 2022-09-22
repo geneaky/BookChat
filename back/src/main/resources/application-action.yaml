@@ -19,26 +19,34 @@ spring:
         show_sql: true
     open-in-view: false
 
-
   jackson:
     parser:
       allow-unquoted-control-chars: true
 
-token:
-  secret: 'test'
-  accessTokenExpiredTime: 1800000
-  refreshTokenExpiredTime: 1209600000
-  oauth2:
-    authorizaedRedirectUris:
-      - http://localhost:8080
-
+logging:
+  level:
+    com:
+      amazonaws:
+        util:
+          EC2MetadataUtils: error
 book:
   api:
     header: 'KakaoAK test'
     uri: test
+
+cloud:
+  aws:
+    stack:
+      auto: false
+    region:
+      static: ap-northeast-2
 
 aws:
   s3:
     accessKey: testetsttest
     secretKey: testestsetst
     region: ap-northeast-2
+
+oauth2:
+  kakaoURI: 'https://kauth.kakao.com/.well-known/jwks.json'
+  googleURI:

@@ -1,6 +1,7 @@
 package toy.bookchat.bookchat.config;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
@@ -9,21 +10,23 @@ import java.security.Key;
 import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.spec.RSAPublicKeySpec;
-import java.util.Base64;
-
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.util.Base64Utils;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
-import toy.bookchat.bookchat.security.token.openid.keys.KakaoPublicKeys;
 
 @RestClientTest(OpenIdTokenConfig.class)
+@ExtendWith(MockitoExtension.class)
 class OpenIdTokenConfigTest {
 
+    @MockBean
+    OAuth2Config oAuth2Config;
     @Autowired
     OpenIdTokenConfig openIdTokenConfig;
     @Autowired
@@ -38,6 +41,7 @@ class OpenIdTokenConfigTest {
     @Test
     public void kakao_keyId_oAuth2Provider로_요청시_일치하는_publickey반환() throws Exception {
 
+        when(oAuth2Config.getKakaoURI()).thenReturn(apiUri);
         mockServer.expect(requestTo(apiUri))
             .andRespond(withSuccess(result, MediaType.APPLICATION_JSON));
 
