@@ -15,5 +15,4 @@ public class KakakoPublicKey {
     private String use;
     private String n;
     private String e;
-
 }

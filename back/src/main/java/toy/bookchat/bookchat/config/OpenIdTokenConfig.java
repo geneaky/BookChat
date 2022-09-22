@@ -6,10 +6,7 @@ import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import toy.bookchat.bookchat.security.exception.NotVerifiedRequestFormatException;
@@ -20,41 +17,74 @@ import toy.bookchat.bookchat.security.token.openid.keys.KakaoPublicKeys;
 @Component
 public class OpenIdTokenConfig {
 
+    public static final String RSA = "RSA";
+    //설정 정보는 설정 파일로 빼야함 (상수와 설정을 구분해서 사용)
+    public static final String KAKAO_PUBLIC_KEY_REQUEST_URI = "https://kauth.kakao.com/.well-known/jwks.json";
     private final RestTemplate restTemplate;
+    private final ConcurrentHashMap<OAuth2Provider, LocalDateTime> publicKeysCachedTime;
+    private final KeyFactory keyFactory;
     private KakaoPublicKeys kakaoPublicKeys;
     private GooglePublicKeys googlePublicKeys;
-    private ConcurrentHashMap<OAuth2Provider, LocalDateTime> publicKeysCachedTime;
 
     public OpenIdTokenConfig(RestTemplateBuilder restTemplateBuilder) {
         this.restTemplate = restTemplateBuilder.build();
         this.publicKeysCachedTime = new ConcurrentHashMap<>();
-        this.googlePublicKeys = new GooglePublicKeys();
-        this.kakaoPublicKeys = new KakaoPublicKeys();
+        this.keyFactory = createKeyFactory();
     }
 
     public Key getPublicKey(String keyId, OAuth2Provider oAuth2Provider) {
 
         if (OAuth2Provider.KAKAO.equals(oAuth2Provider)) {
-            //시간 체크
-            if (isKakaoPublicKeyCacheExpired()) {
-                //만료되면 공개키 최신화
-                refreshKakaoPublicKeys();
-            }
-            KeyFactory keyFactory = null;
-            try {
-                keyFactory = KeyFactory.getInstance("RSA");
-            } catch (NoSuchAlgorithmException e) {
-                throw new RuntimeException(e);
-            }
-            //공개키 조회
-            return this.kakaoPublicKeys.getKey(keyId, keyFactory);
+            checkKakaoPublicKeyCache();
+            return this.kakaoPublicKeys.getKey(keyId, this.keyFactory);
         }
 
         if (OAuth2Provider.GOOGLE.equals(oAuth2Provider)) {
-            return null;
+            checkGooglePublicKeyCache();
+            return this.googlePublicKeys.getKey(keyId, this.keyFactory);
         }
 
         throw new NotVerifiedRequestFormatException(keyId);
+    }
+
+    private KeyFactory createKeyFactory() {
+        KeyFactory keyFactory = null;
+        try {
+            keyFactory = KeyFactory.getInstance(RSA);
+        } catch (NoSuchAlgorithmException ignore) {
+        }
+        return keyFactory;
+    }
+
+    private void checkGooglePublicKeyCache() {
+        if (isGooglePublicKeyCacheExpired()) {
+            refreshGooglePublicKeys();
+        }
+    }
+
+    private boolean isGooglePublicKeyCacheExpired() {
+        return LocalDateTime.now()
+                .isAfter(publicKeysCachedTime.getOrDefault(OAuth2Provider.GOOGLE, LocalDateTime.MIN));
+    }
+
+    private void refreshGooglePublicKeys() {
+        this.googlePublicKeys = fetchGooglePublicKey();
+        this.publicKeysCachedTime.put(OAuth2Provider.GOOGLE, LocalDateTime.now().plusDays(3L));
+    }
+
+    private GooglePublicKeys fetchGooglePublicKey() {
+        return null;
+    }
+
+    private void checkKakaoPublicKeyCache() {
+        if (isKakaoPublicKeyCacheExpired()) {
+            refreshKakaoPublicKeys();
+        }
+    }
+
+    private boolean isKakaoPublicKeyCacheExpired() {
+        return LocalDateTime.now()
+                .isAfter(publicKeysCachedTime.getOrDefault(OAuth2Provider.KAKAO, LocalDateTime.MIN));
     }
 
     private void refreshKakaoPublicKeys() {
@@ -62,25 +92,9 @@ public class OpenIdTokenConfig {
         this.publicKeysCachedTime.put(OAuth2Provider.KAKAO, LocalDateTime.now().plusDays(3L));
     }
 
-    private boolean isKakaoPublicKeyCacheExpired() {
-        return LocalDateTime.now()
-            .isAfter(publicKeysCachedTime.getOrDefault(OAuth2Provider.KAKAO, LocalDateTime.MIN));
-    }
-
-    public KakaoPublicKeys fetchKakaoPublicKey() {
-
-        String uri = "https://kauth.kakao.com/.well-known/jwks.json";
-
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
-        httpHeaders.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-
-        HttpEntity<?> httpEntity = new HttpEntity<>(httpHeaders);
-
-        KakaoPublicKeys kakaoPublicKeys = restTemplate.exchange(uri,
+    private KakaoPublicKeys fetchKakaoPublicKey() {
+        return restTemplate.exchange(KAKAO_PUBLIC_KEY_REQUEST_URI,
             HttpMethod.GET,
-            httpEntity, KakaoPublicKeys.class).getBody();
-
-        return kakaoPublicKeys;
+            null, KakaoPublicKeys.class).getBody();
     }
 }

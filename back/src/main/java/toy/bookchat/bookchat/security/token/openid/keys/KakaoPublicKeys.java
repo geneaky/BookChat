@@ -3,6 +3,7 @@ package toy.bookchat.bookchat.security.token.openid.keys;
 import java.math.BigInteger;
 import java.security.Key;
 import java.security.KeyFactory;
+import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.List;
@@ -10,35 +11,40 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.util.Base64Utils;
-import toy.bookchat.bookchat.config.openid.PublicKeys;
+import toy.bookchat.bookchat.config.openid.OAuthPublicKey;
 import toy.bookchat.bookchat.security.exception.ExpiredPublicKeyCachedException;
 import toy.bookchat.bookchat.security.exception.WrongKeySpecException;
 
 @Getter
 @Setter
 @NoArgsConstructor
-public class KakaoPublicKeys implements PublicKeys {
+public class KakaoPublicKeys implements OAuthPublicKey {
 
     private List<KakakoPublicKey> keys;
 
-    public KakaoPublicKeys(List<KakakoPublicKey> keys) {
-        this.keys = keys;
-    }
-
+    @Override
     public Key getKey(String keyId, KeyFactory keyFactory) {
         try {
-            for (KakakoPublicKey publicKey : this.keys) {
-                if (keyId.equals(publicKey.getKid())) {
-                    BigInteger modulus = new BigInteger(1,
-                        Base64Utils.decode(publicKey.getN().getBytes()));
-                    BigInteger exponent = new BigInteger(1,
-                        Base64Utils.decode(publicKey.getE().getBytes()));
-                    return keyFactory.generatePublic(new RSAPublicKeySpec(modulus, exponent));
-                }
-            }
+            return searchPublicKey(keyId, keyFactory);
         } catch (InvalidKeySpecException exception) {
             throw new WrongKeySpecException("Wrong KeySpec");
         }
-        throw new ExpiredPublicKeyCachedException("Retry Please");
+    }
+
+    private PublicKey searchPublicKey(String keyId, KeyFactory keyFactory) throws InvalidKeySpecException {
+        for (KakakoPublicKey publicKey : this.keys) {
+            if (keyId.equals(publicKey.getKid())) {
+                return generateKakaoPublicKey(keyFactory, publicKey);
+            }
+        }
+        throw new ExpiredPublicKeyCachedException("Can't Find Public Key, Retry Please");
+    }
+
+    private PublicKey generateKakaoPublicKey(KeyFactory keyFactory, KakakoPublicKey publicKey) throws InvalidKeySpecException {
+        BigInteger modulus = new BigInteger(1,
+            Base64Utils.decodeFromUrlSafeString(publicKey.getN()));
+        BigInteger exponent = new BigInteger(1,
+            Base64Utils.decodeFromUrlSafeString(publicKey.getE()));
+        return keyFactory.generatePublic(new RSAPublicKeySpec(modulus, exponent));
     }
 }

@@ -1,12 +1,16 @@
 package toy.bookchat.bookchat.config;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 import java.math.BigInteger;
+import java.security.Key;
 import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.spec.RSAPublicKeySpec;
+import java.util.Base64;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +18,7 @@ import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.util.Base64Utils;
+import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.token.openid.keys.KakaoPublicKeys;
 
 @RestClientTest(OpenIdTokenConfig.class)
@@ -31,21 +36,20 @@ class OpenIdTokenConfigTest {
     private String kid = "3f96980381e451efad0d2ddd30e3d3";
 
     @Test
-    public void keyId_oAuth2Provider로_요청시_일치하는_publickey반환() throws Exception {
+    public void kakao_keyId_oAuth2Provider로_요청시_일치하는_publickey반환() throws Exception {
 
         mockServer.expect(requestTo(apiUri))
             .andRespond(withSuccess(result, MediaType.APPLICATION_JSON));
 
-        KakaoPublicKeys keys = openIdTokenConfig.fetchKakaoPublicKey();
+        Key kakaoPublicKey = openIdTokenConfig.getPublicKey(kid, OAuth2Provider.KAKAO);
 
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         BigInteger modulus = new BigInteger(1,
-            Base64Utils.decode(n.getBytes()));
+            Base64Utils.decodeFromUrlSafeString(n));
         BigInteger exponent = new BigInteger(1,
-            Base64Utils.decode(e.getBytes()));
+            Base64Utils.decodeFromUrlSafeString(e));
         PublicKey publicKey = keyFactory.generatePublic(new RSAPublicKeySpec(modulus, exponent));
 
-        Assertions.assertThat(keys).isEqualTo(publicKey);
-
+        assertThat(kakaoPublicKey).isEqualTo(publicKey);
     }
 }
