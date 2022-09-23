@@ -26,7 +26,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private String nickName;
+    private String nickname;
     private String email;
     private String profileImageUrl;
     private ROLE role;
@@ -40,14 +40,14 @@ public class User {
 
     @Builder
     public User(String name, String email, String profileImageUrl, ROLE role,
-        OAuth2Provider provider, String nickName, List<ReadingTaste> readingTastes,
-        Integer defaultProfileImageType) {
+                OAuth2Provider provider, String nickname, List<ReadingTaste> readingTastes,
+                Integer defaultProfileImageType) {
         this.name = name;
         this.email = email;
         this.profileImageUrl = profileImageUrl;
         this.role = role;
         this.provider = provider;
-        this.nickName = nickName;
+        this.nickname = nickname;
         this.readingTastes = readingTastes;
         this.defaultProfileImageType = defaultProfileImageType;
     }

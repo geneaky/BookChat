@@ -25,7 +25,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public boolean isDuplicatedName(String nickname) {
-        return userRepository.existsByNickName(nickname);
+        return userRepository.existsByNickname(nickname);
     }
 
     @Override

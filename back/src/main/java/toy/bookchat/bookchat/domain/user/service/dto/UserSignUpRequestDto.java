@@ -30,8 +30,6 @@ public class UserSignUpRequestDto {
 
     @NotBlank
     String nickname;
-    // TODO: 2022/09/16 userEmail, oauth2Provider는 openidtoken이랑
-    //  request header에 넣어주기로 했었는데 생각해보니 그럼 여기서는 지워도되네
     MultipartFile userProfileImage;
     List<ReadingTaste> readingTastes;
     @NotNull

@@ -141,8 +141,8 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
             .profileImageUrl("somethingImageUrl@naver.com")
             .build();
 
-        return new UserPrincipal(1L, user.getEmail(), user.getName(), user.getProfileImageUrl(),
-            authorities, user);
+        return new UserPrincipal(1L, user.getEmail(), user.getName(), user.getNickname(), user.getProfileImageUrl(),
+            user.getDefaultProfileImageType(), authorities, user);
     }
 
     private BookShelfRequestDto getBookShelfRequestDto(ReadingStatus readingStatus) {

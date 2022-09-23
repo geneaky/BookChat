@@ -51,19 +51,19 @@ class UserRepositoryTest {
             .name("user")
             .email("kaktus418@gmail.com")
             .provider(OAuth2Provider.KAKAO)
-            .nickName("nickname")
+            .nickname("nickname")
             .build();
 
         userRepository.save(user);
 
-        boolean result = userRepository.existsByNickName("nickname");
+        boolean result = userRepository.existsByNickname("nickname");
 
         assertThat(result).isTrue();
     }
 
     @Test
     public void 사용자_nickname_존재하지않을시_false_반환_성공() throws Exception {
-        boolean result = userRepository.existsByNickName("nickname");
+        boolean result = userRepository.existsByNickname("nickname");
 
         assertThat(result).isFalse();
     }

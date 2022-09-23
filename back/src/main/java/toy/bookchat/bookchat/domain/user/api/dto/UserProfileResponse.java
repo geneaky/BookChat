@@ -8,15 +8,17 @@ import toy.bookchat.bookchat.security.user.UserPrincipal;
 @Builder
 public class UserProfileResponse {
 
-    private String userName;
+    private String userNickname;
     private String userEmail;
     private String userProfileImageUri;
+    private Integer defaultProfileImageType;
 
     public static UserProfileResponse of(UserPrincipal userPrincipal) {
         return UserProfileResponse.builder()
-            .userName(userPrincipal.getName())
+            .userNickname(userPrincipal.getNickname())
             .userEmail(userPrincipal.getEmail())
             .userProfileImageUri(userPrincipal.getProfileImageUri())
+            .defaultProfileImageType(userPrincipal.getDefaultProfileImageType())
             .build();
     }
 }

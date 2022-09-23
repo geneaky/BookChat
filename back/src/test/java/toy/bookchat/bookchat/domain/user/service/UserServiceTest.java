@@ -17,7 +17,6 @@ import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.exception.UserAlreadySignUpException;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.domain.user.service.dto.UserSignUpRequestDto;
-import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
 import java.util.Optional;
 
@@ -34,14 +33,14 @@ class UserServiceTest {
     @Test
     public void 사용자_중복된_nickname_체크() throws Exception {
 
-        when(userRepository.existsByNickName(anyString())).thenReturn(true);
+        when(userRepository.existsByNickname(anyString())).thenReturn(true);
         boolean result = userService.isDuplicatedName("test");
         assertThat(result).isTrue();
     }
 
     @Test
     public void 사용자가_중복되지_않은_nickname_체크() throws Exception {
-        when(userRepository.existsByNickName(anyString())).thenReturn(false);
+        when(userRepository.existsByNickname(anyString())).thenReturn(false);
         boolean result = userService.isDuplicatedName("test");
         assertThat(result).isFalse();
     }
