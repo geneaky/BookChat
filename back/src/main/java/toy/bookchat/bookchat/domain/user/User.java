@@ -2,8 +2,14 @@ package toy.bookchat.bookchat.domain.user;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.*;
-
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,7 +40,8 @@ public class User {
 
     @Builder
     public User(String name, String email, String profileImageUrl, ROLE role,
-        OAuth2Provider provider, String nickName, List<ReadingTaste> readingTastes, Integer defaultProfileImageType) {
+        OAuth2Provider provider, String nickName, List<ReadingTaste> readingTastes,
+        Integer defaultProfileImageType) {
         this.name = name;
         this.email = email;
         this.profileImageUrl = profileImageUrl;

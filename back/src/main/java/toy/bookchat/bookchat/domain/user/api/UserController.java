@@ -1,31 +1,33 @@
 package toy.bookchat.bookchat.domain.user.api;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.util.StringUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import toy.bookchat.bookchat.domain.user.api.dto.UserProfileResponse;
 import toy.bookchat.bookchat.domain.user.service.UserService;
 import toy.bookchat.bookchat.domain.user.service.dto.UserSignUpRequestDto;
-import toy.bookchat.bookchat.security.jwt.JwtTokenManager;
+import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
+import toy.bookchat.bookchat.security.token.openid.OpenIdTokenManager;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
-import toy.bookchat.bookchat.utils.constants.AuthConstants;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import java.util.Optional;
 
 import static toy.bookchat.bookchat.utils.constants.AuthConstants.*;
 
+@Validated
 @RestController
 @RequestMapping("/v1/api")
 @RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
-    private final JwtTokenManager jwtTokenManager;
+    private final OpenIdTokenManager openIdTokenManager;
 
     /* TODO: 2022-08-29
         추후: 사용자 프로필의 경우 프로필 수정을 누르지 않으면 동일한 데이터에 대해 read
@@ -43,32 +45,29 @@ public class UserController {
      */
     @GetMapping("/users/profile/nickname")
     public ResponseEntity<Void> checkDuplicatedNickname(String nickname) {
-        if(userService.isDuplicatedName(nickname)) {
+        if (userService.isDuplicatedName(nickname)) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
         }
         return ResponseEntity.ok(null);
     }
 
     @PostMapping("/users")
-    public ResponseEntity<Void> userSignUp(@Valid @ModelAttribute UserSignUpRequestDto userSignUpRequestDto, HttpServletRequest request) {
+    public ResponseEntity<Void> userSignUp(
+        @Valid @ModelAttribute UserSignUpRequestDto userSignUpRequestDto,
+        @RequestHeader(AUTHORIZATION) @NotBlank @Pattern(regexp = "^(Bearer)\\s.+") String bearerToken,
+        @RequestHeader(PROVIDER_TYPE) @NotNull OAuth2Provider oAuth2Provider) {
 
-        if(isNotValidatedRequest(request)) {
-            return ResponseEntity.badRequest().body(null);
-        }
+        String oauth2MemberNumber = openIdTokenManager.getOAuth2MemberNumberFromToken(
+            getOpenIdToken(bearerToken), oAuth2Provider);
 
-        String oauth2MemberNumber = jwtTokenManager.isNotValidatedToken(getOpenIdToken(request));
-        userService.registerNewUser(userSignUpRequestDto, oauth2MemberNumber);
+        String userEmail = openIdTokenManager.getUserEmailFromToken(getOpenIdToken(bearerToken), oAuth2Provider);
+
+        userService.registerNewUser(userSignUpRequestDto, oauth2MemberNumber, userEmail, oAuth2Provider);
 
         return ResponseEntity.ok(null);
     }
 
-    private String getOpenIdToken(HttpServletRequest request) {
-        return request.getHeader(AUTHORIZATION).substring(BEGIN_INDEX);
+    private String getOpenIdToken(String bearerToken) {
+        return bearerToken.substring(BEGIN_INDEX);
     }
-
-    public boolean isNotValidatedRequest(HttpServletRequest request) {
-        Optional<String> authorization = Optional.ofNullable(request.getHeader(AUTHORIZATION));
-        return authorization.isEmpty() || !authorization.get().startsWith(BEARER) || !StringUtils.hasText(authorization.get().substring(BEGIN_INDEX));
-    }
-
 }

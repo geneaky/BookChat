@@ -449,6 +449,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight nowrap"><code data-lang="http">GET /v1/api/users/profile HTTP/1.1
+Authorization: Bearer eyJraWQiOiJhYmNlZGYiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaXNzIjoiIGh0dHBzOi8va2F1dGgua2FrYW8uY29tIn0.YhpZOu9l6nNSNH2jn6BAxn95zapWSlnLhXcoFwSbQ7mLAtOWYh0P81C4mi0v5GlynbRCbg3ICKB7uA38WlW-1aNko19bLyKZ6ynEfV-xZADkxw4l3fiyL2wCQMQ4fnRjKtzfcLbCO62MchJpQHZm8lJc82I52ggtDBuguDIf6CZWtYj1mMVs54iEkx251DvssxdzRBFVH6-OMo-de3c92mt8tFaqP2S3TtIZNty7BLrYrHgHAhSSDMo5UcuzxyLPAthd_mZuXjgis5L9j9EMjzUPmtYdZp6AE_JUmo51Vo-OqpNGBOqdbezbIZtxc73u0BVvAX4-HveZzCSn0re-iQ
+provider_type: KAKAO
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -462,14 +464,14 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 104
+Content-Length: 105
 
-{&quot;userName&quot;:&quot;testUser&quot;,&quot;userEmail&quot;:&quot;test@gmail.com&quot;,&quot;userProfileImageUri&quot;:&quot;somethingImageUrl@naver.com&quot;}</code></pre>
+{&quot;userName&quot;:&quot;testkakao&quot;,&quot;userEmail&quot;:&quot;test@gmail.com&quot;,&quot;userProfileImageUri&quot;:&quot;somethingImageUrl@naver.com&quot;}</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code>{&quot;userName&quot;:&quot;testUser&quot;,&quot;userEmail&quot;:&quot;test@gmail.com&quot;,&quot;userProfileImageUri&quot;:&quot;somethingImageUrl@naver.com&quot;}</code></pre>
+<pre class="CodeRay highlight nowrap"><code>{&quot;userName&quot;:&quot;testkakao&quot;,&quot;userEmail&quot;:&quot;test@gmail.com&quot;,&quot;userProfileImageUri&quot;:&quot;somethingImageUrl@naver.com&quot;}</code></pre>
 </div>
 </div>
 <hr>
@@ -528,16 +530,6 @@ Host: localhost:8080</code></pre>
 <td class="tableblock halign-left valign-top"><p class="tableblock">닉네임</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>userEmail</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><em>false</em></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">이메일</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>oauth2Provider</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><em>false</em></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">원천 제공자</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>defaultProfileImageType</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><em>false</em></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">기본 이미지 타입</p></td>
@@ -557,11 +549,12 @@ Host: localhost:8080</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight nowrap"><code data-lang="http">POST /v1/api/users HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.UXnCRqPLkzv9UBYd9Z3PHk8dnulvjZIF95beoLX8Vfw
+Authorization: Bearer eyJraWQiOiJhYmNlZGYiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJodHRwczovL2thdXRoLmtha2FvLmNvbSIsImVtYWlsIjoidGVzdEBnbWFpbC5jb20ifQ.gwtFr5ktKeBkxh9PpEvTZqS13BXH1-rNO9SXfQlkCv72v8lWuzVUt7Emw6m4M8yd2KhwyaVmaxAK1ncE_1BeHOoLmKxiF3oc9K_6w71pYEWKoqn2ScGqhyHEW9IrwolXr-C12AHF_zIFFL_VN7hYKZQf-RhAe9nn4-XQ3HyosXpdFE2p9v6z36mAAXbZ2qEYB_CTe_6iUo8bfA6FWpMyyoB1OllXiWxITkRqtsylzUUWUCFTPoiHRi_LZ9xPeWxmYSgbhTGp_pdhW5I5QlgJ7O54gSxknjmUXF5xgksDXyn1djxt9YMqSErWqDdWOzx0g4VZgmt5O2gEWyN2fRscyA
+provider_type: KAKAO
 Host: localhost:8080
 Content-Type: application/x-www-form-urlencoded
 
-nickname=nick&amp;userEmail=kaktus418%40gmail.com&amp;oauth2Provider=google&amp;defaultProfileImageType=1</code></pre>
+nickname=nick&amp;defaultProfileImageType=1&amp;readingTastes=PHILOSOPHY&amp;readingTastes=DEVELOPMENT&amp;readingTastes=DESIGN</code></pre>
 </div>
 </div>
 <div class="listingblock">
@@ -580,6 +573,8 @@ nickname=nick&amp;userEmail=kaktus418%40gmail.com&amp;oauth2Provider=google&amp;
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight nowrap"><code data-lang="http">GET /v1/api/books?isbn=1231513&amp;size=5&amp;page=1&amp;sort=ACCURACY HTTP/1.1
+Authorization: Bearer eyJraWQiOiJhYmNlZGYiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaXNzIjoiIGh0dHBzOi8va2F1dGgua2FrYW8uY29tIn0.YhpZOu9l6nNSNH2jn6BAxn95zapWSlnLhXcoFwSbQ7mLAtOWYh0P81C4mi0v5GlynbRCbg3ICKB7uA38WlW-1aNko19bLyKZ6ynEfV-xZADkxw4l3fiyL2wCQMQ4fnRjKtzfcLbCO62MchJpQHZm8lJc82I52ggtDBuguDIf6CZWtYj1mMVs54iEkx251DvssxdzRBFVH6-OMo-de3c92mt8tFaqP2S3TtIZNty7BLrYrHgHAhSSDMo5UcuzxyLPAthd_mZuXjgis5L9j9EMjzUPmtYdZp6AE_JUmo51Vo-OqpNGBOqdbezbIZtxc73u0BVvAX4-HveZzCSn0re-iQ
+provider_type: KAKAO
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -644,6 +639,8 @@ Content-Length: 203
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight nowrap"><code data-lang="http">GET /v1/api/books?title=effectiveJava&amp;size=5&amp;page=1&amp;sort=LATEST HTTP/1.1
+Authorization: Bearer eyJraWQiOiJhYmNlZGYiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaXNzIjoiIGh0dHBzOi8va2F1dGgua2FrYW8uY29tIn0.YhpZOu9l6nNSNH2jn6BAxn95zapWSlnLhXcoFwSbQ7mLAtOWYh0P81C4mi0v5GlynbRCbg3ICKB7uA38WlW-1aNko19bLyKZ6ynEfV-xZADkxw4l3fiyL2wCQMQ4fnRjKtzfcLbCO62MchJpQHZm8lJc82I52ggtDBuguDIf6CZWtYj1mMVs54iEkx251DvssxdzRBFVH6-OMo-de3c92mt8tFaqP2S3TtIZNty7BLrYrHgHAhSSDMo5UcuzxyLPAthd_mZuXjgis5L9j9EMjzUPmtYdZp6AE_JUmo51Vo-OqpNGBOqdbezbIZtxc73u0BVvAX4-HveZzCSn0re-iQ
+provider_type: KAKAO
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -708,6 +705,8 @@ Content-Length: 203
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight nowrap"><code data-lang="http">GET /v1/api/books?author=Joshua&amp;size=5&amp;page=1&amp;sort=LATEST HTTP/1.1
+Authorization: Bearer eyJraWQiOiJhYmNlZGYiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaXNzIjoiIGh0dHBzOi8va2F1dGgua2FrYW8uY29tIn0.YhpZOu9l6nNSNH2jn6BAxn95zapWSlnLhXcoFwSbQ7mLAtOWYh0P81C4mi0v5GlynbRCbg3ICKB7uA38WlW-1aNko19bLyKZ6ynEfV-xZADkxw4l3fiyL2wCQMQ4fnRjKtzfcLbCO62MchJpQHZm8lJc82I52ggtDBuguDIf6CZWtYj1mMVs54iEkx251DvssxdzRBFVH6-OMo-de3c92mt8tFaqP2S3TtIZNty7BLrYrHgHAhSSDMo5UcuzxyLPAthd_mZuXjgis5L9j9EMjzUPmtYdZp6AE_JUmo51Vo-OqpNGBOqdbezbIZtxc73u0BVvAX4-HveZzCSn0re-iQ
+provider_type: KAKAO
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -773,6 +772,8 @@ Content-Length: 203
 <div class="content">
 <pre class="CodeRay highlight nowrap"><code data-lang="http">POST /v1/api/bookshelf/books HTTP/1.1
 Content-Type: application/json;charset=UTF-8
+Authorization: Bearer eyJraWQiOiJhYmNlZGYiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaXNzIjoiIGh0dHBzOi8va2F1dGgua2FrYW8uY29tIn0.YhpZOu9l6nNSNH2jn6BAxn95zapWSlnLhXcoFwSbQ7mLAtOWYh0P81C4mi0v5GlynbRCbg3ICKB7uA38WlW-1aNko19bLyKZ6ynEfV-xZADkxw4l3fiyL2wCQMQ4fnRjKtzfcLbCO62MchJpQHZm8lJc82I52ggtDBuguDIf6CZWtYj1mMVs54iEkx251DvssxdzRBFVH6-OMo-de3c92mt8tFaqP2S3TtIZNty7BLrYrHgHAhSSDMo5UcuzxyLPAthd_mZuXjgis5L9j9EMjzUPmtYdZp6AE_JUmo51Vo-OqpNGBOqdbezbIZtxc73u0BVvAX4-HveZzCSn0re-iQ
+provider_type: KAKAO
 Content-Length: 155
 Host: localhost:8080
 
@@ -803,6 +804,8 @@ X-Frame-Options: DENY</code></pre>
 <div class="content">
 <pre class="CodeRay highlight nowrap"><code data-lang="http">POST /v1/api/bookshelf/books HTTP/1.1
 Content-Type: application/json;charset=UTF-8
+Authorization: Bearer eyJraWQiOiJhYmNlZGYiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaXNzIjoiIGh0dHBzOi8va2F1dGgua2FrYW8uY29tIn0.YhpZOu9l6nNSNH2jn6BAxn95zapWSlnLhXcoFwSbQ7mLAtOWYh0P81C4mi0v5GlynbRCbg3ICKB7uA38WlW-1aNko19bLyKZ6ynEfV-xZADkxw4l3fiyL2wCQMQ4fnRjKtzfcLbCO62MchJpQHZm8lJc82I52ggtDBuguDIf6CZWtYj1mMVs54iEkx251DvssxdzRBFVH6-OMo-de3c92mt8tFaqP2S3TtIZNty7BLrYrHgHAhSSDMo5UcuzxyLPAthd_mZuXjgis5L9j9EMjzUPmtYdZp6AE_JUmo51Vo-OqpNGBOqdbezbIZtxc73u0BVvAX4-HveZzCSn0re-iQ
+provider_type: KAKAO
 Content-Length: 154
 Host: localhost:8080
 
@@ -833,6 +836,8 @@ X-Frame-Options: DENY</code></pre>
 <div class="content">
 <pre class="CodeRay highlight nowrap"><code data-lang="http">POST /v1/api/bookshelf/books HTTP/1.1
 Content-Type: application/json;charset=UTF-8
+Authorization: Bearer eyJraWQiOiJhYmNlZGYiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaXNzIjoiIGh0dHBzOi8va2F1dGgua2FrYW8uY29tIn0.YhpZOu9l6nNSNH2jn6BAxn95zapWSlnLhXcoFwSbQ7mLAtOWYh0P81C4mi0v5GlynbRCbg3ICKB7uA38WlW-1aNko19bLyKZ6ynEfV-xZADkxw4l3fiyL2wCQMQ4fnRjKtzfcLbCO62MchJpQHZm8lJc82I52ggtDBuguDIf6CZWtYj1mMVs54iEkx251DvssxdzRBFVH6-OMo-de3c92mt8tFaqP2S3TtIZNty7BLrYrHgHAhSSDMo5UcuzxyLPAthd_mZuXjgis5L9j9EMjzUPmtYdZp6AE_JUmo51Vo-OqpNGBOqdbezbIZtxc73u0BVvAX4-HveZzCSn0re-iQ
+provider_type: KAKAO
 Content-Length: 151
 Host: localhost:8080
 
@@ -896,6 +901,8 @@ X-Frame-Options: DENY</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight nowrap"><code data-lang="http">GET /v1/api/bookshelf/books?readingStatus=READING&amp;size=5&amp;page=1&amp;sort=id,DESC HTTP/1.1
+Authorization: Bearer eyJraWQiOiJhYmNlZGYiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaXNzIjoiIGh0dHBzOi8va2F1dGgua2FrYW8uY29tIn0.YhpZOu9l6nNSNH2jn6BAxn95zapWSlnLhXcoFwSbQ7mLAtOWYh0P81C4mi0v5GlynbRCbg3ICKB7uA38WlW-1aNko19bLyKZ6ynEfV-xZADkxw4l3fiyL2wCQMQ4fnRjKtzfcLbCO62MchJpQHZm8lJc82I52ggtDBuguDIf6CZWtYj1mMVs54iEkx251DvssxdzRBFVH6-OMo-de3c92mt8tFaqP2S3TtIZNty7BLrYrHgHAhSSDMo5UcuzxyLPAthd_mZuXjgis5L9j9EMjzUPmtYdZp6AE_JUmo51Vo-OqpNGBOqdbezbIZtxc73u0BVvAX4-HveZzCSn0re-iQ
+provider_type: KAKAO
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -945,6 +952,8 @@ Host: localhost:8080</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight nowrap"><code data-lang="http">GET /v1/api/bookshelf/books?readingStatus=COMPLETE&amp;size=5&amp;page=1&amp;sort=id,DESC HTTP/1.1
+Authorization: Bearer eyJraWQiOiJhYmNlZGYiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaXNzIjoiIGh0dHBzOi8va2F1dGgua2FrYW8uY29tIn0.YhpZOu9l6nNSNH2jn6BAxn95zapWSlnLhXcoFwSbQ7mLAtOWYh0P81C4mi0v5GlynbRCbg3ICKB7uA38WlW-1aNko19bLyKZ6ynEfV-xZADkxw4l3fiyL2wCQMQ4fnRjKtzfcLbCO62MchJpQHZm8lJc82I52ggtDBuguDIf6CZWtYj1mMVs54iEkx251DvssxdzRBFVH6-OMo-de3c92mt8tFaqP2S3TtIZNty7BLrYrHgHAhSSDMo5UcuzxyLPAthd_mZuXjgis5L9j9EMjzUPmtYdZp6AE_JUmo51Vo-OqpNGBOqdbezbIZtxc73u0BVvAX4-HveZzCSn0re-iQ
+provider_type: KAKAO
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -994,6 +1003,8 @@ Host: localhost:8080</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight nowrap"><code data-lang="http">GET /v1/api/bookshelf/books?readingStatus=WISH&amp;size=5&amp;page=1&amp;sort=id,DESC HTTP/1.1
+Authorization: Bearer eyJraWQiOiJhYmNlZGYiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaXNzIjoiIGh0dHBzOi8va2F1dGgua2FrYW8uY29tIn0.YhpZOu9l6nNSNH2jn6BAxn95zapWSlnLhXcoFwSbQ7mLAtOWYh0P81C4mi0v5GlynbRCbg3ICKB7uA38WlW-1aNko19bLyKZ6ynEfV-xZADkxw4l3fiyL2wCQMQ4fnRjKtzfcLbCO62MchJpQHZm8lJc82I52ggtDBuguDIf6CZWtYj1mMVs54iEkx251DvssxdzRBFVH6-OMo-de3c92mt8tFaqP2S3TtIZNty7BLrYrHgHAhSSDMo5UcuzxyLPAthd_mZuXjgis5L9j9EMjzUPmtYdZp6AE_JUmo51Vo-OqpNGBOqdbezbIZtxc73u0BVvAX4-HveZzCSn0re-iQ
+provider_type: KAKAO
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1009,7 +1020,7 @@ Host: localhost:8080</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-08-29 17:10:03 +0900
+Last updated 2022-09-01 09:50:09 +0900
 </div>
 </div>
 </body>

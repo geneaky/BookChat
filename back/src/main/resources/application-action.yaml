@@ -18,52 +18,35 @@ spring:
         use_sql_comments: true
         show_sql: true
     open-in-view: false
-  
-  #Spring Security Setting
-  security:
-    oauth2:
-      client:
-        registration:
-          google:
-            client-id: test
-            client-secret: test
-            redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
-            scope:
-              - email
-              - profile
-          kakao:
-            client-id: test
-            redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
-            authorization-grant-type: authorization_code
-            scope:
-              - account_email
-              - profile_image
-            client-name: test
-        provider:
-          kakao:
-            authorization_uri: test
-            token_uri: test
-            user-info-uri: test
-            user_name_attribute: id
+
   jackson:
     parser:
       allow-unquoted-control-chars: true
 
-token:
-  secret: 'test'
-  accessTokenExpiredTime: 1800000
-  refreshTokenExpiredTime: 1209600000
-  oauth2:
-    authorizaedRedirectUris:
-      - http://localhost:8080
-
+logging:
+  level:
+    com:
+      amazonaws:
+        util:
+          EC2MetadataUtils: error
 book:
   api:
     header: 'KakaoAK test'
     uri: test
+
+cloud:
+  aws:
+    stack:
+      auto: false
+    region:
+      static: ap-northeast-2
 
 aws:
   s3:
     accessKey: testetsttest
     secretKey: testestsetst
     region: ap-northeast-2
+
+oauth2:
+  kakaoURI: 'https://kauth.kakao.com/.well-known/jwks.json'
+  googleURI:
