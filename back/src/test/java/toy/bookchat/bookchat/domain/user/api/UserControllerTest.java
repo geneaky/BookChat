@@ -104,7 +104,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
             .build();
 
         return new UserPrincipal(1L, user.getEmail(),
-            user.getName(), user.getProfileImageUrl(), authorities, user);
+            user.getName(), user.getNickname(), user.getProfileImageUrl(), user.getDefaultProfileImageType(), authorities, user);
     }
 
     @Test
@@ -129,15 +129,18 @@ public class UserControllerTest extends AuthenticationTestExtension {
 
         String real = objectMapper.writeValueAsString(UserProfileResponse.builder()
             .userEmail("test@gmail.com")
-            .userName("testkakao")
+            .userNickname("nickname")
             .userProfileImageUri("somethingImageUrl@naver.com")
+            .defaultProfileImageType(1)
             .build());
 
         User user = User.builder()
             .email("test@gmail.com")
             .name("testkakao")
+            .nickname("nickname")
             .role(ROLE.USER)
             .profileImageUrl("somethingImageUrl@naver.com")
+            .defaultProfileImageType(1)
             .build();
 
         when(userRepository.findByName(any())).thenReturn(Optional.of(user));

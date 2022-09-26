@@ -12,12 +12,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.multipart.MultipartFile;
+import toy.bookchat.bookchat.config.aws.S3Config;
 import toy.bookchat.bookchat.domain.storage.StorageService;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.exception.UserAlreadySignUpException;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.domain.user.service.dto.UserSignUpRequestDto;
-import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
 import java.util.Optional;
 
@@ -34,14 +35,14 @@ class UserServiceTest {
     @Test
     public void 사용자_중복된_nickname_체크() throws Exception {
 
-        when(userRepository.existsByNickName(anyString())).thenReturn(true);
+        when(userRepository.existsByNickname(anyString())).thenReturn(true);
         boolean result = userService.isDuplicatedName("test");
         assertThat(result).isTrue();
     }
 
     @Test
     public void 사용자가_중복되지_않은_nickname_체크() throws Exception {
-        when(userRepository.existsByNickName(anyString())).thenReturn(false);
+        when(userRepository.existsByNickname(anyString())).thenReturn(false);
         boolean result = userService.isDuplicatedName("test");
         assertThat(result).isFalse();
     }
@@ -50,6 +51,7 @@ class UserServiceTest {
     public void 처음_가입하는_회원의_경우_회원가입_성공() throws Exception {
         UserSignUpRequestDto userSignUpRequestDto = mock(UserSignUpRequestDto.class);
         User mockUser = mock(User.class);
+        when(storageService.getFileUrl(any())).thenReturn("testBucketUrl");
         when(userSignUpRequestDto.hasValidImage()).thenReturn(true);
         when(userSignUpRequestDto.getUser(any(), any(), any(), any())).thenReturn(mockUser);
         userService.registerNewUser(userSignUpRequestDto, "memberNumber","test@gmail.com", KAKAO);
@@ -66,5 +68,20 @@ class UserServiceTest {
         assertThatThrownBy(() -> {
             userService.registerNewUser(userSignUpRequestDto, "testMemberNumber","test@gmail.com", KAKAO);
         }).isInstanceOf(UserAlreadySignUpException.class);
+    }
+
+    @Test
+    public void 사용자_회원가입시_지원하지_않는_이미지_확장자_예외발생() throws Exception {
+        MultipartFile multipartFile = mock(MultipartFile.class);
+        UserSignUpRequestDto userSignUpRequestDto = UserSignUpRequestDto.builder()
+                .userProfileImage(multipartFile)
+                .build();
+
+        when(multipartFile.getOriginalFilename()).thenReturn("test.png");
+        when(multipartFile.isEmpty()).thenReturn(false);
+
+        assertThatThrownBy(() -> {
+            userService.registerNewUser(userSignUpRequestDto, "testMemberNumber","test@gmail.com", KAKAO);
+        }).isInstanceOf(IllegalArgumentException.class);
     }
 }

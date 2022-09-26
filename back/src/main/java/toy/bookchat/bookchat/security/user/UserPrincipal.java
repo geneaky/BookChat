@@ -23,15 +23,19 @@ public class UserPrincipal implements UserDetails, OAuth2User {
     private final Collection<? extends GrantedAuthority> authorities;
     @Setter
     private Map<String, Object> attributes;
+    private Integer defaultProfileImageType;
+    private String nickname;
 
     public UserPrincipal(Long id, String email, String userName,
-        String profileImageUri,
+        String nickname, String profileImageUri, Integer defaultProfileImageType,
         Collection<? extends GrantedAuthority> authorities, User user) {
         this.user = user;
         this.id = id;
         this.email = email;
         this.userName = userName;
+        this.nickname = nickname;
         this.profileImageUri = profileImageUri;
+        this.defaultProfileImageType = defaultProfileImageType;
         this.authorities = authorities;
     }
 
@@ -44,7 +48,9 @@ public class UserPrincipal implements UserDetails, OAuth2User {
             user.getId(),
             user.getEmail(),
             user.getName(),
+            user.getNickname(),
             user.getProfileImageUrl(),
+            user.getDefaultProfileImageType(),
             authorities,
             user
         );
@@ -58,6 +64,14 @@ public class UserPrincipal implements UserDetails, OAuth2User {
 
     public User getUser() {
         return user;
+    }
+
+    public Integer getDefaultProfileImageType() {
+        return defaultProfileImageType;
+    }
+
+    public String getNickname() {
+        return nickname;
     }
 
     @Override
@@ -104,5 +118,4 @@ public class UserPrincipal implements UserDetails, OAuth2User {
     public boolean isEnabled() {
         return true;
     }
-
 }

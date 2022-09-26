@@ -65,7 +65,7 @@ class OpenIdAuthenticationFilterTest {
             .name("352kakao")
             .provider(OAuth2Provider.KAKAO)
             .email("test@gmail.com")
-            .nickName("testnick")
+            .nickname("testnick")
             .role(ROLE.USER)
             .build();
 

@@ -130,7 +130,7 @@ public class BookControllerTest extends AuthenticationTestExtension {
             .profileImageUrl("somethingImageUrl@naver.com")
             .build();
 
-        return new UserPrincipal(1L, user.getEmail(), user.getName(), user.getProfileImageUrl(),
+        return new UserPrincipal(1L, user.getEmail(), user.getName(), user.getNickname(), user.getProfileImageUrl(), user.getDefaultProfileImageType(),
             authorities, user);
 
     }

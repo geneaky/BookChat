@@ -34,6 +34,9 @@ public class OpenIdTokenConfig {
         this.keyFactory = createKeyFactory();
     }
 
+    /* TODO: 2022-09-23 app key로 검증하는거까지 추가하자
+     */
+
     public Key getPublicKey(String keyId, OAuth2Provider oAuth2Provider) {
 
         if (OAuth2Provider.KAKAO.equals(oAuth2Provider)) {
