@@ -3,14 +3,21 @@ ifndef::snippets[]
 endif::[]
 
 = BookChat API Documentation
+:toc: left
+:toclevels: 2
+:source-highlighter: highlightjs
 
 == 사용자
 
 === 사용자 기본 프로필 조회
 
+==== 성공
 include::{snippets}/user/http-request.adoc[]
 include::{snippets}/user/http-response.adoc[]
 include::{snippets}/user/response-body.adoc[]
+
+==== 실패
+include::{snippets}/user/
 
 ---
 

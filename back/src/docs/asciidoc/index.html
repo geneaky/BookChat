@@ -435,10 +435,36 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 #footer-text{color:rgba(0,0,0,.6);font-size:.9em}}
 @media amzn-kf8{#header,#content,#footnotes,#footer{padding:0}}
 </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/styles/github.min.css">
 </head>
-<body class="article">
+<body class="article toc2 toc-left">
 <div id="header">
 <h1>BookChat API Documentation</h1>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_사용자">사용자</a>
+<ul class="sectlevel2">
+<li><a href="#_사용자_기본_프로필_조회">사용자 기본 프로필 조회</a></li>
+<li><a href="#_사용자_닉네임_중복_체크">사용자 닉네임 중복 체크</a></li>
+<li><a href="#_사용자_회원가입">사용자 회원가입</a></li>
+</ul>
+</li>
+<li><a href="#_도서">도서</a>
+<ul class="sectlevel2">
+<li><a href="#_isbn_도서_검색">ISBN 도서 검색</a></li>
+<li><a href="#_title_도서_검색">Title 도서 검색</a></li>
+<li><a href="#_author_도서_검색">Author 도서 검색</a></li>
+<li><a href="#_읽은_도서_등록">읽은 도서 등록</a></li>
+<li><a href="#_읽고_있는_도서_등록">읽고 있는 도서 등록</a></li>
+<li><a href="#_읽을_도서_등록">읽을 도서 등록</a></li>
+<li><a href="#_읽고_있는_도서_조회">읽고 있는 도서 조회</a></li>
+<li><a href="#_읽은_도서_조회">읽은 도서 조회</a></li>
+<li><a href="#_읽을_도서_조회">읽을 도서 조회</a></li>
+</ul>
+</li>
+</ul>
+</div>
 </div>
 <div id="content">
 <div class="sect1">
@@ -448,7 +474,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h3 id="_사용자_기본_프로필_조회">사용자 기본 프로필 조회</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code data-lang="http">GET /v1/api/users/profile HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /v1/api/users/profile HTTP/1.1
 Authorization: Bearer eyJraWQiOiJhYmNlZGYiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaXNzIjoiIGh0dHBzOi8va2F1dGgua2FrYW8uY29tIn0.YhpZOu9l6nNSNH2jn6BAxn95zapWSlnLhXcoFwSbQ7mLAtOWYh0P81C4mi0v5GlynbRCbg3ICKB7uA38WlW-1aNko19bLyKZ6ynEfV-xZADkxw4l3fiyL2wCQMQ4fnRjKtzfcLbCO62MchJpQHZm8lJc82I52ggtDBuguDIf6CZWtYj1mMVs54iEkx251DvssxdzRBFVH6-OMo-de3c92mt8tFaqP2S3TtIZNty7BLrYrHgHAhSSDMo5UcuzxyLPAthd_mZuXjgis5L9j9EMjzUPmtYdZp6AE_JUmo51Vo-OqpNGBOqdbezbIZtxc73u0BVvAX4-HveZzCSn0re-iQ
 provider_type: KAKAO
 Host: localhost:8080</code></pre>
@@ -456,7 +482,7 @@ Host: localhost:8080</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code data-lang="http">HTTP/1.1 200 OK
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 1; mode=block
@@ -464,14 +490,14 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 105
+Content-Length: 136
 
-{&quot;userName&quot;:&quot;testkakao&quot;,&quot;userEmail&quot;:&quot;test@gmail.com&quot;,&quot;userProfileImageUri&quot;:&quot;somethingImageUrl@naver.com&quot;}</code></pre>
+{"userNickname":"nickname","userEmail":"test@gmail.com","userProfileImageUri":"somethingImageUrl@naver.com","defaultProfileImageType":1}</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code>{&quot;userName&quot;:&quot;testkakao&quot;,&quot;userEmail&quot;:&quot;test@gmail.com&quot;,&quot;userProfileImageUri&quot;:&quot;somethingImageUrl@naver.com&quot;}</code></pre>
+<pre class="highlightjs highlight nowrap"><code class="language-none hljs">{"userNickname":"nickname","userEmail":"test@gmail.com","userProfileImageUri":"somethingImageUrl@naver.com","defaultProfileImageType":1}</code></pre>
 </div>
 </div>
 <hr>
@@ -499,13 +525,13 @@ Content-Length: 105
 </table>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code data-lang="http">GET /v1/api/users/profile/nickname?nickname=HiBs HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /v1/api/users/profile/nickname?nickname=HiBs HTTP/1.1
 Host: localhost:8080</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code data-lang="http">HTTP/1.1 200 OK</code></pre>
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK</code></pre>
 </div>
 </div>
 <hr>
@@ -548,8 +574,8 @@ Host: localhost:8080</code></pre>
 </table>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code data-lang="http">POST /v1/api/users HTTP/1.1
-Authorization: Bearer eyJraWQiOiJhYmNlZGYiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJodHRwczovL2thdXRoLmtha2FvLmNvbSIsImVtYWlsIjoidGVzdEBnbWFpbC5jb20ifQ.gwtFr5ktKeBkxh9PpEvTZqS13BXH1-rNO9SXfQlkCv72v8lWuzVUt7Emw6m4M8yd2KhwyaVmaxAK1ncE_1BeHOoLmKxiF3oc9K_6w71pYEWKoqn2ScGqhyHEW9IrwolXr-C12AHF_zIFFL_VN7hYKZQf-RhAe9nn4-XQ3HyosXpdFE2p9v6z36mAAXbZ2qEYB_CTe_6iUo8bfA6FWpMyyoB1OllXiWxITkRqtsylzUUWUCFTPoiHRi_LZ9xPeWxmYSgbhTGp_pdhW5I5QlgJ7O54gSxknjmUXF5xgksDXyn1djxt9YMqSErWqDdWOzx0g4VZgmt5O2gEWyN2fRscyA
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /v1/api/users HTTP/1.1
+Authorization: Bearer eyJraWQiOiJhYmNlZGYiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaXNzIjoiaHR0cHM6Ly9rYXV0aC5rYWthby5jb20iLCJlbWFpbCI6InRlc3RAZ21haWwuY29tIn0.YHqXp3Noznet_pP-Umt3o4ifp81O052ELvst2DmbxN7soeHLCsDWnI79xxpstUhKfUZ1XGyqey8wyllu9fJJZpHyyHX1qBjRFtrJ0Ghj_4E6m8W_YB1b4Hwv0QlXNqxigPcT1p9xnr5XvoxarpslAyvl_IUNZKO6u4zQ7iFjCiV-4GCRB082ZktoIx4P8YZw3WqnGi2V3buSmWoG-evEQQbWQBJ6C9Y-vEyA2aCCSU-Vl2A3aN5-fbE_h2OiKXdm44nDye8GWak2r9pg84ufvB-pUMAP5PdkYNIvNMmVt0PDkww2uSNahz7odig83xSU8g-3FofxsNcmDPRkug88_w
 provider_type: KAKAO
 Host: localhost:8080
 Content-Type: application/x-www-form-urlencoded
@@ -559,7 +585,7 @@ nickname=nick&amp;defaultProfileImageType=1&amp;readingTastes=PHILOSOPHY&amp;rea
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code data-lang="http">HTTP/1.1 200 OK</code></pre>
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK</code></pre>
 </div>
 </div>
 </div>
@@ -572,7 +598,7 @@ nickname=nick&amp;defaultProfileImageType=1&amp;readingTastes=PHILOSOPHY&amp;rea
 <h3 id="_isbn_도서_검색">ISBN 도서 검색</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code data-lang="http">GET /v1/api/books?isbn=1231513&amp;size=5&amp;page=1&amp;sort=ACCURACY HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /v1/api/books?isbn=1231513&amp;size=5&amp;page=1&amp;sort=ACCURACY HTTP/1.1
 Authorization: Bearer eyJraWQiOiJhYmNlZGYiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaXNzIjoiIGh0dHBzOi8va2F1dGgua2FrYW8uY29tIn0.YhpZOu9l6nNSNH2jn6BAxn95zapWSlnLhXcoFwSbQ7mLAtOWYh0P81C4mi0v5GlynbRCbg3ICKB7uA38WlW-1aNko19bLyKZ6ynEfV-xZADkxw4l3fiyL2wCQMQ4fnRjKtzfcLbCO62MchJpQHZm8lJc82I52ggtDBuguDIf6CZWtYj1mMVs54iEkx251DvssxdzRBFVH6-OMo-de3c92mt8tFaqP2S3TtIZNty7BLrYrHgHAhSSDMo5UcuzxyLPAthd_mZuXjgis5L9j9EMjzUPmtYdZp6AE_JUmo51Vo-OqpNGBOqdbezbIZtxc73u0BVvAX4-HveZzCSn0re-iQ
 provider_type: KAKAO
 Host: localhost:8080</code></pre>
@@ -614,7 +640,7 @@ Host: localhost:8080</code></pre>
 </table>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code data-lang="http">HTTP/1.1 200 OK
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 1; mode=block
@@ -624,12 +650,12 @@ Expires: 0
 X-Frame-Options: DENY
 Content-Length: 203
 
-{&quot;bookDtos&quot;:[{&quot;isbn&quot;:&quot;213123&quot;,&quot;title&quot;:&quot;effectiveJava&quot;,&quot;author&quot;:[&quot;Joshua&quot;],&quot;publisher&quot;:&quot;testPublisher&quot;,&quot;bookCoverImageUrl&quot;:&quot;bookCoverImageUrl&quot;}],&quot;meta&quot;:{&quot;is_end&quot;:false,&quot;pageable_count&quot;:5,&quot;total_count&quot;:5}}</code></pre>
+{"bookDtos":[{"isbn":"213123","title":"effectiveJava","author":["Joshua"],"publisher":"testPublisher","bookCoverImageUrl":"bookCoverImageUrl"}],"meta":{"is_end":false,"pageable_count":5,"total_count":5}}</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code>{&quot;bookDtos&quot;:[{&quot;isbn&quot;:&quot;213123&quot;,&quot;title&quot;:&quot;effectiveJava&quot;,&quot;author&quot;:[&quot;Joshua&quot;],&quot;publisher&quot;:&quot;testPublisher&quot;,&quot;bookCoverImageUrl&quot;:&quot;bookCoverImageUrl&quot;}],&quot;meta&quot;:{&quot;is_end&quot;:false,&quot;pageable_count&quot;:5,&quot;total_count&quot;:5}}</code></pre>
+<pre class="highlightjs highlight nowrap"><code class="language-none hljs">{"bookDtos":[{"isbn":"213123","title":"effectiveJava","author":["Joshua"],"publisher":"testPublisher","bookCoverImageUrl":"bookCoverImageUrl"}],"meta":{"is_end":false,"pageable_count":5,"total_count":5}}</code></pre>
 </div>
 </div>
 <hr>
@@ -638,7 +664,7 @@ Content-Length: 203
 <h3 id="_title_도서_검색">Title 도서 검색</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code data-lang="http">GET /v1/api/books?title=effectiveJava&amp;size=5&amp;page=1&amp;sort=LATEST HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /v1/api/books?title=effectiveJava&amp;size=5&amp;page=1&amp;sort=LATEST HTTP/1.1
 Authorization: Bearer eyJraWQiOiJhYmNlZGYiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaXNzIjoiIGh0dHBzOi8va2F1dGgua2FrYW8uY29tIn0.YhpZOu9l6nNSNH2jn6BAxn95zapWSlnLhXcoFwSbQ7mLAtOWYh0P81C4mi0v5GlynbRCbg3ICKB7uA38WlW-1aNko19bLyKZ6ynEfV-xZADkxw4l3fiyL2wCQMQ4fnRjKtzfcLbCO62MchJpQHZm8lJc82I52ggtDBuguDIf6CZWtYj1mMVs54iEkx251DvssxdzRBFVH6-OMo-de3c92mt8tFaqP2S3TtIZNty7BLrYrHgHAhSSDMo5UcuzxyLPAthd_mZuXjgis5L9j9EMjzUPmtYdZp6AE_JUmo51Vo-OqpNGBOqdbezbIZtxc73u0BVvAX4-HveZzCSn0re-iQ
 provider_type: KAKAO
 Host: localhost:8080</code></pre>
@@ -680,7 +706,7 @@ Host: localhost:8080</code></pre>
 </table>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code data-lang="http">HTTP/1.1 200 OK
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 1; mode=block
@@ -690,12 +716,12 @@ Expires: 0
 X-Frame-Options: DENY
 Content-Length: 203
 
-{&quot;bookDtos&quot;:[{&quot;isbn&quot;:&quot;213123&quot;,&quot;title&quot;:&quot;effectiveJava&quot;,&quot;author&quot;:[&quot;Joshua&quot;],&quot;publisher&quot;:&quot;testPublisher&quot;,&quot;bookCoverImageUrl&quot;:&quot;bookCoverImageUrl&quot;}],&quot;meta&quot;:{&quot;is_end&quot;:false,&quot;pageable_count&quot;:5,&quot;total_count&quot;:5}}</code></pre>
+{"bookDtos":[{"isbn":"213123","title":"effectiveJava","author":["Joshua"],"publisher":"testPublisher","bookCoverImageUrl":"bookCoverImageUrl"}],"meta":{"is_end":false,"pageable_count":5,"total_count":5}}</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code>{&quot;bookDtos&quot;:[{&quot;isbn&quot;:&quot;213123&quot;,&quot;title&quot;:&quot;effectiveJava&quot;,&quot;author&quot;:[&quot;Joshua&quot;],&quot;publisher&quot;:&quot;testPublisher&quot;,&quot;bookCoverImageUrl&quot;:&quot;bookCoverImageUrl&quot;}],&quot;meta&quot;:{&quot;is_end&quot;:false,&quot;pageable_count&quot;:5,&quot;total_count&quot;:5}}</code></pre>
+<pre class="highlightjs highlight nowrap"><code class="language-none hljs">{"bookDtos":[{"isbn":"213123","title":"effectiveJava","author":["Joshua"],"publisher":"testPublisher","bookCoverImageUrl":"bookCoverImageUrl"}],"meta":{"is_end":false,"pageable_count":5,"total_count":5}}</code></pre>
 </div>
 </div>
 <hr>
@@ -704,7 +730,7 @@ Content-Length: 203
 <h3 id="_author_도서_검색">Author 도서 검색</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code data-lang="http">GET /v1/api/books?author=Joshua&amp;size=5&amp;page=1&amp;sort=LATEST HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /v1/api/books?author=Joshua&amp;size=5&amp;page=1&amp;sort=LATEST HTTP/1.1
 Authorization: Bearer eyJraWQiOiJhYmNlZGYiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaXNzIjoiIGh0dHBzOi8va2F1dGgua2FrYW8uY29tIn0.YhpZOu9l6nNSNH2jn6BAxn95zapWSlnLhXcoFwSbQ7mLAtOWYh0P81C4mi0v5GlynbRCbg3ICKB7uA38WlW-1aNko19bLyKZ6ynEfV-xZADkxw4l3fiyL2wCQMQ4fnRjKtzfcLbCO62MchJpQHZm8lJc82I52ggtDBuguDIf6CZWtYj1mMVs54iEkx251DvssxdzRBFVH6-OMo-de3c92mt8tFaqP2S3TtIZNty7BLrYrHgHAhSSDMo5UcuzxyLPAthd_mZuXjgis5L9j9EMjzUPmtYdZp6AE_JUmo51Vo-OqpNGBOqdbezbIZtxc73u0BVvAX4-HveZzCSn0re-iQ
 provider_type: KAKAO
 Host: localhost:8080</code></pre>
@@ -746,7 +772,7 @@ Host: localhost:8080</code></pre>
 </table>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code data-lang="http">HTTP/1.1 200 OK
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 1; mode=block
@@ -756,12 +782,12 @@ Expires: 0
 X-Frame-Options: DENY
 Content-Length: 203
 
-{&quot;bookDtos&quot;:[{&quot;isbn&quot;:&quot;213123&quot;,&quot;title&quot;:&quot;effectiveJava&quot;,&quot;author&quot;:[&quot;Joshua&quot;],&quot;publisher&quot;:&quot;testPublisher&quot;,&quot;bookCoverImageUrl&quot;:&quot;bookCoverImageUrl&quot;}],&quot;meta&quot;:{&quot;is_end&quot;:false,&quot;pageable_count&quot;:5,&quot;total_count&quot;:5}}</code></pre>
+{"bookDtos":[{"isbn":"213123","title":"effectiveJava","author":["Joshua"],"publisher":"testPublisher","bookCoverImageUrl":"bookCoverImageUrl"}],"meta":{"is_end":false,"pageable_count":5,"total_count":5}}</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code>{&quot;bookDtos&quot;:[{&quot;isbn&quot;:&quot;213123&quot;,&quot;title&quot;:&quot;effectiveJava&quot;,&quot;author&quot;:[&quot;Joshua&quot;],&quot;publisher&quot;:&quot;testPublisher&quot;,&quot;bookCoverImageUrl&quot;:&quot;bookCoverImageUrl&quot;}],&quot;meta&quot;:{&quot;is_end&quot;:false,&quot;pageable_count&quot;:5,&quot;total_count&quot;:5}}</code></pre>
+<pre class="highlightjs highlight nowrap"><code class="language-none hljs">{"bookDtos":[{"isbn":"213123","title":"effectiveJava","author":["Joshua"],"publisher":"testPublisher","bookCoverImageUrl":"bookCoverImageUrl"}],"meta":{"is_end":false,"pageable_count":5,"total_count":5}}</code></pre>
 </div>
 </div>
 <hr>
@@ -770,24 +796,24 @@ Content-Length: 203
 <h3 id="_읽은_도서_등록">읽은 도서 등록</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code data-lang="http">POST /v1/api/bookshelf/books HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /v1/api/bookshelf/books HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Authorization: Bearer eyJraWQiOiJhYmNlZGYiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaXNzIjoiIGh0dHBzOi8va2F1dGgua2FrYW8uY29tIn0.YhpZOu9l6nNSNH2jn6BAxn95zapWSlnLhXcoFwSbQ7mLAtOWYh0P81C4mi0v5GlynbRCbg3ICKB7uA38WlW-1aNko19bLyKZ6ynEfV-xZADkxw4l3fiyL2wCQMQ4fnRjKtzfcLbCO62MchJpQHZm8lJc82I52ggtDBuguDIf6CZWtYj1mMVs54iEkx251DvssxdzRBFVH6-OMo-de3c92mt8tFaqP2S3TtIZNty7BLrYrHgHAhSSDMo5UcuzxyLPAthd_mZuXjgis5L9j9EMjzUPmtYdZp6AE_JUmo51Vo-OqpNGBOqdbezbIZtxc73u0BVvAX4-HveZzCSn0re-iQ
 provider_type: KAKAO
 Content-Length: 155
 Host: localhost:8080
 
-{&quot;isbn&quot;:&quot;124151214&quot;,&quot;title&quot;:&quot;effectiveJava&quot;,&quot;authors&quot;:[&quot;Joshua&quot;],&quot;publisher&quot;:&quot;oreilly&quot;,&quot;bookCoverImageUrl&quot;:&quot;bookCoverImage.com&quot;,&quot;readingStatus&quot;:&quot;COMPLETE&quot;}</code></pre>
+{"isbn":"124151214","title":"effectiveJava","authors":["Joshua"],"publisher":"oreilly","bookCoverImageUrl":"bookCoverImage.com","readingStatus":"COMPLETE"}</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code>{&quot;isbn&quot;:&quot;124151214&quot;,&quot;title&quot;:&quot;effectiveJava&quot;,&quot;authors&quot;:[&quot;Joshua&quot;],&quot;publisher&quot;:&quot;oreilly&quot;,&quot;bookCoverImageUrl&quot;:&quot;bookCoverImage.com&quot;,&quot;readingStatus&quot;:&quot;COMPLETE&quot;}</code></pre>
+<pre class="highlightjs highlight nowrap"><code class="language-none hljs">{"isbn":"124151214","title":"effectiveJava","authors":["Joshua"],"publisher":"oreilly","bookCoverImageUrl":"bookCoverImage.com","readingStatus":"COMPLETE"}</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code data-lang="http">HTTP/1.1 201 Created
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 201 Created
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 1; mode=block
 Cache-Control: no-cache, no-store, max-age=0, must-revalidate
@@ -802,24 +828,24 @@ X-Frame-Options: DENY</code></pre>
 <h3 id="_읽고_있는_도서_등록">읽고 있는 도서 등록</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code data-lang="http">POST /v1/api/bookshelf/books HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /v1/api/bookshelf/books HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Authorization: Bearer eyJraWQiOiJhYmNlZGYiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaXNzIjoiIGh0dHBzOi8va2F1dGgua2FrYW8uY29tIn0.YhpZOu9l6nNSNH2jn6BAxn95zapWSlnLhXcoFwSbQ7mLAtOWYh0P81C4mi0v5GlynbRCbg3ICKB7uA38WlW-1aNko19bLyKZ6ynEfV-xZADkxw4l3fiyL2wCQMQ4fnRjKtzfcLbCO62MchJpQHZm8lJc82I52ggtDBuguDIf6CZWtYj1mMVs54iEkx251DvssxdzRBFVH6-OMo-de3c92mt8tFaqP2S3TtIZNty7BLrYrHgHAhSSDMo5UcuzxyLPAthd_mZuXjgis5L9j9EMjzUPmtYdZp6AE_JUmo51Vo-OqpNGBOqdbezbIZtxc73u0BVvAX4-HveZzCSn0re-iQ
 provider_type: KAKAO
 Content-Length: 154
 Host: localhost:8080
 
-{&quot;isbn&quot;:&quot;124151214&quot;,&quot;title&quot;:&quot;effectiveJava&quot;,&quot;authors&quot;:[&quot;Joshua&quot;],&quot;publisher&quot;:&quot;oreilly&quot;,&quot;bookCoverImageUrl&quot;:&quot;bookCoverImage.com&quot;,&quot;readingStatus&quot;:&quot;READING&quot;}</code></pre>
+{"isbn":"124151214","title":"effectiveJava","authors":["Joshua"],"publisher":"oreilly","bookCoverImageUrl":"bookCoverImage.com","readingStatus":"READING"}</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code>{&quot;isbn&quot;:&quot;124151214&quot;,&quot;title&quot;:&quot;effectiveJava&quot;,&quot;authors&quot;:[&quot;Joshua&quot;],&quot;publisher&quot;:&quot;oreilly&quot;,&quot;bookCoverImageUrl&quot;:&quot;bookCoverImage.com&quot;,&quot;readingStatus&quot;:&quot;READING&quot;}</code></pre>
+<pre class="highlightjs highlight nowrap"><code class="language-none hljs">{"isbn":"124151214","title":"effectiveJava","authors":["Joshua"],"publisher":"oreilly","bookCoverImageUrl":"bookCoverImage.com","readingStatus":"READING"}</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code data-lang="http">HTTP/1.1 201 Created
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 201 Created
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 1; mode=block
 Cache-Control: no-cache, no-store, max-age=0, must-revalidate
@@ -834,24 +860,24 @@ X-Frame-Options: DENY</code></pre>
 <h3 id="_읽을_도서_등록">읽을 도서 등록</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code data-lang="http">POST /v1/api/bookshelf/books HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /v1/api/bookshelf/books HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Authorization: Bearer eyJraWQiOiJhYmNlZGYiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaXNzIjoiIGh0dHBzOi8va2F1dGgua2FrYW8uY29tIn0.YhpZOu9l6nNSNH2jn6BAxn95zapWSlnLhXcoFwSbQ7mLAtOWYh0P81C4mi0v5GlynbRCbg3ICKB7uA38WlW-1aNko19bLyKZ6ynEfV-xZADkxw4l3fiyL2wCQMQ4fnRjKtzfcLbCO62MchJpQHZm8lJc82I52ggtDBuguDIf6CZWtYj1mMVs54iEkx251DvssxdzRBFVH6-OMo-de3c92mt8tFaqP2S3TtIZNty7BLrYrHgHAhSSDMo5UcuzxyLPAthd_mZuXjgis5L9j9EMjzUPmtYdZp6AE_JUmo51Vo-OqpNGBOqdbezbIZtxc73u0BVvAX4-HveZzCSn0re-iQ
 provider_type: KAKAO
 Content-Length: 151
 Host: localhost:8080
 
-{&quot;isbn&quot;:&quot;124151214&quot;,&quot;title&quot;:&quot;effectiveJava&quot;,&quot;authors&quot;:[&quot;Joshua&quot;],&quot;publisher&quot;:&quot;oreilly&quot;,&quot;bookCoverImageUrl&quot;:&quot;bookCoverImage.com&quot;,&quot;readingStatus&quot;:&quot;WISH&quot;}</code></pre>
+{"isbn":"124151214","title":"effectiveJava","authors":["Joshua"],"publisher":"oreilly","bookCoverImageUrl":"bookCoverImage.com","readingStatus":"WISH"}</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code>{&quot;isbn&quot;:&quot;124151214&quot;,&quot;title&quot;:&quot;effectiveJava&quot;,&quot;authors&quot;:[&quot;Joshua&quot;],&quot;publisher&quot;:&quot;oreilly&quot;,&quot;bookCoverImageUrl&quot;:&quot;bookCoverImage.com&quot;,&quot;readingStatus&quot;:&quot;WISH&quot;}</code></pre>
+<pre class="highlightjs highlight nowrap"><code class="language-none hljs">{"isbn":"124151214","title":"effectiveJava","authors":["Joshua"],"publisher":"oreilly","bookCoverImageUrl":"bookCoverImage.com","readingStatus":"WISH"}</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code data-lang="http">HTTP/1.1 201 Created
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 201 Created
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 1; mode=block
 Cache-Control: no-cache, no-store, max-age=0, must-revalidate
@@ -900,7 +926,7 @@ X-Frame-Options: DENY</code></pre>
 </table>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code data-lang="http">GET /v1/api/bookshelf/books?readingStatus=READING&amp;size=5&amp;page=1&amp;sort=id,DESC HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /v1/api/bookshelf/books?readingStatus=READING&amp;size=5&amp;page=1&amp;sort=id,DESC HTTP/1.1
 Authorization: Bearer eyJraWQiOiJhYmNlZGYiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaXNzIjoiIGh0dHBzOi8va2F1dGgua2FrYW8uY29tIn0.YhpZOu9l6nNSNH2jn6BAxn95zapWSlnLhXcoFwSbQ7mLAtOWYh0P81C4mi0v5GlynbRCbg3ICKB7uA38WlW-1aNko19bLyKZ6ynEfV-xZADkxw4l3fiyL2wCQMQ4fnRjKtzfcLbCO62MchJpQHZm8lJc82I52ggtDBuguDIf6CZWtYj1mMVs54iEkx251DvssxdzRBFVH6-OMo-de3c92mt8tFaqP2S3TtIZNty7BLrYrHgHAhSSDMo5UcuzxyLPAthd_mZuXjgis5L9j9EMjzUPmtYdZp6AE_JUmo51Vo-OqpNGBOqdbezbIZtxc73u0BVvAX4-HveZzCSn0re-iQ
 provider_type: KAKAO
 Host: localhost:8080</code></pre>
@@ -908,7 +934,7 @@ Host: localhost:8080</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code>[{&quot;title&quot;:&quot;effectiveJava&quot;,&quot;bookCoverImageUrl&quot;:&quot;testBookCoverImage@naver.com&quot;,&quot;authors&quot;:[&quot;joshua&quot;],&quot;publisher&quot;:&quot;jpub&quot;,&quot;star&quot;:null,&quot;singleLineAssessment&quot;:null}]</code></pre>
+<pre class="highlightjs highlight nowrap"><code class="language-none hljs">[{"title":"effectiveJava","bookCoverImageUrl":"testBookCoverImage@naver.com","authors":["joshua"],"publisher":"jpub","star":null,"singleLineAssessment":null}]</code></pre>
 </div>
 </div>
 <hr>
@@ -951,7 +977,7 @@ Host: localhost:8080</code></pre>
 </table>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code data-lang="http">GET /v1/api/bookshelf/books?readingStatus=COMPLETE&amp;size=5&amp;page=1&amp;sort=id,DESC HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /v1/api/bookshelf/books?readingStatus=COMPLETE&amp;size=5&amp;page=1&amp;sort=id,DESC HTTP/1.1
 Authorization: Bearer eyJraWQiOiJhYmNlZGYiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaXNzIjoiIGh0dHBzOi8va2F1dGgua2FrYW8uY29tIn0.YhpZOu9l6nNSNH2jn6BAxn95zapWSlnLhXcoFwSbQ7mLAtOWYh0P81C4mi0v5GlynbRCbg3ICKB7uA38WlW-1aNko19bLyKZ6ynEfV-xZADkxw4l3fiyL2wCQMQ4fnRjKtzfcLbCO62MchJpQHZm8lJc82I52ggtDBuguDIf6CZWtYj1mMVs54iEkx251DvssxdzRBFVH6-OMo-de3c92mt8tFaqP2S3TtIZNty7BLrYrHgHAhSSDMo5UcuzxyLPAthd_mZuXjgis5L9j9EMjzUPmtYdZp6AE_JUmo51Vo-OqpNGBOqdbezbIZtxc73u0BVvAX4-HveZzCSn0re-iQ
 provider_type: KAKAO
 Host: localhost:8080</code></pre>
@@ -959,7 +985,7 @@ Host: localhost:8080</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code>[{&quot;title&quot;:&quot;effectiveJava&quot;,&quot;bookCoverImageUrl&quot;:&quot;testBookCoverImage@naver.com&quot;,&quot;authors&quot;:[&quot;joshua&quot;],&quot;publisher&quot;:&quot;jpub&quot;,&quot;star&quot;:&quot;FOUR_HALF&quot;,&quot;singleLineAssessment&quot;:&quot;it's is best&quot;}]</code></pre>
+<pre class="highlightjs highlight nowrap"><code class="language-none hljs">[{"title":"effectiveJava","bookCoverImageUrl":"testBookCoverImage@naver.com","authors":["joshua"],"publisher":"jpub","star":"FOUR_HALF","singleLineAssessment":"it's is best"}]</code></pre>
 </div>
 </div>
 <hr>
@@ -1002,7 +1028,7 @@ Host: localhost:8080</code></pre>
 </table>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code data-lang="http">GET /v1/api/bookshelf/books?readingStatus=WISH&amp;size=5&amp;page=1&amp;sort=id,DESC HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /v1/api/bookshelf/books?readingStatus=WISH&amp;size=5&amp;page=1&amp;sort=id,DESC HTTP/1.1
 Authorization: Bearer eyJraWQiOiJhYmNlZGYiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaXNzIjoiIGh0dHBzOi8va2F1dGgua2FrYW8uY29tIn0.YhpZOu9l6nNSNH2jn6BAxn95zapWSlnLhXcoFwSbQ7mLAtOWYh0P81C4mi0v5GlynbRCbg3ICKB7uA38WlW-1aNko19bLyKZ6ynEfV-xZADkxw4l3fiyL2wCQMQ4fnRjKtzfcLbCO62MchJpQHZm8lJc82I52ggtDBuguDIf6CZWtYj1mMVs54iEkx251DvssxdzRBFVH6-OMo-de3c92mt8tFaqP2S3TtIZNty7BLrYrHgHAhSSDMo5UcuzxyLPAthd_mZuXjgis5L9j9EMjzUPmtYdZp6AE_JUmo51Vo-OqpNGBOqdbezbIZtxc73u0BVvAX4-HveZzCSn0re-iQ
 provider_type: KAKAO
 Host: localhost:8080</code></pre>
@@ -1010,7 +1036,7 @@ Host: localhost:8080</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code>[{&quot;title&quot;:&quot;effectiveJava&quot;,&quot;bookCoverImageUrl&quot;:&quot;testBookCoverImage@naver.com&quot;,&quot;authors&quot;:[&quot;joshua&quot;],&quot;publisher&quot;:&quot;jpub&quot;,&quot;star&quot;:null,&quot;singleLineAssessment&quot;:null}]</code></pre>
+<pre class="highlightjs highlight nowrap"><code class="language-none hljs">[{"title":"effectiveJava","bookCoverImageUrl":"testBookCoverImage@naver.com","authors":["joshua"],"publisher":"jpub","star":null,"singleLineAssessment":null}]</code></pre>
 </div>
 </div>
 <hr>
@@ -1020,8 +1046,15 @@ Host: localhost:8080</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-09-01 09:50:09 +0900
+Last updated 2022-09-26 11:37:45 +0900
 </div>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>
+<script>
+if (!hljs.initHighlighting.called) {
+  hljs.initHighlighting.called = true
+  ;[].slice.call(document.querySelectorAll('pre.highlight > code')).forEach(function (el) { hljs.highlightBlock(el) })
+}
+</script>
 </body>
 </html>
