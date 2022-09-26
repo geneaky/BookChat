@@ -28,7 +28,7 @@ public class CustomExceptionHandlingFilter extends OncePerRequestFilter {
             response.setCharacterEncoding("utf-8");
             response.getWriter().write("You Are Blocked");
         } catch (ExpiredTokenException exception) {
-            response.setStatus(400);
+            response.setStatus(401);
             response.setContentType("text/plain");
             response.setCharacterEncoding("utf-8");
             response.getWriter().write("Token Expired");
@@ -38,7 +38,7 @@ public class CustomExceptionHandlingFilter extends OncePerRequestFilter {
             response.setCharacterEncoding("utf-8");
             response.getWriter().write("Not Valid Token Request");
         } catch (NotVerifiedRequestFormatException exception) {
-            response.setStatus(400);
+            response.setStatus(401);
             response.setContentType("text/plain");
             response.setCharacterEncoding("utf-8");
             response.getWriter().write("Empty Provider Type");

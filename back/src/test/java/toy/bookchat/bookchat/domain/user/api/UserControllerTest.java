@@ -248,7 +248,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
                 .header("provider_type", "KAKAO")
                 .param("nickname", "nick")
                 .param("defaultProfileImageType", "2"))
-            .andExpect(status().isPreconditionFailed());
+            .andExpect(status().isUnauthorized());
     }
 
     @Test
