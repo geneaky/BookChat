@@ -104,13 +104,15 @@ public class UserControllerTest extends AuthenticationTestExtension {
             .build();
 
         return new UserPrincipal(1L, user.getEmail(),
-            user.getName(), user.getNickname(), user.getProfileImageUrl(), user.getDefaultProfileImageType(), authorities, user);
+            user.getName(), user.getNickname(), user.getProfileImageUrl(),
+            user.getDefaultProfileImageType(), authorities, user);
     }
 
     @Test
     public void 인증받지_않은_사용자_요청_401응답() throws Exception {
         mockMvc.perform(get("/v1/api/users/profile"))
-            .andExpect(status().isUnauthorized());
+            .andExpect(status().isUnauthorized())
+            .andDo(document("user-profile-error"));
     }
 
     @Test
@@ -230,7 +232,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void 사용자_회원가입_요청시_header_openid가_유효하지않은_경우_412반환() throws Exception {
+    public void 사용자_회원가입_요청시_header_openid가_유효하지않은_경우_401반환() throws Exception {
         PrivateKey privateKey = getPrivateKey();
         PublicKey publicKey = getPublicKey();
 

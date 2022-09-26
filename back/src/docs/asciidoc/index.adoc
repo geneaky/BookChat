@@ -11,20 +11,30 @@ endif::[]
 
 === 사용자 기본 프로필 조회
 
-==== 성공
-include::{snippets}/user/http-request.adoc[]
-include::{snippets}/user/http-response.adoc[]
-include::{snippets}/user/response-body.adoc[]
+`request`
 
-==== 실패
-include::{snippets}/user/
+include::{snippets}/user/http-request.adoc[]
+
+`response`
+
+include::{snippets}/user/http-response.adoc[]
+
+`Error Response`
+
+include::{snippets}/user-profile-error/http-response.adoc[]
 
 ---
 
 === 사용자 닉네임 중복 체크
 
 include::{snippets}/user_nickname/request-parameters.adoc[]
+
+`request`
+
 include::{snippets}/user_nickname/http-request.adoc[]
+
+`response`
+
 include::{snippets}/user_nickname/http-response.adoc[]
 
 ---
@@ -83,6 +93,7 @@ include::{snippets}/bookshelf_reading/http-response.adoc[]
 === 읽을 도서 등록
 
 include::{snippets}/bookshelf_wish/http-request.adoc[]
+include::{snippets}/bookshelf_wish/request-fields.adoc[]
 include::{snippets}/bookshelf_wish/request-body.adoc[]
 include::{snippets}/bookshelf_wish/http-response.adoc[]
 
