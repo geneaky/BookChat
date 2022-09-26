@@ -26,8 +26,6 @@ import java.util.Optional;
 class UserServiceTest {
 
     @Mock
-    S3Config s3Config;
-    @Mock
     UserRepository userRepository;
     @Mock
     StorageService storageService;
@@ -53,7 +51,7 @@ class UserServiceTest {
     public void 처음_가입하는_회원의_경우_회원가입_성공() throws Exception {
         UserSignUpRequestDto userSignUpRequestDto = mock(UserSignUpRequestDto.class);
         User mockUser = mock(User.class);
-        when(s3Config.getImageBucketUrl()).thenReturn("testBucketUrl");
+        when(storageService.getFileUrl(any())).thenReturn("testBucketUrl");
         when(userSignUpRequestDto.hasValidImage()).thenReturn(true);
         when(userSignUpRequestDto.getUser(any(), any(), any(), any())).thenReturn(mockUser);
         userService.registerNewUser(userSignUpRequestDto, "memberNumber","test@gmail.com", KAKAO);

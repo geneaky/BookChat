@@ -46,8 +46,9 @@ aws:
     accessKey: testetsttest
     secretKey: testestsetst
     region: ap-northeast-2
-    imageBucketUrl: 'https://testbucket/testlink/testfile'
     bucketName: 'test-bucket'
+    imageFolder: 'user_profile_image/'
+    imageBucketUrl: 'https://testbucket/testlink/testfile'
 
 oauth2:
   kakaoURI: 'https://kauth.kakao.com/.well-known/jwks.json'
