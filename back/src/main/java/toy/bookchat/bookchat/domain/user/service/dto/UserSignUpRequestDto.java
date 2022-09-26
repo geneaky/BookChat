@@ -4,7 +4,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
 import javax.imageio.ImageIO;
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -18,6 +17,8 @@ import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.exception.ImageInputStreamException;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
+
+import static toy.bookchat.bookchat.domain.user.service.dto.SupportedFileExtension.isSupport;
 
 @Getter
 @Setter
@@ -38,15 +39,38 @@ public class UserSignUpRequestDto {
     public boolean hasValidImage() {
 
         try {
-            if (this.userProfileImage != null) {
+            if(this.userProfileImage.isEmpty()) {
+                return false;
+            }
+
+            if(isValidFileExtension()) {
                 BufferedImage bufferedImage = ImageIO.read(this.userProfileImage.getInputStream());
-                return bufferedImage.getWidth() == WIDTH_LIMIT
-                    && bufferedImage.getHeight() == HEIGHT_LIMIT;
+                return isValidFileSize(bufferedImage);
             }
         } catch (IOException exception) {
             throw new ImageInputStreamException(exception.getMessage(), exception.getCause());
         }
         return false;
+    }
+
+    private boolean isValidFileSize(BufferedImage bufferedImage) {
+        if (bufferedImage.getWidth() == WIDTH_LIMIT && bufferedImage.getHeight() == HEIGHT_LIMIT) {
+            return true;
+        }
+
+        throw new IllegalArgumentException("Not Supplied File Size");
+    }
+
+    private boolean isValidFileExtension() {
+        if(isSupport(getFileExtension())) {
+            return true;
+        }
+
+        throw new IllegalArgumentException("Not Supplied File Extension");
+    }
+
+    public String getFileExtension() {
+        return this.userProfileImage.getOriginalFilename().substring(this.userProfileImage.getOriginalFilename().lastIndexOf(".") + 1);
     }
 
     public User getUser(String oauth2MemberNumber, String email, String profileImageUrl, OAuth2Provider providerType) {

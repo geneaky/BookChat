@@ -12,6 +12,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.multipart.MultipartFile;
+import toy.bookchat.bookchat.config.aws.S3Config;
 import toy.bookchat.bookchat.domain.storage.StorageService;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.exception.UserAlreadySignUpException;
@@ -23,6 +25,8 @@ import java.util.Optional;
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
+    @Mock
+    S3Config s3Config;
     @Mock
     UserRepository userRepository;
     @Mock
@@ -49,6 +53,7 @@ class UserServiceTest {
     public void 처음_가입하는_회원의_경우_회원가입_성공() throws Exception {
         UserSignUpRequestDto userSignUpRequestDto = mock(UserSignUpRequestDto.class);
         User mockUser = mock(User.class);
+        when(s3Config.getImageBucketUrl()).thenReturn("testBucketUrl");
         when(userSignUpRequestDto.hasValidImage()).thenReturn(true);
         when(userSignUpRequestDto.getUser(any(), any(), any(), any())).thenReturn(mockUser);
         userService.registerNewUser(userSignUpRequestDto, "memberNumber","test@gmail.com", KAKAO);
@@ -65,5 +70,20 @@ class UserServiceTest {
         assertThatThrownBy(() -> {
             userService.registerNewUser(userSignUpRequestDto, "testMemberNumber","test@gmail.com", KAKAO);
         }).isInstanceOf(UserAlreadySignUpException.class);
+    }
+
+    @Test
+    public void 사용자_회원가입시_지원하지_않는_이미지_확장자_예외발생() throws Exception {
+        MultipartFile multipartFile = mock(MultipartFile.class);
+        UserSignUpRequestDto userSignUpRequestDto = UserSignUpRequestDto.builder()
+                .userProfileImage(multipartFile)
+                .build();
+
+        when(multipartFile.getOriginalFilename()).thenReturn("test.png");
+        when(multipartFile.isEmpty()).thenReturn(false);
+
+        assertThatThrownBy(() -> {
+            userService.registerNewUser(userSignUpRequestDto, "testMemberNumber","test@gmail.com", KAKAO);
+        }).isInstanceOf(IllegalArgumentException.class);
     }
 }
