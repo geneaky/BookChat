@@ -10,6 +10,9 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.requestHe
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.payload.JsonFieldType.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -43,6 +46,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
@@ -156,6 +160,12 @@ public class UserControllerTest extends AuthenticationTestExtension {
                 requestHeaders(
                     headerWithName("Authorization").description("Bearer [openid token]"),
                     headerWithName("provider_type").description("프로바이더 타입 [KAKAO / GOOGLE]")
+                ),
+                responseFields(
+                        fieldWithPath("userNickname").type(STRING).description("닉네임"),
+                        fieldWithPath("userEmail").type(STRING).description("이메일"),
+                        fieldWithPath("userProfileImageUri").type(STRING).description("프로필 사진 URI"),
+                        fieldWithPath("defaultProfileImageType").type(NUMBER).description("기본 이미지 타입")
                 )))
             .andReturn();
 
@@ -167,7 +177,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
         when(userService.isDuplicatedName(anyString())).thenReturn(false);
         mockMvc.perform(get("/v1/api/users/profile/nickname").param("nickname", "HiBs"))
             .andExpect(status().isOk())
-            .andDo(document("user_nickname", requestParameters(
+            .andDo(document("user-nickname", requestParameters(
                 parameterWithName("nickname").description("사용자 nickname")
             )));
     }
@@ -176,7 +186,8 @@ public class UserControllerTest extends AuthenticationTestExtension {
     public void 사용자_닉네임_중복시_409반환() throws Exception {
         when(userService.isDuplicatedName(anyString())).thenReturn(true);
         mockMvc.perform(get("/v1/api/users/profile/nickname").param("nickname", "HiBs"))
-            .andExpect(status().isConflict());
+            .andExpect(status().isConflict())
+            .andDo(document("user-nickname-error"));
     }
 
     @Test
@@ -187,7 +198,8 @@ public class UserControllerTest extends AuthenticationTestExtension {
                 .param("userEmail", "kaktus418@gmail.com")
                 .param("oauth2Provider", "kakao")
                 .param("defaultProfileImageType", "2"))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isBadRequest())
+            .andDo(document("user-signup-error1"));
     }
 
     @Test
@@ -197,7 +209,8 @@ public class UserControllerTest extends AuthenticationTestExtension {
                 .header("provider_type", "KAKAO")
                 .param("nickname", "nick")
                 .param("defaultProfileImageType", "2"))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isBadRequest())
+            .andDo(document("user-signup-error2"));
     }
 
     private X509EncodedKeySpec getPublicPkcs8EncodedKeySpec(OpenIdTestUtil openIdTestUtil)
@@ -250,7 +263,8 @@ public class UserControllerTest extends AuthenticationTestExtension {
                 .header("provider_type", "KAKAO")
                 .param("nickname", "nick")
                 .param("defaultProfileImageType", "2"))
-            .andExpect(status().isUnauthorized());
+            .andExpect(status().isUnauthorized())
+            .andDo(document("user-signup-error4"));
     }
 
     @Test
@@ -278,7 +292,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
                 .param("defaultProfileImageType", "1")
                 .param("readingTastes", "PHILOSOPHY", "DEVELOPMENT", "DESIGN"))
             .andExpect(status().isOk())
-            .andDo(document("user_sign_up", requestHeaders(
+            .andDo(document("user-signup", requestHeaders(
                     headerWithName("Authorization").description("Bearer [openid token]"),
                     headerWithName("provider_type").description("프로바이더 타입 [KAKAO / GOOGLE]")
                 ),
@@ -321,7 +335,8 @@ public class UserControllerTest extends AuthenticationTestExtension {
                 .header("provider_type", "KAKAO")
                 .param("defaultProfileImageType", "1")
                 .param("nickname", "testName"))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isBadRequest())
+            .andDo(document("user-signup-error3"));
     }
 
     @Test
@@ -336,6 +351,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
                 .param("nickname", "")
                 .param("userEmail", "abcdefg")
                 .param("oauth2Provider", ""))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isBadRequest())
+            .andDo(document("user-signup-error5"));
     }
 }
