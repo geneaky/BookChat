@@ -24,7 +24,6 @@ public class BookShelfService {
 
     private final BookShelfRepository bookShelfRepository;
     private final BookRepository bookRepository;
-    private final UserRepository userRepository;
 
     @Transactional
     public void putBookOnBookShelf(BookShelfRequestDto bookShelfRequestDto, User user) {
@@ -48,13 +47,32 @@ public class BookShelfService {
     }
 
     private void putBookOnBookShelf(BookShelfRequestDto bookShelfRequestDto, Book book, User user) {
-        BookShelf bookShelf = BookShelf.builder()
-            .book(book)
-            .readingStatus(bookShelfRequestDto.getReadingStatus())
-            .user(user)
-            .build();
-
+        BookShelf bookShelf = createBookShelfByReadingStatus(bookShelfRequestDto, book, user);
         bookShelfRepository.save(bookShelf);
+    }
+
+    private BookShelf createBookShelfByReadingStatus(BookShelfRequestDto bookShelfRequestDto, Book book, User user) {
+        if(isFinishedReading(bookShelfRequestDto)) {
+            bookShelfRequestDto.checkCompleteStateField();
+
+            return BookShelf.builder()
+                    .book(book)
+                    .readingStatus(bookShelfRequestDto.getReadingStatus())
+                    .user(user)
+                    .star(bookShelfRequestDto.getStar())
+                    .singleLineAssessment(bookShelfRequestDto.getSingleLineAssessment())
+                    .build();
+        }
+
+        return BookShelf.builder()
+                .book(book)
+                .readingStatus(bookShelfRequestDto.getReadingStatus())
+                .user(user)
+                .build();
+    }
+
+    private boolean isFinishedReading(BookShelfRequestDto bookShelfRequestDto) {
+        return bookShelfRequestDto.getReadingStatus() == ReadingStatus.COMPLETE;
     }
 
     @Transactional(readOnly = true)

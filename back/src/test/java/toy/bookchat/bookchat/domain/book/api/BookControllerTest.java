@@ -7,6 +7,8 @@ import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -357,6 +359,9 @@ public class BookControllerTest extends AuthenticationTestExtension {
             .andExpect(status().isNotFound());
     }
 
+    /* TODO: 2022-09-27 도서 검색은 수정 예정이므로 예시로 하나만 수정하겠음
+        이후 수정하면 대부분 삭제 예정    
+     */
     @Test
     public void 사용자가_isbn_검색시_paging_성공() throws Exception {
 
@@ -397,7 +402,18 @@ public class BookControllerTest extends AuthenticationTestExtension {
                 requestParameters(parameterWithName("isbn").description("isbn  번호"),
                     parameterWithName("size").description("한 번에 조회할 책의 수 - page 당 size"),
                     parameterWithName("page").description("한 번에 조회할 page 수"),
-                    parameterWithName("sort").description("조회시 정렬 옵션"))
+                    parameterWithName("sort").description("조회시 정렬 옵션")),
+                responseFields(
+                        fieldWithPath("bookDtos[]").description("책"),
+                        fieldWithPath("bookDtos[].isbn").description("ISBN"),
+                        fieldWithPath("bookDtos[].title").description("제목"),
+                        fieldWithPath("bookDtos[].author[]").description("저자"),
+                        fieldWithPath("bookDtos[].publisher").description("출판사"),
+                        fieldWithPath("bookDtos[].bookCoverImageUrl").description("책 표지 이미지"),
+                        fieldWithPath("meta.is_end").description("마지막 페이지 여부"),
+                        fieldWithPath("meta.pageable_count").description("가져온 페이지 수"),
+                        fieldWithPath("meta.total_count").description("총 페이지 수")
+                )
             )).andReturn();
 
         verify(bookSearchService).searchByIsbn(any(BookSearchRequestDto.class));
