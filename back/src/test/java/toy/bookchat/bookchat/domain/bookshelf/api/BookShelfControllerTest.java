@@ -1,8 +1,7 @@
 package toy.bookchat.bookchat.domain.bookshelf.api;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -248,6 +247,32 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
 
         verify(bookShelfService).putBookOnBookShelf(any(BookShelfRequestDto.class),
             any(User.class));
+    }
+
+    @Test
+    public void 읽은_책_등록시_평점_한줄평_없으면_400반환() throws Exception {
+        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(getPublicKey());
+        when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
+        doThrow(IllegalArgumentException.class).when(bookShelfService).putBookOnBookShelf(any(),any());
+
+        BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
+                .isbn("124151214")
+                .title("effectiveJava")
+                .authors(List.of("Joshua"))
+                .publisher("oreilly")
+                .bookCoverImageUrl("bookCoverImage.com")
+                .readingStatus(ReadingStatus.COMPLETE)
+                .build();
+
+        mockMvc.perform(post("/v1/api/bookshelf/books")
+                        .header("Authorization", "Bearer " + getTestToken())
+                        .header("provider_type", "KAKAO")
+                        .content(
+                                objectMapper.writeValueAsString(bookShelfRequestDto))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(user(getUserPrincipal())))
+                .andExpect(status().isBadRequest());
+
     }
 
     @Test

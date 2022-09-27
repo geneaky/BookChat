@@ -53,6 +53,8 @@ public class BookShelfService {
 
     private BookShelf createBookShelfByReadingStatus(BookShelfRequestDto bookShelfRequestDto, Book book, User user) {
         if(isFinishedReading(bookShelfRequestDto)) {
+            bookShelfRequestDto.checkCompleteStateField();
+
             return BookShelf.builder()
                     .book(book)
                     .readingStatus(bookShelfRequestDto.getReadingStatus())

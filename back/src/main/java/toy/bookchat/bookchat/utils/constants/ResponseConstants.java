@@ -24,11 +24,14 @@ public class ResponseConstants {
         ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 가입된 사용자입니다");
 
     public static final ResponseEntity<String> CONSTRAINT_VIOLATION =
-        ResponseEntity.status(HttpStatus.BAD_REQUEST).body("유요하지 않은 요청입니다.");
+        ResponseEntity.status(HttpStatus.BAD_REQUEST).body("유효하지 않은 요청입니다");
 
     public static final ResponseEntity<String> EXPIRED_PUBLIC_KEY =
         ResponseEntity.status(HttpStatus.NOT_FOUND).body("다시 요청해주세요");
 
     public static final ResponseEntity<String> WRONG_KEY_SPEC =
         ResponseEntity.status(HttpStatus.BAD_REQUEST).body("잘 못된 키 생성 형식");
+
+    public static final ResponseEntity<String> BAD_REQUEST =
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body("올바르지 않은 요청 형식입니다");
 }

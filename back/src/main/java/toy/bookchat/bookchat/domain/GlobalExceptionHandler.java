@@ -1,15 +1,5 @@
 package toy.bookchat.bookchat.domain;
 
-import static toy.bookchat.bookchat.utils.constants.ResponseConstants.BOOK_NOT_FOUND;
-import static toy.bookchat.bookchat.utils.constants.ResponseConstants.CONSTRAINT_VIOLATION;
-import static toy.bookchat.bookchat.utils.constants.ResponseConstants.EXPIRED_PUBLIC_KEY;
-import static toy.bookchat.bookchat.utils.constants.ResponseConstants.IMAGE_PROCESSING_FAIL;
-import static toy.bookchat.bookchat.utils.constants.ResponseConstants.IMAGE_UPLOAD_FAIL;
-import static toy.bookchat.bookchat.utils.constants.ResponseConstants.NOT_VERIFIED_TOKEN;
-import static toy.bookchat.bookchat.utils.constants.ResponseConstants.USER_ALREADY_EXISTED;
-import static toy.bookchat.bookchat.utils.constants.ResponseConstants.USER_NOT_FOUND;
-import static toy.bookchat.bookchat.utils.constants.ResponseConstants.WRONG_KEY_SPEC;
-
 import javax.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +14,8 @@ import toy.bookchat.bookchat.security.exception.DenidedTokenException;
 import toy.bookchat.bookchat.security.exception.ExpiredPublicKeyCachedException;
 import toy.bookchat.bookchat.security.exception.ExpiredTokenException;
 import toy.bookchat.bookchat.security.exception.WrongKeySpecException;
+
+import static toy.bookchat.bookchat.utils.constants.ResponseConstants.*;
 
 @Slf4j
 @RestControllerAdvice
@@ -97,5 +89,11 @@ public class GlobalExceptionHandler {
         WrongKeySpecException exception) {
         log.info("message = {} :: cause = {}", exception.getMessage(), exception.getCause());
         return WRONG_KEY_SPEC;
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public final ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException exception) {
+        log.info("message = {} :: cause = {}", exception.getMessage(), exception.getCause());
+        return BAD_REQUEST;
     }
 }

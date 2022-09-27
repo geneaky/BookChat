@@ -7,6 +7,8 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
+
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,6 +19,7 @@ import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.book.repository.BookRepository;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
+import toy.bookchat.bookchat.domain.bookshelf.Star;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfRequestDto;
 import toy.bookchat.bookchat.domain.user.User;
@@ -41,7 +44,19 @@ public class BookShelfServiceTest {
             .build();
     }
 
-    private BookShelfRequestDto getBookShelfRequestDto() {
+    private BookShelfRequestDto getBookShelfRequestDto(ReadingStatus readingStatus) {
+        if(readingStatus == ReadingStatus.COMPLETE) {
+            return BookShelfRequestDto.builder()
+                    .isbn("12345")
+                    .title("testBook")
+                    .authors(List.of("test Author"))
+                    .publisher("test publisher")
+                    .bookCoverImageUrl("test@naver.com")
+                    .readingStatus(ReadingStatus.COMPLETE)
+                    .star(Star.THREE)
+                    .singleLineAssessment("very good")
+                    .build();
+        }
         return BookShelfRequestDto.builder()
             .isbn("12345")
             .title("testBook")
@@ -54,7 +69,7 @@ public class BookShelfServiceTest {
 
     @Test
     public void 내부에_등록된_책을_책장에_저장() throws Exception {
-        BookShelfRequestDto bookShelfRequestDto = getBookShelfRequestDto();
+        BookShelfRequestDto bookShelfRequestDto = getBookShelfRequestDto(ReadingStatus.READING);
         Book book = getBook();
 
         when(bookRepository.findByIsbn(bookShelfRequestDto.getIsbn())).thenReturn(
@@ -68,7 +83,7 @@ public class BookShelfServiceTest {
 
     @Test
     public void 내부에_등록되지_않은_책을_책장에_저장() throws Exception {
-        BookShelfRequestDto bookShelfRequestDto = getBookShelfRequestDto();
+        BookShelfRequestDto bookShelfRequestDto = getBookShelfRequestDto(ReadingStatus.READING);
 
         when(bookRepository.findByIsbn(bookShelfRequestDto.getIsbn())).thenReturn(Optional.empty());
 
@@ -76,6 +91,24 @@ public class BookShelfServiceTest {
 
         verify(bookRepository).save(any(Book.class));
         verify(bookShelfRepository).save(any(BookShelf.class));
+    }
+
+    @Test
+    public void 읽은_책_저장시_평점과_한줄평이_없으면_예외발생() throws Exception {
+        BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
+                .isbn("12345")
+                .title("testBook")
+                .authors(List.of("test Author"))
+                .publisher("test publisher")
+                .bookCoverImageUrl("test@naver.com")
+                .readingStatus(ReadingStatus.COMPLETE)
+                .build();
+
+        when(bookRepository.findByIsbn(bookShelfRequestDto.getIsbn())).thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(() -> {
+            bookShelfService.putBookOnBookShelf(bookShelfRequestDto, getUser());
+        }).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
