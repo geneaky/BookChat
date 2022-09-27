@@ -7,9 +7,23 @@ endif::[]
 :toclevels: 2
 :source-highlighter: highlightjs
 
+== 공통 HTTTP Status Code
+
+|===
+| Status Code | Common Mean |    Usage
+|     200     |   Success   |요청 정상 처리
+|     400     | Bad Request |요청이 부적절한 경우
+|     401     | UnAuthorized|인증되지 않은 사용자
+|     403     |  Forbidden  |권한이 없거나 차단된 사용자
+|===
+
 == 사용자
 
 === 사용자 기본 프로필 조회
+
+`Request Header`
+
+include::{snippets}/user/request-headers.adoc[]
 
 `Request`
 
@@ -20,18 +34,14 @@ include::{snippets}/user/http-request.adoc[]
 include::{snippets}/user/response-fields.adoc[]
 include::{snippets}/user/http-response.adoc[]
 
-`Error Response`
-
-include::{snippets}/user-profile-error/http-response.adoc[]
-
 ---
 
 === 사용자 닉네임 중복 체크
 
-include::{snippets}/user-nickname/request-parameters.adoc[]
 
 `Request`
 
+include::{snippets}/user-nickname/request-parameters.adoc[]
 include::{snippets}/user-nickname/http-request.adoc[]
 
 `Response`
@@ -50,7 +60,7 @@ include::{snippets}/user-nickname-error/http-response.adoc[]
 
 include::{snippets}/user-signup/request-headers.adoc[]
 
-`Resquest`
+`Request`
 
 include::{snippets}/user-signup/request-parameters.adoc[]
 include::{snippets}/user-signup/http-request.adoc[]
@@ -85,10 +95,17 @@ include::{snippets}/user-signup-error5/http-response.adoc[]
 
 === ISBN 도서 검색
 
-include::{snippets}/book-search-isbn-paging/http-request.adoc[]
+`Request Header`
+
+include::{snippets}/book-search-isbn-paging/request-headers.adoc[]
+
+`Request`
 include::{snippets}/book-search-isbn-paging/request-parameters.adoc[]
+include::{snippets}/book-search-isbn-paging/http-request.adoc[]
+
+`Resopnse`
 include::{snippets}/book-search-isbn-paging/http-response.adoc[]
-include::{snippets}/book-search-isbn-paging/response-body.adoc[]
+include::{snippets}/book-search-isbn-paging/response-fields.adoc[]
 
 ---
 
@@ -108,53 +125,81 @@ include::{snippets}/book-search-author-paging/request-parameters.adoc[]
 include::{snippets}/book-search-author-paging/http-response.adoc[]
 include::{snippets}/book-search-author-paging/response-body.adoc[]
 
----
+== 책장
 
-=== 읽은 도서 등록
+=== 읽을 도서 등록
 
-include::{snippets}/bookshelf_complete/http-request.adoc[]
-include::{snippets}/bookshelf_complete/request-body.adoc[]
-include::{snippets}/bookshelf_complete/http-response.adoc[]
+`Request`
+
+include::{snippets}/bookshelf-wish/request-fields.adoc[]
+include::{snippets}/bookshelf-wish/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/bookshelf-wish/http-response.adoc[]
 
 ---
 
 === 읽고 있는 도서 등록
 
-include::{snippets}/bookshelf_reading/http-request.adoc[]
-include::{snippets}/bookshelf_reading/request-body.adoc[]
-include::{snippets}/bookshelf_reading/http-response.adoc[]
+`Request`
+
+include::{snippets}/bookshelf-reading/request-fields.adoc[]
+include::{snippets}/bookshelf-reading/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/bookshelf-reading/http-response.adoc[]
 
 ---
 
-=== 읽을 도서 등록
+=== 읽은 도서 등록
 
-include::{snippets}/bookshelf_wish/http-request.adoc[]
-include::{snippets}/bookshelf_wish/request-fields.adoc[]
-include::{snippets}/bookshelf_wish/request-body.adoc[]
-include::{snippets}/bookshelf_wish/http-response.adoc[]
+`Request`
 
----
+include::{snippets}/bookshelf-complete/request-fields.adoc[]
+include::{snippets}/bookshelf-complete/http-request.adoc[]
 
-=== 읽고 있는 도서 조회
+`Response`
 
-include::{snippets}/get_bookshelf_reading/request-parameters.adoc[]
-include::{snippets}/get_bookshelf_reading/http-request.adoc[]
-include::{snippets}/get_bookshelf_reading/response-body.adoc[]
-
----
-
-=== 읽은 도서 조회
-
-include::{snippets}/get_bookshelf_complete/request-parameters.adoc[]
-include::{snippets}/get_bookshelf_complete/http-request.adoc[]
-include::{snippets}/get_bookshelf_complete/response-body.adoc[]
+include::{snippets}/bookshelf-complete/http-response.adoc[]
 
 ---
 
 === 읽을 도서 조회
 
-include::{snippets}/get_bookshelf_wish/request-parameters.adoc[]
-include::{snippets}/get_bookshelf_wish/http-request.adoc[]
-include::{snippets}/get_bookshelf_wish/response-body.adoc[]
+`Request`
+
+include::{snippets}/get-bookshelf-wish/request-parameters.adoc[]
+include::{snippets}/get-bookshelf-wish/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/get-bookshelf-wish/response-fields.adoc[]
+
+---
+
+=== 읽고 있는 도서 조회
+
+`Request`
+
+include::{snippets}/get-bookshelf-reading/request-parameters.adoc[]
+include::{snippets}/get-bookshelf-reading/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/get-bookshelf-reading/response-fields.adoc[]
+
+---
+
+=== 읽은 도서 조회
+
+`Request`
+include::{snippets}/get-bookshelf-complete/request-parameters.adoc[]
+include::{snippets}/get-bookshelf-complete/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/get-bookshelf-complete/response-fields.adoc[]
 
 ---

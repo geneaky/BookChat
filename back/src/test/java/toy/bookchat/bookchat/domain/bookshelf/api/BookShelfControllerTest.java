@@ -6,8 +6,9 @@ import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
+import static org.springframework.restdocs.payload.JsonFieldType.STRING;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -46,6 +47,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
@@ -146,6 +148,19 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
     }
 
     private BookShelfRequestDto getBookShelfRequestDto(ReadingStatus readingStatus) {
+
+        if(readingStatus == ReadingStatus.COMPLETE) {
+            return BookShelfRequestDto.builder()
+                    .isbn("124151214")
+                    .title("effectiveJava")
+                    .authors(List.of("Joshua"))
+                    .publisher("oreilly")
+                    .bookCoverImageUrl("bookCoverImage.com")
+                    .readingStatus(readingStatus)
+                    .star(Star.FOUR)
+                    .singleLineAssessment("very good")
+                    .build();
+        }
         return BookShelfRequestDto.builder()
             .isbn("124151214")
             .title("effectiveJava")
@@ -187,16 +202,18 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isCreated())
-            .andDo(document("bookshelf_reading",
+            .andDo(document("bookshelf-reading",
                 requestHeaders(
                     headerWithName("Authorization").description("Bearer [openid token]"),
                     headerWithName("provider_type").description("프로바이더 타입 [KAKAO / GOOGLE]")),
-                requestFields(fieldWithPath("isbn").description("isbn"),
-                    fieldWithPath("title").description("title"),
-                    fieldWithPath("authors.[]").description("authors"),
-                    fieldWithPath("publisher").description("publisher"),
-                    fieldWithPath("bookCoverImageUrl").description("bookCoverImageUrl"),
-                    fieldWithPath("readingStatus").description("READING"))));
+                requestFields(fieldWithPath("isbn").description("ISBN"),
+                    fieldWithPath("title").type(STRING).description("제목"),
+                    fieldWithPath("authors[]").type(ARRAY).description("저자"),
+                    fieldWithPath("publisher").type(STRING).description("출판사"),
+                    fieldWithPath("bookCoverImageUrl").type(STRING).optional().description("책 커버 이미지 URI"),
+                    fieldWithPath("readingStatus").type(STRING).description("READING"),
+                    fieldWithPath("star").ignored(),
+                    fieldWithPath("singleLineAssessment").ignored())));
 
         verify(bookShelfService).putBookOnBookShelf(any(BookShelfRequestDto.class),
             any(User.class));
@@ -215,17 +232,19 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isCreated())
-            .andDo(document("bookshelf_complete",
+            .andDo(document("bookshelf-complete",
                 requestHeaders(
                     headerWithName("Authorization").description("Bearer [openid token]"),
                     headerWithName("provider_type").description("프로바이더 타입 [KAKAO / GOOGLE]")
                 ),
-                requestFields(fieldWithPath("isbn").description("isbn"),
-                    fieldWithPath("title").description("title"),
-                    fieldWithPath("authors.[]").description("authors"),
-                    fieldWithPath("publisher").description("publisher"),
-                    fieldWithPath("bookCoverImageUrl").description("bookCoverImageUrl"),
-                    fieldWithPath("readingStatus").description("COMPLETE"))));
+                requestFields(fieldWithPath("isbn").type(STRING).description("ISBN"),
+                    fieldWithPath("title").type(STRING).description("제목"),
+                    fieldWithPath("authors[]").type(ARRAY).description("저자"),
+                    fieldWithPath("publisher").type(STRING).description("출판사"),
+                    fieldWithPath("bookCoverImageUrl").type(STRING).optional().description("책 커버 이미지 URI"),
+                    fieldWithPath("readingStatus").type(STRING).description("COMPLETE"),
+                    fieldWithPath("star").type(STRING).description("평점"),
+                    fieldWithPath("singleLineAssessment").type(STRING).description("한 줄 평"))));
 
         verify(bookShelfService).putBookOnBookShelf(any(BookShelfRequestDto.class),
             any(User.class));
@@ -243,17 +262,19 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isCreated())
-            .andDo(document("bookshelf_wish",
+            .andDo(document("bookshelf-wish",
                 requestHeaders(
                     headerWithName("Authorization").description("Bearer [openid token]"),
                     headerWithName("provider_type").description("프로바이더 타입 [KAKAO / GOOGLE]")
                 ),
-                requestFields(fieldWithPath("isbn").description("isbn"),
-                    fieldWithPath("title").description("title"),
-                    fieldWithPath("authors.[]").description("author"),
-                    fieldWithPath("publisher").description("publisher"),
-                    fieldWithPath("bookCoverImageUrl").description("bookCoverImageUrl"),
-                    fieldWithPath("readingStatus").description("WISH"))));
+                requestFields(fieldWithPath("isbn").type(STRING).description("ISBN"),
+                    fieldWithPath("title").type(STRING).description("제목"),
+                    fieldWithPath("authors[]").type(ARRAY).description("저자"),
+                    fieldWithPath("publisher").type(STRING).description("출판사"),
+                    fieldWithPath("bookCoverImageUrl").type(STRING).optional().description("책 커버 이미지 URI"),
+                    fieldWithPath("readingStatus").type(STRING).description("WISH"),
+                    fieldWithPath("star").ignored(),
+                    fieldWithPath("singleLineAssessment").ignored())));
 
         verify(bookShelfService).putBookOnBookShelf(any(BookShelfRequestDto.class),
             any(User.class));
@@ -527,7 +548,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
                 .with(user(getUserPrincipal())))
             .andExpect(status().isOk())
             .andDo(print())
-            .andDo(document("get_bookshelf_reading",
+            .andDo(document("get-bookshelf-reading",
                 requestHeaders(
                     headerWithName("Authorization").description("Bearer [openid token]"),
                     headerWithName("provider_type").description("프로바이더 타입 [KAKAO / GOOGLE]")
@@ -537,7 +558,15 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
                     parameterWithName("size").description("page 당 size"),
                     parameterWithName("page").description("한번에 조회할 page수"),
                     parameterWithName("sort").description("등록순-id")
-                ))
+                ),
+                responseFields(
+                    fieldWithPath("[].title").type(STRING).description("제목"),
+                    fieldWithPath("[].bookCoverImageUrl").type(STRING).optional().description("책 커버 이미지 URI"),
+                    fieldWithPath("[].authors[]").type(ARRAY).description("저자"),
+                    fieldWithPath("[].publisher").type(STRING).description("출판사"),
+                    fieldWithPath("[].star").type(STRING).optional().description("평점"),
+                    fieldWithPath("[].singleLineAssessment").type(STRING).optional().description("한 줄 평")
+                    ))
             );
 
         verify(bookShelfService).takeBooksOutOfBookShelf(any(ReadingStatus.class),
@@ -573,7 +602,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
                 .with(user(getUserPrincipal())))
             .andExpect(status().isOk())
             .andDo(print())
-            .andDo(document("get_bookshelf_complete",
+            .andDo(document("get-bookshelf-complete",
                 requestHeaders(
                     headerWithName("Authorization").description("Bearer [openid token]"),
                     headerWithName("provider_type").description("프로바이더 타입 [KAKAO / GOOGLE]")
@@ -583,6 +612,14 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
                     parameterWithName("size").description("page 당 size"),
                     parameterWithName("page").description("한번에 조회할 page수"),
                     parameterWithName("sort").description("등록순-id")
+                ),
+                responseFields(
+                    fieldWithPath("[].title").type(STRING).description("제목"),
+                    fieldWithPath("[].bookCoverImageUrl").type(STRING).optional().description("책 커버 이미지 URI"),
+                    fieldWithPath("[].authors[]").type(ARRAY).description("저자"),
+                    fieldWithPath("[].publisher").type(STRING).description("출판사"),
+                    fieldWithPath("[].star").type(STRING).description("평점"),
+                    fieldWithPath("[].singleLineAssessment").type(STRING).description("한 줄 평")
                 ))
             );
 
@@ -619,7 +656,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
                 .with(user(getUserPrincipal())))
             .andExpect(status().isOk())
             .andDo(print())
-            .andDo(document("get_bookshelf_wish",
+            .andDo(document("get-bookshelf-wish",
                 requestHeaders(
                     headerWithName("Authorization").description("Bearer [openid token]"),
                     headerWithName("provider_type").description("프로바이더 타입 [KAKAO / GOOGLE]")
@@ -629,7 +666,15 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
                     parameterWithName("size").description("page 당 size"),
                     parameterWithName("page").description("한번에 조회할 page수"),
                     parameterWithName("sort").description("등록순-id")
-                ))
+                ),
+                responseFields(
+                    fieldWithPath("[].title").type(STRING).description("제목"),
+                    fieldWithPath("[].bookCoverImageUrl").type(STRING).optional().description("책 커버 이미지 URI"),
+                    fieldWithPath("[].authors[]").type(ARRAY).description("저자"),
+                    fieldWithPath("[].publisher").type(STRING).description("출판사"),
+                    fieldWithPath("[].star").type(STRING).optional().description("평점"),
+                    fieldWithPath("[].singleLineAssessment").type(STRING).optional().description("한 줄 평")
+                    ))
             );
 
         verify(bookShelfService).takeBooksOutOfBookShelf(any(ReadingStatus.class),

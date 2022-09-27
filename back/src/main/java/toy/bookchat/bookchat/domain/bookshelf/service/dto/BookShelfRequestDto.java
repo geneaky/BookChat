@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
+import toy.bookchat.bookchat.domain.bookshelf.Star;
 
 @Getter
 @Builder
@@ -30,6 +31,8 @@ public class BookShelfRequestDto {
     private String bookCoverImageUrl;
     @NotNull
     private ReadingStatus readingStatus;
+    private Star star;
+    private String singleLineAssessment;
 
     public Book extractBookEntity() {
         return new Book(getIsbn(), getTitle(), getAuthors(), getPublisher(),
