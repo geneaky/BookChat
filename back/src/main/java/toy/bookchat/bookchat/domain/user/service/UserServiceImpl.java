@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import toy.bookchat.bookchat.domain.storage.StorageService;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.exception.UserAlreadySignUpException;
+import toy.bookchat.bookchat.domain.user.exception.UserNotFoundException;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.domain.user.service.dto.UserSignUpRequestDto;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
@@ -36,6 +37,12 @@ public class UserServiceImpl implements UserService {
         }
 
         saveUser(userSignUpRequestDto, oauth2MemberNumber, userEmail, null, providerType);
+    }
+
+    @Override
+    public void checkRegisteredUser(String oauth2MemberNumber) {
+        userRepository.findByName(oauth2MemberNumber)
+                .orElseThrow(() -> {throw new UserNotFoundException("Not Registered User");});
     }
 
     private void saveUser(UserSignUpRequestDto userSignUpRequestDto, String oauth2MemberNumber, String email, String profileImageUrl, OAuth2Provider providerType) {

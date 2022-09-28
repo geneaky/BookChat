@@ -91,6 +91,20 @@ include::{snippets}/user-signup-error4/http-response.adoc[]
 include::{snippets}/user-signup-error5/http-request.adoc[]
 include::{snippets}/user-signup-error5/http-response.adoc[]
 
+=== 사용자 로그인
+
+`Request Header`
+
+include::{snippets}/user-signin/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/user-signin/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/user-signin/response-fields.adoc[]
+
 == 도서
 
 === ISBN 도서 검색

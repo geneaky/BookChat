@@ -60,6 +60,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
         web.ignoring()
             .antMatchers(HttpMethod.GET, "/v1/api/users/profile/nickname")
-            .antMatchers(HttpMethod.POST, "/v1/api/users");
+            .antMatchers(HttpMethod.POST, "/v1/api/users","/v1/api/users/signin");
     }
 }

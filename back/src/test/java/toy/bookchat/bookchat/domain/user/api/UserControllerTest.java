@@ -2,11 +2,8 @@ package toy.bookchat.bookchat.domain.user.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
-import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.mockito.Mockito.*;
+import static org.springframework.restdocs.headers.HeaderDocumentation.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
@@ -46,12 +43,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.Base64Utils;
+import toy.bookchat.bookchat.config.JwtTokenConfig;
 import toy.bookchat.bookchat.config.OpenIdTokenConfig;
 import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
 import toy.bookchat.bookchat.domain.user.ROLE;
@@ -62,6 +59,9 @@ import toy.bookchat.bookchat.domain.user.service.UserService;
 import toy.bookchat.bookchat.domain.user.service.dto.UserSignUpRequestDto;
 import toy.bookchat.bookchat.security.SecurityConfig;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
+import toy.bookchat.bookchat.domain.user.api.dto.Token;
+import toy.bookchat.bookchat.security.token.jwt.JwtTokenProvider;
+import toy.bookchat.bookchat.security.token.jwt.JwtTokenRecorder;
 import toy.bookchat.bookchat.security.token.openid.OpenIdTestUtil;
 import toy.bookchat.bookchat.security.token.openid.OpenIdTokenManager;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
@@ -82,8 +82,13 @@ public class UserControllerTest extends AuthenticationTestExtension {
     OpenIdTokenManager openIdTokenManager;
 
     @MockBean
-    OpenIdTokenConfig openIdTokenConfig;
+    JwtTokenProvider jwtTokenProvider;
 
+    @MockBean
+    JwtTokenRecorder jwtTokenRecorder;
+
+    @MockBean
+    OpenIdTokenConfig openIdTokenConfig;
     @Autowired
     ObjectMapper objectMapper;
     OpenIdTestUtil openIdTestUtil;
@@ -353,5 +358,48 @@ public class UserControllerTest extends AuthenticationTestExtension {
                 .param("oauth2Provider", ""))
             .andExpect(status().isBadRequest())
             .andDo(document("user-signup-error5"));
+    }
+
+    @Test
+    public void 사용자_성공적으로_로그인시_응답_header에_jwt_token삽입() throws Exception {
+        PrivateKey privateKey = getPrivateKey();
+        PublicKey publicKey = getPublicKey();
+
+        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
+
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("email", "test@gmail.com");
+        claims.put("iss", "https://kauth.kakao.com");
+        claims.put("sub", "test");
+
+        String testToken = Jwts.builder()
+                .setHeaderParam("kid", "abcedf")
+                .setClaims(claims)
+                .signWith(SignatureAlgorithm.RS256, privateKey)
+                .compact();
+
+        Token responseToken = Token.builder()
+                .accessToken("accessToken")
+                .refreshToken("refreshToken")
+                .build();
+
+        when(jwtTokenProvider.createToken()).thenReturn(responseToken);
+        MvcResult mvcResult = mockMvc.perform(post("/v1/api/users/signin")
+                        .header("Authorization", "Bearer " + testToken)
+                        .header("provider_type", "KAKAO"))
+                .andExpect(status().isOk())
+                .andDo(document("user-signin",
+                        requestHeaders(
+                                headerWithName("Authorization").description("Bearer [openid token]"),
+                                headerWithName("provider_type").description("프로바이더 타입 [KAKAO / GOOGLE]")
+                        ),
+                        responseFields(
+                                fieldWithPath("accessToken").type(STRING).description("Access Token"),
+                                fieldWithPath("refreshToken").type(STRING).description("Refresh Token")
+                        )))
+                .andReturn();
+
+        verify(jwtTokenRecorder).record(any(),any());
+        assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo(objectMapper.writeValueAsString(responseToken));
     }
 }
