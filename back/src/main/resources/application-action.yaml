@@ -19,6 +19,10 @@ spring:
         show_sql: true
     open-in-view: false
 
+  security:
+    user:
+      password: test
+
   jackson:
     parser:
       allow-unquoted-control-chars: true
@@ -53,3 +57,8 @@ aws:
 oauth2:
   kakaoURI: 'https://kauth.kakao.com/.well-known/jwks.json'
   googleURI:
+
+token:
+  secret: hihi
+  accessTokenExpiredTime: 1800000 #30분
+  refreshTokenExpiredTime: 1210000000 #2주

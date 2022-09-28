@@ -13,13 +13,14 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import toy.bookchat.bookchat.domain.BaseEntity;
 import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.user.User;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class BookShelf {
+public class BookShelf extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

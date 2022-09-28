@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import toy.bookchat.bookchat.config.JpaAuditingConfig;
 import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.book.repository.BookRepository;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
@@ -21,7 +22,7 @@ import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 
 @DataJpaTest
-@Import(TestConfig.class)
+@Import({JpaAuditingConfig.class,TestConfig.class})
 public class BookShelfRepositoryTest {
 
     @Autowired

@@ -38,8 +38,10 @@ class JwtTokenProviderTest {
     JwtTokenConfig jwtTokenConfig;
 
     @InjectMocks
-    JwtTokenProvider tokenProvider = new JwtTokenProvider();
+    JwtTokenProvider tokenProvider = new JwtTokenProvider(jwtTokenConfig);
 
+    /* TODO: 2022-09-28 여기 테스트 다시 enable시키고 수정사항에 맞춰 테스트 추가 및 수정
+     */
     private X509EncodedKeySpec getPublicPkcs8EncodedKeySpec(OpenIdTestUtil openIdTestUtil)
         throws IOException {
         String publicKey = openIdTestUtil.getPublicKey(9);
@@ -84,7 +86,7 @@ class JwtTokenProviderTest {
         PrivateKey pk = keyFactory.generatePrivate(spec);
         PublicKey publicKey1 = keyFactory.generatePublic(pspec);
 
-        when(jwtTokenConfig.getSecret()).thenReturn(publicKey1);
+        when(jwtTokenConfig.getSecret()).thenReturn(null);
 
         when(jwtTokenConfig.getAccessTokenExpiredTime()).thenReturn(expiredTime);
         when(authentication.getPrincipal()).thenReturn(userPrincipal);

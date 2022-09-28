@@ -7,12 +7,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import toy.bookchat.bookchat.config.JpaAuditingConfig;
 import toy.bookchat.bookchat.domain.configuration.TestConfig;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
 @DataJpaTest
-@Import(TestConfig.class)
+@Import({JpaAuditingConfig.class,TestConfig.class})
 class UserRepositoryTest {
 
     @Autowired
