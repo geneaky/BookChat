@@ -1,5 +1,9 @@
 package toy.bookchat.bookchat.security.token.jwt;
 
+import static toy.bookchat.bookchat.utils.constants.AuthConstants.AUTHORIZATION;
+import static toy.bookchat.bookchat.utils.constants.AuthConstants.BEARER;
+import static toy.bookchat.bookchat.utils.constants.AuthConstants.BEGIN_INDEX;
+
 import java.io.IOException;
 import java.util.Optional;
 import javax.servlet.FilterChain;
@@ -8,21 +12,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.exception.UserNotFoundException;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.security.exception.DenidedTokenException;
-import toy.bookchat.bookchat.security.exception.NotVerifiedRequestFormatException;
 import toy.bookchat.bookchat.security.ipblock.IpBlockManager;
-import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.token.TokenManager;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
-
-import static toy.bookchat.bookchat.utils.constants.AuthConstants.*;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -33,7 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final IpBlockManager ipBlockManager;
 
     public JwtAuthenticationFilter(TokenManager jwtTokenManager, UserRepository userRepository,
-                                   IpBlockManager ipBlockManager) {
+        IpBlockManager ipBlockManager) {
         this.jwtTokenManager = jwtTokenManager;
         this.userRepository = userRepository;
         this.ipBlockManager = ipBlockManager;
@@ -44,7 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         FilterChain filterChain) throws ServletException, IOException {
 
         String oAuth2MemberNumber = jwtTokenManager.getOAuth2MemberNumberFromToken(
-                getJwtTokenFromRequest(request), null);
+            getJwtTokenFromRequest(request), null);
 
         registerUserAuthenticationOnSecurityContext(userRepository.findByName(oAuth2MemberNumber));
 
@@ -68,8 +66,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         UserPrincipal userPrincipal = UserPrincipal.create(user);
 
         SecurityContextHolder
-                .getContext()
-                .setAuthentication(new UsernamePasswordAuthenticationToken(userPrincipal, null,
-                        userPrincipal.getAuthorities()));
+            .getContext()
+            .setAuthentication(new UsernamePasswordAuthenticationToken(userPrincipal, null,
+                userPrincipal.getAuthorities()));
     }
 }

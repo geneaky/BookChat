@@ -1,7 +1,7 @@
 package toy.bookchat.bookchat.security.token.jwt;
 
 import org.springframework.stereotype.Component;
-import toy.bookchat.bookchat.domain.user.api.dto.Token;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class JwtTokenRecorder {
@@ -12,7 +12,10 @@ public class JwtTokenRecorder {
         this.refreshTokenRepository = refreshTokenRepository;
     }
 
-    public void record(String userName, Token token) {
+    @Transactional
+    public void record(String userName, String refreshToken) {
+        RefreshToken token = new RefreshToken(userName, refreshToken);
 
+        refreshTokenRepository.save(token);
     }
 }

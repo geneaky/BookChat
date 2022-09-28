@@ -1,27 +1,33 @@
 package toy.bookchat.bookchat.domain.user.api;
 
+import static toy.bookchat.bookchat.utils.constants.AuthConstants.AUTHORIZATION;
+import static toy.bookchat.bookchat.utils.constants.AuthConstants.BEGIN_INDEX;
+import static toy.bookchat.bookchat.utils.constants.AuthConstants.PROVIDER_TYPE;
+
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import toy.bookchat.bookchat.domain.user.api.dto.Token;
 import toy.bookchat.bookchat.domain.user.api.dto.UserProfileResponse;
 import toy.bookchat.bookchat.domain.user.service.UserService;
 import toy.bookchat.bookchat.domain.user.service.dto.UserSignUpRequestDto;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
-import toy.bookchat.bookchat.domain.user.api.dto.Token;
 import toy.bookchat.bookchat.security.token.TokenManager;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenProvider;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenRecorder;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
-
-import static toy.bookchat.bookchat.utils.constants.AuthConstants.*;
 
 @Validated
 @RestController
@@ -33,7 +39,8 @@ public class UserController {
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtTokenRecorder jwtTokenRecorder;
 
-    public UserController(UserService userService, TokenManager openIdTokenManager, JwtTokenProvider jwtTokenProvider, JwtTokenRecorder jwtTokenRecorder) {
+    public UserController(UserService userService, TokenManager openIdTokenManager,
+        JwtTokenProvider jwtTokenProvider, JwtTokenRecorder jwtTokenRecorder) {
         this.userService = userService;
         this.openIdTokenManager = openIdTokenManager;
         this.jwtTokenProvider = jwtTokenProvider;
@@ -70,8 +77,10 @@ public class UserController {
 
         String oauth2MemberNumber = openIdTokenManager.getOAuth2MemberNumberFromToken(
             getOpenIdToken(bearerToken), oAuth2Provider);
-        String userEmail = openIdTokenManager.getUserEmailFromToken(getOpenIdToken(bearerToken), oAuth2Provider);
-        userService.registerNewUser(userSignUpRequestDto, oauth2MemberNumber, userEmail, oAuth2Provider);
+        String userEmail = openIdTokenManager.getUserEmailFromToken(getOpenIdToken(bearerToken),
+            oAuth2Provider);
+        userService.registerNewUser(userSignUpRequestDto, oauth2MemberNumber, userEmail,
+            oAuth2Provider);
 
         return ResponseEntity.ok(null);
     }
@@ -82,11 +91,13 @@ public class UserController {
         @RequestHeader(PROVIDER_TYPE) @NotNull OAuth2Provider oAuth2Provider) {
 
         String userName = openIdTokenManager.getOAuth2MemberNumberFromToken(
-                getOpenIdToken(bearerToken), oAuth2Provider);
+            getOpenIdToken(bearerToken), oAuth2Provider);
         userService.checkRegisteredUser(userName);
+        String userEmail = openIdTokenManager.getUserEmailFromToken(getOpenIdToken(bearerToken),
+            oAuth2Provider);
 
-        Token token = jwtTokenProvider.createToken();
-        jwtTokenRecorder.record(userName, token);
+        Token token = jwtTokenProvider.createToken(userName, userEmail, oAuth2Provider);
+        jwtTokenRecorder.record(userName, token.getRefreshToken());
 
         return ResponseEntity.ok(token);
     }

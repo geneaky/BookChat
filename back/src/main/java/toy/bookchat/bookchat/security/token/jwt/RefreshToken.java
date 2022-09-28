@@ -1,16 +1,17 @@
 package toy.bookchat.bookchat.security.token.jwt;
 
-import lombok.*;
-import toy.bookchat.bookchat.domain.BaseEntity;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import toy.bookchat.bookchat.domain.BaseEntity;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RefreshToken extends BaseEntity {
 
@@ -21,8 +22,7 @@ public class RefreshToken extends BaseEntity {
     private String refreshToken;
 
     @Builder
-    public RefreshToken(Long id, String userName, String refreshToken) {
-        this.id = id;
+    public RefreshToken(String userName, String refreshToken) {
         this.userName = userName;
         this.refreshToken = refreshToken;
     }
