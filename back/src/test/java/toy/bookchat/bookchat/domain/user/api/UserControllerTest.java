@@ -402,4 +402,67 @@ public class UserControllerTest extends AuthenticationTestExtension {
         verify(jwtTokenRecorder).record(any(),any());
         assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo(objectMapper.writeValueAsString(responseToken));
     }
+
+    @Test
+    public void 로그인_요청시_Header없으면_예외발생() throws Exception {
+
+        mockMvc.perform(post("/v1/api/users/signin"))
+                .andExpect(status().isBadRequest())
+                .andDo(document("user-signin-error1"));
+    }
+
+    @Test
+    public void 로그인_요청시_Header에_토큰이_없으면_예외발생() throws Exception {
+        mockMvc.perform(post("/v1/api/users/signin")
+                        .header("Authorization","Bearer ")
+                        .header("provider_type","KAKAO"))
+                .andExpect(status().isBadRequest())
+                .andDo(document("user-signin-error2"));
+    }
+
+    @Test
+    public void 로그인_요청시_Header인증정보가_Bearer양식에_맞지않으면_예외발생() throws Exception {
+        PrivateKey privateKey = getPrivateKey();
+        PublicKey publicKey = getPublicKey();
+
+        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
+
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("email", "test@gmail.com");
+        claims.put("iss", "https://kauth.kakao.com");
+        claims.put("sub", "test");
+
+        String testToken = Jwts.builder()
+                .setHeaderParam("kid", "abcedf")
+                .setClaims(claims)
+                .signWith(SignatureAlgorithm.RS256, privateKey)
+                .compact();
+
+        mockMvc.perform(post("/v1/api/users/signin")
+                        .header("Authorization", "Tearer " + testToken)
+                        .header("provider_type", "KAKAO"))
+                .andExpect(status().isBadRequest())
+                .andDo(document("user-signin-error3"));
+    }
+
+    @Test
+    public void 만료된_토큰으로_요청시_401_예외발생() throws Exception {
+        PrivateKey privateKey = getPrivateKey();
+        PublicKey publicKey = getPublicKey();
+
+        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
+
+        Claims claims = Jwts.claims().setIssuer("https://kauth.kakao.com")
+                .setSubject("test").setExpiration(new Date(0));
+        String testToken = Jwts.builder()
+                .setHeaderParam("kid", "abcdefg")
+                .setClaims(claims)
+                .signWith(SignatureAlgorithm.RS256, privateKey).compact();
+
+        mockMvc.perform(post("/v1/api/users/siginin")
+                        .header("Authorization", "Bearer " + testToken)
+                        .header("provider_type", "KAKAO"))
+                .andExpect(status().isUnauthorized())
+                .andDo(document("user-signin-error4"));
+    }
 }

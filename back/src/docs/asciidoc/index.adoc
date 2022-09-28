@@ -105,6 +105,24 @@ include::{snippets}/user-signin/http-request.adoc[]
 
 include::{snippets}/user-signin/response-fields.adoc[]
 
+`Error Response`
+
+요청 오류(Authorization Header 없을 시)
+include::{snippets}/user-signup-error1/http-request.adoc[]
+include::{snippets}/user-signup-error1/http-response.adoc[]
+
+요청 오류(Authorization Header에 빈 토큰으로 요청시)
+include::{snippets}/user-signin-error2/http-request.adoc[]
+include::{snippets}/user-signin-error2/http-response.adoc[]
+
+요청 오류(Authorization Bearer 양식에 맞지 않을 때)
+include::{snippets}/user-signin-error3/http-request.adoc[]
+include::{snippets}/user-signin-error3/http-response.adoc[]
+
+만료된 토큰
+include::{snippets}/user-signin-error4/http-request.adoc[]
+include::{snippets}/user-signin-error4/http-response.adoc[]
+
 == 도서
 
 === ISBN 도서 검색
