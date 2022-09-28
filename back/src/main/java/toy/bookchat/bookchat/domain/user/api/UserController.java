@@ -4,7 +4,6 @@ import static toy.bookchat.bookchat.utils.constants.AuthConstants.AUTHORIZATION;
 import static toy.bookchat.bookchat.utils.constants.AuthConstants.BEGIN_INDEX;
 import static toy.bookchat.bookchat.utils.constants.AuthConstants.PROVIDER_TYPE;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -86,7 +85,7 @@ public class UserController {
     }
 
     @PostMapping("/users/signin")
-    public ResponseEntity<Token> userSignIn(HttpServletResponse httpServletResponse,
+    public ResponseEntity<Token> userSignIn(
         @RequestHeader(AUTHORIZATION) @NotBlank @Pattern(regexp = "^(Bearer)\\s.+") String bearerToken,
         @RequestHeader(PROVIDER_TYPE) @NotNull OAuth2Provider oAuth2Provider) {
 
