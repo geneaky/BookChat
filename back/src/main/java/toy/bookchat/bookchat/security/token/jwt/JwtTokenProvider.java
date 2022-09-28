@@ -17,12 +17,6 @@ import toy.bookchat.bookchat.security.user.UserPrincipal;
 @Slf4j
 @Component
 public class JwtTokenProvider {
-    /*@todo
-     *   외부 의존성인 io.jwts를 사용하는 것이 아니라 인터페이스를 만들고 그 구현체에서 사용하는 방식으로
-     *   작성하면 이후 io.jwts가 아니라 다른 jwt 구현체를 사용하도록 확장가능
-     *   근데 추상화 비용을 생각해보면 추상화된 토큰 방식의 구현체를 변경할 일이 있을까 싶네,,,
-     *   사용하고 있는 라이브러리가 deprecated되거나 다른 라이브러리로 변경될때를 대비하는 의미로 할까 고민중
-     * */
 
     public static final String EMAIL = "email";
     public static final String KAKAO_ACCOUNT = "kakao_account";

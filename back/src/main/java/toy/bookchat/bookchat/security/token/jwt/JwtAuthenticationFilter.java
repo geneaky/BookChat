@@ -1,9 +1,5 @@
 package toy.bookchat.bookchat.security.token.jwt;
 
-import static toy.bookchat.bookchat.utils.constants.AuthConstants.AUTHORIZATION;
-import static toy.bookchat.bookchat.utils.constants.AuthConstants.BEARER;
-import static toy.bookchat.bookchat.utils.constants.AuthConstants.BEGIN_INDEX;
-
 import java.io.IOException;
 import java.util.Optional;
 import javax.servlet.FilterChain;
@@ -19,19 +15,26 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.exception.UserNotFoundException;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
+import toy.bookchat.bookchat.security.exception.DenidedTokenException;
+import toy.bookchat.bookchat.security.exception.NotVerifiedRequestFormatException;
 import toy.bookchat.bookchat.security.ipblock.IpBlockManager;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
+import toy.bookchat.bookchat.security.token.TokenManager;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
+
+import static toy.bookchat.bookchat.utils.constants.AuthConstants.*;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtTokenProvider jwtTokenProvider;
+    /* TODO: 2022-09-28 test
+     */
+    private final TokenManager jwtTokenManager;
     private final UserRepository userRepository;
     private final IpBlockManager ipBlockManager;
 
-    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, UserRepository userRepository,
-        IpBlockManager ipBlockManager) {
-        this.jwtTokenProvider = jwtTokenProvider;
+    public JwtAuthenticationFilter(TokenManager jwtTokenManager, UserRepository userRepository,
+                                   IpBlockManager ipBlockManager) {
+        this.jwtTokenManager = jwtTokenManager;
         this.userRepository = userRepository;
         this.ipBlockManager = ipBlockManager;
     }
@@ -40,56 +43,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
         FilterChain filterChain) throws ServletException, IOException {
 
-        String jwt = getJwtFromRequest(request);
+        String oAuth2MemberNumber = jwtTokenManager.getOAuth2MemberNumberFromToken(
+                getJwtTokenFromRequest(request), null);
 
-        validUserRequestByJwt(request, jwt);
+        registerUserAuthenticationOnSecurityContext(userRepository.findByName(oAuth2MemberNumber));
 
         filterChain.doFilter(request, response);
     }
 
-    private String getJwtFromRequest(HttpServletRequest request) {
+    private String getJwtTokenFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader(AUTHORIZATION);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER)) {
             return bearerToken.substring(BEGIN_INDEX);
         }
-        return null;
+        ipBlockManager.increase(request);
+        throw new DenidedTokenException("Not Allowed Format Request Exception");
     }
 
-    private void validUserRequestByJwt(HttpServletRequest request, String jwt) {
-        if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt) == JwtTokenValidationCode.ACCESS) {
-            String email = jwtTokenProvider.getEmailFromToken(jwt);
-            OAuth2Provider oAuth2TokenProvider = jwtTokenProvider.getOauth2TokenProviderFromToken(
-                jwt);
+    private void registerUserAuthenticationOnSecurityContext(Optional<User> optionalUser) {
+        User user = optionalUser.orElseThrow(() -> {
+            throw new UserNotFoundException("Not Registered User");
+        });
 
-            Optional<User> optionalUser = userRepository.findByEmailAndProvider(email,
-                oAuth2TokenProvider);
-            optionalUser.ifPresentOrElse((user -> registerUserAuthentication(request, user)),
-                () -> {
-                    throw new UserNotFoundException("Not Registered User Request");
-                });
-        }
+        UserPrincipal userPrincipal = UserPrincipal.create(user);
 
-        if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt) == JwtTokenValidationCode.EXPIRED) {
-            ipBlockManager.increase(request);
-        }
-
-        if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt) == JwtTokenValidationCode.DENIED) {
-            ipBlockManager.increase(request);
-        }
-
-        if (!StringUtils.hasText(
-            jwt)) { //인증된 사용자만 가능한 요청에 토큰자체를 담지 않는 경우, 인증이 필요없는 rest api의 경우 카운트하면안되는데 여길 통과하게됨
-            ipBlockManager.increase(request);
-        }
-    }
-
-    private void registerUserAuthentication(HttpServletRequest request,
-        User user) {
-        UserDetails userDetails = UserPrincipal.create(user);
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-            userDetails, null, userDetails.getAuthorities());
-        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        SecurityContextHolder
+                .getContext()
+                .setAuthentication(new UsernamePasswordAuthenticationToken(userPrincipal, null,
+                        userPrincipal.getAuthorities()));
     }
 }

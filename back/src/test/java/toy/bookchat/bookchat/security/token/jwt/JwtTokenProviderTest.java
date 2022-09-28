@@ -30,7 +30,6 @@ import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.token.openid.OpenIdTestUtil;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
-@Disabled
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
 class JwtTokenProviderTest {
 
@@ -40,62 +39,6 @@ class JwtTokenProviderTest {
     @InjectMocks
     JwtTokenProvider tokenProvider = new JwtTokenProvider(jwtTokenConfig);
 
-    /* TODO: 2022-09-28 여기 테스트 다시 enable시키고 수정사항에 맞춰 테스트 추가 및 수정
-     */
-    private X509EncodedKeySpec getPublicPkcs8EncodedKeySpec(OpenIdTestUtil openIdTestUtil)
-        throws IOException {
-        String publicKey = openIdTestUtil.getPublicKey(9);
-        byte[] decodePublicKey = Base64Utils.decode(publicKey.getBytes());
-        X509EncodedKeySpec spec = new X509EncodedKeySpec(publicKey.getBytes());
-        return spec;
-    }
-
-    private PKCS8EncodedKeySpec getPrivatePkcs8EncodedKeySpec(OpenIdTestUtil openIdTestUtil)
-        throws IOException {
-        String privateKey = openIdTestUtil.getPrivateKey(28);
-        byte[] decodePrivateKey = Base64Utils.decode(privateKey.getBytes());
-        PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(
-            decodePrivateKey);
-        return spec;
-    }
-
-    private String getKakaoToken(Long expiredTime)
-        throws IOException, InvalidKeySpecException, NoSuchAlgorithmException {
-        Authentication authentication = mock(Authentication.class);
-        UserPrincipal userPrincipal = mock(UserPrincipal.class);
-        User user = mock(User.class);
-
-        Map<String, Object> innerMap = new HashMap<>();
-        innerMap.put(JwtTokenProvider.EMAIL, "kaktus418@gmail.com");
-        innerMap.put(JwtTokenProvider.OAUTH2_PROVIDER, "kakao");
-        OAuth2Provider oAuth2Provider = OAuth2Provider.KAKAO;
-
-        Map<String, Object> outerMap = new HashMap<>();
-        outerMap.put(KAKAO_ACCOUNT, innerMap);
-
-        OpenIdTestUtil openIdTestUtil = new OpenIdTestUtil(
-            "src/test/java/toy/bookchat/bookchat/security/openid/token_key.pem",
-            "src/test/java/toy/bookchat/bookchat/security/openid/openidRSA256-public.pem");
-
-        PKCS8EncodedKeySpec spec = getPrivatePkcs8EncodedKeySpec(openIdTestUtil);
-
-        X509EncodedKeySpec pspec = getPublicPkcs8EncodedKeySpec(openIdTestUtil);
-
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-
-        PrivateKey pk = keyFactory.generatePrivate(spec);
-        PublicKey publicKey1 = keyFactory.generatePublic(pspec);
-
-        when(jwtTokenConfig.getSecret()).thenReturn(null);
-
-        when(jwtTokenConfig.getAccessTokenExpiredTime()).thenReturn(expiredTime);
-        when(authentication.getPrincipal()).thenReturn(userPrincipal);
-        when(userPrincipal.getUser()).thenReturn(user);
-        when(userPrincipal.getAttributes()).thenReturn(outerMap);
-        when(user.getProvider()).thenReturn(oAuth2Provider);
-
-        return tokenProvider.createToken(authentication);
-    }
 
     @Test
     public void 토큰을_생성_성공() throws Exception {
