@@ -68,4 +68,22 @@ class UserRepositoryTest {
 
         assertThat(result).isFalse();
     }
+
+    @Test
+    public void 사용자_이름으로_조회_성공() throws Exception {
+        String userName = "KAKAO123456";
+        User user = User.builder()
+                .name(userName)
+                .email("kaktus418@gmail.com")
+                .provider(OAuth2Provider.KAKAO)
+                .nickname("nickname")
+                .build();
+
+        userRepository.save(user);
+        userRepository.flush();
+
+        User findUser = userRepository.findByName(userName).get();
+
+        assertThat(user).isEqualTo(findUser);
+    }
 }
