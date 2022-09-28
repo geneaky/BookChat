@@ -70,9 +70,7 @@ public class UserController {
 
         String oauth2MemberNumber = openIdTokenManager.getOAuth2MemberNumberFromToken(
             getOpenIdToken(bearerToken), oAuth2Provider);
-
         String userEmail = openIdTokenManager.getUserEmailFromToken(getOpenIdToken(bearerToken), oAuth2Provider);
-
         userService.registerNewUser(userSignUpRequestDto, oauth2MemberNumber, userEmail, oAuth2Provider);
 
         return ResponseEntity.ok(null);
@@ -85,11 +83,9 @@ public class UserController {
 
         String userName = openIdTokenManager.getOAuth2MemberNumberFromToken(
                 getOpenIdToken(bearerToken), oAuth2Provider);
-
         userService.checkRegisteredUser(userName);
 
         Token token = jwtTokenProvider.createToken();
-
         jwtTokenRecorder.record(userName, token);
 
         return ResponseEntity.ok(token);
