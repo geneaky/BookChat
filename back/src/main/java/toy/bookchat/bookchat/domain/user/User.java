@@ -26,6 +26,9 @@ public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    /**
+    * name은 [oauth2 provider+oauth2 member number]로 정의함
+    */
     private String name;
     private String nickname;
     private String email;
