@@ -97,8 +97,4 @@ class OpenIdAuthenticationFilterTest {
         verify(ipBlockManager).increase(httpServletRequest);
     }
 
-    /* TODO: 2022-09-08 양방향 rsa256 utill class를 만들어서 openidconnect를 테스트 / 블로깅
-     */
-
-
 }

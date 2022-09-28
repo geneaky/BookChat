@@ -17,6 +17,7 @@ import toy.bookchat.bookchat.config.aws.S3Config;
 import toy.bookchat.bookchat.domain.storage.StorageService;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.exception.UserAlreadySignUpException;
+import toy.bookchat.bookchat.domain.user.exception.UserNotFoundException;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.domain.user.service.dto.UserSignUpRequestDto;
 
@@ -83,5 +84,15 @@ class UserServiceTest {
         assertThatThrownBy(() -> {
             userService.registerNewUser(userSignUpRequestDto, "testMemberNumber","test@gmail.com", KAKAO);
         }).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void 가입된_사용자인지_체크시_가입되지_않은_사용자라면_예외발생() throws Exception {
+
+        when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(null));
+
+        assertThatThrownBy(() -> {
+            userService.checkRegisteredUser("username");
+        }).isInstanceOf(UserNotFoundException.class);
     }
 }

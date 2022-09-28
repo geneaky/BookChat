@@ -7,12 +7,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import toy.bookchat.bookchat.config.JpaAuditingConfig;
 import toy.bookchat.bookchat.domain.configuration.TestConfig;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
 @DataJpaTest
-@Import(TestConfig.class)
+@Import({JpaAuditingConfig.class,TestConfig.class})
 class UserRepositoryTest {
 
     @Autowired
@@ -66,5 +67,23 @@ class UserRepositoryTest {
         boolean result = userRepository.existsByNickname("nickname");
 
         assertThat(result).isFalse();
+    }
+
+    @Test
+    public void 사용자_이름으로_조회_성공() throws Exception {
+        String userName = "KAKAO123456";
+        User user = User.builder()
+                .name(userName)
+                .email("kaktus418@gmail.com")
+                .provider(OAuth2Provider.KAKAO)
+                .nickname("nickname")
+                .build();
+
+        userRepository.save(user);
+        userRepository.flush();
+
+        User findUser = userRepository.findByName(userName).get();
+
+        assertThat(user).isEqualTo(findUser);
     }
 }

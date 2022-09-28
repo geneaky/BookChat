@@ -55,10 +55,12 @@ public class OpenIdToken {
 
     private Claims getBody(Key publicKey) {
         try {
-            return Jwts.parser()
+            return Optional.ofNullable(Jwts.parser()
                 .setSigningKey(publicKey)
                 .parseClaimsJws(this.openidToken)
-                .getBody();
+                .getBody()).orElseThrow(() -> {
+                throw new IllegalStandardTokenException("Token body is not existed");
+            });
         } catch (ExpiredJwtException exception) {
             log.info("Token :: {} :: is expired", this.openidToken);
             throw new ExpiredTokenException(exception.getMessage(), exception);

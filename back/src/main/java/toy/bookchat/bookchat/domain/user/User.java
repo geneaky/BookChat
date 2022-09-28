@@ -14,17 +14,21 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import toy.bookchat.bookchat.domain.BaseEntity;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class User {
+public class User extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    /**
+    * name은 [oauth2 provider+oauth2 member number]로 정의함
+    */
     private String name;
     private String nickname;
     private String email;

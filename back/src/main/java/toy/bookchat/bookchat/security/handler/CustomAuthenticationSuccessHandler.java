@@ -50,11 +50,12 @@ public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             .map(Cookie::getValue);
 
         String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
-        String jwtToken = jwtTokenProvider.createToken(authentication);
+//        String jwtToken = jwtTokenProvider.createToken(authentication);
+//        String jwtToken = jwtTokenProvider.createToken();
 
         return UriComponentsBuilder.fromUriString(targetUrl)
             .path(AUTH_PATH)
-            .queryParam("token", jwtToken)
+//            .queryParam("token", jwtToken)
             .build().toUriString();
     }
 
