@@ -2,9 +2,7 @@ package toy.bookchat.bookchat.domain.user.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -44,6 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.MockReset;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
@@ -62,7 +61,10 @@ import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.domain.user.service.UserService;
 import toy.bookchat.bookchat.domain.user.service.dto.UserSignUpRequestDto;
 import toy.bookchat.bookchat.security.SecurityConfig;
+import toy.bookchat.bookchat.security.exception.ExpiredTokenException;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
+import toy.bookchat.bookchat.security.token.TokenManager;
+import toy.bookchat.bookchat.security.token.jwt.JwtTokenManager;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenProvider;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenRecorder;
 import toy.bookchat.bookchat.security.token.openid.OpenIdTestUtil;
@@ -81,8 +83,11 @@ public class UserControllerTest extends AuthenticationTestExtension {
     @MockBean
     UserRepository userRepository;
 
-    @SpyBean
-    OpenIdTokenManager openIdTokenManager;
+    @MockBean(value = OpenIdTokenManager.class)
+    TokenManager openIdTokenManager;
+
+    @MockBean(value = JwtTokenManager.class)
+    TokenManager jwtTokenManager;
 
     @MockBean
     JwtTokenProvider jwtTokenProvider;
@@ -129,17 +134,17 @@ public class UserControllerTest extends AuthenticationTestExtension {
 
     @Test
     public void 사용자_프로필_정보_반환() throws Exception {
-        PrivateKey privateKey = getPrivateKey();
-        PublicKey publicKey = getPublicKey();
 
-        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("sub","test");
+        claims.put("name","google123");
+        claims.put("provider", OAuth2Provider.GOOGLE);
+        claims.put("email","test@gmail.com");
 
         String testToken = Jwts.builder()
-            .setSubject("test")
-            .setHeaderParam("kid", "abcedf")
-            .setIssuer(" https://kauth.kakao.com")
-            .signWith(SignatureAlgorithm.RS256, privateKey)
-            .compact();
+                .setClaims(claims)
+                .signWith(SignatureAlgorithm.HS256, "test")
+                .compact();
 
         String real = objectMapper.writeValueAsString(UserProfileResponse.builder()
             .userEmail("test@gmail.com")
@@ -161,13 +166,11 @@ public class UserControllerTest extends AuthenticationTestExtension {
 
         MvcResult mvcResult = mockMvc.perform(get("/v1/api/users/profile")
                 .with(user(getUserPrincipal()))
-                .header("Authorization", "Bearer " + testToken)
-                .header("provider_type", "KAKAO"))
+                .header("Authorization", "Bearer " + testToken))
             .andExpect(status().isOk())
             .andDo(document("user",
                 requestHeaders(
-                    headerWithName("Authorization").description("Bearer [openid token]"),
-                    headerWithName("provider_type").description("프로바이더 타입 [KAKAO / GOOGLE]")
+                    headerWithName("Authorization").description("Bearer [JWT token]")
                 ),
                 responseFields(
                     fieldWithPath("userNickname").type(STRING).description("닉네임"),
@@ -258,6 +261,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
         PublicKey publicKey = getPublicKey();
 
         when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
+        doThrow(ExpiredTokenException.class).when(openIdTokenManager).getOAuth2MemberNumberFromToken(any(),any());
 
         Claims claims = Jwts.claims().setIssuer("https://kauth.kakao.com")
             .setSubject("test").setExpiration(new Date(0));
@@ -281,6 +285,8 @@ public class UserControllerTest extends AuthenticationTestExtension {
         PublicKey publicKey = getPublicKey();
 
         when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
+        when(openIdTokenManager.getOAuth2MemberNumberFromToken(any(),any())).thenReturn("testkakao");
+        when(openIdTokenManager.getUserEmailFromToken(any(),any())).thenReturn("test@gmail.com");
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("email", "test@gmail.com");

@@ -10,6 +10,8 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
@@ -30,8 +32,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserRepository userRepository;
     private final IpBlockManager ipBlockManager;
 
-    public JwtAuthenticationFilter(TokenManager jwtTokenManager, UserRepository userRepository,
-        IpBlockManager ipBlockManager) {
+    public JwtAuthenticationFilter(@Qualifier("jwtTokenManager") TokenManager jwtTokenManager, UserRepository userRepository,
+                                   IpBlockManager ipBlockManager) {
         this.jwtTokenManager = jwtTokenManager;
         this.userRepository = userRepository;
         this.ipBlockManager = ipBlockManager;

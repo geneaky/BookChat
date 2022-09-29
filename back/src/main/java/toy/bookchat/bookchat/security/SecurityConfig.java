@@ -1,6 +1,7 @@
 package toy.bookchat.bookchat.security;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,18 +15,22 @@ import toy.bookchat.bookchat.security.exception.CustomExceptionHandlingFilter;
 import toy.bookchat.bookchat.security.handler.RestAuthenticationEntryPoint;
 import toy.bookchat.bookchat.security.ipblock.IpBlockCheckingFilter;
 import toy.bookchat.bookchat.security.ipblock.IpBlockManager;
-import toy.bookchat.bookchat.security.token.openid.OpenIdAuthenticationFilter;
-import toy.bookchat.bookchat.security.token.openid.OpenIdTokenManager;
+import toy.bookchat.bookchat.security.token.TokenManager;
+import toy.bookchat.bookchat.security.token.jwt.JwtAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final IpBlockManager ipBlockManager;
-    private final OpenIdTokenManager openIdTokenManager;
+    private final TokenManager jwtTokenManager;
     private final UserRepository userRepository;
 
+    public SecurityConfig(IpBlockManager ipBlockManager, @Qualifier("jwtTokenManager")TokenManager jwtTokenManager, UserRepository userRepository) {
+        this.ipBlockManager = ipBlockManager;
+        this.jwtTokenManager = jwtTokenManager;
+        this.userRepository = userRepository;
+    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -38,7 +43,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             new CustomExceptionHandlingFilter(),
             UsernamePasswordAuthenticationFilter.class);
         http.addFilterAt(
-            new OpenIdAuthenticationFilter(openIdTokenManager, userRepository, ipBlockManager),
+            new JwtAuthenticationFilter(jwtTokenManager, userRepository, ipBlockManager),
             UsernamePasswordAuthenticationFilter.class);
         http.addFilterAfter(
             new IpBlockCheckingFilter(ipBlockManager),

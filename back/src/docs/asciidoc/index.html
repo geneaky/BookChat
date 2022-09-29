@@ -534,11 +534,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Authorization</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Bearer [openid token]</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>provider_type</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">프로바이더 타입 [KAKAO / GOOGLE]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Bearer [JWT token]</p></td>
 </tr>
 </tbody>
 </table>
@@ -548,8 +544,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /v1/api/users/profile HTTP/1.1
-Authorization: Bearer eyJraWQiOiJhYmNlZGYiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaXNzIjoiIGh0dHBzOi8va2F1dGgua2FrYW8uY29tIn0.YhpZOu9l6nNSNH2jn6BAxn95zapWSlnLhXcoFwSbQ7mLAtOWYh0P81C4mi0v5GlynbRCbg3ICKB7uA38WlW-1aNko19bLyKZ6ynEfV-xZADkxw4l3fiyL2wCQMQ4fnRjKtzfcLbCO62MchJpQHZm8lJc82I52ggtDBuguDIf6CZWtYj1mMVs54iEkx251DvssxdzRBFVH6-OMo-de3c92mt8tFaqP2S3TtIZNty7BLrYrHgHAhSSDMo5UcuzxyLPAthd_mZuXjgis5L9j9EMjzUPmtYdZp6AE_JUmo51Vo-OqpNGBOqdbezbIZtxc73u0BVvAX4-HveZzCSn0re-iQ
-provider_type: KAKAO
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwicHJvdmlkZXIiOiJHT09HTEUiLCJuYW1lIjoiZ29vZ2xlMTIzIiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSJ9.MFg4fTS3TFWfASSpOkHx5Q85oqiyehXDtvEC-v2z7dE
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -998,9 +993,9 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 13
+Content-Length: 27
 
-Token Expired</code></pre>
+Not Registered User Request</code></pre>
 </div>
 </div>
 </div>
@@ -1028,11 +1023,7 @@ Token Expired</code></pre>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Authorization</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Bearer [openid token]</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>provider_type</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">프로바이더 타입 [KAKAO / GOOGLE]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Bearer [JWT token]</p></td>
 </tr>
 </tbody>
 </table>
@@ -1076,8 +1067,7 @@ Token Expired</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /v1/api/books?isbn=1231513&amp;size=5&amp;page=1&amp;sort=ACCURACY HTTP/1.1
-Authorization: Bearer eyJraWQiOiJhYmNlZGYiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaXNzIjoiIGh0dHBzOi8va2F1dGgua2FrYW8uY29tIn0.YhpZOu9l6nNSNH2jn6BAxn95zapWSlnLhXcoFwSbQ7mLAtOWYh0P81C4mi0v5GlynbRCbg3ICKB7uA38WlW-1aNko19bLyKZ6ynEfV-xZADkxw4l3fiyL2wCQMQ4fnRjKtzfcLbCO62MchJpQHZm8lJc82I52ggtDBuguDIf6CZWtYj1mMVs54iEkx251DvssxdzRBFVH6-OMo-de3c92mt8tFaqP2S3TtIZNty7BLrYrHgHAhSSDMo5UcuzxyLPAthd_mZuXjgis5L9j9EMjzUPmtYdZp6AE_JUmo51Vo-OqpNGBOqdbezbIZtxc73u0BVvAX4-HveZzCSn0re-iQ
-provider_type: KAKAO
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwicHJvdmlkZXIiOiJHT09HTEUiLCJuYW1lIjoiZ29vZ2xlMTIzIiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSJ9.MFg4fTS3TFWfASSpOkHx5Q85oqiyehXDtvEC-v2z7dE
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1167,8 +1157,7 @@ Content-Length: 203
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /v1/api/books?title=effectiveJava&amp;size=5&amp;page=1&amp;sort=LATEST HTTP/1.1
-Authorization: Bearer eyJraWQiOiJhYmNlZGYiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaXNzIjoiIGh0dHBzOi8va2F1dGgua2FrYW8uY29tIn0.YhpZOu9l6nNSNH2jn6BAxn95zapWSlnLhXcoFwSbQ7mLAtOWYh0P81C4mi0v5GlynbRCbg3ICKB7uA38WlW-1aNko19bLyKZ6ynEfV-xZADkxw4l3fiyL2wCQMQ4fnRjKtzfcLbCO62MchJpQHZm8lJc82I52ggtDBuguDIf6CZWtYj1mMVs54iEkx251DvssxdzRBFVH6-OMo-de3c92mt8tFaqP2S3TtIZNty7BLrYrHgHAhSSDMo5UcuzxyLPAthd_mZuXjgis5L9j9EMjzUPmtYdZp6AE_JUmo51Vo-OqpNGBOqdbezbIZtxc73u0BVvAX4-HveZzCSn0re-iQ
-provider_type: KAKAO
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwicHJvdmlkZXIiOiJHT09HTEUiLCJuYW1lIjoiZ29vZ2xlMTIzIiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSJ9.MFg4fTS3TFWfASSpOkHx5Q85oqiyehXDtvEC-v2z7dE
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1233,8 +1222,7 @@ Content-Length: 203
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /v1/api/books?author=Joshua&amp;size=5&amp;page=1&amp;sort=LATEST HTTP/1.1
-Authorization: Bearer eyJraWQiOiJhYmNlZGYiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaXNzIjoiIGh0dHBzOi8va2F1dGgua2FrYW8uY29tIn0.YhpZOu9l6nNSNH2jn6BAxn95zapWSlnLhXcoFwSbQ7mLAtOWYh0P81C4mi0v5GlynbRCbg3ICKB7uA38WlW-1aNko19bLyKZ6ynEfV-xZADkxw4l3fiyL2wCQMQ4fnRjKtzfcLbCO62MchJpQHZm8lJc82I52ggtDBuguDIf6CZWtYj1mMVs54iEkx251DvssxdzRBFVH6-OMo-de3c92mt8tFaqP2S3TtIZNty7BLrYrHgHAhSSDMo5UcuzxyLPAthd_mZuXjgis5L9j9EMjzUPmtYdZp6AE_JUmo51Vo-OqpNGBOqdbezbIZtxc73u0BVvAX4-HveZzCSn0re-iQ
-provider_type: KAKAO
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwicHJvdmlkZXIiOiJHT09HTEUiLCJuYW1lIjoiZ29vZ2xlMTIzIiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSJ9.MFg4fTS3TFWfASSpOkHx5Q85oqiyehXDtvEC-v2z7dE
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1359,8 +1347,7 @@ Content-Length: 203
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /v1/api/bookshelf/books HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJraWQiOiJhYmNlZGYiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaXNzIjoiIGh0dHBzOi8va2F1dGgua2FrYW8uY29tIn0.YhpZOu9l6nNSNH2jn6BAxn95zapWSlnLhXcoFwSbQ7mLAtOWYh0P81C4mi0v5GlynbRCbg3ICKB7uA38WlW-1aNko19bLyKZ6ynEfV-xZADkxw4l3fiyL2wCQMQ4fnRjKtzfcLbCO62MchJpQHZm8lJc82I52ggtDBuguDIf6CZWtYj1mMVs54iEkx251DvssxdzRBFVH6-OMo-de3c92mt8tFaqP2S3TtIZNty7BLrYrHgHAhSSDMo5UcuzxyLPAthd_mZuXjgis5L9j9EMjzUPmtYdZp6AE_JUmo51Vo-OqpNGBOqdbezbIZtxc73u0BVvAX4-HveZzCSn0re-iQ
-provider_type: KAKAO
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwicHJvdmlkZXIiOiJHT09HTEUiLCJuYW1lIjoiZ29vZ2xlMTIzIiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSJ9.MFg4fTS3TFWfASSpOkHx5Q85oqiyehXDtvEC-v2z7dE
 Content-Length: 191
 Host: localhost:8080
 
@@ -1444,8 +1431,7 @@ X-Frame-Options: DENY</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /v1/api/bookshelf/books HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJraWQiOiJhYmNlZGYiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaXNzIjoiIGh0dHBzOi8va2F1dGgua2FrYW8uY29tIn0.YhpZOu9l6nNSNH2jn6BAxn95zapWSlnLhXcoFwSbQ7mLAtOWYh0P81C4mi0v5GlynbRCbg3ICKB7uA38WlW-1aNko19bLyKZ6ynEfV-xZADkxw4l3fiyL2wCQMQ4fnRjKtzfcLbCO62MchJpQHZm8lJc82I52ggtDBuguDIf6CZWtYj1mMVs54iEkx251DvssxdzRBFVH6-OMo-de3c92mt8tFaqP2S3TtIZNty7BLrYrHgHAhSSDMo5UcuzxyLPAthd_mZuXjgis5L9j9EMjzUPmtYdZp6AE_JUmo51Vo-OqpNGBOqdbezbIZtxc73u0BVvAX4-HveZzCSn0re-iQ
-provider_type: KAKAO
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwicHJvdmlkZXIiOiJHT09HTEUiLCJuYW1lIjoiZ29vZ2xlMTIzIiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSJ9.MFg4fTS3TFWfASSpOkHx5Q85oqiyehXDtvEC-v2z7dE
 Content-Length: 194
 Host: localhost:8080
 
@@ -1541,8 +1527,7 @@ X-Frame-Options: DENY</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /v1/api/bookshelf/books HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJraWQiOiJhYmNlZGYiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaXNzIjoiIGh0dHBzOi8va2F1dGgua2FrYW8uY29tIn0.YhpZOu9l6nNSNH2jn6BAxn95zapWSlnLhXcoFwSbQ7mLAtOWYh0P81C4mi0v5GlynbRCbg3ICKB7uA38WlW-1aNko19bLyKZ6ynEfV-xZADkxw4l3fiyL2wCQMQ4fnRjKtzfcLbCO62MchJpQHZm8lJc82I52ggtDBuguDIf6CZWtYj1mMVs54iEkx251DvssxdzRBFVH6-OMo-de3c92mt8tFaqP2S3TtIZNty7BLrYrHgHAhSSDMo5UcuzxyLPAthd_mZuXjgis5L9j9EMjzUPmtYdZp6AE_JUmo51Vo-OqpNGBOqdbezbIZtxc73u0BVvAX4-HveZzCSn0re-iQ
-provider_type: KAKAO
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwicHJvdmlkZXIiOiJHT09HTEUiLCJuYW1lIjoiZ29vZ2xlMTIzIiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSJ9.MFg4fTS3TFWfASSpOkHx5Q85oqiyehXDtvEC-v2z7dE
 Content-Length: 204
 Host: localhost:8080
 
@@ -1607,8 +1592,7 @@ X-Frame-Options: DENY</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /v1/api/bookshelf/books?readingStatus=WISH&amp;size=5&amp;page=1&amp;sort=id,DESC HTTP/1.1
-Authorization: Bearer eyJraWQiOiJhYmNlZGYiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaXNzIjoiIGh0dHBzOi8va2F1dGgua2FrYW8uY29tIn0.YhpZOu9l6nNSNH2jn6BAxn95zapWSlnLhXcoFwSbQ7mLAtOWYh0P81C4mi0v5GlynbRCbg3ICKB7uA38WlW-1aNko19bLyKZ6ynEfV-xZADkxw4l3fiyL2wCQMQ4fnRjKtzfcLbCO62MchJpQHZm8lJc82I52ggtDBuguDIf6CZWtYj1mMVs54iEkx251DvssxdzRBFVH6-OMo-de3c92mt8tFaqP2S3TtIZNty7BLrYrHgHAhSSDMo5UcuzxyLPAthd_mZuXjgis5L9j9EMjzUPmtYdZp6AE_JUmo51Vo-OqpNGBOqdbezbIZtxc73u0BVvAX4-HveZzCSn0re-iQ
-provider_type: KAKAO
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwicHJvdmlkZXIiOiJHT09HTEUiLCJuYW1lIjoiZ29vZ2xlMTIzIiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSJ9.MFg4fTS3TFWfASSpOkHx5Q85oqiyehXDtvEC-v2z7dE
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1705,8 +1689,7 @@ Host: localhost:8080</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /v1/api/bookshelf/books?readingStatus=READING&amp;size=5&amp;page=1&amp;sort=id,DESC HTTP/1.1
-Authorization: Bearer eyJraWQiOiJhYmNlZGYiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaXNzIjoiIGh0dHBzOi8va2F1dGgua2FrYW8uY29tIn0.YhpZOu9l6nNSNH2jn6BAxn95zapWSlnLhXcoFwSbQ7mLAtOWYh0P81C4mi0v5GlynbRCbg3ICKB7uA38WlW-1aNko19bLyKZ6ynEfV-xZADkxw4l3fiyL2wCQMQ4fnRjKtzfcLbCO62MchJpQHZm8lJc82I52ggtDBuguDIf6CZWtYj1mMVs54iEkx251DvssxdzRBFVH6-OMo-de3c92mt8tFaqP2S3TtIZNty7BLrYrHgHAhSSDMo5UcuzxyLPAthd_mZuXjgis5L9j9EMjzUPmtYdZp6AE_JUmo51Vo-OqpNGBOqdbezbIZtxc73u0BVvAX4-HveZzCSn0re-iQ
-provider_type: KAKAO
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwicHJvdmlkZXIiOiJHT09HTEUiLCJuYW1lIjoiZ29vZ2xlMTIzIiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSJ9.MFg4fTS3TFWfASSpOkHx5Q85oqiyehXDtvEC-v2z7dE
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1803,8 +1786,7 @@ Host: localhost:8080</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /v1/api/bookshelf/books?readingStatus=COMPLETE&amp;size=5&amp;page=1&amp;sort=id,DESC HTTP/1.1
-Authorization: Bearer eyJraWQiOiJhYmNlZGYiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaXNzIjoiIGh0dHBzOi8va2F1dGgua2FrYW8uY29tIn0.YhpZOu9l6nNSNH2jn6BAxn95zapWSlnLhXcoFwSbQ7mLAtOWYh0P81C4mi0v5GlynbRCbg3ICKB7uA38WlW-1aNko19bLyKZ6ynEfV-xZADkxw4l3fiyL2wCQMQ4fnRjKtzfcLbCO62MchJpQHZm8lJc82I52ggtDBuguDIf6CZWtYj1mMVs54iEkx251DvssxdzRBFVH6-OMo-de3c92mt8tFaqP2S3TtIZNty7BLrYrHgHAhSSDMo5UcuzxyLPAthd_mZuXjgis5L9j9EMjzUPmtYdZp6AE_JUmo51Vo-OqpNGBOqdbezbIZtxc73u0BVvAX4-HveZzCSn0re-iQ
-provider_type: KAKAO
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwicHJvdmlkZXIiOiJHT09HTEUiLCJuYW1lIjoiZ29vZ2xlMTIzIiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSJ9.MFg4fTS3TFWfASSpOkHx5Q85oqiyehXDtvEC-v2z7dE
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1864,7 +1846,7 @@ Host: localhost:8080</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-09-28 17:09:12 +0900
+Last updated 2022-09-29 09:30:05 +0900
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>
