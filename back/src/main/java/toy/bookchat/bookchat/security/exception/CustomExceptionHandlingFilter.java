@@ -17,31 +17,11 @@ public class CustomExceptionHandlingFilter extends OncePerRequestFilter {
 
         try {
             filterChain.doFilter(request, response);
-        } catch (UserNotFoundException exception) {
-            response.setStatus(401);
-            response.setContentType("text/plain");
-            response.setCharacterEncoding("utf-8");
-            response.getWriter().write("Not Registered User Request");
         } catch (BlockedIpException exception) {
             response.setStatus(403);
             response.setContentType("text/plain");
             response.setCharacterEncoding("utf-8");
             response.getWriter().write("You Are Blocked");
-        } catch (ExpiredTokenException exception) {
-            response.setStatus(401);
-            response.setContentType("text/plain");
-            response.setCharacterEncoding("utf-8");
-            response.getWriter().write("Token Expired");
-        } catch (DenidedTokenException exception) {
-            response.setStatus(401);
-            response.setContentType("text/plain");
-            response.setCharacterEncoding("utf-8");
-            response.getWriter().write("Not Valid Token Request");
-        } catch (NotVerifiedRequestFormatException exception) {
-            response.setStatus(401);
-            response.setContentType("text/plain");
-            response.setCharacterEncoding("utf-8");
-            response.getWriter().write("Empty Provider Type");
         }
     }
 }
