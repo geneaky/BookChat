@@ -203,7 +203,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
 
     @Test
     public void 사용자_회원가입_요청시_header_인증정보_없을시_400반환() throws Exception {
-        mockMvc.perform(post("/v1/api/users")
+        mockMvc.perform(post("/v1/api/users/signup")
                 .header("Authorization", " ")
                 .param("nickname", "nick")
                 .param("userEmail", "kaktus418@gmail.com")
@@ -215,7 +215,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
 
     @Test
     public void 사용자_회원가입_요청시_header_openid없는_인증정보_400반환() throws Exception {
-        mockMvc.perform(post("/v1/api/users")
+        mockMvc.perform(post("/v1/api/users/signup")
                 .header("Authorization", "Bearer ")
                 .header("provider_type", "KAKAO")
                 .param("nickname", "nick")
@@ -270,7 +270,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
             .setClaims(claims)
             .signWith(SignatureAlgorithm.RS256, privateKey).compact();
 
-        mockMvc.perform(post("/v1/api/users")
+        mockMvc.perform(post("/v1/api/users/signup")
                 .header("Authorization", "Bearer " + testToken)
                 .header("provider_type", "KAKAO")
                 .param("nickname", "nick")
@@ -299,7 +299,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
             .signWith(SignatureAlgorithm.RS256, privateKey)
             .compact();
 
-        mockMvc.perform(post("/v1/api/users")
+        mockMvc.perform(post("/v1/api/users/signup")
                 .header("Authorization", "Bearer " + testToken)
                 .header("provider_type", "KAKAO")
                 .param("nickname", "nick")
@@ -344,7 +344,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
         String testToken = Jwts.builder().setSubject("test")
             .signWith(SignatureAlgorithm.RS256, privateKey).compact();
 
-        mockMvc.perform(post("/v1/api/users")
+        mockMvc.perform(post("/v1/api/users/signup")
                 .header("Authorization", "Tearer" + testToken)
                 .header("provider_type", "KAKAO")
                 .param("defaultProfileImageType", "1")
@@ -360,7 +360,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
         String testToken = Jwts.builder().setSubject("test")
             .signWith(SignatureAlgorithm.RS256, privateKey).compact();
 
-        mockMvc.perform(post("/v1/api/users")
+        mockMvc.perform(post("/v1/api/users/signup")
                 .header("Authorization", "Bearer " + testToken)
                 .param("nickname", "")
                 .param("userEmail", "abcdefg")

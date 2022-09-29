@@ -70,7 +70,7 @@ public class UserController {
         return ResponseEntity.ok(null);
     }
 
-    @PostMapping("/users")
+    @PostMapping("/users/signup")
     public ResponseEntity<Void> userSignUp(
         @Valid @ModelAttribute UserSignUpRequestDto userSignUpRequestDto,
         @RequestHeader(AUTHORIZATION) @NotBlank @Pattern(regexp = "^(Bearer)\\s.+") String bearerToken,
