@@ -75,6 +75,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
         web.ignoring()
             .antMatchers(HttpMethod.GET, "/v1/api/users/profile/nickname")
-            .antMatchers(HttpMethod.POST, "/v1/api/users/signup","/v1/api/users/signin");
+            .antMatchers(HttpMethod.POST, "/v1/api/users/signup", "/v1/api/users/signin", "/v1/api/auth/token");
     }
 }
