@@ -1,6 +1,7 @@
 package toy.bookchat.bookchat.security.token.openid;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import toy.bookchat.bookchat.config.OpenIdTokenConfig;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
@@ -8,6 +9,7 @@ import toy.bookchat.bookchat.security.token.TokenManager;
 
 @Slf4j
 @Component
+@Qualifier("openIdTokenManager")
 public class OpenIdTokenManager implements TokenManager {
 
     private final OpenIdTokenConfig openIdTokenConfig;

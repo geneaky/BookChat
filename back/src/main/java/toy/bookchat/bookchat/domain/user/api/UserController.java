@@ -9,6 +9,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -39,8 +40,7 @@ public class UserController {
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtTokenRecorder jwtTokenRecorder;
 
-    @Autowired
-    public UserController(UserService userService, TokenManager openIdTokenManager,
+    public UserController(UserService userService, @Qualifier("openIdTokenManager") TokenManager openIdTokenManager,
         JwtTokenProvider jwtTokenProvider, JwtTokenRecorder jwtTokenRecorder) {
         this.userService = userService;
         this.openIdTokenManager = openIdTokenManager;

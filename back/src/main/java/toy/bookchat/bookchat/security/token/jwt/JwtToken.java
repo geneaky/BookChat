@@ -16,6 +16,7 @@ import toy.bookchat.bookchat.security.exception.IllegalStandardTokenException;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class JwtToken {
 
+    public static final String EMAIL = "email";
     private String jwtToken;
 
     public static JwtToken of(String jwtToken) {
@@ -30,7 +31,7 @@ public class JwtToken {
     }
 
     public String getEmail(String secret) {
-        return (String) Optional.ofNullable(getBody(secret).get("email"))
+        return (String) Optional.ofNullable(getBody(secret).get(EMAIL))
             .orElseThrow(() -> {
                 throw new IllegalStandardTokenException("Email is not existed");
             });

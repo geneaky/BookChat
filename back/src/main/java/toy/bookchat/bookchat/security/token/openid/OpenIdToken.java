@@ -23,6 +23,7 @@ public class OpenIdToken {
     public static final int HEADER = 0;
     public static final int PAYLOAD = 1;
     public static final String KID = "kid";
+    public static final String EMAIL = "email";
     private final String openidToken;
 
     public static OpenIdToken of(String openidToken) {
@@ -48,7 +49,7 @@ public class OpenIdToken {
     }
 
     public String getEmail(Key publicKey) {
-        return (String) Optional.ofNullable(getBody(publicKey).get("email")).orElseThrow(() -> {
+        return (String) Optional.ofNullable(getBody(publicKey).get(EMAIL)).orElseThrow(() -> {
             throw new IllegalStandardTokenException("Email is not existed");
         });
     }

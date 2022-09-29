@@ -29,10 +29,7 @@ import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -61,6 +58,9 @@ import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfSearchRespons
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.security.SecurityConfig;
+import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
+import toy.bookchat.bookchat.security.token.TokenManager;
+import toy.bookchat.bookchat.security.token.jwt.JwtTokenManager;
 import toy.bookchat.bookchat.security.token.openid.OpenIdTestUtil;
 import toy.bookchat.bookchat.security.token.openid.OpenIdTokenManager;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
@@ -73,55 +73,18 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
 
     @Autowired
     ObjectMapper objectMapper;
-    @MockBean
-    OpenIdTokenManager openIdTokenManager;
+    @MockBean(value = OpenIdTokenManager.class)
+    TokenManager openIdTokenManager;
+    @MockBean(value = JwtTokenManager.class)
+    TokenManager jwtTokenManager;
     @MockBean
     OpenIdTokenConfig openIdTokenConfig;
     @MockBean
     UserRepository userRepository;
     @MockBean
     BookShelfService bookShelfService;
-    OpenIdTestUtil openIdTestUtil;
     @Autowired
     private MockMvc mockMvc;
-
-    @BeforeEach
-    public void init() throws FileNotFoundException {
-        openIdTestUtil = new OpenIdTestUtil(
-                "src/test/java/toy/bookchat/bookchat/security/token/openid/token_key.pem",
-                "src/test/java/toy/bookchat/bookchat/security/token/openid/openidRSA256-public.pem");
-    }
-
-    private X509EncodedKeySpec getPublicPkcs8EncodedKeySpec(OpenIdTestUtil openIdTestUtil)
-            throws IOException {
-        String publicKey = openIdTestUtil.getPublicKey(9);
-        byte[] decodePublicKey = Base64Utils.decode(publicKey.getBytes());
-        return new X509EncodedKeySpec(decodePublicKey);
-    }
-
-    private PKCS8EncodedKeySpec getPrivatePkcs8EncodedKeySpec(OpenIdTestUtil openIdTestUtil)
-            throws IOException {
-        String privateKey = openIdTestUtil.getPrivateKey(28);
-        byte[] decodePrivateKey = Base64Utils.decode(privateKey.getBytes());
-        return new PKCS8EncodedKeySpec(
-                decodePrivateKey);
-    }
-
-    private PublicKey getPublicKey()
-            throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        X509EncodedKeySpec publicKeySpec = getPublicPkcs8EncodedKeySpec(openIdTestUtil);
-        PublicKey publicKey = keyFactory.generatePublic(publicKeySpec);
-        return publicKey;
-    }
-
-    private PrivateKey getPrivateKey()
-            throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        PKCS8EncodedKeySpec privateKeySpec = getPrivatePkcs8EncodedKeySpec(openIdTestUtil);
-        PrivateKey privateKey = keyFactory.generatePrivate(privateKeySpec);
-        return privateKey;
-    }
 
     private User getUser() {
         return User.builder()
@@ -171,13 +134,17 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
     }
 
     private String getTestToken() throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
-        PrivateKey privateKey = getPrivateKey();
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("sub","test");
+        claims.put("name","google123");
+        claims.put("provider", OAuth2Provider.GOOGLE);
+        claims.put("email","test@gmail.com");
+
         String testToken = Jwts.builder()
-                .setSubject("test")
-                .setHeaderParam("kid", "abcedf")
-                .setIssuer(" https://kauth.kakao.com")
-                .signWith(SignatureAlgorithm.RS256, privateKey)
+                .setClaims(claims)
+                .signWith(SignatureAlgorithm.HS256, "test")
                 .compact();
+
         return testToken;
     }
 
@@ -191,20 +158,17 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
 
     @Test
     public void 읽고_있는_책_등록_성공() throws Exception {
-        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(getPublicKey());
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
                 .header("Authorization", "Bearer " + getTestToken())
-                .header("provider_type", "KAKAO")
                 .content(objectMapper.writeValueAsString(getBookShelfRequestDto(ReadingStatus.READING)))
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isCreated())
             .andDo(document("bookshelf-reading",
                 requestHeaders(
-                    headerWithName("Authorization").description("Bearer [openid token]"),
-                    headerWithName("provider_type").description("프로바이더 타입 [KAKAO / GOOGLE]")),
+                    headerWithName("Authorization").description("Bearer [JWT token]")),
                 requestFields(fieldWithPath("isbn").description("ISBN"),
                     fieldWithPath("title").type(STRING).description("제목"),
                     fieldWithPath("authors[]").type(ARRAY).description("저자"),
@@ -220,12 +184,10 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
 
     @Test
     public void 읽은_책_등록_성공() throws Exception {
-        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(getPublicKey());
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
                 .header("Authorization", "Bearer " + getTestToken())
-                .header("provider_type", "KAKAO")
                 .content(
                     objectMapper.writeValueAsString(getBookShelfRequestDto(ReadingStatus.COMPLETE)))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -233,8 +195,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
             .andExpect(status().isCreated())
             .andDo(document("bookshelf-complete",
                 requestHeaders(
-                    headerWithName("Authorization").description("Bearer [openid token]"),
-                    headerWithName("provider_type").description("프로바이더 타입 [KAKAO / GOOGLE]")
+                    headerWithName("Authorization").description("Bearer [JWT token]")
                 ),
                 requestFields(fieldWithPath("isbn").type(STRING).description("ISBN"),
                     fieldWithPath("title").type(STRING).description("제목"),
@@ -251,7 +212,6 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
 
     @Test
     public void 읽은_책_등록시_평점_한줄평_없으면_400반환() throws Exception {
-        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(getPublicKey());
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
         doThrow(IllegalArgumentException.class).when(bookShelfService).putBookOnBookShelf(any(),any());
 
@@ -266,7 +226,6 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
                         .header("Authorization", "Bearer " + getTestToken())
-                        .header("provider_type", "KAKAO")
                         .content(
                                 objectMapper.writeValueAsString(bookShelfRequestDto))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -277,20 +236,17 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
 
     @Test
     public void 읽을_책_등록_성공() throws Exception {
-        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(getPublicKey());
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
                 .header("Authorization", "Bearer " + getTestToken())
-                .header("provider_type", "KAKAO")
                 .content(objectMapper.writeValueAsString(getBookShelfRequestDto(ReadingStatus.WISH)))
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isCreated())
             .andDo(document("bookshelf-wish",
                 requestHeaders(
-                    headerWithName("Authorization").description("Bearer [openid token]"),
-                    headerWithName("provider_type").description("프로바이더 타입 [KAKAO / GOOGLE]")
+                    headerWithName("Authorization").description("Bearer [openid token]")
                 ),
                 requestFields(fieldWithPath("isbn").type(STRING).description("ISBN"),
                     fieldWithPath("title").type(STRING).description("제목"),
@@ -307,12 +263,10 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
 
     @Test
     public void null로_요청_실패() throws Exception {
-        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(getPublicKey());
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
                 .header("Authorization", "Bearer " + getTestToken())
-                .header("provider_type", "KAKAO")
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isBadRequest());
@@ -320,7 +274,6 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
 
     @Test
     public void 존재하지않은_readingstatus_책_등록_실패() throws Exception {
-        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(getPublicKey());
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
 
         BookShelfTestRequestDto bookShelfTestRequestDto = new BookShelfTestRequestDto("124151214",
@@ -329,7 +282,6 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
                 .header("Authorization", "Bearer " + getTestToken())
-                .header("provider_type", "KAKAO")
                 .content(objectMapper.writeValueAsString(bookShelfTestRequestDto))
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
@@ -338,7 +290,6 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
 
     @Test
     public void readingStatus_없이_요청_실패() throws Exception {
-        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(getPublicKey());
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
 
         BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
@@ -351,7 +302,6 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
                 .header("Authorization", "Bearer " + getTestToken())
-                .header("provider_type", "KAKAO")
                 .content(objectMapper.writeValueAsString(bookShelfRequestDto))
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
@@ -361,7 +311,6 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
 
     @Test
     public void isbn_없이_책_등록_요청_실패() throws Exception {
-        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(getPublicKey());
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
 
         BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
@@ -374,7 +323,6 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
                 .header("Authorization", "Bearer " + getTestToken())
-                .header("provider_type", "KAKAO")
                 .content(objectMapper.writeValueAsString(bookShelfRequestDto))
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
@@ -383,7 +331,6 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
 
     @Test
     public void isbn_빈_문자열_요청_실패() throws Exception {
-        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(getPublicKey());
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
 
         BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
@@ -397,7 +344,6 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
                 .header("Authorization", "Bearer " + getTestToken())
-                .header("provider_type", "KAKAO")
                 .content(objectMapper.writeValueAsString(bookShelfRequestDto))
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
@@ -406,7 +352,6 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
 
     @Test
     public void 제목_없이_요청_실패() throws Exception {
-        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(getPublicKey());
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
 
         BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
@@ -419,7 +364,6 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
                 .header("Authorization", "Bearer " + getTestToken())
-                .header("provider_type", "KAKAO")
                 .content(objectMapper.writeValueAsString(bookShelfRequestDto))
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
@@ -428,7 +372,6 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
 
     @Test
     public void 제목_빈_문자열_요청_실패() throws Exception {
-        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(getPublicKey());
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
 
         BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
@@ -442,7 +385,6 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
                 .header("Authorization", "Bearer " + getTestToken())
-                .header("provider_type", "KAKAO")
                 .content(objectMapper.writeValueAsString(bookShelfRequestDto))
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
@@ -452,7 +394,6 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
 
     @Test
     public void 작가명_없이_요청_실패() throws Exception {
-        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(getPublicKey());
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
 
         BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
@@ -465,7 +406,6 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
                 .header("Authorization", "Bearer " + getTestToken())
-                .header("provider_type", "KAKAO")
                 .content(objectMapper.writeValueAsString(bookShelfRequestDto))
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
@@ -475,7 +415,6 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
 
     @Test
     public void 작가명_빈_문자열_요청_실패() throws Exception {
-        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(getPublicKey());
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
 
         BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
@@ -489,7 +428,6 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
                 .header("Authorization", "Bearer " + getTestToken())
-                .header("provider_type", "KAKAO")
                 .content(objectMapper.writeValueAsString(bookShelfRequestDto))
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
@@ -499,7 +437,6 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
 
     @Test
     public void 출판사_없이_요청_실패() throws Exception {
-        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(getPublicKey());
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
 
         BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
@@ -512,7 +449,6 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
                 .header("Authorization", "Bearer " + getTestToken())
-                .header("provider_type", "KAKAO")
                 .content(objectMapper.writeValueAsString(bookShelfRequestDto))
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
@@ -522,7 +458,6 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
 
     @Test
     public void 출판사_빈_문자열_요청_실패() throws Exception {
-        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(getPublicKey());
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
 
         BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
@@ -536,7 +471,6 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
                 .header("Authorization", "Bearer " + getTestToken())
-                .header("provider_type", "KAKAO")
                 .content(objectMapper.writeValueAsString(bookShelfRequestDto))
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
@@ -558,14 +492,12 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
 
         result.add(bookShelfSearchResponseDto);
 
-        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(getPublicKey());
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
         when(bookShelfService.takeBooksOutOfBookShelf(any(ReadingStatus.class), any(Pageable.class),
             any(User.class))).thenReturn(result);
 
         mockMvc.perform(get("/v1/api/bookshelf/books")
                 .header("Authorization", "Bearer " + getTestToken())
-                .header("provider_type", "KAKAO")
                 .queryParam("readingStatus", "READING")
                 .queryParam("size", "5")
                 .queryParam("page", "1")
@@ -575,8 +507,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
             .andDo(print())
             .andDo(document("get-bookshelf-reading",
                 requestHeaders(
-                    headerWithName("Authorization").description("Bearer [openid token]"),
-                    headerWithName("provider_type").description("프로바이더 타입 [KAKAO / GOOGLE]")
+                    headerWithName("Authorization").description("Bearer [JWT token]")
                 ),
                 requestParameters(
                     parameterWithName("readingStatus").description("READING"),
@@ -612,14 +543,12 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
 
         result.add(bookShelfSearchResponseDto);
 
-        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(getPublicKey());
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
         when(bookShelfService.takeBooksOutOfBookShelf(any(ReadingStatus.class), any(Pageable.class),
             any(User.class))).thenReturn(result);
 
         mockMvc.perform(get("/v1/api/bookshelf/books")
                 .header("Authorization", "Bearer " + getTestToken())
-                .header("provider_type", "KAKAO")
                 .queryParam("readingStatus", "COMPLETE")
                 .queryParam("size", "5")
                 .queryParam("page", "1")
@@ -629,8 +558,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
             .andDo(print())
             .andDo(document("get-bookshelf-complete",
                 requestHeaders(
-                    headerWithName("Authorization").description("Bearer [openid token]"),
-                    headerWithName("provider_type").description("프로바이더 타입 [KAKAO / GOOGLE]")
+                    headerWithName("Authorization").description("Bearer [JWT token]")
                 ),
                 requestParameters(
                     parameterWithName("readingStatus").description("COMPLETE"),
@@ -666,14 +594,12 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
 
         result.add(bookShelfSearchResponseDto);
 
-        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(getPublicKey());
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
         when(bookShelfService.takeBooksOutOfBookShelf(any(ReadingStatus.class), any(Pageable.class),
             any(User.class))).thenReturn(result);
 
         mockMvc.perform(get("/v1/api/bookshelf/books")
                 .header("Authorization", "Bearer " + getTestToken())
-                .header("provider_type", "KAKAO")
                 .queryParam("readingStatus", "WISH")
                 .queryParam("size", "5")
                 .queryParam("page", "1")
@@ -683,8 +609,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
             .andDo(print())
             .andDo(document("get-bookshelf-wish",
                 requestHeaders(
-                    headerWithName("Authorization").description("Bearer [openid token]"),
-                    headerWithName("provider_type").description("프로바이더 타입 [KAKAO / GOOGLE]")
+                    headerWithName("Authorization").description("Bearer [JWT token]")
                 ),
                 requestParameters(
                     parameterWithName("readingStatus").description("WISH"),
