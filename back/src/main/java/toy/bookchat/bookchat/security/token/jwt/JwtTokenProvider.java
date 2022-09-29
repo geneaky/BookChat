@@ -1,5 +1,10 @@
 package toy.bookchat.bookchat.security.token.jwt;
 
+import static toy.bookchat.bookchat.security.token.TokenConstants.PROVIDER;
+import static toy.bookchat.bookchat.security.token.TokenConstants.SUB;
+import static toy.bookchat.bookchat.security.token.TokenConstants.USER_EMAIL;
+import static toy.bookchat.bookchat.security.token.TokenConstants.USER_NAME;
+
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.util.Date;
@@ -59,10 +64,10 @@ public class JwtTokenProvider {
     private Map<String, Object> createClaims(String userName, String userEmail,
         OAuth2Provider oAuth2Provider) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("sub", "BookChat");
-        claims.put("oAuth2Provider", oAuth2Provider);
-        claims.put("userName", userName);
-        claims.put("email", userEmail);
+        claims.put(SUB, "BookChat");
+        claims.put(PROVIDER, oAuth2Provider);
+        claims.put(USER_NAME, userName);
+        claims.put(USER_EMAIL, userEmail);
         return claims;
     }
 }

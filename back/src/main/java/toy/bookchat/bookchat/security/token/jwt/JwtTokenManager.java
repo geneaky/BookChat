@@ -27,4 +27,10 @@ public class JwtTokenManager implements TokenManager {
         JwtToken jwtToken = JwtToken.of(token);
         return jwtToken.getEmail(jwtTokenConfig.getSecret());
     }
+
+    @Override
+    public OAuth2Provider getOAuth2ProviderFromToken(String token) {
+        JwtToken jwtToken = JwtToken.of(token);
+        return jwtToken.getOAuth2Provider(jwtTokenConfig.getSecret());
+    }
 }

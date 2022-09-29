@@ -31,4 +31,9 @@ public class OpenIdTokenManager implements TokenManager {
         return openIdToken.getEmail(
             openIdTokenConfig.getPublicKey(openIdToken.getKeyId(), oAuth2Provider));
     }
+
+    @Override
+    public OAuth2Provider getOAuth2ProviderFromToken(String token) {
+        return null;
+    }
 }

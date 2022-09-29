@@ -7,4 +7,6 @@ public interface TokenManager {
     String getOAuth2MemberNumberFromToken(String token, OAuth2Provider oAuth2Provider);
 
     String getUserEmailFromToken(String token, OAuth2Provider oAuth2Provider);
+
+    OAuth2Provider getOAuth2ProviderFromToken(String token);
 }

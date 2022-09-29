@@ -1,5 +1,7 @@
 package toy.bookchat.bookchat.security.token.jwt;
 
+import static toy.bookchat.bookchat.security.token.TokenConstants.PROVIDER;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -11,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import toy.bookchat.bookchat.security.exception.DenidedTokenException;
 import toy.bookchat.bookchat.security.exception.ExpiredTokenException;
 import toy.bookchat.bookchat.security.exception.IllegalStandardTokenException;
+import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
 @Slf4j
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -54,4 +57,10 @@ public class JwtToken {
         }
     }
 
+    public OAuth2Provider getOAuth2Provider(String secret) {
+        return (OAuth2Provider) Optional.ofNullable(getBody(secret).get(PROVIDER))
+            .orElseThrow(() -> {
+                throw new IllegalStandardTokenException("Provider is not existed");
+            });
+    }
 }
