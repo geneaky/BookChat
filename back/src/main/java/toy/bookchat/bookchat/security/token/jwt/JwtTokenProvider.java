@@ -2,7 +2,7 @@ package toy.bookchat.bookchat.security.token.jwt;
 
 import static toy.bookchat.bookchat.security.token.TokenConstants.PROVIDER;
 import static toy.bookchat.bookchat.security.token.TokenConstants.SUB;
-import static toy.bookchat.bookchat.security.token.TokenConstants.USER_EMAIL;
+import static toy.bookchat.bookchat.security.token.TokenConstants.EMAIL;
 import static toy.bookchat.bookchat.security.token.TokenConstants.USER_NAME;
 
 import io.jsonwebtoken.Jwts;
@@ -33,7 +33,7 @@ public class JwtTokenProvider {
             .build();
     }
 
-    private String createRefreshToken(String userName, String userEmail,
+    public String createRefreshToken(String userName, String userEmail,
         OAuth2Provider oAuth2Provider) {
         Map<String, Object> claims = createClaims(userName, userEmail, oAuth2Provider);
 
@@ -47,7 +47,7 @@ public class JwtTokenProvider {
             .compact();
     }
 
-    private String createAccessToken(String userName, String userEmail,
+    public String createAccessToken(String userName, String userEmail,
         OAuth2Provider oAuth2Provider) {
         Map<String, Object> claims = createClaims(userName, userEmail, oAuth2Provider);
 
@@ -67,7 +67,7 @@ public class JwtTokenProvider {
         claims.put(SUB, "BookChat");
         claims.put(PROVIDER, oAuth2Provider);
         claims.put(USER_NAME, userName);
-        claims.put(USER_EMAIL, userEmail);
+        claims.put(EMAIL, userEmail);
         return claims;
     }
 }

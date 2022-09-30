@@ -1,7 +1,5 @@
 package toy.bookchat.bookchat.security.token.jwt;
 
-import static toy.bookchat.bookchat.security.token.TokenConstants.PROVIDER;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -15,11 +13,12 @@ import toy.bookchat.bookchat.security.exception.ExpiredTokenException;
 import toy.bookchat.bookchat.security.exception.IllegalStandardTokenException;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
+import static toy.bookchat.bookchat.security.token.TokenConstants.*;
+
 @Slf4j
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class JwtToken {
 
-    public static final String EMAIL = "email";
     private String jwtToken;
 
     public static JwtToken of(String jwtToken) {
@@ -27,7 +26,7 @@ public class JwtToken {
     }
 
     public String getOAuth2MemberNumber(String secret) {
-        return (String) Optional.ofNullable(getBody(secret).get("userName"))
+        return (String) Optional.ofNullable(getBody(secret).get(USER_NAME))
             .orElseThrow(() -> {
                 throw new IllegalStandardTokenException("User name is not existed");
             });

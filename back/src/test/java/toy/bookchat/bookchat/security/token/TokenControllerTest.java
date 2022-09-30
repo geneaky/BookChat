@@ -28,10 +28,12 @@ import toy.bookchat.bookchat.security.token.jwt.JwtTokenProvider;
 @AutoConfigureRestDocs
 class TokenControllerTest extends AuthenticationTestExtension {
 
-    @MockBean(value = JwtTokenManager.class)
-    TokenManager jwtTokenManager;
+    @MockBean
+    JwtTokenManager jwtTokenManager;
     @MockBean
     UserRepository userRepository;
+    @MockBean
+    TokenService tokenService;
     @SpyBean
     JwtTokenProvider jwtTokenProvider;
     @Autowired
@@ -39,7 +41,6 @@ class TokenControllerTest extends AuthenticationTestExtension {
 
     @Test
     public void Access토큰_만료시_만료되지_않은_리프레시_토큰으로_갱신() throws Exception {
-
         Token token = jwtTokenProvider.createToken("testGoogle", "test@gamil.com",
             OAuth2Provider.GOOGLE);
 
@@ -52,7 +53,7 @@ class TokenControllerTest extends AuthenticationTestExtension {
 
         String accessToken = mvcResult.getResponse().getContentAsString();
         String userName = jwtTokenManager.getOAuth2MemberNumberFromToken(
-            accessToken, null);
+            accessToken);
 
         assertThat(userName).isEqualTo("testGoogle");
     }

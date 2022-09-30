@@ -22,7 +22,7 @@ class JwtTokenManagerTest {
     JwtTokenProvider jwtTokenProvider;
 
     @InjectMocks
-    JwtTokenManager jwtTokenManager;
+    JwtTokenManagerImpl jwtTokenManager;
 
     @Test
     public void 토큰에서_사용자_이름_추출_성공() throws Exception {
@@ -37,7 +37,7 @@ class JwtTokenManagerTest {
         Token token = jwtTokenProvider.createToken(userName, userEmail, OAuth2Provider.KAKAO);
 
         String findUserName = jwtTokenManager.getOAuth2MemberNumberFromToken(
-            token.getAccessToken(), null);
+            token.getAccessToken());
 
         assertThat(userName).isEqualTo(findUserName);
     }
@@ -53,8 +53,7 @@ class JwtTokenManagerTest {
 
         Token token = jwtTokenProvider.createToken(userName, userEmail, OAuth2Provider.KAKAO);
 
-        String findUserEmail = jwtTokenManager.getUserEmailFromToken(token.getAccessToken(),
-            null);
+        String findUserEmail = jwtTokenManager.getUserEmailFromToken(token.getAccessToken());
 
         assertThat(userEmail).isEqualTo(findUserEmail);
     }

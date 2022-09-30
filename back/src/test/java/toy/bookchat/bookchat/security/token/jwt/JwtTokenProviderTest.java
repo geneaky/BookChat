@@ -19,7 +19,7 @@ class JwtTokenProviderTest {
     JwtTokenConfig jwtTokenConfig;
 
     @InjectMocks
-    JwtTokenManager jwtTokenManager;
+    JwtTokenManagerImpl jwtTokenManager;
     @InjectMocks
     JwtTokenProvider tokenProvider;
 
@@ -33,7 +33,7 @@ class JwtTokenProviderTest {
             OAuth2Provider.GOOGLE);
 
         String userName = jwtTokenManager.getOAuth2MemberNumberFromToken(
-            token.getAccessToken(), null);
+            token.getAccessToken());
 
         assertThat(userName).isEqualTo("google123");
     }

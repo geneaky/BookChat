@@ -1,6 +1,5 @@
 package toy.bookchat.bookchat.domain.user.api;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -38,7 +37,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +62,6 @@ import toy.bookchat.bookchat.domain.user.service.dto.UserSignUpRequestDto;
 import toy.bookchat.bookchat.security.SecurityConfig;
 import toy.bookchat.bookchat.security.exception.ExpiredTokenException;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
-import toy.bookchat.bookchat.security.token.TokenManager;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenManager;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenProvider;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenRecorder;
@@ -84,11 +81,11 @@ public class UserControllerTest extends AuthenticationTestExtension {
     @MockBean
     UserRepository userRepository;
 
-    @MockBean(value = OpenIdTokenManager.class)
-    TokenManager openIdTokenManager;
+    @MockBean
+    OpenIdTokenManager openIdTokenManager;
 
-    @MockBean(value = JwtTokenManager.class)
-    TokenManager jwtTokenManager;
+    @MockBean
+    JwtTokenManager jwtTokenManager;
 
     @MockBean
     JwtTokenProvider jwtTokenProvider;

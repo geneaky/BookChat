@@ -1,40 +1,30 @@
 package toy.bookchat.bookchat.security;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.web.access.AccessDeniedHandler;
-import org.springframework.security.web.access.AccessDeniedHandlerImpl;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.security.exception.CustomExceptionHandlingFilter;
 import toy.bookchat.bookchat.security.handler.RestAuthenticationEntryPoint;
 import toy.bookchat.bookchat.security.ipblock.IpBlockCheckingFilter;
 import toy.bookchat.bookchat.security.ipblock.IpBlockManager;
-import toy.bookchat.bookchat.security.token.TokenManager;
 import toy.bookchat.bookchat.security.token.jwt.JwtAuthenticationFilter;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import toy.bookchat.bookchat.security.token.jwt.JwtTokenManager;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final IpBlockManager ipBlockManager;
-    private final TokenManager jwtTokenManager;
+    private final JwtTokenManager jwtTokenManager;
     private final UserRepository userRepository;
 
-    public SecurityConfig(IpBlockManager ipBlockManager, @Qualifier("jwtTokenManager")TokenManager jwtTokenManager, UserRepository userRepository) {
+    public SecurityConfig(IpBlockManager ipBlockManager, JwtTokenManager jwtTokenManager, UserRepository userRepository) {
         this.ipBlockManager = ipBlockManager;
         this.jwtTokenManager = jwtTokenManager;
         this.userRepository = userRepository;
