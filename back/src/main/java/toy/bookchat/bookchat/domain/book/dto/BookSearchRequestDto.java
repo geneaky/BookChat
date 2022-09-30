@@ -1,16 +1,14 @@
 package toy.bookchat.bookchat.domain.book.dto;
 
 import java.util.Optional;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+
+import lombok.*;
 import org.springframework.util.StringUtils;
 import toy.bookchat.bookchat.domain.book.service.BookSearchSort;
 
 @Getter
 @Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BookSearchRequestDto {
 
     private String isbn;

@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import toy.bookchat.bookchat.domain.user.api.dto.Token;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
+import toy.bookchat.bookchat.security.token.dto.RefreshTokenRequestDto;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenManager;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenProvider;
 
@@ -20,23 +21,23 @@ public class TokenService {
         this.jwtTokenManager = jwtTokenManager;
     }
 
-    public Token generateToken(String refreshTokenRequestDto) {
-        String userName = jwtTokenManager.getOAuth2MemberNumberFromToken(refreshTokenRequestDto);
-        String userEmail = jwtTokenManager.getUserEmailFromToken(refreshTokenRequestDto);
+    public Token generateToken(RefreshTokenRequestDto refreshTokenRequestDto) {
+        String userName = jwtTokenManager.getOAuth2MemberNumberFromToken(refreshTokenRequestDto.getRefreshToken());
+        String userEmail = jwtTokenManager.getUserEmailFromToken(refreshTokenRequestDto.getRefreshToken());
         OAuth2Provider oAuth2Provider = jwtTokenManager.getOAuth2ProviderFromToken(
-                refreshTokenRequestDto);
+                refreshTokenRequestDto.getRefreshToken());
+
         String accessToken = jwtTokenProvider.createAccessToken(userName, userEmail, oAuth2Provider);
-        String refreshToken = refreshTokenRequestDto;
+        String refreshToken = refreshTokenRequestDto.getRefreshToken();
 
         if(jwtTokenManager.shouldRefreshTokenBeRenewed(refreshToken)){
             refreshToken = jwtTokenProvider.createRefreshToken(userName, userEmail, oAuth2Provider);
         }
 
-        Token token = Token.builder()
+        return Token.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
-        return token;
     }
 
 }
