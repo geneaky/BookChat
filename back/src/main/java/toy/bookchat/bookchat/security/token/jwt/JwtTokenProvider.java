@@ -1,8 +1,8 @@
 package toy.bookchat.bookchat.security.token.jwt;
 
+import static toy.bookchat.bookchat.security.token.TokenConstants.EMAIL;
 import static toy.bookchat.bookchat.security.token.TokenConstants.PROVIDER;
 import static toy.bookchat.bookchat.security.token.TokenConstants.SUB;
-import static toy.bookchat.bookchat.security.token.TokenConstants.EMAIL;
 import static toy.bookchat.bookchat.security.token.TokenConstants.USER_NAME;
 
 import io.jsonwebtoken.Jwts;
@@ -35,7 +35,7 @@ public class JwtTokenProvider {
 
     public String createRefreshToken(String userName, String userEmail,
         OAuth2Provider oAuth2Provider) {
-        Map<String, Object> claims = createClaims(userName, userEmail, oAuth2Provider);
+        Map<String, Object> claims = createClaims(userName, userEmail, oAuth2Provider.getValue());
 
         Date date = new Date();
         date.setTime(date.getTime() + jwtTokenConfig.getRefreshTokenExpiredTime());
@@ -49,7 +49,7 @@ public class JwtTokenProvider {
 
     public String createAccessToken(String userName, String userEmail,
         OAuth2Provider oAuth2Provider) {
-        Map<String, Object> claims = createClaims(userName, userEmail, oAuth2Provider);
+        Map<String, Object> claims = createClaims(userName, userEmail, oAuth2Provider.getValue());
 
         Date date = new Date();
         date.setTime(date.getTime() + jwtTokenConfig.getAccessTokenExpiredTime());
@@ -62,7 +62,7 @@ public class JwtTokenProvider {
     }
 
     private Map<String, Object> createClaims(String userName, String userEmail,
-        OAuth2Provider oAuth2Provider) {
+        String oAuth2Provider) {
         Map<String, Object> claims = new HashMap<>();
         claims.put(SUB, "BookChat");
         claims.put(PROVIDER, oAuth2Provider);

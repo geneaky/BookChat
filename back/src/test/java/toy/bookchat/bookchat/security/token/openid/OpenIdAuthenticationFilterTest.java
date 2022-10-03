@@ -69,7 +69,7 @@ class OpenIdAuthenticationFilterTest {
         String bearerToken = "Bearer 90YJ4D3";
 
         when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(bearerToken);
-        when(httpServletRequest.getHeader(PROVIDER_TYPE)).thenReturn("KAKAO");
+        when(httpServletRequest.getHeader(PROVIDER_TYPE)).thenReturn("kakao");
         when(userRepository.findByName(any())).thenReturn(Optional.of(user));
 
         openIdAuthenticationFilter.doFilterInternal(httpServletRequest, httpServletResponse,

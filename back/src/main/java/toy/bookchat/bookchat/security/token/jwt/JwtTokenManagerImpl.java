@@ -33,6 +33,8 @@ public class JwtTokenManagerImpl implements JwtTokenManager {
 
     @Override
     public boolean shouldRefreshTokenBeRenewed(String token) {
-        return false;
+        JwtToken jwtToken = JwtToken.of(token);
+        return jwtToken.hasNotRemainingTime(jwtTokenConfig.getSecret(),
+            jwtTokenConfig.getReissuePeriod());
     }
 }

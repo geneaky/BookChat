@@ -1,9 +1,14 @@
 package toy.bookchat.bookchat.security.token.jwt;
 
+import static toy.bookchat.bookchat.security.token.TokenConstants.EMAIL;
+import static toy.bookchat.bookchat.security.token.TokenConstants.PROVIDER;
+import static toy.bookchat.bookchat.security.token.TokenConstants.USER_NAME;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import java.util.Date;
 import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -12,8 +17,6 @@ import toy.bookchat.bookchat.security.exception.DenidedTokenException;
 import toy.bookchat.bookchat.security.exception.ExpiredTokenException;
 import toy.bookchat.bookchat.security.exception.IllegalStandardTokenException;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
-
-import static toy.bookchat.bookchat.security.token.TokenConstants.*;
 
 @Slf4j
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -57,9 +60,15 @@ public class JwtToken {
     }
 
     public OAuth2Provider getOAuth2Provider(String secret) {
-        return (OAuth2Provider) Optional.ofNullable(getBody(secret).get(PROVIDER))
+        return OAuth2Provider.from((String) Optional.ofNullable(getBody(secret).get(PROVIDER))
             .orElseThrow(() -> {
                 throw new IllegalStandardTokenException("Provider is not existed");
-            });
+            }));
+    }
+
+    public boolean hasNotRemainingTime(String secret, long reissuePeriod) {
+        Date now = new Date();
+        Date expiration = getBody(secret).getExpiration();
+        return now.after(new Date(expiration.getTime() - reissuePeriod));
     }
 }

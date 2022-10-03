@@ -6,10 +6,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import toy.bookchat.bookchat.config.JpaAuditingConfig;
 import toy.bookchat.bookchat.domain.configuration.TestConfig;
 
 @DataJpaTest
-@Import(TestConfig.class)
+@Import({JpaAuditingConfig.class, TestConfig.class})
 class RefreshTokenRepositoryTest {
 
     @Autowired
@@ -25,5 +26,17 @@ class RefreshTokenRepositoryTest {
         RefreshToken findToken = refreshTokenRepository.findById(refreshToken.getId()).get();
 
         assertThat(refreshToken).isEqualTo(findToken);
+    }
+
+    @Test
+    public void 리프레시토큰_이름으로_조회_성공() throws Exception {
+        RefreshToken refreshToken = new RefreshToken("aEKrR", "aFK0");
+
+        refreshTokenRepository.save(refreshToken);
+        refreshTokenRepository.flush();
+
+        RefreshToken findRefreshToken = refreshTokenRepository.findByUserName("aEKrR");
+
+        assertThat(refreshToken).isEqualTo(findRefreshToken);
     }
 }

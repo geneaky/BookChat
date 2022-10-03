@@ -1,12 +1,22 @@
 package toy.bookchat.bookchat.security.token;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.payload.JsonFieldType.STRING;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
@@ -17,11 +27,12 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
 import toy.bookchat.bookchat.domain.user.api.dto.Token;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.security.SecurityConfig;
+import toy.bookchat.bookchat.security.exception.DenidedTokenException;
+import toy.bookchat.bookchat.security.exception.ExpiredTokenException;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.token.dto.RefreshTokenRequestDto;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenManager;
@@ -37,7 +48,7 @@ class TokenControllerTest extends AuthenticationTestExtension {
     JwtTokenManager jwtTokenManager;
     @MockBean
     UserRepository userRepository;
-    @SpyBean
+    @MockBean
     TokenService tokenService;
     @SpyBean
     JwtTokenProvider jwtTokenProvider;
@@ -48,25 +59,78 @@ class TokenControllerTest extends AuthenticationTestExtension {
 
     @Test
     public void Access토큰_만료시_만료되지_않은_리프레시_토큰으로_갱신() throws Exception {
+        Token token = jwtTokenProvider.createToken("testGOOGLE", "test@gamil.com",
+            OAuth2Provider.GOOGLE);
+
+        RefreshTokenRequestDto refreshTokenRequestDto = RefreshTokenRequestDto.builder()
+            .refreshToken(token.getRefreshToken())
+            .build();
+
+        Token newToken = jwtTokenProvider.createToken("testGOOGLE", "test@gamil.com",
+            OAuth2Provider.GOOGLE);
+
+        when(tokenService.generateToken(any())).thenReturn(newToken);
+
+        mockMvc.perform(post("/v1/api/auth/token")
+                .content(objectMapper.writeValueAsString(refreshTokenRequestDto))
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andDo(document("token-reissue", requestFields(
+                fieldWithPath("refreshToken").type(STRING).description("리프레쉬 토큰")
+            ), responseFields(
+                fieldWithPath("accessToken").type(STRING).description("엑세스 토큰"),
+                fieldWithPath("refreshToken").type(STRING).description("리프레쉬 토큰")
+            )));
+    }
+
+    @Test
+    public void 리프레시_토큰없이_요청시_400응답() throws Exception {
+        RefreshTokenRequestDto refreshTokenRequestDto = RefreshTokenRequestDto.builder()
+            .refreshToken(null)
+            .build();
+
+        mockMvc.perform(post("/v1/api/auth/token").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(refreshTokenRequestDto)))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void 만료된_리프레시_토큰으로_요청시_401응답() throws Exception {
+        Map<String, Object> claims = new HashMap<>();
+
+        Date date = new Date(0);
+        String expiredRefreshToken = Jwts.builder()
+            .setClaims(claims)
+            .setExpiration(date)
+            .signWith(SignatureAlgorithm.HS256, "test")
+            .compact();
+
+        RefreshTokenRequestDto refreshTokenRequestDto = RefreshTokenRequestDto.builder()
+            .refreshToken(expiredRefreshToken)
+            .build();
+
+        doThrow(ExpiredTokenException.class).when(tokenService)
+            .generateToken(any());
+
+        mockMvc.perform(post("/v1/api/auth/token").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(refreshTokenRequestDto)))
+            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void 유효하지않은_토큰으로_요청시_401응답() throws Exception {
         Token token = jwtTokenProvider.createToken("testGoogle", "test@gamil.com",
             OAuth2Provider.GOOGLE);
 
         RefreshTokenRequestDto refreshTokenRequestDto = RefreshTokenRequestDto.builder()
-                .refreshToken(token.getRefreshToken())
-                .build();
+            .refreshToken(token.getRefreshToken() + "invalid")
+            .build();
 
-        when(tokenService.generateToken(any(RefreshTokenRequestDto.class))).thenReturn(token);
+        doThrow(DenidedTokenException.class).when(tokenService)
+            .generateToken(any());
 
-        MvcResult mvcResult = mockMvc.perform(post("/v1/api/auth/token")
-                .content(objectMapper.writeValueAsString(refreshTokenRequestDto))
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andReturn();
-
-        String accessToken = mvcResult.getResponse().getContentAsString();
-        String userName = jwtTokenManager.getOAuth2MemberNumberFromToken(
-            accessToken);
-
-        assertThat(userName).isEqualTo("testGoogle");
+        mockMvc.perform(post("/v1/api/auth/token").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(refreshTokenRequestDto)))
+            .andExpect(status().isUnauthorized());
     }
 }

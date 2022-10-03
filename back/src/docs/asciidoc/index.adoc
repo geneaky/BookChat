@@ -17,6 +17,22 @@ endif::[]
 |     403     |  Forbidden  |권한이 없거나 차단된 사용자
 |===
 
+== 토큰
+
+=== 엑세스 토큰 재발급
+
+`Request`
+
+include::{snippets}/token-reissue/request-fields.adoc[]
+
+include::{snippets}/token-reissue/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/token-reissue/response-fields.adoc[]
+
+include::{snippets}/token-reissue/http-response.adoc[]
+
 == 사용자
 
 === 사용자 기본 프로필 조회
@@ -37,7 +53,6 @@ include::{snippets}/user/http-response.adoc[]
 ---
 
 === 사용자 닉네임 중복 체크
-
 
 `Request`
 
@@ -72,22 +87,27 @@ include::{snippets}/user-signup/http-response.adoc[]
 `Error Response`
 
 요청 오류(Authorization Header 없을 시)
+
 include::{snippets}/user-signup-error1/http-request.adoc[]
 include::{snippets}/user-signup-error1/http-response.adoc[]
 
 요청 오류(Authorization Header에 빈 토큰으로 요청시)
+
 include::{snippets}/user-signup-error2/http-request.adoc[]
 include::{snippets}/user-signup-error2/http-response.adoc[]
 
 요청 오류(Authorization Bearer 양식에 맞지 않을 때)
+
 include::{snippets}/user-signup-error3/http-request.adoc[]
 include::{snippets}/user-signup-error3/http-response.adoc[]
 
 만료된 토큰
+
 include::{snippets}/user-signup-error4/http-request.adoc[]
 include::{snippets}/user-signup-error4/http-response.adoc[]
 
 올바르지 않은 요청 파라미터
+
 include::{snippets}/user-signup-error5/http-request.adoc[]
 include::{snippets}/user-signup-error5/http-response.adoc[]
 
@@ -108,18 +128,22 @@ include::{snippets}/user-signin/response-fields.adoc[]
 `Error Response`
 
 요청 오류(Authorization Header 없을 시)
+
 include::{snippets}/user-signup-error1/http-request.adoc[]
 include::{snippets}/user-signup-error1/http-response.adoc[]
 
 요청 오류(Authorization Header에 빈 토큰으로 요청시)
+
 include::{snippets}/user-signin-error2/http-request.adoc[]
 include::{snippets}/user-signin-error2/http-response.adoc[]
 
 요청 오류(Authorization Bearer 양식에 맞지 않을 때)
+
 include::{snippets}/user-signin-error3/http-request.adoc[]
 include::{snippets}/user-signin-error3/http-response.adoc[]
 
 만료된 토큰
+
 include::{snippets}/user-signin-error4/http-request.adoc[]
 include::{snippets}/user-signin-error4/http-response.adoc[]
 
@@ -132,10 +156,12 @@ include::{snippets}/user-signin-error4/http-response.adoc[]
 include::{snippets}/book-search-isbn-paging/request-headers.adoc[]
 
 `Request`
+
 include::{snippets}/book-search-isbn-paging/request-parameters.adoc[]
 include::{snippets}/book-search-isbn-paging/http-request.adoc[]
 
 `Resopnse`
+
 include::{snippets}/book-search-isbn-paging/http-response.adoc[]
 include::{snippets}/book-search-isbn-paging/response-fields.adoc[]
 
@@ -227,6 +253,7 @@ include::{snippets}/get-bookshelf-reading/response-fields.adoc[]
 === 읽은 도서 조회
 
 `Request`
+
 include::{snippets}/get-bookshelf-complete/request-parameters.adoc[]
 include::{snippets}/get-bookshelf-complete/http-request.adoc[]
 
