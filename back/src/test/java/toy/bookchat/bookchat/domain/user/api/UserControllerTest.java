@@ -36,14 +36,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.MockReset;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.security.core.GrantedAuthority;
@@ -63,7 +62,6 @@ import toy.bookchat.bookchat.domain.user.service.dto.UserSignUpRequestDto;
 import toy.bookchat.bookchat.security.SecurityConfig;
 import toy.bookchat.bookchat.security.exception.ExpiredTokenException;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
-import toy.bookchat.bookchat.security.token.TokenManager;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenManager;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenProvider;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenRecorder;
@@ -83,11 +81,11 @@ public class UserControllerTest extends AuthenticationTestExtension {
     @MockBean
     UserRepository userRepository;
 
-    @MockBean(value = OpenIdTokenManager.class)
-    TokenManager openIdTokenManager;
+    @MockBean
+    OpenIdTokenManager openIdTokenManager;
 
-    @MockBean(value = JwtTokenManager.class)
-    TokenManager jwtTokenManager;
+    @MockBean
+    JwtTokenManager jwtTokenManager;
 
     @MockBean
     JwtTokenProvider jwtTokenProvider;
@@ -203,7 +201,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
 
     @Test
     public void 사용자_회원가입_요청시_header_인증정보_없을시_400반환() throws Exception {
-        mockMvc.perform(post("/v1/api/users")
+        mockMvc.perform(post("/v1/api/users/signup")
                 .header("Authorization", " ")
                 .param("nickname", "nick")
                 .param("userEmail", "kaktus418@gmail.com")
@@ -215,7 +213,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
 
     @Test
     public void 사용자_회원가입_요청시_header_openid없는_인증정보_400반환() throws Exception {
-        mockMvc.perform(post("/v1/api/users")
+        mockMvc.perform(post("/v1/api/users/signup")
                 .header("Authorization", "Bearer ")
                 .header("provider_type", "KAKAO")
                 .param("nickname", "nick")
@@ -270,7 +268,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
             .setClaims(claims)
             .signWith(SignatureAlgorithm.RS256, privateKey).compact();
 
-        mockMvc.perform(post("/v1/api/users")
+        mockMvc.perform(post("/v1/api/users/signup")
                 .header("Authorization", "Bearer " + testToken)
                 .header("provider_type", "KAKAO")
                 .param("nickname", "nick")
@@ -299,7 +297,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
             .signWith(SignatureAlgorithm.RS256, privateKey)
             .compact();
 
-        mockMvc.perform(post("/v1/api/users")
+        mockMvc.perform(post("/v1/api/users/signup")
                 .header("Authorization", "Bearer " + testToken)
                 .header("provider_type", "KAKAO")
                 .param("nickname", "nick")
@@ -344,7 +342,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
         String testToken = Jwts.builder().setSubject("test")
             .signWith(SignatureAlgorithm.RS256, privateKey).compact();
 
-        mockMvc.perform(post("/v1/api/users")
+        mockMvc.perform(post("/v1/api/users/signup")
                 .header("Authorization", "Tearer" + testToken)
                 .header("provider_type", "KAKAO")
                 .param("defaultProfileImageType", "1")
@@ -360,7 +358,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
         String testToken = Jwts.builder().setSubject("test")
             .signWith(SignatureAlgorithm.RS256, privateKey).compact();
 
-        mockMvc.perform(post("/v1/api/users")
+        mockMvc.perform(post("/v1/api/users/signup")
                 .header("Authorization", "Bearer " + testToken)
                 .param("nickname", "")
                 .param("userEmail", "abcdefg")

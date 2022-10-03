@@ -8,8 +8,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,9 +24,9 @@ import toy.bookchat.bookchat.domain.user.api.dto.UserProfileResponse;
 import toy.bookchat.bookchat.domain.user.service.UserService;
 import toy.bookchat.bookchat.domain.user.service.dto.UserSignUpRequestDto;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
-import toy.bookchat.bookchat.security.token.TokenManager;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenProvider;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenRecorder;
+import toy.bookchat.bookchat.security.token.openid.OpenIdTokenManager;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @Validated
@@ -36,11 +35,11 @@ import toy.bookchat.bookchat.security.user.UserPrincipal;
 public class UserController {
 
     private final UserService userService;
-    private final TokenManager openIdTokenManager;
+    private final OpenIdTokenManager openIdTokenManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtTokenRecorder jwtTokenRecorder;
 
-    public UserController(UserService userService, @Qualifier("openIdTokenManager") TokenManager openIdTokenManager,
+    public UserController(UserService userService, OpenIdTokenManager openIdTokenManager,
         JwtTokenProvider jwtTokenProvider, JwtTokenRecorder jwtTokenRecorder) {
         this.userService = userService;
         this.openIdTokenManager = openIdTokenManager;
@@ -70,7 +69,7 @@ public class UserController {
         return ResponseEntity.ok(null);
     }
 
-    @PostMapping("/users")
+    @PostMapping("/users/signup")
     public ResponseEntity<Void> userSignUp(
         @Valid @ModelAttribute UserSignUpRequestDto userSignUpRequestDto,
         @RequestHeader(AUTHORIZATION) @NotBlank @Pattern(regexp = "^(Bearer)\\s.+") String bearerToken,

@@ -1,9 +1,14 @@
 package toy.bookchat.bookchat.security.token.jwt;
 
+import static toy.bookchat.bookchat.security.token.TokenConstants.EMAIL;
+import static toy.bookchat.bookchat.security.token.TokenConstants.PROVIDER;
+import static toy.bookchat.bookchat.security.token.TokenConstants.USER_NAME;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import java.util.Date;
 import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -11,12 +16,12 @@ import lombok.extern.slf4j.Slf4j;
 import toy.bookchat.bookchat.security.exception.DenidedTokenException;
 import toy.bookchat.bookchat.security.exception.ExpiredTokenException;
 import toy.bookchat.bookchat.security.exception.IllegalStandardTokenException;
+import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
 @Slf4j
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class JwtToken {
 
-    public static final String EMAIL = "email";
     private String jwtToken;
 
     public static JwtToken of(String jwtToken) {
@@ -24,7 +29,7 @@ public class JwtToken {
     }
 
     public String getOAuth2MemberNumber(String secret) {
-        return (String) Optional.ofNullable(getBody(secret).get("userName"))
+        return (String) Optional.ofNullable(getBody(secret).get(USER_NAME))
             .orElseThrow(() -> {
                 throw new IllegalStandardTokenException("User name is not existed");
             });
@@ -54,4 +59,16 @@ public class JwtToken {
         }
     }
 
+    public OAuth2Provider getOAuth2Provider(String secret) {
+        return OAuth2Provider.from((String) Optional.ofNullable(getBody(secret).get(PROVIDER))
+            .orElseThrow(() -> {
+                throw new IllegalStandardTokenException("Provider is not existed");
+            }));
+    }
+
+    public boolean hasNotRemainingTime(String secret, long reissuePeriod) {
+        Date now = new Date();
+        Date expiration = getBody(secret).getExpiration();
+        return now.after(new Date(expiration.getTime() - reissuePeriod));
+    }
 }

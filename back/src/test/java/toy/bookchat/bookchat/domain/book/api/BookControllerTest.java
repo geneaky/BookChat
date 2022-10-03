@@ -19,18 +19,12 @@ import static toy.bookchat.bookchat.domain.user.ROLE.USER;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import java.io.FileNotFoundException;
+
 import java.io.IOException;
-import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
 import java.util.*;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
@@ -42,7 +36,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.util.Base64Utils;
 import toy.bookchat.bookchat.config.OpenIdTokenConfig;
 import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
 import toy.bookchat.bookchat.domain.book.dto.BookDto;
@@ -55,9 +48,7 @@ import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.security.SecurityConfig;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
-import toy.bookchat.bookchat.security.token.TokenManager;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenManager;
-import toy.bookchat.bookchat.security.token.openid.OpenIdTestUtil;
 import toy.bookchat.bookchat.security.token.openid.OpenIdTokenManager;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
@@ -68,11 +59,11 @@ import toy.bookchat.bookchat.security.user.UserPrincipal;
 public class BookControllerTest extends AuthenticationTestExtension {
 
 
-    @MockBean(value = OpenIdTokenManager.class)
-    TokenManager openIdTokenManager;
+    @MockBean
+    OpenIdTokenManager openIdTokenManager;
 
-    @MockBean(value = JwtTokenManager.class)
-    TokenManager jwtTokenManager;
+    @MockBean
+    JwtTokenManager jwtTokenManager;
 
     @MockBean
     OpenIdTokenConfig openIdTokenConfig;

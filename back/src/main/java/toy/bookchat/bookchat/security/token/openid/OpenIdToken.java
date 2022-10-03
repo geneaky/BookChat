@@ -35,12 +35,12 @@ public class OpenIdToken {
         stringBuilder.append(getSubject(publicKey));
 
         String issuer = getIssuer(publicKey);
-        if (issuer.contains(OAuth2Provider.KAKAO.getValue())) {
+        if (issuer.contains(OAuth2Provider.KAKAO.getValue().toLowerCase())) {
             stringBuilder.append(OAuth2Provider.KAKAO.getValue());
             return stringBuilder.toString();
         }
 
-        if (issuer.contains(OAuth2Provider.GOOGLE.getValue())) {
+        if (issuer.contains(OAuth2Provider.GOOGLE.getValue().toLowerCase())) {
             stringBuilder.append(OAuth2Provider.GOOGLE.getValue());
             return stringBuilder.toString();
         }

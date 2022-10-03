@@ -1,6 +1,5 @@
 package toy.bookchat.bookchat.config;
 
-import java.security.Key;
 import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
@@ -13,10 +12,13 @@ public class JwtTokenConfig {
     private final String secret;
     private final long accessTokenExpiredTime;
     private final long refreshTokenExpiredTime;
+    private final long reissuePeriod;
 
-    public JwtTokenConfig(String secret, long accessTokenExpiredTime, long refreshTokenExpiredTime) {
+    public JwtTokenConfig(String secret, long accessTokenExpiredTime, long refreshTokenExpiredTime,
+        long reissuePeriod) {
         this.secret = secret;
         this.accessTokenExpiredTime = accessTokenExpiredTime;
         this.refreshTokenExpiredTime = refreshTokenExpiredTime;
+        this.reissuePeriod = reissuePeriod;
     }
 }

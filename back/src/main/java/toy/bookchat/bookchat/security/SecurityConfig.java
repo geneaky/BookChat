@@ -1,7 +1,5 @@
 package toy.bookchat.bookchat.security;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,18 +13,18 @@ import toy.bookchat.bookchat.security.exception.CustomExceptionHandlingFilter;
 import toy.bookchat.bookchat.security.handler.RestAuthenticationEntryPoint;
 import toy.bookchat.bookchat.security.ipblock.IpBlockCheckingFilter;
 import toy.bookchat.bookchat.security.ipblock.IpBlockManager;
-import toy.bookchat.bookchat.security.token.TokenManager;
 import toy.bookchat.bookchat.security.token.jwt.JwtAuthenticationFilter;
+import toy.bookchat.bookchat.security.token.jwt.JwtTokenManager;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final IpBlockManager ipBlockManager;
-    private final TokenManager jwtTokenManager;
+    private final JwtTokenManager jwtTokenManager;
     private final UserRepository userRepository;
 
-    public SecurityConfig(IpBlockManager ipBlockManager, @Qualifier("jwtTokenManager")TokenManager jwtTokenManager, UserRepository userRepository) {
+    public SecurityConfig(IpBlockManager ipBlockManager, JwtTokenManager jwtTokenManager, UserRepository userRepository) {
         this.ipBlockManager = ipBlockManager;
         this.jwtTokenManager = jwtTokenManager;
         this.userRepository = userRepository;
@@ -42,9 +40,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.addFilterBefore(
             new CustomExceptionHandlingFilter(),
             UsernamePasswordAuthenticationFilter.class);
+
         http.addFilterAt(
             new JwtAuthenticationFilter(jwtTokenManager, userRepository, ipBlockManager),
             UsernamePasswordAuthenticationFilter.class);
+
         http.addFilterAfter(
             new IpBlockCheckingFilter(ipBlockManager),
             UsernamePasswordAuthenticationFilter.class);
@@ -65,6 +65,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
         web.ignoring()
             .antMatchers(HttpMethod.GET, "/v1/api/users/profile/nickname")
-            .antMatchers(HttpMethod.POST, "/v1/api/users","/v1/api/users/signin");
+            .antMatchers(HttpMethod.POST, "/v1/api/users/signup", "/v1/api/users/signin", "/v1/api/auth/token");
     }
 }

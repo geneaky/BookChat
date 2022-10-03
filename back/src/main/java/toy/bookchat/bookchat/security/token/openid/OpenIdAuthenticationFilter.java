@@ -11,8 +11,7 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
@@ -24,16 +23,15 @@ import toy.bookchat.bookchat.security.exception.DenidedTokenException;
 import toy.bookchat.bookchat.security.exception.NotVerifiedRequestFormatException;
 import toy.bookchat.bookchat.security.ipblock.IpBlockManager;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
-import toy.bookchat.bookchat.security.token.TokenManager;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 public class OpenIdAuthenticationFilter extends OncePerRequestFilter {
 
-    private final TokenManager openIdTokenManager;
+    private final OpenIdTokenManager openIdTokenManager;
     private final UserRepository userRepository;
     private final IpBlockManager ipBlockManager;
 
-    public OpenIdAuthenticationFilter(@Qualifier("openIdTokenManager") TokenManager openIdTokenManager,
+    public OpenIdAuthenticationFilter(OpenIdTokenManager openIdTokenManager,
         UserRepository userRepository, IpBlockManager ipBlockManager) {
         this.openIdTokenManager = openIdTokenManager;
         this.userRepository = userRepository;

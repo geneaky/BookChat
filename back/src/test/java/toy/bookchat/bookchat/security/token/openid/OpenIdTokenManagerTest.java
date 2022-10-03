@@ -37,7 +37,7 @@ class OpenIdTokenManagerTest {
     @Mock
     OpenIdTokenConfig openIdTokenConfig;
     @InjectMocks
-    OpenIdTokenManager openIdTokenManager;
+    OpenIdTokenManagerImpl openIdTokenManager;
 
     OpenIdTestUtil openIdTestUtil;
 

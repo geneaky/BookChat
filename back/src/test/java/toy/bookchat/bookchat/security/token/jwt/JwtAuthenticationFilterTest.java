@@ -11,7 +11,6 @@ import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.security.ipblock.IpBlockManager;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
-import toy.bookchat.bookchat.security.token.TokenManager;
 
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
@@ -20,7 +19,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -28,7 +26,7 @@ import static org.mockito.Mockito.*;
 class JwtAuthenticationFilterTest {
 
     @Mock
-    TokenManager tokenManager;
+    JwtTokenManager jwtTokenManager;
 
     @Mock
     UserRepository userRepository;
@@ -58,7 +56,7 @@ class JwtAuthenticationFilterTest {
 
         when(request.getHeader(any())).thenReturn("Bearer test");
         when(userRepository.findByName(any())).thenReturn(Optional.of(user));
-        when(tokenManager.getOAuth2MemberNumberFromToken(any(), any())).thenReturn("userName");
+        when(jwtTokenManager.getOAuth2MemberNumberFromToken(any())).thenReturn("userName");
 
         jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
 

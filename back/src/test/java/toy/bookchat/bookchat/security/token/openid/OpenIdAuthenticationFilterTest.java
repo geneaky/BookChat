@@ -24,8 +24,6 @@ import toy.bookchat.bookchat.security.exception.DenidedTokenException;
 import toy.bookchat.bookchat.security.exception.NotVerifiedRequestFormatException;
 import toy.bookchat.bookchat.security.ipblock.IpBlockManager;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
-import toy.bookchat.bookchat.security.token.openid.OpenIdAuthenticationFilter;
-import toy.bookchat.bookchat.security.token.openid.OpenIdTokenManager;
 
 @ExtendWith(MockitoExtension.class)
 class OpenIdAuthenticationFilterTest {
@@ -36,7 +34,6 @@ class OpenIdAuthenticationFilterTest {
     UserRepository userRepository;
     @Mock
     IpBlockManager ipBlockManager;
-
     @InjectMocks
     OpenIdAuthenticationFilter openIdAuthenticationFilter;
 
@@ -72,7 +69,7 @@ class OpenIdAuthenticationFilterTest {
         String bearerToken = "Bearer 90YJ4D3";
 
         when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(bearerToken);
-        when(httpServletRequest.getHeader(PROVIDER_TYPE)).thenReturn("KAKAO");
+        when(httpServletRequest.getHeader(PROVIDER_TYPE)).thenReturn("kakao");
         when(userRepository.findByName(any())).thenReturn(Optional.of(user));
 
         openIdAuthenticationFilter.doFilterInternal(httpServletRequest, httpServletResponse,

@@ -62,3 +62,4 @@ token:
   secret: hihi
   accessTokenExpiredTime: 1800000 #30분
   refreshTokenExpiredTime: 1210000000 #2주
+  reissuePeriod: 259200000 #3일
