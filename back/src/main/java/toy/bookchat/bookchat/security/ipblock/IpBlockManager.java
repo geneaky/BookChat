@@ -1,21 +1,20 @@
 package toy.bookchat.bookchat.security.ipblock;
 
 import com.querydsl.core.util.StringUtils;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import javax.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class IpBlockManager {
 
-    public static final long ONE_DAY = 86400L;
-    public static final int LIMITED_COUNT = 100;
+    public static final long ONE_DAY = 1800; // 30분으로 임시 변경
+    public static final int LIMITED_COUNT = 1000;
     private final AccessIpRepository accessIpRepository;
 
     @Transactional
@@ -31,13 +30,14 @@ public class IpBlockManager {
     private void increaseAccessFailCount(String X_Forwarded_For) {
         Optional<AccessIp> optionalAccessIp = accessIpRepository.findById(X_Forwarded_For);
         optionalAccessIp.ifPresentOrElse(accessIp -> {
-            if(Duration.between(accessIp.getUpdatedAt(),LocalDateTime.now()).getSeconds() > ONE_DAY) {
+            if (Duration.between(accessIp.getUpdatedAt(), LocalDateTime.now()).getSeconds()
+                > ONE_DAY) {
                 accessIp.reset();
                 return;
             }
             accessIp.increase();
-        },() -> {
-            AccessIp accessIp = new AccessIp(X_Forwarded_For,0L);
+        }, () -> {
+            AccessIp accessIp = new AccessIp(X_Forwarded_For, 0L);
             accessIpRepository.save(accessIp);
         });
     }
@@ -45,10 +45,13 @@ public class IpBlockManager {
     public boolean validateRequest(HttpServletRequest request) {
         final String header = request.getHeader("X-Forwarded-For");
         if (StringUtils.isNullOrEmpty(header)) {
-            Optional<AccessIp> optionalAccessIp = accessIpRepository.findById(request.getRemoteAddr());
-            return optionalAccessIp.map(accessIp -> accessIp.getAccessFailCount() < LIMITED_COUNT).orElse(true);
+            Optional<AccessIp> optionalAccessIp = accessIpRepository.findById(
+                request.getRemoteAddr());
+            return optionalAccessIp.map(accessIp -> accessIp.getAccessFailCount() < LIMITED_COUNT)
+                .orElse(true);
         }
         Optional<AccessIp> optionalAccessIp = accessIpRepository.findById(header);
-        return optionalAccessIp.map(accessIp -> accessIp.getAccessFailCount() < LIMITED_COUNT).orElse(true);
+        return optionalAccessIp.map(accessIp -> accessIp.getAccessFailCount() < LIMITED_COUNT)
+            .orElse(true);
     }
 }
