@@ -162,26 +162,44 @@ include::{snippets}/book-search-isbn-paging/http-request.adoc[]
 
 `Resopnse`
 
-include::{snippets}/book-search-isbn-paging/http-response.adoc[]
 include::{snippets}/book-search-isbn-paging/response-fields.adoc[]
+include::{snippets}/book-search-isbn-paging/http-response.adoc[]
 
 ---
 
 === Title 도서 검색
 
-include::{snippets}/book-search-title-paging/http-request.adoc[]
+`Request Header`
+
+include::{snippets}/book-search-title-paging/request-headers.adoc[]
+
+`Request`
+
 include::{snippets}/book-search-title-paging/request-parameters.adoc[]
+include::{snippets}/book-search-title-paging/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/book-search-title-paging/response-fields.adoc[]
 include::{snippets}/book-search-title-paging/http-response.adoc[]
-include::{snippets}/book-search-title-paging/response-body.adoc[]
 
 ---
 
 === Author 도서 검색
 
-include::{snippets}/book-search-author-paging/http-request.adoc[]
+`Request Header`
+
+include::{snippets}/book-search-author-paging/request-headers.adoc[]
+
+`Request`
+
 include::{snippets}/book-search-author-paging/request-parameters.adoc[]
+include::{snippets}/book-search-author-paging/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/book-search-author-paging/response-fields.adoc[]
 include::{snippets}/book-search-author-paging/http-response.adoc[]
-include::{snippets}/book-search-author-paging/response-body.adoc[]
 
 == 책장
 

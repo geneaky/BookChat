@@ -21,15 +21,9 @@ import toy.bookchat.bookchat.domain.book.exception.BookNotFoundException;
 public class BookSearchServiceImpl implements BookSearchService {
 
     public static final String AUTHORIZATION = "Authorization";
-    public static final String ISBN = "isbn";
     public static final String QUERY = "query";
-    public static final String TITLE = "title";
-    public static final String AUTHOR = "author";
-
     public static final String SIZE = "size";
-
     public static final String PAGE = "page";
-
     public static final String SORT = "sort";
     private final RestTemplate restTemplate;
     @Value("${book.api.uri}")
@@ -42,28 +36,18 @@ public class BookSearchServiceImpl implements BookSearchService {
     }
 
     @Override
-    public BookSearchResponseDto searchByIsbn(BookSearchRequestDto bookSearchRequestDto) {
-        return fetchBooks(ISBN, bookSearchRequestDto);
+    public BookSearchResponseDto searchByQuery(BookSearchRequestDto bookSearchRequestDto) {
+        return fetchBooks(bookSearchRequestDto);
     }
 
-    @Override
-    public BookSearchResponseDto searchByTitle(BookSearchRequestDto bookSearchRequestDto) {
-        return fetchBooks(TITLE, bookSearchRequestDto);
-    }
 
-    @Override
-    public BookSearchResponseDto searchByAuthor(BookSearchRequestDto bookSearchRequestDto) {
-        return fetchBooks(AUTHOR, bookSearchRequestDto);
-    }
-
-    private BookSearchResponseDto fetchBooks(String queryOption,
-        BookSearchRequestDto queryParameter) {
+    private BookSearchResponseDto fetchBooks(BookSearchRequestDto bookSearchRequestDto) {
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder
-            .fromUri(URI.create(apiUri + queryOption))
-            .queryParam(QUERY, getQueryByQueryOption(queryOption, queryParameter))
-            .queryParamIfPresent(PAGE, queryParameter.getPage())
-            .queryParamIfPresent(SIZE, queryParameter.getSize())
-            .queryParamIfPresent(SORT, queryParameter.getBookSearchSort());
+            .fromUri(URI.create(apiUri))
+            .queryParam(QUERY, bookSearchRequestDto.getQuery())
+            .queryParamIfPresent(PAGE, bookSearchRequestDto.getPage())
+            .queryParamIfPresent(SIZE, bookSearchRequestDto.getSize())
+            .queryParamIfPresent(SORT, bookSearchRequestDto.getBookSearchSort());
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.set(AUTHORIZATION, header);
@@ -83,22 +67,4 @@ public class BookSearchServiceImpl implements BookSearchService {
 
         throw new BookNotFoundException("can't find book");
     }
-
-    private String getQueryByQueryOption(String queryOption, BookSearchRequestDto queryParameter) {
-
-        if (queryOption.equals(ISBN)) {
-            return queryParameter.getIsbn();
-        }
-
-        if (queryOption.equals(TITLE)) {
-            return queryParameter.getTitle();
-        }
-
-        if (queryOption.equals(AUTHOR)) {
-            return queryParameter.getAuthor();
-        }
-
-        throw new IllegalArgumentException();
-    }
-
 }
