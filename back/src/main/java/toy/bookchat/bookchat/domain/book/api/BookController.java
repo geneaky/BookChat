@@ -12,6 +12,8 @@ import toy.bookchat.bookchat.domain.book.dto.BookSearchResponseDto;
 import toy.bookchat.bookchat.domain.book.service.BookSearchService;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/v1/api")
 @RequiredArgsConstructor
@@ -20,22 +22,7 @@ public class BookController {
     private final BookSearchService bookSearchService;
 
     @GetMapping("/books")
-    public ResponseEntity<BookSearchResponseDto> getBookInformation(
-        @AuthenticationPrincipal UserPrincipal userPrincipal,
-        @ModelAttribute BookSearchRequestDto bookSearchRequestDto) {
-
-        if (bookSearchRequestDto.isIsbnPresent()) {
-            return ResponseEntity.ok(bookSearchService.searchByIsbn(bookSearchRequestDto));
-        }
-
-        if (bookSearchRequestDto.isTitlePresent()) {
-            return ResponseEntity.ok(bookSearchService.searchByTitle(bookSearchRequestDto));
-        }
-
-        if (bookSearchRequestDto.isAuthorPresent()) {
-            return ResponseEntity.ok(bookSearchService.searchByAuthor(bookSearchRequestDto));
-        }
-
-        return ResponseEntity.badRequest().body(null);
+    public ResponseEntity<BookSearchResponseDto> getBookInformation(@Valid @ModelAttribute BookSearchRequestDto bookSearchRequestDto) {
+        return ResponseEntity.ok(bookSearchService.searchByQuery(bookSearchRequestDto));
     }
 }

@@ -10,7 +10,6 @@ import org.springframework.boot.context.properties.ConstructorBinding;
 public class OAuth2Config {
 
     private final String kakaoURI;
-
     private final String googleURI;
 
     public OAuth2Config(String kakaoURI, String googleURI) {

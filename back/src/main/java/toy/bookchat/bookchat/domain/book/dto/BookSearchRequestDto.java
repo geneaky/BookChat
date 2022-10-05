@@ -6,14 +6,15 @@ import lombok.*;
 import org.springframework.util.StringUtils;
 import toy.bookchat.bookchat.domain.book.service.BookSearchSort;
 
+import javax.validation.constraints.NotBlank;
+
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BookSearchRequestDto {
 
-    private String isbn;
-    private String title;
-    private String author;
+    @NotBlank
+    private String query;
 
     private Integer size;
 
@@ -22,12 +23,10 @@ public class BookSearchRequestDto {
     private BookSearchSort bookSearchSort;
 
     @Builder
-    protected BookSearchRequestDto(String isbn, String title, String author, Integer size,
+    protected BookSearchRequestDto(String query, Integer size,
         Integer page,
         BookSearchSort bookSearchSort) {
-        this.isbn = isbn;
-        this.title = title;
-        this.author = author;
+        this.query = query;
         this.size = size;
         this.page = page;
         this.bookSearchSort = bookSearchSort;
@@ -45,15 +44,4 @@ public class BookSearchRequestDto {
         return Optional.ofNullable(this.bookSearchSort);
     }
 
-    public boolean isIsbnPresent() {
-        return StringUtils.hasText(Optional.ofNullable(isbn).orElse(""));
-    }
-
-    public boolean isTitlePresent() {
-        return StringUtils.hasText(Optional.ofNullable(title).orElse(""));
-    }
-
-    public boolean isAuthorPresent() {
-        return StringUtils.hasText(Optional.ofNullable(author).orElse(""));
-    }
 }

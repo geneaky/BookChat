@@ -15,7 +15,6 @@ import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.token.openid.keys.GooglePublicKeys;
 import toy.bookchat.bookchat.security.token.openid.keys.KakaoPublicKeys;
 
-@Slf4j
 @Component
 public class OpenIdTokenConfig {
 
@@ -34,14 +33,13 @@ public class OpenIdTokenConfig {
         this.keyFactory = createKeyFactory();
     }
 
-    /* TODO: 2022-09-23 app key로 검증하는거까지 추가하자
+    /* TODO: 2022-09-23 app key로 검증하는거까지 추가하자(구글 openid 검증방식 확인 후)
      */
 
     public Key getPublicKey(String keyId, OAuth2Provider oAuth2Provider) {
 
         if (OAuth2Provider.KAKAO.equals(oAuth2Provider)) {
             checkKakaoPublicKeyCache();
-            log.info(this.kakaoPublicKeys.getKeys().get(0).getN());
             return this.kakaoPublicKeys.getKey(keyId, this.keyFactory);
         }
 

@@ -57,7 +57,7 @@ import toy.bookchat.bookchat.security.user.UserPrincipal;
 @WebMvcTest(controllers = BookShelfController.class,
     includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {
         SecurityConfig.class}))
-@AutoConfigureRestDocs
+@AutoConfigureRestDocs(uriScheme = "https", uriHost = "bookchat.link", uriPort = 443)
 public class BookShelfControllerTest extends AuthenticationTestExtension {
 
     @Autowired

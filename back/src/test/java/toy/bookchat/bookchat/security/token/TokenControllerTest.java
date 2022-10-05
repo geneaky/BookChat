@@ -41,7 +41,7 @@ import toy.bookchat.bookchat.security.token.jwt.JwtTokenProvider;
 @WebMvcTest(controllers = TokenController.class,
     includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {
         SecurityConfig.class}))
-@AutoConfigureRestDocs
+@AutoConfigureRestDocs(uriScheme = "https", uriHost = "bookchat.link", uriPort = 443)
 class TokenControllerTest extends AuthenticationTestExtension {
 
     @MockBean
