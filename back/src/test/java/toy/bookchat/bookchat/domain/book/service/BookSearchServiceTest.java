@@ -45,7 +45,7 @@ public class BookSearchServiceTest {
     @Test
     public void isbn으로_외부api_호출_json결과_응답() throws Exception {
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder
-            .fromUri(URI.create(apiUri + "isbn"))
+            .fromUri(URI.create(apiUri))
             .queryParam("query", isbn);
 
         BookSearchRequestDto bookSearchRequestDto = getBookSearchRequestDto(isbn,null, null, null);
@@ -69,7 +69,7 @@ public class BookSearchServiceTest {
     @Test
     public void title로_외부api_호출_json결과_응답() throws Exception {
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder
-            .fromUri(URI.create(apiUri + "title"))
+            .fromUri(URI.create(apiUri))
             .queryParam("query", title);
 
         BookSearchRequestDto bookSearchRequestDto = getBookSearchRequestDto(title, null, null, null);
@@ -93,7 +93,7 @@ public class BookSearchServiceTest {
     @Test
     public void author로_외부api_호출_json결과_응답() throws Exception {
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder
-            .fromUri(URI.create(apiUri + "author"))
+            .fromUri(URI.create(apiUri))
             .queryParam("query", authors[0]);
 
         BookSearchRequestDto bookSearchRequestDto = getBookSearchRequestDto(authors[0], null, null, null);
@@ -117,7 +117,7 @@ public class BookSearchServiceTest {
     @Test
     public void 외부api_호출시_size지정() throws Exception {
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder
-            .fromUri(URI.create(apiUri + "title"))
+            .fromUri(URI.create(apiUri))
             .queryParam("query", "이펙티브")
             .queryParam("size", 5);
 
@@ -140,7 +140,7 @@ public class BookSearchServiceTest {
     @Test
     public void 외부api_호출시_page지정() throws Exception {
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder
-            .fromUri(URI.create(apiUri + "title"))
+            .fromUri(URI.create(apiUri))
             .queryParam("query", "이펙티브")
             .queryParam("page", 1)
             .queryParam("size", 5);
@@ -164,7 +164,7 @@ public class BookSearchServiceTest {
     @Test
     public void 외부api_호출시_sort지정() throws Exception {
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder
-            .fromUri(URI.create(apiUri + "title"))
+            .fromUri(URI.create(apiUri))
             .queryParam("query", "이펙티브")
             .queryParam("page", 1)
             .queryParam("size", 5)
