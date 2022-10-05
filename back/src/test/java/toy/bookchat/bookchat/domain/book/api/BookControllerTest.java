@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.JsonFieldType.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
@@ -32,6 +33,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
@@ -340,15 +342,14 @@ public class BookControllerTest extends AuthenticationTestExtension {
                     parameterWithName("page").description("한 번에 조회할 page 수"),
                     parameterWithName("sort").description("조회시 정렬 옵션")),
                 responseFields(
-                        fieldWithPath("bookDtos[]").description("책"),
-                        fieldWithPath("bookDtos[].isbn").description("ISBN"),
-                        fieldWithPath("bookDtos[].title").description("제목"),
-                        fieldWithPath("bookDtos[].author[]").description("저자"),
-                        fieldWithPath("bookDtos[].publisher").description("출판사"),
-                        fieldWithPath("bookDtos[].bookCoverImageUrl").description("책 표지 이미지"),
-                        fieldWithPath("meta.is_end").description("마지막 페이지 여부"),
-                        fieldWithPath("meta.pageable_count").description("가져온 페이지 수"),
-                        fieldWithPath("meta.total_count").description("총 페이지 수")
+                        fieldWithPath("bookDtos[].isbn").type(STRING).description("ISBN"),
+                        fieldWithPath("bookDtos[].title").type(STRING).description("제목"),
+                        fieldWithPath("bookDtos[].author[]").type(ARRAY).description("저자"),
+                        fieldWithPath("bookDtos[].publisher").type(STRING).description("출판사"),
+                        fieldWithPath("bookDtos[].bookCoverImageUrl").type(STRING).description("책 표지 이미지"),
+                        fieldWithPath("meta.is_end").type(BOOLEAN).description("마지막 페이지 여부"),
+                        fieldWithPath("meta.pageable_count").type(NUMBER).description("가져온 페이지 수"),
+                        fieldWithPath("meta.total_count").type(NUMBER).description("총 페이지 수")
                 ))).andReturn();
 
         verify(bookSearchService).searchByQuery(any(BookSearchRequestDto.class));
@@ -395,15 +396,14 @@ public class BookControllerTest extends AuthenticationTestExtension {
                     parameterWithName("page").description("한 번에 조회할 page 수"),
                     parameterWithName("sort").description("조회시 정렬 옵션")),
                 responseFields(
-                    fieldWithPath("bookDtos[]").description("책"),
-                    fieldWithPath("bookDtos[].isbn").description("ISBN"),
-                    fieldWithPath("bookDtos[].title").description("제목"),
-                    fieldWithPath("bookDtos[].author[]").description("저자"),
-                    fieldWithPath("bookDtos[].publisher").description("출판사"),
-                    fieldWithPath("bookDtos[].bookCoverImageUrl").description("책 표지 이미지"),
-                    fieldWithPath("meta.is_end").description("마지막 페이지 여부"),
-                    fieldWithPath("meta.pageable_count").description("가져온 페이지 수"),
-                    fieldWithPath("meta.total_count").description("총 페이지 수")
+                    fieldWithPath("bookDtos[].isbn").type(STRING).description("ISBN"),
+                    fieldWithPath("bookDtos[].title").type(STRING).description("제목"),
+                    fieldWithPath("bookDtos[].author[]").type(ARRAY).description("저자"),
+                    fieldWithPath("bookDtos[].publisher").type(STRING).description("출판사"),
+                    fieldWithPath("bookDtos[].bookCoverImageUrl").type(STRING).description("책 표지 이미지"),
+                    fieldWithPath("meta.is_end").type(BOOLEAN).description("마지막 페이지 여부"),
+                    fieldWithPath("meta.pageable_count").type(NUMBER).description("가져온 페이지 수"),
+                    fieldWithPath("meta.total_count").type(NUMBER).description("총 페이지 수")
                 ))).andReturn();
 
         verify(bookSearchService).searchByQuery(any(BookSearchRequestDto.class));
@@ -449,15 +449,14 @@ public class BookControllerTest extends AuthenticationTestExtension {
                     parameterWithName("page").description("한 번에 조회할 page 수"),
                     parameterWithName("sort").description("조회시 정렬 옵션")),
                 responseFields(
-                    fieldWithPath("bookDtos[]").description("책"),
-                    fieldWithPath("bookDtos[].isbn").description("ISBN"),
-                    fieldWithPath("bookDtos[].title").description("제목"),
-                    fieldWithPath("bookDtos[].author[]").description("저자"),
-                    fieldWithPath("bookDtos[].publisher").description("출판사"),
-                    fieldWithPath("bookDtos[].bookCoverImageUrl").description("책 표지 이미지"),
-                    fieldWithPath("meta.is_end").description("마지막 페이지 여부"),
-                    fieldWithPath("meta.pageable_count").description("가져온 페이지 수"),
-                    fieldWithPath("meta.total_count").description("총 페이지 수")
+                    fieldWithPath("bookDtos[].isbn").type(STRING).description("ISBN"),
+                    fieldWithPath("bookDtos[].title").type(STRING).description("제목"),
+                    fieldWithPath("bookDtos[].author[]").type(ARRAY).description("저자"),
+                    fieldWithPath("bookDtos[].publisher").type(STRING).description("출판사"),
+                    fieldWithPath("bookDtos[].bookCoverImageUrl").type(STRING).description("책 표지 이미지"),
+                    fieldWithPath("meta.is_end").type(BOOLEAN).description("마지막 페이지 여부"),
+                    fieldWithPath("meta.pageable_count").type(NUMBER).description("가져온 페이지 수"),
+                    fieldWithPath("meta.total_count").type(NUMBER).description("총 페이지 수")
                 ))).andReturn();
 
         verify(bookSearchService).searchByQuery(any(BookSearchRequestDto.class));
