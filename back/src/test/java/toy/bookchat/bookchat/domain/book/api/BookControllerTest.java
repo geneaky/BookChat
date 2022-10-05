@@ -139,102 +139,7 @@ public class BookControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void 사용자가_isbn으로_책_검색_요청시_성공() throws Exception {
-        List<BookDto> bookDtos = new ArrayList<>();
-        bookDtos.add(getBookDto("213123", "effectiveJava", List.of("Joshua")));
-        BookSearchResponseDto bookSearchResponseDto = BookSearchResponseDto.builder()
-            .bookDtos(bookDtos)
-            .build();
-
-        when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
-        when(bookSearchService.searchByQuery(any(BookSearchRequestDto.class))).thenReturn(
-            bookSearchResponseDto);
-
-        String result = objectMapper.writeValueAsString(bookSearchResponseDto);
-
-        MvcResult mvcResult = mockMvc.perform(get("/v1/api/books")
-                .header("Authorization", "Bearer " + getTestToken())
-                .param("query", "1231513")
-                .with(user(getUserPrincipal())))
-            .andExpect(status().isOk())
-            .andDo(document("book-search-isbn",
-                requestHeaders(
-                        headerWithName("Authorization").description("Bearer [JWT token]")),
-                requestParameters(parameterWithName("query").description("ISBN  번호"))
-            ))
-            .andReturn();
-
-        verify(bookSearchService).searchByQuery(any(BookSearchRequestDto.class));
-        assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo(result);
-    }
-
-    @Test
-    public void 사용자가_잘못된_isbn으로_책_검색_요청시_실패() throws Exception {
-        when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
-
-        mockMvc.perform(get("/v1/api/books")
-                .header("Authorization", "Bearer " + getTestToken())
-                .param("isbn", "")
-                .with(user(getUserPrincipal())))
-            .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    public void 외부api_isbn_검색_요청_실패시_404() throws Exception {
-        when(bookSearchService.searchByQuery(any(BookSearchRequestDto.class))).thenThrow(
-            BookNotFoundException.class);
-        when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
-
-        mockMvc.perform(get("/v1/api/books")
-                .header("Authorization", "Bearer " + getTestToken())
-                .param("query", "123456")
-                .with(user(getUserPrincipal())))
-            .andExpect(status().isNotFound());
-    }
-
-    @Test
-    public void 사용자가_도서명_검색_요청시_성공() throws Exception {
-        List<BookDto> bookDtos = new ArrayList<>();
-        bookDtos.add(getBookDto("213123", "effectiveJava", List.of("Joshua")));
-
-        BookSearchResponseDto bookSearchResponseDto = BookSearchResponseDto.builder()
-            .bookDtos(bookDtos)
-            .build();
-
-        when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
-        when(bookSearchService.searchByQuery(any(BookSearchRequestDto.class))).thenReturn(
-            bookSearchResponseDto);
-
-        String result = objectMapper.writeValueAsString(bookSearchResponseDto);
-
-        MvcResult mvcResult = mockMvc.perform(get("/v1/api/books")
-                .header("Authorization", "Bearer " + getTestToken())
-                .param("query", "effectiveJava")
-                .with(user(getUserPrincipal())))
-            .andExpect(status().isOk())
-            .andDo(document("book-search-title",
-                requestHeaders(
-                        headerWithName("Authorization").description("Bearer [JWT token]")),
-                requestParameters(parameterWithName("query").description("도서 제목"))))
-            .andReturn();
-
-        verify(bookSearchService).searchByQuery(any(BookSearchRequestDto.class));
-        assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo(result);
-    }
-
-    @Test
-    public void 사용자가_빈_도서명_검색_요청시_실패() throws Exception {
-        when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
-
-        mockMvc.perform(get("/v1/api/books")
-                .header("Authorization", "Bearer " + getTestToken())
-                .param("title", "")
-                .with(user(getUserPrincipal())))
-            .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    public void 외부api_도서명_검색_요청_실패시_404() throws Exception {
+    public void 외부api_검색_요청_실패시_404() throws Exception {
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
         when(bookSearchService.searchByQuery(any(BookSearchRequestDto.class))).thenThrow(
             BookNotFoundException.class);
@@ -247,62 +152,16 @@ public class BookControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void 사용자가_작가명_검색_요청시_성공() throws Exception {
-        List<BookDto> bookDtos = new ArrayList<>();
-        bookDtos.add(getBookDto("213123", "effectiveJava", List.of("Joshua")));
-
-        BookSearchResponseDto bookSearchResponseDto = BookSearchResponseDto.builder()
-            .bookDtos(bookDtos)
-            .build();
-
-        when(bookSearchService.searchByQuery(any(BookSearchRequestDto.class))).thenReturn(
-                bookSearchResponseDto);
-        when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
-
-        String result = objectMapper.writeValueAsString(bookSearchResponseDto);
-
-        MvcResult mvcResult = mockMvc.perform(get("/v1/api/books")
-                 .header("Authorization", "Bearer " + getTestToken())
-                .param("query", "Joshua")
-                .with(user(getUserPrincipal())))
-            .andExpect(status().isOk())
-            .andDo(document("book-search-author",
-                requestHeaders(
-                        headerWithName("Authorization").description("Bearer [JWT token]")),
-                requestParameters(parameterWithName("query").description("작가"))))
-            .andReturn();
-
-        verify(bookSearchService).searchByQuery(any(BookSearchRequestDto.class));
-        assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo(result);
-    }
-
-    @Test
-    public void 사용자가_빈_작가명_검색_요청시_실패() throws Exception {
+    public void 올바르지않은_요청으로_외부api_검색_요청시_400() throws Exception {
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
 
         mockMvc.perform(get("/v1/api/books")
-                .header("Authorization", "Bearer " + getTestToken())
-                .param("author", "")
-                .with(user(getUserPrincipal())))
-            .andExpect(status().isBadRequest());
+                        .header("Authorization", "Bearer " + getTestToken())
+                        .param("query", " ")
+                        .with(user(getUserPrincipal())))
+                .andExpect(status().isBadRequest());
     }
 
-    @Test
-    public void 외부api_작가명_검색_요청_실패시_404() throws Exception {
-        when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
-        when(bookSearchService.searchByQuery(any(BookSearchRequestDto.class))).thenThrow(
-            BookNotFoundException.class);
-
-        mockMvc.perform(get("/v1/api/books")
-                .header("Authorization", "Bearer " + getTestToken())
-                .param("query", "Joshua")
-                .with(user(getUserPrincipal())))
-            .andExpect(status().isNotFound());
-    }
-
-    /* TODO: 2022-09-27 도서 검색은 수정 예정이므로 예시로 하나만 수정하겠음
-        이후 수정하면 대부분 삭제 예정    
-     */
     @Test
     public void 사용자가_isbn_검색시_paging_성공() throws Exception {
 
