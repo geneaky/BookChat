@@ -14,8 +14,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class IpBlockManager {
 
-    public static final int ONE_DAY = 86400;
-    public static final int LIMITED_COUNT = 10;
+    public static final long ONE_DAY = 86400L;
+    public static final int LIMITED_COUNT = 100;
     private final AccessIpRepository accessIpRepository;
 
     @Transactional
@@ -31,14 +31,13 @@ public class IpBlockManager {
     private void increaseAccessFailCount(String X_Forwarded_For) {
         Optional<AccessIp> optionalAccessIp = accessIpRepository.findById(X_Forwarded_For);
         optionalAccessIp.ifPresentOrElse(accessIp -> {
-            if(Duration.between(LocalDateTime.now(),accessIp.getAccessTimeStamp()).getSeconds() > ONE_DAY) {
-                accessIp.updateAccessTimeStamp(LocalDateTime.now());
+            if(Duration.between(accessIp.getUpdatedAt(),LocalDateTime.now()).getSeconds() > ONE_DAY) {
                 accessIp.reset();
                 return;
             }
             accessIp.increase();
         },() -> {
-            AccessIp accessIp = new AccessIp(X_Forwarded_For,0L, LocalDateTime.now());
+            AccessIp accessIp = new AccessIp(X_Forwarded_For,0L);
             accessIpRepository.save(accessIp);
         });
     }

@@ -20,7 +20,7 @@ public class IpBlockCheckingFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
         FilterChain filterChain) throws ServletException, IOException {
         if (!ipBlockManager.validateRequest(request)) {
-            throw new BlockedIpException("you are blocked");
+            throw new BlockedIpException("You Are Blocked");
         }
         filterChain.doFilter(request, response);
     }
