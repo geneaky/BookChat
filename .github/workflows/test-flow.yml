@@ -35,19 +35,15 @@ jobs:
       shell: bash
       working-directory: ${{ env.working-directory }}
       
-    - name: Test
-      run: ls -al
-      shell: bash
-      
     - name: Create Configuration File
-      run: touch ./back/src/main/resource/application.yml && echo "${{ env.APPLICATION }}" > ./back/src/main/resource/application.yml
+      run: echo "${{ env.APPLICATION }}" > ./back/src/main/resources/application.yml
       shell: bash
       
     - name: Substitute Configuration File
       uses: actions/upload-artifact@v3
       with: 
         name: application.yml
-        path: ./back/src/main/resource/application.yml
+        path: ./back/src/main/resources/application.yml
       
 
     - name: Test with Gradle
