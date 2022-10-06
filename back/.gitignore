@@ -5,8 +5,6 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 src/main/resources/*
-!src/main/resources/application.yaml
-!src/main/resources/application-action.yaml
 logs/
 !src/main/resources/log4j2-spring-local.xml
 
