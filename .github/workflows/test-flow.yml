@@ -35,12 +35,12 @@ jobs:
       shell: bash
       working-directory: ${{ env.working-directory }}
       
-    - name: Create Configuration File
-      run: touch ./src/main/resource/application.yml && echo "${{ env.APPLICATION }}" > ./src/main/resource/application.yml
-      shell: bash
-      
     - name: Test
       run: pwd
+      shell: bash
+      
+    - name: Create Configuration File
+      run: touch ./src/main/resource/application.yml && echo "${{ env.APPLICATION }}" > ./src/main/resource/application.yml
       shell: bash
       
     - name: Substitute Configuration File
