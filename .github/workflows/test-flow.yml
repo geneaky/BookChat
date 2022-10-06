@@ -18,6 +18,7 @@ jobs:
       actions: read
     env:
      working-directory: ./back
+     APPLICATION: ${{secrets.TEST}}
 
     steps:
     - name: Check out
@@ -33,15 +34,20 @@ jobs:
       run: chmod +x ./gradlew
       shell: bash
       working-directory: ${{ env.working-directory }}
+      
+    - name: Create Configuration File
+    - uses: actions/checkout@v3
+    - run: echo "{{env.APPLICATION}}" > "./back/src/main/resource/application.yml"
+    - uses: actions/upload-artifact@v3
+      with: 
+        name: application.yml
+        path: ./back/src/main/resource/application.yml
+      
 
     - name: Test with Gradle
       run: ./gradlew clean test -x asciidoctor
       shell: bash
       working-directory: ${{ env.working-directory }}
-      
-    - name: tt
-      run: cd back && cd build && ls -al && cd test-results && ls -al && cd test && ls -al
-      shell: bash
       
     - name: Test Report
       uses: EnricoMi/publish-unit-test-result-action@v2
@@ -49,19 +55,3 @@ jobs:
       with:
         junit_files: '**/build/test-results/test/TEST-*.xml'
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        
-    - name: Build with Gradle
-      run: ./gradlew clean build -x test -x asciidoctor
-      shell: bash
-      working-directory: ${{ env.working-directory }}
-
-    - name: Get Current Time
-      uses: josStorer/get-current-time@v2.0.0
-      id: current-time
-      with:
-        format: YYYY-MM-DD-HH-mm-ss
-        utcOffset: "+09:00"
-        
-    - name: Show Current Time
-      run: echo "CurrentTime=${{steps.current-time.outputs.formattedTime}}"
-      shell: bash
