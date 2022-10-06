@@ -1,4 +1,4 @@
-name: bookchat-service
+name: bookchat-service-test
 
 on:
   push:
@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 jobs:
-  backend:
+  TEST:
     runs-on: ubuntu-latest
     permissions:
       checks: write
@@ -65,22 +65,3 @@ jobs:
     - name: Show Current Time
       run: echo "CurrentTime=${{steps.current-time.outputs.formattedTime}}"
       shell: bash
-
-  docs:
-    runs-on: ubuntu-latest
-    env:
-      working-directory: ./back
-      
-    steps:
-      - uses: actions/checkout@v3
-      - name: Run a one-line script
-        run: echo Hello, world!
-  
-      - name: Upload Documentation to Wiki
-        uses: geneaky/github-wiki-publish-action2@master
-        with:
-          path: "./back/src/docs/asciidoc"
-        env:
-          GH_PERSONAL_ACCESS_TOKEN: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN  }}
-          WIKI_PAGE_NAME: "BookChatAPI"
-    
