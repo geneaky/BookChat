@@ -36,7 +36,11 @@ jobs:
       working-directory: ${{ env.working-directory }}
       
     - name: Create Configuration File
-      run: echo "${{ env.APPLICATION }}" > "./src/main/resource/application.yml" && pwd
+      run: echo "${{ env.APPLICATION }}" > "./src/main/resource/application.yml"
+      shell: bash
+      
+    - name: Test
+      run: pwd
       shell: bash
       
     - name: Substitute Configuration File
