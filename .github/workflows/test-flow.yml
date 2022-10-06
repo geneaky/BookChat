@@ -36,7 +36,7 @@ jobs:
       working-directory: ${{ env.working-directory }}
       
     - name: Test
-      run: pwd
+      run: ls -al
       shell: bash
       
     - name: Create Configuration File
