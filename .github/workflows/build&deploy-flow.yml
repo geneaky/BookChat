@@ -33,15 +33,15 @@ jobs:
       shell: bash
       working-directory: ${{ env.working-directory }}
       
-    - name: Create Configuration File
-      run: echo "${{ env.APPLICATION }}" > ./back/src/main/resources/application.yml
-      shell: bash
+#     - name: Create Configuration File
+#       run: echo "${{ env.APPLICATION }}" > ./back/src/main/resources/application.yml
+#       shell: bash
       
-    - name: Substitute Configuration File
-      uses: actions/upload-artifact@v3
-      with: 
-        name: application.yml
-        path: ./back/src/main/resources/application.yml
+#     - name: Substitute Configuration File
+#       uses: actions/upload-artifact@v3
+#       with: 
+#         name: application.yml
+#         path: ./back/src/main/resources/application.yml
       
     - name: Build with Gradle
       run: ./gradlew clean build -x test -x asciidoctor
