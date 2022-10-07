@@ -1,5 +1,7 @@
 package toy.bookchat.bookchat.domain.user.service.dto;
 
+import static toy.bookchat.bookchat.domain.user.service.dto.SupportedFileExtension.isSupport;
+
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
@@ -17,8 +19,6 @@ import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.exception.ImageInputStreamException;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
-
-import static toy.bookchat.bookchat.domain.user.service.dto.SupportedFileExtension.isSupport;
 
 @Getter
 @Setter
@@ -39,11 +39,11 @@ public class UserSignUpRequestDto {
     public boolean hasValidImage() {
 
         try {
-            if(this.userProfileImage.isEmpty()) {
+            if (this.userProfileImage == null) {
                 return false;
             }
 
-            if(isValidFileExtension()) {
+            if (isValidFileExtension()) {
                 BufferedImage bufferedImage = ImageIO.read(this.userProfileImage.getInputStream());
                 return isValidFileSize(bufferedImage);
             }
@@ -62,7 +62,7 @@ public class UserSignUpRequestDto {
     }
 
     private boolean isValidFileExtension() {
-        if(isSupport(getFileExtension())) {
+        if (isSupport(getFileExtension())) {
             return true;
         }
 
@@ -70,10 +70,12 @@ public class UserSignUpRequestDto {
     }
 
     public String getFileExtension() {
-        return this.userProfileImage.getOriginalFilename().substring(this.userProfileImage.getOriginalFilename().lastIndexOf(".") + 1);
+        return this.userProfileImage.getOriginalFilename()
+            .substring(this.userProfileImage.getOriginalFilename().lastIndexOf(".") + 1);
     }
 
-    public User getUser(String oauth2MemberNumber, String email, String profileImageUrl, OAuth2Provider providerType) {
+    public User getUser(String oauth2MemberNumber, String email, String profileImageUrl,
+        OAuth2Provider providerType) {
         return new User(oauth2MemberNumber, email, profileImageUrl, ROLE.USER,
             providerType, this.getNickname(), this.getReadingTastes(),
             this.getDefaultProfileImageType());
