@@ -3,6 +3,7 @@ package toy.bookchat.bookchat.domain;
 import javax.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MissingRequestValueException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import toy.bookchat.bookchat.domain.book.exception.BookNotFoundException;
@@ -93,6 +94,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public final ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException exception) {
+        log.info("message = {} :: cause = {}", exception.getMessage(), exception.getCause());
+        return BAD_REQUEST;
+    }
+
+    @ExceptionHandler(MissingRequestValueException.class)
+    public final ResponseEntity<String> test(MissingRequestValueException exception) {
         log.info("message = {} :: cause = {}", exception.getMessage(), exception.getCause());
         return BAD_REQUEST;
     }
