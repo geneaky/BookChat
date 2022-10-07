@@ -1,7 +1,6 @@
 package toy.bookchat.bookchat.security;
 
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -24,7 +23,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final JwtTokenManager jwtTokenManager;
     private final UserRepository userRepository;
 
-    public SecurityConfig(IpBlockManager ipBlockManager, JwtTokenManager jwtTokenManager, UserRepository userRepository) {
+    public SecurityConfig(IpBlockManager ipBlockManager, JwtTokenManager jwtTokenManager,
+        UserRepository userRepository) {
         this.ipBlockManager = ipBlockManager;
         this.jwtTokenManager = jwtTokenManager;
         this.userRepository = userRepository;
@@ -64,7 +64,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring()
-            .antMatchers(HttpMethod.GET, "/v1/api/users/profile/nickname")
-            .antMatchers(HttpMethod.POST, "/v1/api/users/signup", "/v1/api/users/signin", "/v1/api/auth/token");
+            .antMatchers("/v1/api/users/profile/nickname")
+            .antMatchers("/v1/api/users/signup", "/v1/api/users/signin",
+                "/v1/api/auth/token");
     }
 }
