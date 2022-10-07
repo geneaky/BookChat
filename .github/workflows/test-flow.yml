@@ -1,6 +1,8 @@
 name: bookchat-service-test
 
 on:
+  push:
+    branches: [ master ]
   pull_request:
     branches: [ master ]
 
@@ -55,3 +57,11 @@ jobs:
       with:
         junit_files: '**/build/test-results/test/TEST-*.xml'
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Add coverage to PR
+      uses: Madrapps/jacoco-report@v1.3
+      with:
+        paths: ${{ github.workspace }}/build/reports/jacoco/test/jacocoTestReport.xml
+        token: ${{ secrets.GITHUB_TOKEN }}
+        min-coverage-overall: 0
+        min-coverage-changed-files: 0
