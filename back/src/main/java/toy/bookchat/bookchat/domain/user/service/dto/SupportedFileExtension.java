@@ -10,11 +10,15 @@ public enum SupportedFileExtension {
     }
 
     public static boolean isSupport(String fileExtension) {
-        for( SupportedFileExtension supportedFileExtension : SupportedFileExtension.values()) {
-            if(supportedFileExtension.fileExtension.equals(fileExtension)) {
+        for (SupportedFileExtension supportedFileExtension : SupportedFileExtension.values()) {
+            if (supportedFileExtension.fileExtension.equals(fileExtension)) {
                 return true;
             }
         }
         return false;
+    }
+
+    public String getValue() {
+        return this.fileExtension;
     }
 }
