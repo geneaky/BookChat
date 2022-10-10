@@ -17,6 +17,10 @@ jobs:
     env:
      working-directory: ./back
      APPLICATION: ${{secrets.PRODUCTION}}
+     AWS_REGION: ap-northeast-2
+     S3_BUCKET_NAME: bookchat-codedeploy
+     CODE_DEPLOY_APPLICATION_NAME: bookchat-codedeploy-app
+     CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: bookchat-codedeploy-deployment-group
 
     steps:
     - name: Check out
@@ -44,6 +48,29 @@ jobs:
         path: ./back/src/main/resources/application.yml
       
     - name: Build with Gradle
-      run: ./gradlew clean build -x test -x asciidoctor
+      run: ./gradlew clean bootJar -x test -x asciidoctor -x jacocoTestReport -x jacocoTestCoverageVerification
       shell: bash
       working-directory: ${{ env.working-directory }}
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+        
+    - name: Upload to AWS S3
+      run: |
+        aws deploy push \
+          --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
+          --ignore-hidden-files \
+          --s3-location s3://$S3_BUCKET_NAME/$GITHUB_SHA.zip \
+          --source ./back
+          
+    - name: Deploy to AWS EC2 from S3
+      run: |
+        aws deploy create-deployment \
+        --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
+        --deployment-config-name CodeDeployDefault.AllAtOnce \
+        --deployment-group-name ${{ env.CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
+        --s3-location bucket=$S3_BUCKET_NAME,key=$GITHUB_SHA.zip,bundleType=zip
