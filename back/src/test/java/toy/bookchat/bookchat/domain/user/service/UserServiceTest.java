@@ -36,7 +36,7 @@ class UserServiceTest {
     UserServiceImpl userService;
 
     @Test
-    public void 사용자_중복된_nickname_체크() throws Exception {
+    void 사용자_중복된_nickname_체크() throws Exception {
 
         when(userRepository.existsByNickname(anyString())).thenReturn(true);
         boolean result = userService.isDuplicatedName("test");
@@ -44,14 +44,14 @@ class UserServiceTest {
     }
 
     @Test
-    public void 사용자가_중복되지_않은_nickname_체크() throws Exception {
+    void 사용자가_중복되지_않은_nickname_체크() throws Exception {
         when(userRepository.existsByNickname(anyString())).thenReturn(false);
         boolean result = userService.isDuplicatedName("test");
         assertThat(result).isFalse();
     }
 
     @Test
-    public void 처음_가입하는_회원의_경우_회원가입_성공() throws Exception {
+    void 처음_가입하는_회원의_경우_회원가입_성공() throws Exception {
         UserSignUpRequestDto userSignUpRequestDto = mock(UserSignUpRequestDto.class);
         User mockUser = mock(User.class);
         when(storageService.getFileUrl(any())).thenReturn("testBucketUrl");
@@ -64,7 +64,7 @@ class UserServiceTest {
     }
 
     @Test
-    public void 이미_가입된_사용자일경우_예외발생() throws Exception {
+    void 이미_가입된_사용자일경우_예외발생() throws Exception {
         UserSignUpRequestDto userSignUpRequestDto = mock(UserSignUpRequestDto.class);
         User mockUser = mock(User.class);
         when(userRepository.findByName(any())).thenReturn(Optional.of(mockUser));
@@ -75,12 +75,19 @@ class UserServiceTest {
     }
 
     @Test
-    public void 가입된_사용자인지_체크시_가입되지_않은_사용자라면_예외발생() throws Exception {
+    void 가입된_사용자인지_체크시_가입되지_않은_사용자라면_예외발생() throws Exception {
 
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(null));
 
         assertThatThrownBy(() -> {
             userService.checkRegisteredUser("username");
         }).isInstanceOf(UserNotFoundException.class);
+    }
+
+    @Test
+    void 사용자_회원탈퇴_요청시_삭제_성공() throws Exception {
+        userService.deleteUser(any(User.class));
+
+        verify(userRepository).delete(any());
     }
 }

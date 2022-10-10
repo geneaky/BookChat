@@ -1,5 +1,6 @@
 package toy.bookchat.bookchat.domain.user.service;
 
+import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.service.dto.UserSignUpRequestDto;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
@@ -12,4 +13,6 @@ public interface UserService {
         String userEmail, OAuth2Provider providerType);
 
     void checkRegisteredUser(String oauth2MemberNumber);
+
+    void deleteUser(User user);
 }
