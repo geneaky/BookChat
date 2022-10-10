@@ -147,6 +147,20 @@ include::{snippets}/user-signin-error3/http-response.adoc[]
 include::{snippets}/user-signin-error4/http-request.adoc[]
 include::{snippets}/user-signin-error4/http-response.adoc[]
 
+=== 사용자 회원탈퇴
+
+`Request Header`
+
+include::{snippets}/delete-user/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/delete-user/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/delete-user/http-response.adoc[]
+
 == 도서
 
 === ISBN 도서 검색

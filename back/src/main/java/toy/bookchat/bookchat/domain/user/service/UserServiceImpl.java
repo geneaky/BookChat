@@ -58,10 +58,16 @@ public class UserServiceImpl implements UserService {
             });
     }
 
+    @Override
+    @Transactional
+    public void deleteUser(User user) {
+        userRepository.delete(user);
+    }
+
     private void saveUser(UserSignUpRequestDto userSignUpRequestDto, String oauth2MemberNumber,
         String email, String profileImageUrl, OAuth2Provider providerType) {
         Optional<User> optionalUser = userRepository.findByName(oauth2MemberNumber);
-        optionalUser.ifPresentOrElse((u) -> {
+        optionalUser.ifPresentOrElse(u -> {
             throw new UserAlreadySignUpException("user already sign up");
         }, () -> {
             User user = userSignUpRequestDto.getUser(oauth2MemberNumber, email, profileImageUrl,
