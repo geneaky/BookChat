@@ -2,10 +2,14 @@ package toy.bookchat.bookchat.domain.user.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
@@ -36,7 +40,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,7 +76,7 @@ import toy.bookchat.bookchat.security.user.UserPrincipal;
     includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {
         SecurityConfig.class}))
 @AutoConfigureRestDocs(uriScheme = "https", uriHost = "bookchat.link", uriPort = 443)
-public class UserControllerTest extends AuthenticationTestExtension {
+class UserControllerTest extends AuthenticationTestExtension {
 
     @MockBean
     UserService userService;
@@ -101,6 +104,20 @@ public class UserControllerTest extends AuthenticationTestExtension {
     @Autowired
     private MockMvc mockMvc;
 
+    private static String getTestToken() {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("sub", "test");
+        claims.put("name", "testkakao");
+        claims.put("provider", OAuth2Provider.GOOGLE);
+        claims.put("email", "test@gmail.com");
+
+        String testToken = Jwts.builder()
+            .setClaims(claims)
+            .signWith(SignatureAlgorithm.HS256, "test")
+            .compact();
+        return testToken;
+    }
+
     @BeforeEach
     public void init() throws FileNotFoundException {
         openIdTestUtil = new OpenIdTestUtil(
@@ -124,25 +141,16 @@ public class UserControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void 인증받지_않은_사용자_요청_401응답() throws Exception {
+    void 인증받지_않은_사용자_요청_401응답() throws Exception {
         mockMvc.perform(get("/v1/api/users/profile"))
             .andExpect(status().isUnauthorized())
             .andDo(document("user-profile-error"));
     }
 
     @Test
-    public void 사용자_프로필_정보_반환() throws Exception {
+    void 사용자_프로필_정보_반환() throws Exception {
 
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("sub","test");
-        claims.put("name","google123");
-        claims.put("provider", OAuth2Provider.GOOGLE);
-        claims.put("email","test@gmail.com");
-
-        String testToken = Jwts.builder()
-                .setClaims(claims)
-                .signWith(SignatureAlgorithm.HS256, "test")
-                .compact();
+        String testToken = getTestToken();
 
         String real = objectMapper.writeValueAsString(UserProfileResponse.builder()
             .userEmail("test@gmail.com")
@@ -182,7 +190,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void 사용자_닉네임_중복_아닐시_200반환() throws Exception {
+    void 사용자_닉네임_중복_아닐시_200반환() throws Exception {
         when(userService.isDuplicatedName(anyString())).thenReturn(false);
         mockMvc.perform(get("/v1/api/users/profile/nickname").param("nickname", "HiBs"))
             .andExpect(status().isOk())
@@ -192,7 +200,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void 사용자_닉네임_중복시_409반환() throws Exception {
+    void 사용자_닉네임_중복시_409반환() throws Exception {
         when(userService.isDuplicatedName(anyString())).thenReturn(true);
         mockMvc.perform(get("/v1/api/users/profile/nickname").param("nickname", "HiBs"))
             .andExpect(status().isConflict())
@@ -200,7 +208,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void 사용자_회원가입_요청시_header_인증정보_없을시_400반환() throws Exception {
+    void 사용자_회원가입_요청시_header_인증정보_없을시_400반환() throws Exception {
         mockMvc.perform(post("/v1/api/users/signup")
                 .header("Authorization", " ")
                 .param("nickname", "nick")
@@ -212,7 +220,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void 사용자_회원가입_요청시_header_openid없는_인증정보_400반환() throws Exception {
+    void 사용자_회원가입_요청시_header_openid없는_인증정보_400반환() throws Exception {
         mockMvc.perform(post("/v1/api/users/signup")
                 .header("Authorization", "Bearer ")
                 .header("provider_type", "KAKAO")
@@ -254,12 +262,13 @@ public class UserControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void 사용자_회원가입_요청시_header_openid가_유효하지않은_경우_401반환() throws Exception {
+    void 사용자_회원가입_요청시_header_openid가_유효하지않은_경우_401반환() throws Exception {
         PrivateKey privateKey = getPrivateKey();
         PublicKey publicKey = getPublicKey();
 
         when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
-        doThrow(ExpiredTokenException.class).when(openIdTokenManager).getOAuth2MemberNumberFromToken(any(),any());
+        doThrow(ExpiredTokenException.class).when(openIdTokenManager)
+            .getOAuth2MemberNumberFromToken(any(), any());
 
         Claims claims = Jwts.claims().setIssuer("https://kauth.kakao.com")
             .setSubject("test").setExpiration(new Date(0));
@@ -278,13 +287,14 @@ public class UserControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void 사용자_회원가입_요청시_header_openid가_유효한경우_회원가입진행() throws Exception {
+    void 사용자_회원가입_요청시_header_openid가_유효한경우_회원가입진행() throws Exception {
         PrivateKey privateKey = getPrivateKey();
         PublicKey publicKey = getPublicKey();
 
         when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
-        when(openIdTokenManager.getOAuth2MemberNumberFromToken(any(),any())).thenReturn("testkakao");
-        when(openIdTokenManager.getUserEmailFromToken(any(),any())).thenReturn("test@gmail.com");
+        when(openIdTokenManager.getOAuth2MemberNumberFromToken(any(), any())).thenReturn(
+            "testkakao");
+        when(openIdTokenManager.getUserEmailFromToken(any(), any())).thenReturn("test@gmail.com");
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("email", "test@gmail.com");
@@ -320,7 +330,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void 토큰형식_정규표현식_확인() throws Exception {
+    void 토큰형식_정규표현식_확인() throws Exception {
         PrivateKey privateKey = getPrivateKey();
 
         String testToken = Jwts.builder().setSubject("test")
@@ -336,7 +346,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void 사용자_회원가입_요청시_올바르지않은_토큰_요청규격_예외처리() throws Exception {
+    void 사용자_회원가입_요청시_올바르지않은_토큰_요청규격_예외처리() throws Exception {
         PrivateKey privateKey = getPrivateKey();
 
         String testToken = Jwts.builder().setSubject("test")
@@ -352,7 +362,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void 사용자_회원가입_요청시_올바르지않은_파라미터형식_예외처리() throws Exception {
+    void 사용자_회원가입_요청시_올바르지않은_파라미터형식_예외처리() throws Exception {
         PrivateKey privateKey = getPrivateKey();
 
         String testToken = Jwts.builder().setSubject("test")
@@ -368,7 +378,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void 사용자_성공적으로_로그인시_응답_header에_jwt_token삽입() throws Exception {
+    void 사용자_성공적으로_로그인시_응답_header에_jwt_token삽입() throws Exception {
         PrivateKey privateKey = getPrivateKey();
         PublicKey publicKey = getPublicKey();
 
@@ -412,7 +422,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void 로그인_요청시_Header없으면_예외발생() throws Exception {
+    void 로그인_요청시_Header없으면_예외발생() throws Exception {
 
         mockMvc.perform(post("/v1/api/users/signin"))
             .andExpect(status().isBadRequest())
@@ -420,7 +430,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void 로그인_요청시_Header에_토큰이_없으면_예외발생() throws Exception {
+    void 로그인_요청시_Header에_토큰이_없으면_예외발생() throws Exception {
         mockMvc.perform(post("/v1/api/users/signin")
                 .header("Authorization", "Bearer ")
                 .header("provider_type", "KAKAO"))
@@ -429,7 +439,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void 로그인_요청시_Header인증정보가_Bearer양식에_맞지않으면_예외발생() throws Exception {
+    void 로그인_요청시_Header인증정보가_Bearer양식에_맞지않으면_예외발생() throws Exception {
         PrivateKey privateKey = getPrivateKey();
         PublicKey publicKey = getPublicKey();
 
@@ -454,7 +464,7 @@ public class UserControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void 만료된_토큰으로_요청시_401_예외발생() throws Exception {
+    void 만료된_토큰으로_요청시_401_예외발생() throws Exception {
         PrivateKey privateKey = getPrivateKey();
         PublicKey publicKey = getPublicKey();
 
@@ -472,5 +482,32 @@ public class UserControllerTest extends AuthenticationTestExtension {
                 .header("provider_type", "KAKAO"))
             .andExpect(status().isUnauthorized())
             .andDo(document("user-signin-error4"));
+    }
+
+    @Test
+    void 가입된_사용자_회원탈퇴_성공() throws Exception {
+        String testToken = getTestToken();
+
+        User user = User.builder()
+            .email("test@gmail.com")
+            .name("testkakao")
+            .nickname("nickname")
+            .role(ROLE.USER)
+            .profileImageUrl("somethingImageUrl@naver.com")
+            .defaultProfileImageType(1)
+            .build();
+
+        when(userRepository.findByName(any())).thenReturn(Optional.of(user));
+
+        mockMvc.perform(delete("/v1/api/users")
+                .with(user(getUserPrincipal()))
+                .header("Authorization", "Bearer " + testToken))
+            .andExpect(status().isOk())
+            .andDo(document("delete-user",
+                requestHeaders(
+                    headerWithName("Authorization").description("Bearer [JWT token]")
+                )));
+
+        verify(userService).deleteUser(any());
     }
 }

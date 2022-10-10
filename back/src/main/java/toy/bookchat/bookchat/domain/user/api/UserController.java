@@ -8,17 +8,18 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.api.dto.Token;
 import toy.bookchat.bookchat.domain.user.api.dto.UserProfileResponse;
 import toy.bookchat.bookchat.domain.user.service.UserService;
@@ -27,6 +28,7 @@ import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenProvider;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenRecorder;
 import toy.bookchat.bookchat.security.token.openid.OpenIdTokenManager;
+import toy.bookchat.bookchat.security.user.CurrentUser;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @Validated
@@ -100,6 +102,11 @@ public class UserController {
         jwtTokenRecorder.record(userName, token.getRefreshToken());
 
         return ResponseEntity.ok(token);
+    }
+
+    @DeleteMapping("/users")
+    public void deleteUser(@CurrentUser User user) {
+        userService.deleteUser(user);
     }
 
     private String getOpenIdToken(String bearerToken) {
