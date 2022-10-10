@@ -9,18 +9,19 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import toy.bookchat.bookchat.config.JpaAuditingConfig;
 import toy.bookchat.bookchat.domain.configuration.TestConfig;
+import toy.bookchat.bookchat.domain.user.ROLE;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
 @DataJpaTest
-@Import({JpaAuditingConfig.class,TestConfig.class})
+@Import({JpaAuditingConfig.class, TestConfig.class})
 class UserRepositoryTest {
 
     @Autowired
     private UserRepository userRepository;
 
     @Test
-    public void 사용자_이메일_OAuth2Provider를_구분으로_조회_성공() throws Exception {
+    void 사용자_이메일_OAuth2Provider를_구분으로_조회_성공() throws Exception {
 
         User user1 = User.builder()
             .name("user")
@@ -47,7 +48,7 @@ class UserRepositoryTest {
     }
 
     @Test
-    public void 사용자_nickname_존재시_true_반환_성공() throws Exception {
+    void 사용자_nickname_존재시_true_반환_성공() throws Exception {
         User user = User.builder()
             .name("user")
             .email("kaktus418@gmail.com")
@@ -63,21 +64,21 @@ class UserRepositoryTest {
     }
 
     @Test
-    public void 사용자_nickname_존재하지않을시_false_반환_성공() throws Exception {
+    void 사용자_nickname_존재하지않을시_false_반환_성공() throws Exception {
         boolean result = userRepository.existsByNickname("nickname");
 
         assertThat(result).isFalse();
     }
 
     @Test
-    public void 사용자_이름으로_조회_성공() throws Exception {
+    void 사용자_이름으로_조회_성공() throws Exception {
         String userName = "KAKAO123456";
         User user = User.builder()
-                .name(userName)
-                .email("kaktus418@gmail.com")
-                .provider(OAuth2Provider.KAKAO)
-                .nickname("nickname")
-                .build();
+            .name(userName)
+            .email("kaktus418@gmail.com")
+            .provider(OAuth2Provider.KAKAO)
+            .nickname("nickname")
+            .build();
 
         userRepository.save(user);
         userRepository.flush();
@@ -85,5 +86,25 @@ class UserRepositoryTest {
         User findUser = userRepository.findByName(userName).get();
 
         assertThat(user).isEqualTo(findUser);
+    }
+
+    @Test
+    void 사용자_삭제_성공() throws Exception {
+        User user = User.builder()
+            .email("test@gmail.com")
+            .name("testkakao")
+            .nickname("nickname")
+            .role(ROLE.USER)
+            .profileImageUrl("somethingImageUrl@naver.com")
+            .defaultProfileImageType(1)
+            .build();
+
+        userRepository.save(user);
+        userRepository.flush();
+
+        userRepository.delete(user);
+
+        Optional<User> ou = userRepository.findById(user.getId());
+        assertThat(ou.isPresent()).isFalse();
     }
 }
