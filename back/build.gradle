@@ -91,6 +91,10 @@ jacocoTestCoverageVerification {
     }
 }
 
+jar {
+    enabled = false
+}
+
 jacocoTestReport {
     reports {
         xml.enabled true

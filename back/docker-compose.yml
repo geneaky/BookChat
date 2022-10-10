@@ -11,7 +11,7 @@ services:
       - .:/app
     entrypoint: [ "/bin/bash", "-c" ]
     command:
-      - ./gradlew bootRun
+      - java -jar ./build/libs/*.jar
     restart: always
 
   nginx:
