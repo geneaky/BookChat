@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Configuration status="INFO">
+  <Appenders>
+    <Console name="ConsoleLog" target="SYSTEM_OUT">
+      <PatternLayout charset="UTF-8"
+        pattern="%style{%d{ISO8601}}{cyan} %highlight{[%-5p]}{FATAL=bg_red, ERROR=red,INFO=green, DEBUG=blue} [%C] %style{[%t]}{yellow}:: %m%n ::"/>
+    </Console>
+    <RollingFile fileName="./logs/spring.log"
+      filePattern="./logs/spring-%d{yyyy-MM-dd}-%i.log"
+      name="FileLog">
+      <DefaultRolloverStrategy fileIndex="min" max="20"/>
+      <PatternLayout charset="UTF-8"
+        pattern="%style{%d{ISO8601}}{cyan} %highlight{[%-5p]}{FATAL=bg_red, ERROR=red,INFO=green, DEBUG=blue} [%C] %style{[%t]}{yellow}:: %m%n ::"/>
+      <Policies>
+        <SizeBasedTriggeringPolicy size="10000KB"/>
+        <TimeBasedTriggeringPolicy interval="1"/>
+      </Policies>
+    </RollingFile>
+  </Appenders>
+  <Loggers>
+    <Logger additivity="false" name="toy.bookchat.bookchat">
+      <AppenderRef ref="ConsoleLog"/>
+      <AppenderRef ref="FileLog"/>
+    </Logger>
+    <Root level="info">
+      <AppenderRef ref="ConsoleLog"/>
+      <AppenderRef ref="FileLog"/>
+    </Root>
+  </Loggers>
+</Configuration>

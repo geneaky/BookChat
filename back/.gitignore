@@ -7,7 +7,7 @@ build/
 src/main/resources/*
 !src/main/resources/.gitkeep
 logs/
-!src/main/resources/log4j2-spring-local.xml
+!src/main/resources/log4j2-spring-production.xml
 
 logs/
 !src/main/resources/log4j2-spring-local.xml
