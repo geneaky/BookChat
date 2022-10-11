@@ -278,7 +278,7 @@ class UserControllerTest extends AuthenticationTestExtension {
             .signWith(SignatureAlgorithm.RS256, privateKey).compact();
 
         mockMvc.perform(post("/v1/api/users/signup")
-                .header("Authorization", "Bearer " + testToken)
+                .header("OIDC", "Bearer " + testToken)
                 .header("provider_type", "KAKAO")
                 .param("nickname", "nick")
                 .param("defaultProfileImageType", "2"))
@@ -308,14 +308,14 @@ class UserControllerTest extends AuthenticationTestExtension {
             .compact();
 
         mockMvc.perform(post("/v1/api/users/signup")
-                .header("Authorization", "Bearer " + testToken)
+                .header("OIDC", "Bearer " + testToken)
                 .header("provider_type", "KAKAO")
                 .param("nickname", "nick")
                 .param("defaultProfileImageType", "1")
                 .param("readingTastes", "PHILOSOPHY", "DEVELOPMENT", "DESIGN"))
             .andExpect(status().isOk())
             .andDo(document("user-signup", requestHeaders(
-                    headerWithName("Authorization").description("Bearer [openid token]"),
+                    headerWithName("OIDC").description("Bearer [openid token]"),
                     headerWithName("provider_type").description("프로바이더 타입 [KAKAO / GOOGLE]")
                 ),
                 requestParameters(
@@ -402,12 +402,12 @@ class UserControllerTest extends AuthenticationTestExtension {
 
         when(jwtTokenProvider.createToken(any(), any(), any())).thenReturn(responseToken);
         MvcResult mvcResult = mockMvc.perform(post("/v1/api/users/signin")
-                .header("Authorization", "Bearer " + testToken)
+                .header("OIDC", "Bearer " + testToken)
                 .header("provider_type", "KAKAO"))
             .andExpect(status().isOk())
             .andDo(document("user-signin",
                 requestHeaders(
-                    headerWithName("Authorization").description("Bearer [openid token]"),
+                    headerWithName("OIDC").description("Bearer [openid token]"),
                     headerWithName("provider_type").description("프로바이더 타입 [KAKAO / GOOGLE]")
                 ),
                 responseFields(

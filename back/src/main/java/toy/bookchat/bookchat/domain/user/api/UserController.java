@@ -1,7 +1,7 @@
 package toy.bookchat.bookchat.domain.user.api;
 
-import static toy.bookchat.bookchat.utils.constants.AuthConstants.AUTHORIZATION;
 import static toy.bookchat.bookchat.utils.constants.AuthConstants.BEGIN_INDEX;
+import static toy.bookchat.bookchat.utils.constants.AuthConstants.OIDC;
 import static toy.bookchat.bookchat.utils.constants.AuthConstants.PROVIDER_TYPE;
 
 import javax.validation.Valid;
@@ -74,7 +74,7 @@ public class UserController {
     @PostMapping("/users/signup")
     public ResponseEntity<Void> userSignUp(
         @Valid @ModelAttribute UserSignUpRequestDto userSignUpRequestDto,
-        @RequestHeader(AUTHORIZATION) @NotBlank @Pattern(regexp = "^(Bearer)\\s.+") String bearerToken,
+        @RequestHeader(OIDC) @NotBlank @Pattern(regexp = "^(Bearer)\\s.+") String bearerToken,
         @RequestHeader(PROVIDER_TYPE) @NotNull OAuth2Provider oAuth2Provider) {
 
         String oauth2MemberNumber = openIdTokenManager.getOAuth2MemberNumberFromToken(
@@ -89,7 +89,7 @@ public class UserController {
 
     @PostMapping("/users/signin")
     public ResponseEntity<Token> userSignIn(
-        @RequestHeader(AUTHORIZATION) @NotBlank @Pattern(regexp = "^(Bearer)\\s.+") String bearerToken,
+        @RequestHeader(OIDC) @NotBlank @Pattern(regexp = "^(Bearer)\\s.+") String bearerToken,
         @RequestHeader(PROVIDER_TYPE) @NotNull OAuth2Provider oAuth2Provider) {
 
         String userName = openIdTokenManager.getOAuth2MemberNumberFromToken(
