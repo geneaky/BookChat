@@ -1,5 +1,7 @@
 package toy.bookchat.bookchat.security.token.openid;
 
+import static toy.bookchat.bookchat.utils.constants.AuthConstants.BEGIN_INDEX;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import toy.bookchat.bookchat.config.OpenIdTokenConfig;
@@ -17,15 +19,19 @@ public class OpenIdTokenManagerImpl implements OpenIdTokenManager {
 
     @Override
     public String getOAuth2MemberNumberFromToken(String token, OAuth2Provider oAuth2Provider) {
-        OpenIdToken openIdToken = OpenIdToken.of(token);
+        OpenIdToken openIdToken = OpenIdToken.of(getOpenIdToken(token));
         return openIdToken.getOAuth2MemberNumber(
             openIdTokenConfig.getPublicKey(openIdToken.getKeyId(), oAuth2Provider));
     }
 
     @Override
     public String getUserEmailFromToken(String token, OAuth2Provider oAuth2Provider) {
-        OpenIdToken openIdToken = OpenIdToken.of(token);
+        OpenIdToken openIdToken = OpenIdToken.of(getOpenIdToken(token));
         return openIdToken.getEmail(
             openIdTokenConfig.getPublicKey(openIdToken.getKeyId(), oAuth2Provider));
+    }
+
+    private String getOpenIdToken(String bearerToken) {
+        return bearerToken.substring(BEGIN_INDEX);
     }
 }

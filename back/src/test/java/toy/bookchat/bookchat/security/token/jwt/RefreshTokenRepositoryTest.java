@@ -35,7 +35,7 @@ class RefreshTokenRepositoryTest {
         refreshTokenRepository.save(refreshToken);
         refreshTokenRepository.flush();
 
-        RefreshToken findRefreshToken = refreshTokenRepository.findByUserName("aEKrR");
+        RefreshToken findRefreshToken = refreshTokenRepository.findByUserName("aEKrR").get();
 
         assertThat(refreshToken).isEqualTo(findRefreshToken);
     }

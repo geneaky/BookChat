@@ -86,14 +86,14 @@ class OpenIdTokenManagerTest {
             .setIssuer("https://kauth.kakao.com")
             .signWith(SignatureAlgorithm.RS256, privateKey)
             .compact();
-        return token;
+        return "Bearer " + token;
     }
 
     @Test
     public void 만료된_토큰으로_처리_요청시_예외발생() throws Exception {
         PrivateKey privateKey = getPrivateKey();
 
-        String token = Jwts.builder()
+        String token = "Bearer " + Jwts.builder()
             .setSubject("1234")
             .setHeaderParam(KEY_ID, "abcdedf")
             .setIssuer("https://kauth.kakao.com")
@@ -125,7 +125,7 @@ class OpenIdTokenManagerTest {
         PrivateKey privateKey = getPrivateKey();
         PublicKey publicKey = getPublicKey();
 
-        String token = Jwts.builder()
+        String token = "Bearer " + Jwts.builder()
             .setSubject("1234")
             .setHeaderParam(KEY_ID, "abcdedf")
             .signWith(SignatureAlgorithm.RS256, privateKey)

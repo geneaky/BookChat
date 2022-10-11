@@ -10,6 +10,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -65,7 +66,8 @@ class TokenServiceTest {
             .build();
 
         when(jwtTokenManager.shouldRefreshTokenBeRenewed(any())).thenReturn(true);
-        when(refreshTokenRepository.findByUserName(any())).thenReturn(reNewedRefreshToken);
+        when(refreshTokenRepository.findByUserName(any())).thenReturn(
+            Optional.of(reNewedRefreshToken));
 
         Token token = tokenService.generateToken(refreshTokenRequestDto);
 
