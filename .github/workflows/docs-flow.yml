@@ -10,9 +10,7 @@ permissions:
 jobs:
   docs:
     runs-on: ubuntu-latest
-    env:
-      working-directory: ./back
-      
+
     steps:
       - uses: actions/checkout@v3
       - name: Run a one-line script
@@ -21,7 +19,7 @@ jobs:
       - name: Upload Documentation to Wiki
         uses: geneaky/github-wiki-publish-action2@master
         with:
-          path: "./back/src/docs/asciidoc"
+          path: "./src/docs/asciidoc"
         env:
           GH_PERSONAL_ACCESS_TOKEN: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN  }}
           WIKI_PAGE_NAME: "BookChatAPI"

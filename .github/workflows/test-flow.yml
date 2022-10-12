@@ -15,7 +15,6 @@ jobs:
       pull-requests: write
       actions: read
     env:
-     working-directory: ./back
      APPLICATION: ${{secrets.TEST}}
 
     steps:
@@ -31,24 +30,22 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x ./gradlew
       shell: bash
-      working-directory: ${{ env.working-directory }}
-      
+
     - name: Create Configuration File
-      run: echo "${{ env.APPLICATION }}" > ./back/src/main/resources/application.yml
+      run: echo "${{ env.APPLICATION }}" > ./src/main/resources/application.yml
       shell: bash
       
     - name: Substitute Configuration File
       uses: actions/upload-artifact@v3
       with: 
         name: application.yml
-        path: ./back/src/main/resources/application.yml
+        path: ./src/main/resources/application.yml
       
 
     - name: Test with Gradle
       run: ./gradlew clean test -x asciidoctor
       shell: bash
-      working-directory: ${{ env.working-directory }}
-      
+
     - name: Test Report
       uses: EnricoMi/publish-unit-test-result-action@v2
       if: always()
@@ -59,7 +56,7 @@ jobs:
     - name: Add coverage to PR
       uses: Madrapps/jacoco-report@v1.3
       with:
-        paths: ${{ github.workspace }}/back/build/reports/jacoco/test/jacocoTestReport.xml
+        paths: ${{ github.workspace }}/build/reports/jacoco/test/jacocoTestReport.xml
         token: ${{ secrets.GITHUB_TOKEN }}
         min-coverage-overall: 0
         min-coverage-changed-files: 0
