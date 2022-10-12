@@ -22,12 +22,12 @@ import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 public class UserSignUpRequestDto {
 
     @NotBlank
-    String nickname;
-    List<ReadingTaste> readingTastes;
+    private String nickname;
+    private List<ReadingTaste> readingTastes;
     @NotNull
-    Integer defaultProfileImageType;
+    private Integer defaultProfileImageType;
     @NotNull
-    OAuth2Provider oAuth2Provider;
+    private OAuth2Provider oAuth2Provider;
 
     public User getUser(String oauth2MemberNumber, String email, String profileImageUrl,
         OAuth2Provider providerType) {
