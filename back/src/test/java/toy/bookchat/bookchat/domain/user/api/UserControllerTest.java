@@ -288,9 +288,6 @@ class UserControllerTest extends AuthenticationTestExtension {
             .readingTastes(List.of(DEVELOPMENT, ART, SCIENCE))
             .build();
 
-        MockMultipartFile userSignUpRequestDto = new MockMultipartFile("userSignUpRequestDto",
-            objectMapper.writeValueAsString(requestDto).getBytes());
-
         Claims claims = Jwts.claims().setIssuer("https://kauth.kakao.com")
             .setSubject("test").setExpiration(new Date(0));
         String testToken = Jwts.builder()
@@ -304,7 +301,9 @@ class UserControllerTest extends AuthenticationTestExtension {
 
         mockMvc.perform(multipart("/v1/api/users/signup")
                 .file(multipartFile)
-                .file(userSignUpRequestDto)
+                .file(new MockMultipartFile("userSignUpRequestDto", "", "application/json",
+                    objectMapper.writeValueAsString(requestDto)
+                        .getBytes(StandardCharsets.UTF_8)))
                 .header("OIDC", "Bearer " + testToken))
             .andExpect(status().isUnauthorized())
             .andDo(document("user-signup-error4"));
