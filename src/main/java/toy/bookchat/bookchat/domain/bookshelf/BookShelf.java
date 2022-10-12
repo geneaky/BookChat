@@ -10,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,6 +20,8 @@ import toy.bookchat.bookchat.domain.user.User;
 
 @Entity
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BookShelf extends BaseEntity {
 
@@ -28,7 +31,7 @@ public class BookShelf extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Book book;
-
+    private Integer pages;
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
@@ -39,16 +42,6 @@ public class BookShelf extends BaseEntity {
     private Star star;
 
     private String singleLineAssessment;
-
-    @Builder
-    private BookShelf(Book book, User user, ReadingStatus readingStatus, Star star,
-        String singleLineAssessment) {
-        this.book = book;
-        this.user = user;
-        this.readingStatus = readingStatus;
-        this.star = star;
-        this.singleLineAssessment = singleLineAssessment;
-    }
 
     public void setUser(User user) {
         this.user = user;

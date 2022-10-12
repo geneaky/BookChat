@@ -16,7 +16,6 @@ import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfRequestDto;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfSearchResponseDto;
 import toy.bookchat.bookchat.domain.user.User;
-import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -51,24 +50,25 @@ public class BookShelfService {
         bookShelfRepository.save(bookShelf);
     }
 
-    private BookShelf createBookShelfByReadingStatus(BookShelfRequestDto bookShelfRequestDto, Book book, User user) {
-        if(isFinishedReading(bookShelfRequestDto)) {
+    private BookShelf createBookShelfByReadingStatus(BookShelfRequestDto bookShelfRequestDto,
+        Book book, User user) {
+        if (isFinishedReading(bookShelfRequestDto)) {
             bookShelfRequestDto.checkCompleteStateField();
 
             return BookShelf.builder()
-                    .book(book)
-                    .readingStatus(bookShelfRequestDto.getReadingStatus())
-                    .user(user)
-                    .star(bookShelfRequestDto.getStar())
-                    .singleLineAssessment(bookShelfRequestDto.getSingleLineAssessment())
-                    .build();
-        }
-
-        return BookShelf.builder()
                 .book(book)
                 .readingStatus(bookShelfRequestDto.getReadingStatus())
                 .user(user)
+                .star(bookShelfRequestDto.getStar())
+                .singleLineAssessment(bookShelfRequestDto.getSingleLineAssessment())
                 .build();
+        }
+
+        return BookShelf.builder()
+            .book(book)
+            .readingStatus(bookShelfRequestDto.getReadingStatus())
+            .user(user)
+            .build();
     }
 
     private boolean isFinishedReading(BookShelfRequestDto bookShelfRequestDto) {
@@ -98,6 +98,7 @@ public class BookShelfService {
                 .bookCoverImageUrl(bookShelf.getBookCoverImageUrl())
                 .star(bookShelf.getStar())
                 .singleLineAssessment(bookShelf.getSingleLineAssessment())
+                .pages(bookShelf.getPages())
                 .build();
 
             bookShelfSearchResponseDtos.add(bookShelfSearchResponseDto);

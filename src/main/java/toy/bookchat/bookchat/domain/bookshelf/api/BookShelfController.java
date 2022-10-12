@@ -39,7 +39,6 @@ public class BookShelfController {
         ReadingStatus readingStatus, Pageable pageable,
         @CurrentUser User user
     ) {
-
         List<BookShelfSearchResponseDto> bookShelfSearchResponseDtos = bookShelfService.takeBooksOutOfBookShelf(
             readingStatus, pageable, user);
         return ResponseEntity.status(HttpStatus.OK).body(bookShelfSearchResponseDtos);

@@ -18,4 +18,5 @@ public class BookShelfSearchResponseDto {
     private String publisher;
     private Star star;
     private String singleLineAssessment;
+    private Integer pages;
 }

@@ -1,13 +1,17 @@
 package toy.bookchat.bookchat.domain.bookshelf.api;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
-import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -19,14 +23,17 @@ import static toy.bookchat.bookchat.domain.user.ROLE.USER;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.*;
-
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
@@ -58,7 +65,7 @@ import toy.bookchat.bookchat.security.user.UserPrincipal;
     includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {
         SecurityConfig.class}))
 @AutoConfigureRestDocs(uriScheme = "https", uriHost = "bookchat.link", uriPort = 443)
-public class BookShelfControllerTest extends AuthenticationTestExtension {
+class BookShelfControllerTest extends AuthenticationTestExtension {
 
     @Autowired
     ObjectMapper objectMapper;
@@ -77,11 +84,11 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
 
     private User getUser() {
         return User.builder()
-                .email("test@gmail.com")
-                .role(USER)
-                .name("testUser")
-                .profileImageUrl("somethingImageUrl@naver.com")
-                .build();
+            .email("test@gmail.com")
+            .role(USER)
+            .name("testUser")
+            .profileImageUrl("somethingImageUrl@naver.com")
+            .build();
     }
 
     private UserPrincipal getUserPrincipal() {
@@ -94,23 +101,24 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
             .profileImageUrl("somethingImageUrl@naver.com")
             .build();
 
-        return new UserPrincipal(1L, user.getEmail(), user.getName(), user.getNickname(), user.getProfileImageUrl(),
+        return new UserPrincipal(1L, user.getEmail(), user.getName(), user.getNickname(),
+            user.getProfileImageUrl(),
             user.getDefaultProfileImageType(), authorities, user);
     }
 
     private BookShelfRequestDto getBookShelfRequestDto(ReadingStatus readingStatus) {
 
-        if(readingStatus == ReadingStatus.COMPLETE) {
+        if (readingStatus == ReadingStatus.COMPLETE) {
             return BookShelfRequestDto.builder()
-                    .isbn("124151214")
-                    .title("effectiveJava")
-                    .authors(List.of("Joshua"))
-                    .publisher("oreilly")
-                    .bookCoverImageUrl("bookCoverImage.com")
-                    .readingStatus(readingStatus)
-                    .star(Star.FOUR)
-                    .singleLineAssessment("very good")
-                    .build();
+                .isbn("124151214")
+                .title("effectiveJava")
+                .authors(List.of("Joshua"))
+                .publisher("oreilly")
+                .bookCoverImageUrl("bookCoverImage.com")
+                .readingStatus(readingStatus)
+                .star(Star.FOUR)
+                .singleLineAssessment("very good")
+                .build();
         }
         return BookShelfRequestDto.builder()
             .isbn("124151214")
@@ -122,23 +130,24 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
             .build();
     }
 
-    private String getTestToken() throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
+    private String getTestToken()
+        throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("sub","test");
-        claims.put("name","google123");
+        claims.put("sub", "test");
+        claims.put("name", "google123");
         claims.put("provider", OAuth2Provider.GOOGLE);
-        claims.put("email","test@gmail.com");
+        claims.put("email", "test@gmail.com");
 
         String testToken = Jwts.builder()
-                .setClaims(claims)
-                .signWith(SignatureAlgorithm.HS256, "test")
-                .compact();
+            .setClaims(claims)
+            .signWith(SignatureAlgorithm.HS256, "test")
+            .compact();
 
         return testToken;
     }
 
     @Test
-    public void 로그인하지_않은_사용자_요청_401() throws Exception {
+    void 로그인하지_않은_사용자_요청_401() throws Exception {
         mockMvc.perform(post("/v1/api/bookshelf/books")
                 .content(objectMapper.writeValueAsString(getBookShelfRequestDto(ReadingStatus.READING)))
                 .contentType(MediaType.APPLICATION_JSON))
@@ -146,7 +155,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void 읽고_있는_책_등록_성공() throws Exception {
+    void 읽고_있는_책_등록_성공() throws Exception {
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
@@ -162,7 +171,8 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
                     fieldWithPath("title").type(STRING).description("제목"),
                     fieldWithPath("authors[]").type(ARRAY).description("저자"),
                     fieldWithPath("publisher").type(STRING).description("출판사"),
-                    fieldWithPath("bookCoverImageUrl").type(STRING).optional().description("책 커버 이미지 URI"),
+                    fieldWithPath("bookCoverImageUrl").type(STRING).optional()
+                        .description("책 커버 이미지 URI"),
                     fieldWithPath("readingStatus").type(STRING).description("READING"),
                     fieldWithPath("star").ignored(),
                     fieldWithPath("singleLineAssessment").ignored())));
@@ -172,7 +182,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void 읽은_책_등록_성공() throws Exception {
+    void 읽은_책_등록_성공() throws Exception {
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
@@ -190,7 +200,8 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
                     fieldWithPath("title").type(STRING).description("제목"),
                     fieldWithPath("authors[]").type(ARRAY).description("저자"),
                     fieldWithPath("publisher").type(STRING).description("출판사"),
-                    fieldWithPath("bookCoverImageUrl").type(STRING).optional().description("책 커버 이미지 URI"),
+                    fieldWithPath("bookCoverImageUrl").type(STRING).optional()
+                        .description("책 커버 이미지 URI"),
                     fieldWithPath("readingStatus").type(STRING).description("COMPLETE"),
                     fieldWithPath("star").type(STRING).description("평점"),
                     fieldWithPath("singleLineAssessment").type(STRING).description("한 줄 평"))));
@@ -200,31 +211,32 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void 읽은_책_등록시_평점_한줄평_없으면_400반환() throws Exception {
+    void 읽은_책_등록시_평점_한줄평_없으면_400반환() throws Exception {
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
-        doThrow(IllegalArgumentException.class).when(bookShelfService).putBookOnBookShelf(any(),any());
+        doThrow(IllegalArgumentException.class).when(bookShelfService)
+            .putBookOnBookShelf(any(), any());
 
         BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
-                .isbn("124151214")
-                .title("effectiveJava")
-                .authors(List.of("Joshua"))
-                .publisher("oreilly")
-                .bookCoverImageUrl("bookCoverImage.com")
-                .readingStatus(ReadingStatus.COMPLETE)
-                .build();
+            .isbn("124151214")
+            .title("effectiveJava")
+            .authors(List.of("Joshua"))
+            .publisher("oreilly")
+            .bookCoverImageUrl("bookCoverImage.com")
+            .readingStatus(ReadingStatus.COMPLETE)
+            .build();
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
-                        .header("Authorization", "Bearer " + getTestToken())
-                        .content(
-                                objectMapper.writeValueAsString(bookShelfRequestDto))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .with(user(getUserPrincipal())))
-                .andExpect(status().isBadRequest());
+                .header("Authorization", "Bearer " + getTestToken())
+                .content(
+                    objectMapper.writeValueAsString(bookShelfRequestDto))
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isBadRequest());
 
     }
 
     @Test
-    public void 읽을_책_등록_성공() throws Exception {
+    void 읽을_책_등록_성공() throws Exception {
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
@@ -241,7 +253,8 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
                     fieldWithPath("title").type(STRING).description("제목"),
                     fieldWithPath("authors[]").type(ARRAY).description("저자"),
                     fieldWithPath("publisher").type(STRING).description("출판사"),
-                    fieldWithPath("bookCoverImageUrl").type(STRING).optional().description("책 커버 이미지 URI"),
+                    fieldWithPath("bookCoverImageUrl").type(STRING).optional()
+                        .description("책 커버 이미지 URI"),
                     fieldWithPath("readingStatus").type(STRING).description("WISH"),
                     fieldWithPath("star").ignored(),
                     fieldWithPath("singleLineAssessment").ignored())));
@@ -251,7 +264,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void null로_요청_실패() throws Exception {
+    void null로_요청_실패() throws Exception {
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
@@ -262,7 +275,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void 존재하지않은_readingstatus_책_등록_실패() throws Exception {
+    void 존재하지않은_readingstatus_책_등록_실패() throws Exception {
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
 
         BookShelfTestRequestDto bookShelfTestRequestDto = new BookShelfTestRequestDto("124151214",
@@ -278,7 +291,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void readingStatus_없이_요청_실패() throws Exception {
+    void readingStatus_없이_요청_실패() throws Exception {
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
 
         BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
@@ -299,7 +312,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void isbn_없이_책_등록_요청_실패() throws Exception {
+    void isbn_없이_책_등록_요청_실패() throws Exception {
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
 
         BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
@@ -319,7 +332,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void isbn_빈_문자열_요청_실패() throws Exception {
+    void isbn_빈_문자열_요청_실패() throws Exception {
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
 
         BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
@@ -340,7 +353,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void 제목_없이_요청_실패() throws Exception {
+    void 제목_없이_요청_실패() throws Exception {
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
 
         BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
@@ -360,7 +373,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void 제목_빈_문자열_요청_실패() throws Exception {
+    void 제목_빈_문자열_요청_실패() throws Exception {
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
 
         BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
@@ -382,7 +395,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void 작가명_없이_요청_실패() throws Exception {
+    void 작가명_없이_요청_실패() throws Exception {
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
 
         BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
@@ -403,7 +416,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void 작가명_빈_문자열_요청_실패() throws Exception {
+    void 작가명_빈_문자열_요청_실패() throws Exception {
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
 
         BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
@@ -425,7 +438,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void 출판사_없이_요청_실패() throws Exception {
+    void 출판사_없이_요청_실패() throws Exception {
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
 
         BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
@@ -446,7 +459,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void 출판사_빈_문자열_요청_실패() throws Exception {
+    void 출판사_빈_문자열_요청_실패() throws Exception {
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
 
         BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
@@ -468,7 +481,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void 읽고있는_책_조회_성공() throws Exception {
+    void 읽고있는_책_조회_성공() throws Exception {
         List<BookShelfSearchResponseDto> result = new ArrayList<>();
 
         BookShelfSearchResponseDto bookShelfSearchResponseDto = BookShelfSearchResponseDto.builder()
@@ -506,12 +519,14 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
                 ),
                 responseFields(
                     fieldWithPath("[].title").type(STRING).description("제목"),
-                    fieldWithPath("[].bookCoverImageUrl").type(STRING).optional().description("책 커버 이미지 URI"),
+                    fieldWithPath("[].bookCoverImageUrl").type(STRING).optional()
+                        .description("책 커버 이미지 URI"),
                     fieldWithPath("[].authors[]").type(ARRAY).description("저자"),
                     fieldWithPath("[].publisher").type(STRING).description("출판사"),
                     fieldWithPath("[].star").type(STRING).optional().description("평점"),
-                    fieldWithPath("[].singleLineAssessment").type(STRING).optional().description("한 줄 평")
-                    ))
+                    fieldWithPath("[].singleLineAssessment").type(STRING).optional()
+                        .description("한 줄 평")
+                ))
             );
 
         verify(bookShelfService).takeBooksOutOfBookShelf(any(ReadingStatus.class),
@@ -519,7 +534,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void 읽은_책_조회_성공() throws Exception {
+    void 읽은_책_조회_성공() throws Exception {
         List<BookShelfSearchResponseDto> result = new ArrayList<>();
 
         BookShelfSearchResponseDto bookShelfSearchResponseDto = BookShelfSearchResponseDto.builder()
@@ -557,7 +572,8 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
                 ),
                 responseFields(
                     fieldWithPath("[].title").type(STRING).description("제목"),
-                    fieldWithPath("[].bookCoverImageUrl").type(STRING).optional().description("책 커버 이미지 URI"),
+                    fieldWithPath("[].bookCoverImageUrl").type(STRING).optional()
+                        .description("책 커버 이미지 URI"),
                     fieldWithPath("[].authors[]").type(ARRAY).description("저자"),
                     fieldWithPath("[].publisher").type(STRING).description("출판사"),
                     fieldWithPath("[].star").type(STRING).description("평점"),
@@ -570,7 +586,7 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void 읽을_책_조회_성공() throws Exception {
+    void 읽을_책_조회_성공() throws Exception {
         List<BookShelfSearchResponseDto> result = new ArrayList<>();
 
         BookShelfSearchResponseDto bookShelfSearchResponseDto = BookShelfSearchResponseDto.builder()
@@ -608,12 +624,14 @@ public class BookShelfControllerTest extends AuthenticationTestExtension {
                 ),
                 responseFields(
                     fieldWithPath("[].title").type(STRING).description("제목"),
-                    fieldWithPath("[].bookCoverImageUrl").type(STRING).optional().description("책 커버 이미지 URI"),
+                    fieldWithPath("[].bookCoverImageUrl").type(STRING).optional()
+                        .description("책 커버 이미지 URI"),
                     fieldWithPath("[].authors[]").type(ARRAY).description("저자"),
                     fieldWithPath("[].publisher").type(STRING).description("출판사"),
                     fieldWithPath("[].star").type(STRING).optional().description("평점"),
-                    fieldWithPath("[].singleLineAssessment").type(STRING).optional().description("한 줄 평")
-                    ))
+                    fieldWithPath("[].singleLineAssessment").type(STRING).optional()
+                        .description("한 줄 평")
+                ))
             );
 
         verify(bookShelfService).takeBooksOutOfBookShelf(any(ReadingStatus.class),
