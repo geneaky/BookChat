@@ -10,21 +10,6 @@
 [__Issuelog(문제 해결 or 고민)__](https://github.com/geneaky/BookChat/wiki/backend-issue)
 
 ***
-### Android
-도전 가득한 이번 프로젝트!!
-
-* Test 작성 (도전)
-* Coroutine을 이용한 비동기작업 (도전)
-* 적절한 애니메이션 UI 제작 (도전) 
-* MVVM 모델 (도전)
-* 기기 OS버전별 분기 작업 (도전)
-* Clean한 Code (도전)
-* 오직 터미널을 이용한 Git 사용 (도전)
-* Figma를 이용한 앱 디자인 (도전)
-
-[__Issuelog(문제 해결 or 고민)__](https://github.com/geneaky/BookChat/wiki/Android-Issue)
-
-***
 ### Commit Message
 * **feat** (feature)                              : 새로운 기능에 대한 커밋
 * **fix** (bug fix)                               : 버그 수정에 대한 커밋
