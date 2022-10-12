@@ -66,6 +66,20 @@ class OpenIdTokenManagerTest {
             decodePrivateKey);
     }
 
+    private PublicKey getPublicKey()
+            throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        X509EncodedKeySpec publicKeySpec = getPublicPkcs8EncodedKeySpec(openIdTestUtil);
+        return keyFactory.generatePublic(publicKeySpec);
+    }
+
+    private PrivateKey getPrivateKey()
+            throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        PKCS8EncodedKeySpec privateKeySpec = getPrivatePkcs8EncodedKeySpec(openIdTestUtil);
+        return keyFactory.generatePrivate(privateKeySpec);
+    }
+
     @Test
     void 토큰에서_사용자_원천_회원번호_추출_성공() throws Exception {
         PrivateKey privateKey = getPrivateKey();
@@ -108,95 +122,5 @@ class OpenIdTokenManagerTest {
             .signWith(SignatureAlgorithm.RS256, privateKey)
             .compact();
         return "Bearer " + token;
-    }
-
-    @Test
-    void 만료된_토큰으로_처리_요청시_예외발생() throws Exception {
-        PrivateKey privateKey = getPrivateKey();
-
-        String token = "Bearer " + Jwts.builder()
-            .setSubject("1234")
-            .setHeaderParam(KEY_ID, "abcdedf")
-            .setIssuer("https://kauth.kakao.com")
-            .setExpiration(new Date(0))
-            .signWith(SignatureAlgorithm.RS256, privateKey)
-            .compact();
-
-        assertThatThrownBy(() -> {
-            openIdTokenManager.getOAuth2MemberNumberFromToken(token, OAuth2Provider.KAKAO);
-        }).isInstanceOf(ExpiredTokenException.class);
-    }
-
-    @Test
-    void 임의로_수정한_토큰으로_처리_요청시_예외발생() throws Exception {
-        PrivateKey privateKey = getPrivateKey();
-        PublicKey publicKey = getPublicKey();
-
-        String token = getMockOpenIdToken(privateKey);
-
-        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
-
-        assertThatThrownBy(() -> {
-            openIdTokenManager.getOAuth2MemberNumberFromToken(token + "test", OAuth2Provider.KAKAO);
-        }).isInstanceOf(DenidedTokenException.class);
-    }
-
-    @Test
-    void 발급_인증기관_정보_없을시_예외발생() throws Exception {
-        PrivateKey privateKey = getPrivateKey();
-        PublicKey publicKey = getPublicKey();
-
-        String token = "Bearer " + Jwts.builder()
-            .setSubject("1234")
-            .setHeaderParam(KEY_ID, "abcdedf")
-            .signWith(SignatureAlgorithm.RS256, privateKey)
-            .compact();
-
-        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
-
-        assertThatThrownBy(() -> {
-            openIdTokenManager.getOAuth2MemberNumberFromToken(token, OAuth2Provider.KAKAO);
-        }).isInstanceOf(IllegalStandardTokenException.class);
-    }
-
-    @Test
-    void 토큰_포맷_검증으로_header_payload_signature로_작성되었는지_확인() throws Exception {
-        PrivateKey privateKey = getPrivateKey();
-
-        String token = Jwts.builder()
-            .setHeaderParam(KEY_ID, "abcdedf")
-            .setSubject("test")
-            .signWith(SignatureAlgorithm.RS256, privateKey)
-            .compact();
-
-        StringBuilder stringBuilder = new StringBuilder();
-
-        String[] split = token.split("\\.");
-
-        stringBuilder.append(split[0]);
-        stringBuilder.append(".");
-        stringBuilder.append(split[2]);
-        stringBuilder.append(".");
-
-        String informalToken = stringBuilder.toString();
-
-        assertThatThrownBy(() -> {
-            openIdTokenManager.getOAuth2MemberNumberFromToken(informalToken,
-                OAuth2Provider.KAKAO);
-        }).isInstanceOf(IllegalStandardTokenException.class);
-    }
-
-    private PublicKey getPublicKey()
-        throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        X509EncodedKeySpec publicKeySpec = getPublicPkcs8EncodedKeySpec(openIdTestUtil);
-        return keyFactory.generatePublic(publicKeySpec);
-    }
-
-    private PrivateKey getPrivateKey()
-        throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        PKCS8EncodedKeySpec privateKeySpec = getPrivatePkcs8EncodedKeySpec(openIdTestUtil);
-        return keyFactory.generatePrivate(privateKeySpec);
     }
 }

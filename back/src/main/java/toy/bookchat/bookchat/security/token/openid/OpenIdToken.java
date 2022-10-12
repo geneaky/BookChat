@@ -56,16 +56,15 @@ public class OpenIdToken {
 
     private Claims getBody(Key publicKey) {
         try {
-            return Optional.ofNullable(Jwts.parser()
+            return Jwts.parser()
                 .setSigningKey(publicKey)
                 .parseClaimsJws(this.token)
-                .getBody()).orElseThrow(() -> {
-                throw new IllegalStandardTokenException("Token body is not existed");
-            });
+                .getBody();
+
         } catch (ExpiredJwtException exception) {
             log.info("Token :: {} :: is expired", this.token);
             throw new ExpiredTokenException(exception.getMessage(), exception);
-        } catch (JwtException exception) {
+        } catch (JwtException | IllegalStateException exception) {
             log.info("Token :: {} :: is denied", this.token);
             throw new DenidedTokenException(exception.getMessage(), exception);
         }
@@ -100,9 +99,6 @@ public class OpenIdToken {
         } catch (ExpiredJwtException exception) {
             log.info("Token :: {} :: is expired", this.token);
             throw new ExpiredTokenException(exception.getMessage(), exception);
-        } catch (JwtException exception) {
-            log.info("Token :: {} :: is denied", this.token);
-            throw new DenidedTokenException(exception.getMessage(), exception);
         }
     }
 
