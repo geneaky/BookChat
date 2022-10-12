@@ -555,7 +555,7 @@ Content-Type: application/json;charset=UTF-8
 Content-Length: 223
 Host: bookchat.link
 
-{"refreshToken":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJCb29rQ2hhdCIsInByb3ZpZGVyIjoiZ29vZ2xlIiwidXNlck5hbWUiOiJ0ZXN0R09PR0xFIiwiZXhwIjoxNjY2NzQyNzA5LCJlbWFpbCI6InRlc3RAZ2FtaWwuY29tIn0.yAtgHI5nTOEoZDaLU2ks5bzwJP9SfGyWlodT4Ytt_EY"}</code></pre>
+{"refreshToken":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJCb29rQ2hhdCIsInByb3ZpZGVyIjoiZ29vZ2xlIiwidXNlck5hbWUiOiJ0ZXN0R09PR0xFIiwiZXhwIjoxNjY2NzYxOTg1LCJlbWFpbCI6InRlc3RAZ2FtaWwuY29tIn0.Y-778HS4lw_5crLj4z9oIa7y0QLcBvRMtr4SOBsuarU"}</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -593,7 +593,7 @@ Host: bookchat.link
 Content-Type: application/json
 Content-Length: 444
 
-{"accessToken":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJCb29rQ2hhdCIsInByb3ZpZGVyIjoiZ29vZ2xlIiwidXNlck5hbWUiOiJ0ZXN0R09PR0xFIiwiZXhwIjoxNjY1NTM0NTA5LCJlbWFpbCI6InRlc3RAZ2FtaWwuY29tIn0.v8MC3thkV9z4Y2sJ1s1FBxIOS8ffMnYsJVJulFmh1nQ","refreshToken":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJCb29rQ2hhdCIsInByb3ZpZGVyIjoiZ29vZ2xlIiwidXNlck5hbWUiOiJ0ZXN0R09PR0xFIiwiZXhwIjoxNjY2NzQyNzA5LCJlbWFpbCI6InRlc3RAZ2FtaWwuY29tIn0.yAtgHI5nTOEoZDaLU2ks5bzwJP9SfGyWlodT4Ytt_EY"}</code></pre>
+{"accessToken":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJCb29rQ2hhdCIsInByb3ZpZGVyIjoiZ29vZ2xlIiwidXNlck5hbWUiOiJ0ZXN0R09PR0xFIiwiZXhwIjoxNjY1NTUzNzg1LCJlbWFpbCI6InRlc3RAZ2FtaWwuY29tIn0.OO0hqcGBWl4sgjSt9rfeSQjzLTvACfq6Y2uz9lrKzdw","refreshToken":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJCb29rQ2hhdCIsInByb3ZpZGVyIjoiZ29vZ2xlIiwidXNlck5hbWUiOiJ0ZXN0R09PR0xFIiwiZXhwIjoxNjY2NzYxOTg1LCJlbWFpbCI6InRlc3RAZ2FtaWwuY29tIn0.Y-778HS4lw_5crLj4z9oIa7y0QLcBvRMtr4SOBsuarU"}</code></pre>
 </div>
 </div>
 </div>
@@ -892,12 +892,20 @@ defaultProfileImageType=1&amp;nickname=testName</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /v1/api/users/signup HTTP/1.1
+Content-Type: multipart/form-data;charset=UTF-8; boundary=6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
 OIDC: Bearer eyJraWQiOiJhYmNkZWZnIiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJodHRwczovL2thdXRoLmtha2FvLmNvbSIsInN1YiI6InRlc3QiLCJleHAiOjB9.LZCwNer7fEt6pRnsRWAHPoLO6Hqb3XQyhOYUsJoWXUGGg8z48H474eACTgKVaRG6RrVu-bvm2tQ-BwAf81WQQsgU87xN4T4cz0lzRti4hMeM-G-yollDhDsFr39gg1ikpUzHzku4UsS_MMKy087pmVg7NhWvFyrdj1rDyoBBVXGSRo54rP7ACG9ZHtlvwO99Ts7xw3aVTqPIadQx0B15oIBP1-scQlghGJlssDwmWXSnflPE5tgboQQYi2gB3-kKjuX1zJ6ksv76F4pCIvBSYpv-jA5Pn49u0GSbj-OGSDo8_MC1uOcZ1gEDNI41-CcRQt3qJDqEYtWDJ7Jfv7Z_Wg
-provider_type: KAKAO
 Host: bookchat.link
-Content-Type: application/x-www-form-urlencoded
 
-nickname=nick&amp;defaultProfileImageType=2</code></pre>
+--6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
+Content-Disposition: form-data; name=userProfileImage
+
+testImage
+--6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
+Content-Disposition: form-data; name=userSignUpRequestDto
+Content-Type: application/json
+
+{"nickname":"nick","readingTastes":["DEVELOPMENT","ART","SCIENCE"],"defaultProfileImageType":1,"oauth2Provider":"KAKAO"}
+--6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm--</code></pre>
 </div>
 </div>
 <div class="listingblock">
@@ -2132,7 +2140,7 @@ Host: bookchat.link</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-10-10 23:37:52 +0900
+Last updated 2022-10-12 13:04:32 +0900
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>

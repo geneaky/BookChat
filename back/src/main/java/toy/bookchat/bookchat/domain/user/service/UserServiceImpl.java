@@ -42,11 +42,8 @@ public class UserServiceImpl implements UserService {
     public void registerNewUser(UserSignUpRequestDto userSignUpRequestDto,
         MultipartFile userProfileImage, String userName, String userEmail) {
         if (imageValidator.hasValidImage(userProfileImage)) {
-            String prefixedUUIDFileName = storageService.createFileName(
-                imageValidator.getFileExtension(userProfileImage),
-                    UUID.randomUUID().toString(),
-                    new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
-            String prefixedUUIDFileUrl = storageService.getFileUrl(prefixedUUIDFileName);
+            String prefixedUUIDFileName = createFileName(userProfileImage);
+            String prefixedUUIDFileUrl = createFileUrl(prefixedUUIDFileName);
 
             saveUser(userSignUpRequestDto, userName, userEmail, prefixedUUIDFileUrl,
                 userSignUpRequestDto.getOAuth2Provider());
@@ -57,6 +54,17 @@ public class UserServiceImpl implements UserService {
 
         saveUser(userSignUpRequestDto, userName, userEmail, null,
             userSignUpRequestDto.getOAuth2Provider());
+    }
+
+    private String createFileUrl(String prefixedUUIDFileName) {
+        return storageService.getFileUrl(prefixedUUIDFileName);
+    }
+
+    private String createFileName(MultipartFile userProfileImage) {
+        return storageService.createFileName(
+                imageValidator.getFileExtension(userProfileImage),
+                UUID.randomUUID().toString(),
+                new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
     }
 
     @Override
