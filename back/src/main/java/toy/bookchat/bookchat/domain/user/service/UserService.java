@@ -9,9 +9,7 @@ public interface UserService {
 
     boolean isDuplicatedName(String nickname);
 
-    void registerNewUser(UserSignUpRequestDto userSignUpRequestDto, MultipartFile userProfileImage,
-        String oauth2MemberNumber,
-        String userEmail);
+    void registerNewUser(UserSignUpRequestDto userSignUpRequestDto, MultipartFile userProfileImage, String oauth2MemberNumber, String userEmail);
 
     void checkRegisteredUser(String oauth2MemberNumber);
 
