@@ -89,7 +89,6 @@ public class UserController {
     public ResponseEntity<Token> userSignIn(
         @RequestHeader(OIDC) @NotBlank @Pattern(regexp = "^(Bearer)\\s.+") String bearerToken,
         @RequestBody UserSignInRequestDto userSignInRequestDto) {
-
         String userName = openIdTokenManager.getOAuth2MemberNumberFromToken(bearerToken,
             userSignInRequestDto.getOAuth2Provider());
         userService.checkRegisteredUser(userName);
