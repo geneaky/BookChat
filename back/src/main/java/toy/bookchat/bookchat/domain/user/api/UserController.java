@@ -1,12 +1,9 @@
 package toy.bookchat.bookchat.domain.user.api;
 
-import static toy.bookchat.bookchat.utils.constants.AuthConstants.AUTHORIZATION;
-import static toy.bookchat.bookchat.utils.constants.AuthConstants.BEGIN_INDEX;
-import static toy.bookchat.bookchat.utils.constants.AuthConstants.PROVIDER_TYPE;
+import static toy.bookchat.bookchat.utils.constants.AuthConstants.OIDC;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,17 +11,19 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.api.dto.Token;
 import toy.bookchat.bookchat.domain.user.api.dto.UserProfileResponse;
 import toy.bookchat.bookchat.domain.user.service.UserService;
+import toy.bookchat.bookchat.domain.user.service.dto.UserSignInRequestDto;
 import toy.bookchat.bookchat.domain.user.service.dto.UserSignUpRequestDto;
-import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenProvider;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenRecorder;
 import toy.bookchat.bookchat.security.token.openid.OpenIdTokenManager;
@@ -72,33 +71,33 @@ public class UserController {
     }
 
     @PostMapping("/users/signup")
-    public ResponseEntity<Void> userSignUp(
-        @Valid @ModelAttribute UserSignUpRequestDto userSignUpRequestDto,
-        @RequestHeader(AUTHORIZATION) @NotBlank @Pattern(regexp = "^(Bearer)\\s.+") String bearerToken,
-        @RequestHeader(PROVIDER_TYPE) @NotNull OAuth2Provider oAuth2Provider) {
+    public void userSignUp(
+        @Valid @RequestPart UserSignUpRequestDto userSignUpRequestDto,
+        @RequestPart MultipartFile userProfileImage,
+        @RequestHeader(OIDC) @NotBlank @Pattern(regexp = "^(Bearer)\\s.+") String bearerToken) {
 
-        String oauth2MemberNumber = openIdTokenManager.getOAuth2MemberNumberFromToken(
-            getOpenIdToken(bearerToken), oAuth2Provider);
-        String userEmail = openIdTokenManager.getUserEmailFromToken(getOpenIdToken(bearerToken),
-            oAuth2Provider);
-        userService.registerNewUser(userSignUpRequestDto, oauth2MemberNumber, userEmail,
-            oAuth2Provider);
+        String oauth2MemberNumber = openIdTokenManager.getOAuth2MemberNumberFromToken(bearerToken,
+            userSignUpRequestDto.getOAuth2Provider());
+        String userEmail = openIdTokenManager.getUserEmailFromToken(bearerToken,
+            userSignUpRequestDto.getOAuth2Provider());
 
-        return ResponseEntity.ok(null);
+        userService.registerNewUser(userSignUpRequestDto, userProfileImage, oauth2MemberNumber,
+            userEmail);
     }
 
     @PostMapping("/users/signin")
     public ResponseEntity<Token> userSignIn(
-        @RequestHeader(AUTHORIZATION) @NotBlank @Pattern(regexp = "^(Bearer)\\s.+") String bearerToken,
-        @RequestHeader(PROVIDER_TYPE) @NotNull OAuth2Provider oAuth2Provider) {
-
-        String userName = openIdTokenManager.getOAuth2MemberNumberFromToken(
-            getOpenIdToken(bearerToken), oAuth2Provider);
+        @RequestHeader(OIDC) @NotBlank @Pattern(regexp = "^(Bearer)\\s.+") String bearerToken,
+        @RequestBody UserSignInRequestDto userSignInRequestDto) {
+        String userName = openIdTokenManager.getOAuth2MemberNumberFromToken(bearerToken,
+            userSignInRequestDto.getOAuth2Provider());
         userService.checkRegisteredUser(userName);
-        String userEmail = openIdTokenManager.getUserEmailFromToken(getOpenIdToken(bearerToken),
-            oAuth2Provider);
+        String userEmail = openIdTokenManager.getUserEmailFromToken(bearerToken,
+            userSignInRequestDto.getOAuth2Provider());
 
-        Token token = jwtTokenProvider.createToken(userName, userEmail, oAuth2Provider);
+        Token token = jwtTokenProvider.createToken(userName, userEmail,
+            userSignInRequestDto.getOAuth2Provider());
+
         jwtTokenRecorder.record(userName, token.getRefreshToken());
 
         return ResponseEntity.ok(token);
@@ -107,9 +106,5 @@ public class UserController {
     @DeleteMapping("/users")
     public void deleteUser(@CurrentUser User user) {
         userService.deleteUser(user);
-    }
-
-    private String getOpenIdToken(String bearerToken) {
-        return bearerToken.substring(BEGIN_INDEX);
     }
 }

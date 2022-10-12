@@ -37,7 +37,7 @@ class StorageServiceTest {
     StorageServiceImpl storageService;
 
     @Test
-    public void 이미지_파일_업로드_성공() throws Exception {
+    void 이미지_파일_업로드_성공() throws Exception {
         MultipartFile multipartFile = mock(MultipartFile.class);
         when(s3Config.getBucketName()).thenReturn("testBucketName");
         when(multipartFile.getInputStream()).thenReturn(mock(InputStream.class));
@@ -46,7 +46,7 @@ class StorageServiceTest {
     }
 
     @Test
-    public void 이미지_업로드중_S3예외_발생시_커스텀예외_던지기_성공() throws Exception {
+    void 이미지_업로드중_S3예외_발생시_커스텀예외_던지기_성공() throws Exception {
         when(amazonS3Client.putObject(any(),any(), any(), any())).thenThrow(ImageUploadToStorageException.class);
         when(s3Config.getBucketName()).thenReturn("testBucketName");
         assertThatThrownBy(() -> {
@@ -55,12 +55,30 @@ class StorageServiceTest {
     }
 
     @Test
-    public void 이미지_업로드중_IO예외_발생시_커스텀예외_던지기_성공() throws Exception {
+    void 이미지_업로드중_IO예외_발생시_커스텀예외_던지기_성공() throws Exception {
         MultipartFile multipartFile = mock(MultipartFile.class);
         when(s3Config.getBucketName()).thenReturn("testBucketName");
         when(multipartFile.getInputStream()).thenThrow(IOException.class);
         assertThatThrownBy(() -> {
             storageService.upload(multipartFile, "test");
         }).isInstanceOf(ImageUploadToStorageException.class);
+    }
+
+    @Test
+    void 파일이름으로_S3_오브젝트_URI생성() throws Exception {
+
+        when(s3Config.getImageBucketUrl()).thenReturn("www//s3bucket/");
+        String fileUrl = storageService.getFileUrl("test");
+
+        assertThat(fileUrl).isEqualTo("www//s3bucket/test");
+    }
+
+    @Test
+    void S3_오브젝트_파일이름_생성() throws Exception {
+        when(s3Config.getImageFolder()).thenReturn("test/");
+
+        String fileName = storageService.createFileName("webp", "1234", "2022-10-12");
+
+        assertThat(fileName).isEqualTo("test/21-01-22021234.webp");
     }
 }

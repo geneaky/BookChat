@@ -8,7 +8,6 @@ import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.token.dto.RefreshTokenRequestDto;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenManager;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenProvider;
-import toy.bookchat.bookchat.security.token.jwt.RefreshToken;
 import toy.bookchat.bookchat.security.token.jwt.RefreshTokenRepository;
 
 @Slf4j
@@ -61,8 +60,11 @@ public class TokenService {
 
         if (jwtTokenManager.shouldRefreshTokenBeRenewed(refreshToken)) {
             refreshToken = jwtTokenProvider.createRefreshToken(userName, userEmail, oAuth2Provider);
-            RefreshToken userRefreshToken = refreshTokenRepository.findByUserName(userName);
-            userRefreshToken.changeRefreshToken(refreshToken);
+            refreshTokenRepository.findByUserName(userName)
+                .orElseThrow(() -> {
+                    throw new IllegalStateException();
+                })
+                .changeRefreshToken(refreshToken);
         }
 
         return refreshToken;

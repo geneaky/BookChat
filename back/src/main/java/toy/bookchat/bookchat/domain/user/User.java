@@ -27,8 +27,8 @@ public class User extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     /**
-    * name은 [oauth2 provider+oauth2 member number]로 정의함
-    */
+     * name은 [oauth2 provider+oauth2 member number]로 정의함
+     */
     private String name;
     private String nickname;
     private String email;
@@ -37,15 +37,15 @@ public class User extends BaseEntity {
     private Integer defaultProfileImageType;
     @Enumerated(EnumType.STRING)
     private OAuth2Provider provider;
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user") // TODO: 2022/10/10 delete cascade 설정
     private List<BookShelf> bookShelves = new ArrayList<>();
     @ElementCollection
     private List<ReadingTaste> readingTastes = new ArrayList<>();
 
     @Builder
     public User(String name, String email, String profileImageUrl, ROLE role,
-                OAuth2Provider provider, String nickname, List<ReadingTaste> readingTastes,
-                Integer defaultProfileImageType) {
+        OAuth2Provider provider, String nickname, List<ReadingTaste> readingTastes,
+        Integer defaultProfileImageType) {
         this.name = name;
         this.email = email;
         this.profileImageUrl = profileImageUrl;

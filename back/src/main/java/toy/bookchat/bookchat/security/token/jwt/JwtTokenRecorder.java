@@ -14,10 +14,10 @@ public class JwtTokenRecorder {
 
     @Transactional
     public void record(String userName, String refreshToken) {
-        /* TODO: 2022-09-29 조회해보고 있으면 갱신해야됨 없으면 신규 등록
-         */
-        RefreshToken token = new RefreshToken(userName, refreshToken);
-
-        refreshTokenRepository.save(token);
+        refreshTokenRepository.findByUserName(userName)
+            .ifPresentOrElse(r -> r.changeRefreshToken(refreshToken), () -> {
+                RefreshToken token = new RefreshToken(userName, refreshToken);
+                refreshTokenRepository.save(token);
+            });
     }
 }

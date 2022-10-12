@@ -7,8 +7,8 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.web.multipart.MultipartFile;
 import toy.bookchat.bookchat.domain.user.ROLE;
 import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.domain.user.User;
@@ -18,14 +18,16 @@ import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 @Setter
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor
 public class UserSignUpRequestDto {
 
     @NotBlank
-    String nickname;
-    MultipartFile userProfileImage;
-    List<ReadingTaste> readingTastes;
+    private String nickname;
+    private List<ReadingTaste> readingTastes;
     @NotNull
-    Integer defaultProfileImageType;
+    private Integer defaultProfileImageType;
+    @NotNull
+    private OAuth2Provider oAuth2Provider;
 
     public User getUser(String oauth2MemberNumber, String email, String profileImageUrl,
         OAuth2Provider providerType) {

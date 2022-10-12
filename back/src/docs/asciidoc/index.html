@@ -555,7 +555,7 @@ Content-Type: application/json;charset=UTF-8
 Content-Length: 223
 Host: bookchat.link
 
-{"refreshToken":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJCb29rQ2hhdCIsInByb3ZpZGVyIjoiZ29vZ2xlIiwidXNlck5hbWUiOiJ0ZXN0R09PR0xFIiwiZXhwIjoxNjY2NTkyMDk2LCJlbWFpbCI6InRlc3RAZ2FtaWwuY29tIn0.yr5lox0b-RT4fW7ln8-h4XOGkK6ipOkVv91Wf3h5mJs"}</code></pre>
+{"refreshToken":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJCb29rQ2hhdCIsInByb3ZpZGVyIjoiZ29vZ2xlIiwidXNlck5hbWUiOiJ0ZXN0R09PR0xFIiwiZXhwIjoxNjY2NzYxOTg1LCJlbWFpbCI6InRlc3RAZ2FtaWwuY29tIn0.Y-778HS4lw_5crLj4z9oIa7y0QLcBvRMtr4SOBsuarU"}</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -593,7 +593,7 @@ Host: bookchat.link
 Content-Type: application/json
 Content-Length: 444
 
-{"accessToken":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJCb29rQ2hhdCIsInByb3ZpZGVyIjoiZ29vZ2xlIiwidXNlck5hbWUiOiJ0ZXN0R09PR0xFIiwiZXhwIjoxNjY1MzgzODk2LCJlbWFpbCI6InRlc3RAZ2FtaWwuY29tIn0.oB8-T7UGg906BLD1NXB07vL7x2_WM_7TQRa2F4kx6xM","refreshToken":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJCb29rQ2hhdCIsInByb3ZpZGVyIjoiZ29vZ2xlIiwidXNlck5hbWUiOiJ0ZXN0R09PR0xFIiwiZXhwIjoxNjY2NTkyMDk2LCJlbWFpbCI6InRlc3RAZ2FtaWwuY29tIn0.yr5lox0b-RT4fW7ln8-h4XOGkK6ipOkVv91Wf3h5mJs"}</code></pre>
+{"accessToken":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJCb29rQ2hhdCIsInByb3ZpZGVyIjoiZ29vZ2xlIiwidXNlck5hbWUiOiJ0ZXN0R09PR0xFIiwiZXhwIjoxNjY1NTUzNzg1LCJlbWFpbCI6InRlc3RAZ2FtaWwuY29tIn0.OO0hqcGBWl4sgjSt9rfeSQjzLTvACfq6Y2uz9lrKzdw","refreshToken":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJCb29rQ2hhdCIsInByb3ZpZGVyIjoiZ29vZ2xlIiwidXNlck5hbWUiOiJ0ZXN0R09PR0xFIiwiZXhwIjoxNjY2NzYxOTg1LCJlbWFpbCI6InRlc3RAZ2FtaWwuY29tIn0.Y-778HS4lw_5crLj4z9oIa7y0QLcBvRMtr4SOBsuarU"}</code></pre>
 </div>
 </div>
 </div>
@@ -758,12 +758,8 @@ Host: bookchat.link</code></pre>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Authorization</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>OIDC</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Bearer [openid token]</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>provider_type</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">프로바이더 타입 [KAKAO / GOOGLE]</p></td>
 </tr>
 </tbody>
 </table>
@@ -807,12 +803,20 @@ Host: bookchat.link</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /v1/api/users/signup HTTP/1.1
-Authorization: Bearer eyJraWQiOiJhYmNlZGYiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaXNzIjoiaHR0cHM6Ly9rYXV0aC5rYWthby5jb20iLCJlbWFpbCI6InRlc3RAZ21haWwuY29tIn0.YHqXp3Noznet_pP-Umt3o4ifp81O052ELvst2DmbxN7soeHLCsDWnI79xxpstUhKfUZ1XGyqey8wyllu9fJJZpHyyHX1qBjRFtrJ0Ghj_4E6m8W_YB1b4Hwv0QlXNqxigPcT1p9xnr5XvoxarpslAyvl_IUNZKO6u4zQ7iFjCiV-4GCRB082ZktoIx4P8YZw3WqnGi2V3buSmWoG-evEQQbWQBJ6C9Y-vEyA2aCCSU-Vl2A3aN5-fbE_h2OiKXdm44nDye8GWak2r9pg84ufvB-pUMAP5PdkYNIvNMmVt0PDkww2uSNahz7odig83xSU8g-3FofxsNcmDPRkug88_w
-provider_type: KAKAO
+Content-Type: multipart/form-data;charset=UTF-8; boundary=6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
+OIDC: Bearer eyJraWQiOiJhYmNlZGYiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaXNzIjoiaHR0cHM6Ly9rYXV0aC5rYWthby5jb20iLCJlbWFpbCI6InRlc3RAZ21haWwuY29tIn0.YHqXp3Noznet_pP-Umt3o4ifp81O052ELvst2DmbxN7soeHLCsDWnI79xxpstUhKfUZ1XGyqey8wyllu9fJJZpHyyHX1qBjRFtrJ0Ghj_4E6m8W_YB1b4Hwv0QlXNqxigPcT1p9xnr5XvoxarpslAyvl_IUNZKO6u4zQ7iFjCiV-4GCRB082ZktoIx4P8YZw3WqnGi2V3buSmWoG-evEQQbWQBJ6C9Y-vEyA2aCCSU-Vl2A3aN5-fbE_h2OiKXdm44nDye8GWak2r9pg84ufvB-pUMAP5PdkYNIvNMmVt0PDkww2uSNahz7odig83xSU8g-3FofxsNcmDPRkug88_w
 Host: bookchat.link
-Content-Type: application/x-www-form-urlencoded
 
-nickname=nick&amp;defaultProfileImageType=1&amp;readingTastes=PHILOSOPHY&amp;readingTastes=DEVELOPMENT&amp;readingTastes=DESIGN</code></pre>
+--6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
+Content-Disposition: form-data; name=userProfileImage
+
+test
+--6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
+Content-Disposition: form-data; name=userSignUpRequestDto
+Content-Type: application/json
+
+{"nickname":"nick","readingTastes":["DEVELOPMENT","ART","SCIENCE"],"defaultProfileImageType":1,"oauth2Provider":"KAKAO"}
+--6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm--</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -841,11 +845,7 @@ nickname=nick&amp;userEmail=kaktus418%40gmail.com&amp;oauth2Provider=kakao&amp;d
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 400 Bad Request
-Content-Type: text/plain;charset=UTF-8
-Content-Length: 42
-
-올바르지 않은 요청 형식입니다</code></pre>
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 400 Bad Request</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -864,11 +864,7 @@ nickname=nick&amp;defaultProfileImageType=2</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 400 Bad Request
-Content-Type: text/plain;charset=UTF-8
-Content-Length: 35
-
-유효하지 않은 요청입니다</code></pre>
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 400 Bad Request</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -887,11 +883,7 @@ defaultProfileImageType=1&amp;nickname=testName</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 400 Bad Request
-Content-Type: text/plain;charset=UTF-8
-Content-Length: 35
-
-유효하지 않은 요청입니다</code></pre>
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 400 Bad Request</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -900,12 +892,20 @@ Content-Length: 35
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /v1/api/users/signup HTTP/1.1
-Authorization: Bearer eyJraWQiOiJhYmNkZWZnIiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJodHRwczovL2thdXRoLmtha2FvLmNvbSIsInN1YiI6InRlc3QiLCJleHAiOjB9.LZCwNer7fEt6pRnsRWAHPoLO6Hqb3XQyhOYUsJoWXUGGg8z48H474eACTgKVaRG6RrVu-bvm2tQ-BwAf81WQQsgU87xN4T4cz0lzRti4hMeM-G-yollDhDsFr39gg1ikpUzHzku4UsS_MMKy087pmVg7NhWvFyrdj1rDyoBBVXGSRo54rP7ACG9ZHtlvwO99Ts7xw3aVTqPIadQx0B15oIBP1-scQlghGJlssDwmWXSnflPE5tgboQQYi2gB3-kKjuX1zJ6ksv76F4pCIvBSYpv-jA5Pn49u0GSbj-OGSDo8_MC1uOcZ1gEDNI41-CcRQt3qJDqEYtWDJ7Jfv7Z_Wg
-provider_type: KAKAO
+Content-Type: multipart/form-data;charset=UTF-8; boundary=6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
+OIDC: Bearer eyJraWQiOiJhYmNkZWZnIiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJodHRwczovL2thdXRoLmtha2FvLmNvbSIsInN1YiI6InRlc3QiLCJleHAiOjB9.LZCwNer7fEt6pRnsRWAHPoLO6Hqb3XQyhOYUsJoWXUGGg8z48H474eACTgKVaRG6RrVu-bvm2tQ-BwAf81WQQsgU87xN4T4cz0lzRti4hMeM-G-yollDhDsFr39gg1ikpUzHzku4UsS_MMKy087pmVg7NhWvFyrdj1rDyoBBVXGSRo54rP7ACG9ZHtlvwO99Ts7xw3aVTqPIadQx0B15oIBP1-scQlghGJlssDwmWXSnflPE5tgboQQYi2gB3-kKjuX1zJ6ksv76F4pCIvBSYpv-jA5Pn49u0GSbj-OGSDo8_MC1uOcZ1gEDNI41-CcRQt3qJDqEYtWDJ7Jfv7Z_Wg
 Host: bookchat.link
-Content-Type: application/x-www-form-urlencoded
 
-nickname=nick&amp;defaultProfileImageType=2</code></pre>
+--6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
+Content-Disposition: form-data; name=userProfileImage
+
+testImage
+--6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
+Content-Disposition: form-data; name=userSignUpRequestDto
+Content-Type: application/json
+
+{"nickname":"nick","readingTastes":["DEVELOPMENT","ART","SCIENCE"],"defaultProfileImageType":1,"oauth2Provider":"KAKAO"}
+--6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm--</code></pre>
 </div>
 </div>
 <div class="listingblock">
@@ -954,12 +954,8 @@ nickname=&amp;userEmail=abcdefg&amp;oauth2Provider=</code></pre>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Authorization</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>OIDC</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Bearer [openid token]</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>provider_type</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">프로바이더 타입 [KAKAO / GOOGLE]</p></td>
 </tr>
 </tbody>
 </table>
@@ -969,9 +965,12 @@ nickname=&amp;userEmail=abcdefg&amp;oauth2Provider=</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /v1/api/users/signin HTTP/1.1
-Authorization: Bearer eyJraWQiOiJhYmNlZGYiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaXNzIjoiaHR0cHM6Ly9rYXV0aC5rYWthby5jb20iLCJlbWFpbCI6InRlc3RAZ21haWwuY29tIn0.YHqXp3Noznet_pP-Umt3o4ifp81O052ELvst2DmbxN7soeHLCsDWnI79xxpstUhKfUZ1XGyqey8wyllu9fJJZpHyyHX1qBjRFtrJ0Ghj_4E6m8W_YB1b4Hwv0QlXNqxigPcT1p9xnr5XvoxarpslAyvl_IUNZKO6u4zQ7iFjCiV-4GCRB082ZktoIx4P8YZw3WqnGi2V3buSmWoG-evEQQbWQBJ6C9Y-vEyA2aCCSU-Vl2A3aN5-fbE_h2OiKXdm44nDye8GWak2r9pg84ufvB-pUMAP5PdkYNIvNMmVt0PDkww2uSNahz7odig83xSU8g-3FofxsNcmDPRkug88_w
-provider_type: KAKAO
-Host: bookchat.link</code></pre>
+Content-Type: application/json;charset=UTF-8
+OIDC: Bearer eyJraWQiOiJhYmNlZGYiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaXNzIjoiaHR0cHM6Ly9rYXV0aC5rYWthby5jb20iLCJlbWFpbCI6InRlc3RAZ21haWwuY29tIn0.YHqXp3Noznet_pP-Umt3o4ifp81O052ELvst2DmbxN7soeHLCsDWnI79xxpstUhKfUZ1XGyqey8wyllu9fJJZpHyyHX1qBjRFtrJ0Ghj_4E6m8W_YB1b4Hwv0QlXNqxigPcT1p9xnr5XvoxarpslAyvl_IUNZKO6u4zQ7iFjCiV-4GCRB082ZktoIx4P8YZw3WqnGi2V3buSmWoG-evEQQbWQBJ6C9Y-vEyA2aCCSU-Vl2A3aN5-fbE_h2OiKXdm44nDye8GWak2r9pg84ufvB-pUMAP5PdkYNIvNMmVt0PDkww2uSNahz7odig83xSU8g-3FofxsNcmDPRkug88_w
+Content-Length: 26
+Host: bookchat.link
+
+{"oauth2Provider":"KAKAO"}</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1021,11 +1020,7 @@ nickname=nick&amp;userEmail=kaktus418%40gmail.com&amp;oauth2Provider=kakao&amp;d
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 400 Bad Request
-Content-Type: text/plain;charset=UTF-8
-Content-Length: 42
-
-올바르지 않은 요청 형식입니다</code></pre>
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 400 Bad Request</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1043,9 +1038,9 @@ Host: bookchat.link</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 400 Bad Request
 Content-Type: text/plain;charset=UTF-8
-Content-Length: 35
+Content-Length: 42
 
-유효하지 않은 요청입니다</code></pre>
+올바르지 않은 요청 형식입니다</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1063,9 +1058,9 @@ Host: bookchat.link</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 400 Bad Request
 Content-Type: text/plain;charset=UTF-8
-Content-Length: 35
+Content-Length: 42
 
-유효하지 않은 요청입니다</code></pre>
+올바르지 않은 요청 형식입니다</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2145,7 +2140,7 @@ Host: bookchat.link</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-10-10 22:48:11 +0900
+Last updated 2022-10-12 13:04:32 +0900
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>

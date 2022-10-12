@@ -74,4 +74,13 @@ class ImageValidatorTest {
             imageValidator.hasValidImage(multipartFile);
         }).isInstanceOf(IllegalArgumentException.class);
     }
+
+    @Test
+    void 올바른_이미지의_경우_검증통과() throws Exception {
+        MultipartFile multipartFile = mock(MultipartFile.class);
+        when(imageReaderAdapter.getHeight()).thenReturn(150);
+        when(imageReaderAdapter.getWidth()).thenReturn(150);
+
+        assertThat(imageValidator.hasValidImage(multipartFile)).isTrue();
+    }
 }

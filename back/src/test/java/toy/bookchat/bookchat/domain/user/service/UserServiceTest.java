@@ -7,7 +7,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static toy.bookchat.bookchat.security.oauth.OAuth2Provider.KAKAO;
 
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -15,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.multipart.MultipartFile;
 import toy.bookchat.bookchat.domain.storage.StorageService;
 import toy.bookchat.bookchat.domain.storage.image.ImageValidator;
 import toy.bookchat.bookchat.domain.user.User;
@@ -54,10 +54,14 @@ class UserServiceTest {
     void 처음_가입하는_회원의_경우_회원가입_성공() throws Exception {
         UserSignUpRequestDto userSignUpRequestDto = mock(UserSignUpRequestDto.class);
         User mockUser = mock(User.class);
+        MultipartFile multipartFile = mock(MultipartFile.class);
+
         when(storageService.getFileUrl(any())).thenReturn("testBucketUrl");
         when(imageValidator.hasValidImage(any())).thenReturn(true);
         when(userSignUpRequestDto.getUser(any(), any(), any(), any())).thenReturn(mockUser);
-        userService.registerNewUser(userSignUpRequestDto, "memberNumber", "test@gmail.com", KAKAO);
+
+        userService.registerNewUser(userSignUpRequestDto, multipartFile, "memberNumber",
+            "test@gmail.com");
 
         verify(userRepository).save(any(User.class));
         verify(storageService).upload(any(), any());
@@ -67,10 +71,14 @@ class UserServiceTest {
     void 이미_가입된_사용자일경우_예외발생() throws Exception {
         UserSignUpRequestDto userSignUpRequestDto = mock(UserSignUpRequestDto.class);
         User mockUser = mock(User.class);
+        MultipartFile multipartFile = mock(MultipartFile.class);
+
         when(userRepository.findByName(any())).thenReturn(Optional.of(mockUser));
+
         assertThatThrownBy(() -> {
-            userService.registerNewUser(userSignUpRequestDto, "testMemberNumber", "test@gmail.com",
-                KAKAO);
+            userService.registerNewUser(userSignUpRequestDto, multipartFile, "testMemberNumber",
+                "test@gmail.com"
+            );
         }).isInstanceOf(UserAlreadySignUpException.class);
     }
 

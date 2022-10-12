@@ -105,6 +105,6 @@ class UserRepositoryTest {
         userRepository.delete(user);
 
         Optional<User> ou = userRepository.findById(user.getId());
-        assertThat(ou.isPresent()).isFalse();
+        assertThat(ou).isNotPresent();
     }
 }

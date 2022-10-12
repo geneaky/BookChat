@@ -1,8 +1,13 @@
 package toy.bookchat.bookchat.domain.user.service;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import toy.bookchat.bookchat.domain.storage.StorageService;
 import toy.bookchat.bookchat.domain.storage.image.ImageValidator;
 import toy.bookchat.bookchat.domain.user.User;
@@ -35,19 +40,31 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void registerNewUser(UserSignUpRequestDto userSignUpRequestDto,
-        String oauth2MemberNumber, String userEmail, OAuth2Provider providerType) {
-        if (imageValidator.hasValidImage(userSignUpRequestDto.getUserProfileImage())) {
-            String prefixedUUIDFileName = storageService.createFileName(
-                imageValidator.getFileExtension(
-                    userSignUpRequestDto.getUserProfileImage()));
-            String prefixedUUIDFileUrl = storageService.getFileUrl(prefixedUUIDFileName);
-            saveUser(userSignUpRequestDto, oauth2MemberNumber, userEmail, prefixedUUIDFileUrl,
-                providerType);
-            storageService.upload(userSignUpRequestDto.getUserProfileImage(), prefixedUUIDFileName);
+        MultipartFile userProfileImage, String userName, String userEmail) {
+        if (imageValidator.hasValidImage(userProfileImage)) {
+            String prefixedUUIDFileName = createFileName(userProfileImage);
+            String prefixedUUIDFileUrl = createFileUrl(prefixedUUIDFileName);
+
+            saveUser(userSignUpRequestDto, userName, userEmail, prefixedUUIDFileUrl,
+                userSignUpRequestDto.getOAuth2Provider());
+
+            storageService.upload(userProfileImage, prefixedUUIDFileName);
             return;
         }
 
-        saveUser(userSignUpRequestDto, oauth2MemberNumber, userEmail, null, providerType);
+        saveUser(userSignUpRequestDto, userName, userEmail, null,
+            userSignUpRequestDto.getOAuth2Provider());
+    }
+
+    private String createFileUrl(String prefixedUUIDFileName) {
+        return storageService.getFileUrl(prefixedUUIDFileName);
+    }
+
+    private String createFileName(MultipartFile userProfileImage) {
+        return storageService.createFileName(
+                imageValidator.getFileExtension(userProfileImage),
+                UUID.randomUUID().toString(),
+                new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
     }
 
     @Override
@@ -64,13 +81,13 @@ public class UserServiceImpl implements UserService {
         userRepository.delete(user);
     }
 
-    private void saveUser(UserSignUpRequestDto userSignUpRequestDto, String oauth2MemberNumber,
+    private void saveUser(UserSignUpRequestDto userSignUpRequestDto, String userName,
         String email, String profileImageUrl, OAuth2Provider providerType) {
-        Optional<User> optionalUser = userRepository.findByName(oauth2MemberNumber);
+        Optional<User> optionalUser = userRepository.findByName(userName);
         optionalUser.ifPresentOrElse(u -> {
             throw new UserAlreadySignUpException("user already sign up");
         }, () -> {
-            User user = userSignUpRequestDto.getUser(oauth2MemberNumber, email, profileImageUrl,
+            User user = userSignUpRequestDto.getUser(userName, email, profileImageUrl,
                 providerType);
             userRepository.save(user);
         });

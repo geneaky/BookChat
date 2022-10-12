@@ -11,15 +11,23 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.requestHe
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.multipart;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestPartFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static toy.bookchat.bookchat.domain.user.ReadingTaste.ART;
+import static toy.bookchat.bookchat.domain.user.ReadingTaste.DEVELOPMENT;
+import static toy.bookchat.bookchat.domain.user.ReadingTaste.SCIENCE;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
@@ -27,6 +35,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -48,11 +57,14 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.Base64Utils;
+import org.springframework.web.multipart.MultipartFile;
 import toy.bookchat.bookchat.config.OpenIdTokenConfig;
 import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
 import toy.bookchat.bookchat.domain.user.ROLE;
@@ -61,6 +73,7 @@ import toy.bookchat.bookchat.domain.user.api.dto.Token;
 import toy.bookchat.bookchat.domain.user.api.dto.UserProfileResponse;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.domain.user.service.UserService;
+import toy.bookchat.bookchat.domain.user.service.dto.UserSignInRequestDto;
 import toy.bookchat.bookchat.domain.user.service.dto.UserSignUpRequestDto;
 import toy.bookchat.bookchat.security.SecurityConfig;
 import toy.bookchat.bookchat.security.exception.ExpiredTokenException;
@@ -265,10 +278,15 @@ class UserControllerTest extends AuthenticationTestExtension {
     void 사용자_회원가입_요청시_header_openid가_유효하지않은_경우_401반환() throws Exception {
         PrivateKey privateKey = getPrivateKey();
         PublicKey publicKey = getPublicKey();
+        MockMultipartFile multipartFile = new MockMultipartFile("userProfileImage",
+            "testImage".getBytes());
 
-        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
-        doThrow(ExpiredTokenException.class).when(openIdTokenManager)
-            .getOAuth2MemberNumberFromToken(any(), any());
+        UserSignUpRequestDto requestDto = UserSignUpRequestDto.builder()
+            .nickname("nick")
+            .defaultProfileImageType(1)
+            .oAuth2Provider(OAuth2Provider.KAKAO)
+            .readingTastes(List.of(DEVELOPMENT, ART, SCIENCE))
+            .build();
 
         Claims claims = Jwts.claims().setIssuer("https://kauth.kakao.com")
             .setSubject("test").setExpiration(new Date(0));
@@ -277,11 +295,16 @@ class UserControllerTest extends AuthenticationTestExtension {
             .setClaims(claims)
             .signWith(SignatureAlgorithm.RS256, privateKey).compact();
 
-        mockMvc.perform(post("/v1/api/users/signup")
-                .header("Authorization", "Bearer " + testToken)
-                .header("provider_type", "KAKAO")
-                .param("nickname", "nick")
-                .param("defaultProfileImageType", "2"))
+        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
+        doThrow(ExpiredTokenException.class).when(openIdTokenManager)
+            .getOAuth2MemberNumberFromToken(any(), any());
+
+        mockMvc.perform(multipart("/v1/api/users/signup")
+                .file(multipartFile)
+                .file(new MockMultipartFile("userSignUpRequestDto", "", "application/json",
+                    objectMapper.writeValueAsString(requestDto)
+                        .getBytes(StandardCharsets.UTF_8)))
+                .header("OIDC", "Bearer " + testToken))
             .andExpect(status().isUnauthorized())
             .andDo(document("user-signup-error4"));
     }
@@ -307,26 +330,40 @@ class UserControllerTest extends AuthenticationTestExtension {
             .signWith(SignatureAlgorithm.RS256, privateKey)
             .compact();
 
-        mockMvc.perform(post("/v1/api/users/signup")
-                .header("Authorization", "Bearer " + testToken)
-                .header("provider_type", "KAKAO")
-                .param("nickname", "nick")
-                .param("defaultProfileImageType", "1")
-                .param("readingTastes", "PHILOSOPHY", "DEVELOPMENT", "DESIGN"))
+        MockMultipartFile multipartFile = new MockMultipartFile("userProfileImage",
+            "test".getBytes());
+        UserSignUpRequestDto userSignUpRequestDto = UserSignUpRequestDto.builder()
+            .nickname("nick")
+            .defaultProfileImageType(1)
+            .oAuth2Provider(OAuth2Provider.KAKAO)
+            .readingTastes(List.of(DEVELOPMENT, ART, SCIENCE))
+            .build();
+
+        mockMvc.perform(multipart("/v1/api/users/signup")
+                .file(multipartFile)
+                .file(new MockMultipartFile("userSignUpRequestDto", "", "application/json",
+                    objectMapper.writeValueAsString(userSignUpRequestDto)
+                        .getBytes(StandardCharsets.UTF_8)))
+                .header("OIDC", "Bearer " + testToken))
             .andExpect(status().isOk())
             .andDo(document("user-signup", requestHeaders(
-                    headerWithName("Authorization").description("Bearer [openid token]"),
-                    headerWithName("provider_type").description("프로바이더 타입 [KAKAO / GOOGLE]")
+                    headerWithName("OIDC").description("Bearer [openid token]")
                 ),
-                requestParameters(
-                    parameterWithName("nickname").description("닉네임"),
-                    parameterWithName("defaultProfileImageType").description("기본 이미지 타입"),
-                    parameterWithName("userProfileImage").optional().description("프로필 이미지"),
-                    parameterWithName("readingTastes").optional().description("독서 취향")
+                requestParts(
+                    partWithName("userProfileImage").description("프로필 이미지"),
+                    partWithName("userSignUpRequestDto").description("회원가입 입력 폼")
+                ),
+                requestPartFields("userSignUpRequestDto",
+                    fieldWithPath("nickname").description("닉네임"),
+                    fieldWithPath("defaultProfileImageType").optional().description("기본 이미지 타입"),
+                    fieldWithPath("readingTastes").optional().description("독서 취향"),
+                    fieldWithPath("oauth2Provider").description("프로바이더 타입[KAKAO/GOOGLE]")
                 )));
 
-        verify(userService).registerNewUser(any(UserSignUpRequestDto.class), anyString(),
-            anyString(), any(OAuth2Provider.class));
+        verify(userService).registerNewUser(any(UserSignUpRequestDto.class),
+            any(MultipartFile.class),
+            anyString(),
+            anyString());
     }
 
     @Test
@@ -400,15 +437,23 @@ class UserControllerTest extends AuthenticationTestExtension {
             .refreshToken("refreshToken")
             .build();
 
+        UserSignInRequestDto userSignInRequestDto = UserSignInRequestDto.builder()
+            .oAuth2Provider(OAuth2Provider.KAKAO)
+            .build();
+
         when(jwtTokenProvider.createToken(any(), any(), any())).thenReturn(responseToken);
         MvcResult mvcResult = mockMvc.perform(post("/v1/api/users/signin")
-                .header("Authorization", "Bearer " + testToken)
-                .header("provider_type", "KAKAO"))
+                .header("OIDC", "Bearer " + testToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userSignInRequestDto)))
             .andExpect(status().isOk())
             .andDo(document("user-signin",
                 requestHeaders(
-                    headerWithName("Authorization").description("Bearer [openid token]"),
-                    headerWithName("provider_type").description("프로바이더 타입 [KAKAO / GOOGLE]")
+                    headerWithName("OIDC").description("Bearer [openid token]")
+                ),
+                requestFields(
+                    fieldWithPath("oauth2Provider").type(STRING)
+                        .description("프로바이더 타입[KAKAO/GOOGLE]")
                 ),
                 responseFields(
                     fieldWithPath("accessToken").type(STRING).description("Access Token"),
