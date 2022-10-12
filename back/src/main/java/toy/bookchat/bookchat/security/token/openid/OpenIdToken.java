@@ -24,10 +24,10 @@ public class OpenIdToken {
     public static final int PAYLOAD = 1;
     public static final String KID = "kid";
     public static final String EMAIL = "email";
-    private final String openidToken;
+    private final String token;
 
-    public static OpenIdToken of(String openidToken) {
-        return new OpenIdToken(openidToken);
+    public static OpenIdToken of(String token) {
+        return new OpenIdToken(token);
     }
 
     public String getOAuth2MemberNumber(Key publicKey) {
@@ -58,15 +58,15 @@ public class OpenIdToken {
         try {
             return Optional.ofNullable(Jwts.parser()
                 .setSigningKey(publicKey)
-                .parseClaimsJws(this.openidToken)
+                .parseClaimsJws(this.token)
                 .getBody()).orElseThrow(() -> {
                 throw new IllegalStandardTokenException("Token body is not existed");
             });
         } catch (ExpiredJwtException exception) {
-            log.info("Token :: {} :: is expired", this.openidToken);
+            log.info("Token :: {} :: is expired", this.token);
             throw new ExpiredTokenException(exception.getMessage(), exception);
         } catch (JwtException exception) {
-            log.info("Token :: {} :: is denied", this.openidToken);
+            log.info("Token :: {} :: is denied", this.token);
             throw new DenidedTokenException(exception.getMessage(), exception);
         }
     }
@@ -95,19 +95,19 @@ public class OpenIdToken {
         validateTokenLength();
         try {
             return Jwts.parser()
-                .parse(getUnsignedTokenBuilder(this.openidToken))
+                .parse(getUnsignedTokenBuilder(this.token))
                 .getHeader();
         } catch (ExpiredJwtException exception) {
-            log.info("Token :: {} :: is expired", this.openidToken);
+            log.info("Token :: {} :: is expired", this.token);
             throw new ExpiredTokenException(exception.getMessage(), exception);
         } catch (JwtException exception) {
-            log.info("Token :: {} :: is denied", this.openidToken);
+            log.info("Token :: {} :: is denied", this.token);
             throw new DenidedTokenException(exception.getMessage(), exception);
         }
     }
 
     private void validateTokenLength() {
-        if (this.openidToken.split("\\.").length != STANDARD_TOKEN_LENGTH) {
+        if (this.token.split("\\.").length != STANDARD_TOKEN_LENGTH) {
             throw new IllegalStandardTokenException("Illegal Standard Token Length");
         }
     }

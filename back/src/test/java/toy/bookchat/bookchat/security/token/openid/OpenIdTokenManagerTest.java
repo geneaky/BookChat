@@ -18,6 +18,8 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -65,7 +67,7 @@ class OpenIdTokenManagerTest {
     }
 
     @Test
-    public void 토큰에서_사용자_원천_회원번호_추출_성공() throws Exception {
+    void 토큰에서_사용자_원천_회원번호_추출_성공() throws Exception {
         PrivateKey privateKey = getPrivateKey();
         PublicKey publicKey = getPublicKey();
 
@@ -79,18 +81,37 @@ class OpenIdTokenManagerTest {
             "1234kakao");
     }
 
+    @Test
+    void 토큰에서_사용자_원천_이메일_추출_성공() throws Exception {
+        PrivateKey privateKey = getPrivateKey();
+        PublicKey publicKey = getPublicKey();
+
+        String token = getMockOpenIdToken(privateKey);
+
+        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
+
+        assertThat(
+            openIdTokenManager.getUserEmailFromToken(token,
+                OAuth2Provider.KAKAO)).isEqualTo(
+            "test@naver.com");
+    }
+
     private String getMockOpenIdToken(PrivateKey privateKey) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("sub", "1234");
+        claims.put("iss", "https://kauth.kakao.com");
+        claims.put("email", "test@naver.com");
+
         String token = Jwts.builder()
             .setHeaderParam(KEY_ID, "abcdedf")
-            .setSubject("1234")
-            .setIssuer("https://kauth.kakao.com")
+            .setClaims(claims)
             .signWith(SignatureAlgorithm.RS256, privateKey)
             .compact();
         return "Bearer " + token;
     }
 
     @Test
-    public void 만료된_토큰으로_처리_요청시_예외발생() throws Exception {
+    void 만료된_토큰으로_처리_요청시_예외발생() throws Exception {
         PrivateKey privateKey = getPrivateKey();
 
         String token = "Bearer " + Jwts.builder()
@@ -107,7 +128,7 @@ class OpenIdTokenManagerTest {
     }
 
     @Test
-    public void 임의로_수정한_토큰으로_처리_요청시_예외발생() throws Exception {
+    void 임의로_수정한_토큰으로_처리_요청시_예외발생() throws Exception {
         PrivateKey privateKey = getPrivateKey();
         PublicKey publicKey = getPublicKey();
 
@@ -121,7 +142,7 @@ class OpenIdTokenManagerTest {
     }
 
     @Test
-    public void 발급_인증기관_정보_없을시_예외발생() throws Exception {
+    void 발급_인증기관_정보_없을시_예외발생() throws Exception {
         PrivateKey privateKey = getPrivateKey();
         PublicKey publicKey = getPublicKey();
 
@@ -139,7 +160,7 @@ class OpenIdTokenManagerTest {
     }
 
     @Test
-    public void 토큰_포맷_검증으로_header_payload_signature로_작성되었는지_확인() throws Exception {
+    void 토큰_포맷_검증으로_header_payload_signature로_작성되었는지_확인() throws Exception {
         PrivateKey privateKey = getPrivateKey();
 
         String token = Jwts.builder()
@@ -157,8 +178,10 @@ class OpenIdTokenManagerTest {
         stringBuilder.append(split[2]);
         stringBuilder.append(".");
 
+        String informalToken = stringBuilder.toString();
+
         assertThatThrownBy(() -> {
-            openIdTokenManager.getOAuth2MemberNumberFromToken(stringBuilder.toString(),
+            openIdTokenManager.getOAuth2MemberNumberFromToken(informalToken,
                 OAuth2Provider.KAKAO);
         }).isInstanceOf(IllegalStandardTokenException.class);
     }
