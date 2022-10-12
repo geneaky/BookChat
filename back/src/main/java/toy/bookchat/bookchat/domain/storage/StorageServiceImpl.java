@@ -49,11 +49,10 @@ public class StorageServiceImpl implements StorageService{
      * '날짜 역순' + UUID로 저장 - S3가 prefix를 사용하여 partitioning을 하기 때문에
      */
     @Override
-    public String createFileName(String fileExtension) {
+    public String createFileName(String fileExtension, String uuidFileName, String currentTime) {
         StringBuilder stringBuilder = new StringBuilder();
-        String UUIDFileName = UUID.randomUUID().toString();
-        stringBuilder.append(new SimpleDateFormat("yyyy-MM-dd").format(new Date())).reverse();
-        stringBuilder.append(UUIDFileName);
+        stringBuilder.append(currentTime).reverse();
+        stringBuilder.append(uuidFileName);
         stringBuilder.append(".");
         stringBuilder.append(fileExtension);
         stringBuilder.insert(0, s3Config.getImageFolder());

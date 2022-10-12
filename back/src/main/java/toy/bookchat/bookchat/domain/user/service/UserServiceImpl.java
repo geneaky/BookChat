@@ -1,6 +1,10 @@
 package toy.bookchat.bookchat.domain.user.service;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -39,7 +43,9 @@ public class UserServiceImpl implements UserService {
         MultipartFile userProfileImage, String userName, String userEmail) {
         if (imageValidator.hasValidImage(userProfileImage)) {
             String prefixedUUIDFileName = storageService.createFileName(
-                imageValidator.getFileExtension(userProfileImage));
+                imageValidator.getFileExtension(userProfileImage),
+                    UUID.randomUUID().toString(),
+                    new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
             String prefixedUUIDFileUrl = storageService.getFileUrl(prefixedUUIDFileName);
 
             saveUser(userSignUpRequestDto, userName, userEmail, prefixedUUIDFileUrl,
