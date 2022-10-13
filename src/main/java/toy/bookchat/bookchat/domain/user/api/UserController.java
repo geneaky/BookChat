@@ -102,9 +102,9 @@ public class UserController {
 
         return ResponseEntity.ok(token);
     }
-
+    
     @DeleteMapping("/users")
-    public void deleteUser(@CurrentUser User user) {
+    public void withdrawUser(@CurrentUser User user) {
         userService.deleteUser(user);
     }
 }

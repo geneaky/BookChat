@@ -14,7 +14,7 @@ import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfRequestDto;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfSearchResponseDto;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfResponseDto;
 import toy.bookchat.bookchat.domain.user.User;
 
 @Service
@@ -76,7 +76,7 @@ public class BookShelfService {
     }
 
     @Transactional(readOnly = true)
-    public List<BookShelfSearchResponseDto> takeBooksOutOfBookShelf(ReadingStatus readingStatus,
+    public List<BookShelfResponseDto> takeBooksOutOfBookShelf(ReadingStatus readingStatus,
         Pageable pageable, User user) {
 
         List<BookShelf> bookShelves = bookShelfRepository.findSpecificStatusBookByUserId(
@@ -86,12 +86,12 @@ public class BookShelfService {
         return getBookShelfSearchResponseDtos(bookShelves);
     }
 
-    private List<BookShelfSearchResponseDto> getBookShelfSearchResponseDtos(
+    private List<BookShelfResponseDto> getBookShelfSearchResponseDtos(
         List<BookShelf> bookShelves) {
-        List<BookShelfSearchResponseDto> bookShelfSearchResponseDtos = new ArrayList<>();
+        List<BookShelfResponseDto> bookShelfResponseDtos = new ArrayList<>();
 
         for (BookShelf bookShelf : bookShelves) {
-            BookShelfSearchResponseDto bookShelfSearchResponseDto = BookShelfSearchResponseDto.builder()
+            BookShelfResponseDto bookShelfResponseDto = BookShelfResponseDto.builder()
                 .title(bookShelf.getBookTitle())
                 .authors(bookShelf.getBookAuthors())
                 .publisher(bookShelf.getBookPublisher())
@@ -101,8 +101,8 @@ public class BookShelfService {
                 .pages(bookShelf.getPages())
                 .build();
 
-            bookShelfSearchResponseDtos.add(bookShelfSearchResponseDto);
+            bookShelfResponseDtos.add(bookShelfResponseDto);
         }
-        return bookShelfSearchResponseDtos;
+        return bookShelfResponseDtos;
     }
 }

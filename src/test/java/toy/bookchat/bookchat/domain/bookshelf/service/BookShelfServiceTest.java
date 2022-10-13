@@ -7,7 +7,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
-
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,17 +44,17 @@ public class BookShelfServiceTest {
     }
 
     private BookShelfRequestDto getBookShelfRequestDto(ReadingStatus readingStatus) {
-        if(readingStatus == ReadingStatus.COMPLETE) {
+        if (readingStatus == ReadingStatus.COMPLETE) {
             return BookShelfRequestDto.builder()
-                    .isbn("12345")
-                    .title("testBook")
-                    .authors(List.of("test Author"))
-                    .publisher("test publisher")
-                    .bookCoverImageUrl("test@naver.com")
-                    .readingStatus(ReadingStatus.COMPLETE)
-                    .star(Star.THREE)
-                    .singleLineAssessment("very good")
-                    .build();
+                .isbn("12345")
+                .title("testBook")
+                .authors(List.of("test Author"))
+                .publisher("test publisher")
+                .bookCoverImageUrl("test@naver.com")
+                .readingStatus(ReadingStatus.COMPLETE)
+                .star(Star.THREE)
+                .singleLineAssessment("very good")
+                .build();
         }
         return BookShelfRequestDto.builder()
             .isbn("12345")
@@ -96,13 +95,13 @@ public class BookShelfServiceTest {
     @Test
     public void 읽은_책_저장시_평점과_한줄평이_없으면_예외발생() throws Exception {
         BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
-                .isbn("12345")
-                .title("testBook")
-                .authors(List.of("test Author"))
-                .publisher("test publisher")
-                .bookCoverImageUrl("test@naver.com")
-                .readingStatus(ReadingStatus.COMPLETE)
-                .build();
+            .isbn("12345")
+            .title("testBook")
+            .authors(List.of("test Author"))
+            .publisher("test publisher")
+            .bookCoverImageUrl("test@naver.com")
+            .readingStatus(ReadingStatus.COMPLETE)
+            .build();
 
         when(bookRepository.findByIsbn(bookShelfRequestDto.getIsbn())).thenReturn(Optional.empty());
 
