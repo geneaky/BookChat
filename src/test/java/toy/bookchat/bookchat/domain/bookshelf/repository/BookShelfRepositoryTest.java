@@ -22,7 +22,7 @@ import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 
 @DataJpaTest
-@Import({JpaAuditingConfig.class,TestConfig.class})
+@Import({JpaAuditingConfig.class, TestConfig.class})
 public class BookShelfRepositoryTest {
 
     @Autowired
@@ -46,7 +46,7 @@ public class BookShelfRepositoryTest {
 
         BookShelf bookShelf = BookShelf.builder().build();
 
-        Book book = new Book("1234", "effective java", List.of("Joshua"), "insight",
+        Book book = new Book("1-4133-0454-0", "effective java", List.of("Joshua"), "insight",
             "bookCover@naver.com");
 
         book.setBookShelf(bookShelf);
@@ -161,7 +161,7 @@ public class BookShelfRepositoryTest {
         bookRepository.save(book1);
         bookRepository.save(book2);
 
-        User user = User.builder().build();
+        User user = User.builder().name("hi").build();
         userRepository.save(user);
 
         BookShelf bookShelf1 = BookShelf.builder()
@@ -188,10 +188,71 @@ public class BookShelfRepositoryTest {
         bookShelfRepository.save(bookShelf1);
         bookShelfRepository.save(bookShelf2);
 
+        userRepository.flush();
+        bookRepository.flush();
+        bookShelfRepository.flush();
+
+        user.updateImageUrl("hi");
+//        bookShelf1.getUser().updateImageUrl("by");
+
         Pageable pageable = PageRequest.of(0, 2, Sort.by(Direction.DESC, "id"));
         List<BookShelf> bookShelves = bookShelfRepository.findSpecificStatusBookByUserId(
             ReadingStatus.WISH, pageable, user.getId());
 
+        for (BookShelf b : bookShelves) {
+//            b.getUser().getId();
+            System.out.println(b.getBook().getTitle());
+        }
+
         assertThat(bookShelves.size()).isEqualTo(2);
     }
+
+    @Test
+    void ts() throws Exception {
+
+        Book book1 = new Book("1234", "effective java", List.of("Joshua"), "insight",
+            "bookCover@naver.com");
+        Book book2 = new Book("12345", "effective java2", List.of("Joshua"), "insight",
+            "bookCove2r@naver.com");
+
+        User user = User.builder().name("hi").build();
+
+        BookShelf bookShelf1 = BookShelf.builder()
+            .book(book1)
+            .readingStatus(ReadingStatus.WISH)
+            .star(Star.ZERO)
+            .singleLineAssessment(null)
+            .build();
+
+        BookShelf bookShelf2 = BookShelf.builder()
+            .book(book2)
+            .readingStatus(ReadingStatus.WISH)
+            .star(Star.ZERO)
+            .singleLineAssessment(null)
+            .build();
+
+        user.setBookShelf(bookShelf1);
+        user.setBookShelf(bookShelf2);
+
+        bookRepository.save(book1);
+        bookRepository.save(book2);
+        userRepository.save(user);
+
+        bookRepository.flush();
+        userRepository.flush();
+
+        User suser = userRepository.findByName("hi").get();
+        List<BookShelf> bookShelves = suser.getBookShelves();
+
+        for (BookShelf bk : bookShelves) {
+            System.out.println(bk.getBookTitle());
+            bookShelfRepository.delete(bk);
+        }
+
+//        suser.getBookShelves().clear();
+
+        bookShelfRepository.flush();
+        userRepository.flush();
+    }
+
 }

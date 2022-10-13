@@ -52,7 +52,7 @@ import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.Star;
 import toy.bookchat.bookchat.domain.bookshelf.service.BookShelfService;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfRequestDto;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfSearchResponseDto;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfResponseDto;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.security.SecurityConfig;
@@ -482,9 +482,9 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
 
     @Test
     void 읽고있는_책_조회_성공() throws Exception {
-        List<BookShelfSearchResponseDto> result = new ArrayList<>();
+        List<BookShelfResponseDto> result = new ArrayList<>();
 
-        BookShelfSearchResponseDto bookShelfSearchResponseDto = BookShelfSearchResponseDto.builder()
+        BookShelfResponseDto bookShelfResponseDto = BookShelfResponseDto.builder()
             .title("effectiveJava")
             .authors(List.of("joshua"))
             .bookCoverImageUrl("testBookCoverImage@naver.com")
@@ -492,7 +492,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
             .star(null)
             .singleLineAssessment(null).build();
 
-        result.add(bookShelfSearchResponseDto);
+        result.add(bookShelfResponseDto);
 
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
         when(bookShelfService.takeBooksOutOfBookShelf(any(ReadingStatus.class), any(Pageable.class),
@@ -535,9 +535,9 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
 
     @Test
     void 읽은_책_조회_성공() throws Exception {
-        List<BookShelfSearchResponseDto> result = new ArrayList<>();
+        List<BookShelfResponseDto> result = new ArrayList<>();
 
-        BookShelfSearchResponseDto bookShelfSearchResponseDto = BookShelfSearchResponseDto.builder()
+        BookShelfResponseDto bookShelfResponseDto = BookShelfResponseDto.builder()
             .title("effectiveJava")
             .authors(List.of("joshua"))
             .bookCoverImageUrl("testBookCoverImage@naver.com")
@@ -545,7 +545,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
             .star(Star.FOUR_HALF)
             .singleLineAssessment("it's is best").build();
 
-        result.add(bookShelfSearchResponseDto);
+        result.add(bookShelfResponseDto);
 
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
         when(bookShelfService.takeBooksOutOfBookShelf(any(ReadingStatus.class), any(Pageable.class),
@@ -587,9 +587,9 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
 
     @Test
     void 읽을_책_조회_성공() throws Exception {
-        List<BookShelfSearchResponseDto> result = new ArrayList<>();
+        List<BookShelfResponseDto> result = new ArrayList<>();
 
-        BookShelfSearchResponseDto bookShelfSearchResponseDto = BookShelfSearchResponseDto.builder()
+        BookShelfResponseDto bookShelfResponseDto = BookShelfResponseDto.builder()
             .title("effectiveJava")
             .authors(List.of("joshua"))
             .bookCoverImageUrl("testBookCoverImage@naver.com")
@@ -597,7 +597,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
             .star(null)
             .singleLineAssessment(null).build();
 
-        result.add(bookShelfSearchResponseDto);
+        result.add(bookShelfResponseDto);
 
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
         when(bookShelfService.takeBooksOutOfBookShelf(any(ReadingStatus.class), any(Pageable.class),

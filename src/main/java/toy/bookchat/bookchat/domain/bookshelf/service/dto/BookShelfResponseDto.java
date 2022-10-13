@@ -10,9 +10,10 @@ import toy.bookchat.bookchat.domain.bookshelf.Star;
 @Getter
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class BookShelfSearchResponseDto {
+public class BookShelfResponseDto {
 
     private String title;
+    private String isbn;
     private String bookCoverImageUrl;
     private List<String> authors;
     private String publisher;

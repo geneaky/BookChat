@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.service.BookShelfService;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfRequestDto;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfSearchResponseDto;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfResponseDto;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.security.user.CurrentUser;
 
@@ -35,12 +35,12 @@ public class BookShelfController {
     }
 
     @GetMapping("/bookshelf/books")
-    public ResponseEntity<List<BookShelfSearchResponseDto>> takeBookOutOfBookShelf(
+    public ResponseEntity<List<BookShelfResponseDto>> takeBookOutOfBookShelf(
         ReadingStatus readingStatus, Pageable pageable,
         @CurrentUser User user
     ) {
-        List<BookShelfSearchResponseDto> bookShelfSearchResponseDtos = bookShelfService.takeBooksOutOfBookShelf(
+        List<BookShelfResponseDto> bookShelfResponseDtos = bookShelfService.takeBooksOutOfBookShelf(
             readingStatus, pageable, user);
-        return ResponseEntity.status(HttpStatus.OK).body(bookShelfSearchResponseDtos);
+        return ResponseEntity.status(HttpStatus.OK).body(bookShelfResponseDtos);
     }
 }
