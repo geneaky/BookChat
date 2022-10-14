@@ -1,5 +1,8 @@
 package toy.bookchat.bookchat.domain.user.service.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import javax.validation.constraints.NotNull;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,8 +12,10 @@ import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 @Getter
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserSignInRequestDto {
 
-    private OAuth2Provider oAuth2Provider;
+    @NotNull
+    @JsonProperty("oauth2Provider")
+    private OAuth2Provider oauth2Provider;
 }

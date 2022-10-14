@@ -73,13 +73,13 @@ public class UserController {
     @PostMapping("/users/signup")
     public void userSignUp(
         @Valid @RequestPart UserSignUpRequestDto userSignUpRequestDto,
-        @RequestPart MultipartFile userProfileImage,
+        @RequestPart(required = false) MultipartFile userProfileImage,
         @RequestHeader(OIDC) @NotBlank @Pattern(regexp = "^(Bearer)\\s.+") String bearerToken) {
 
         String oauth2MemberNumber = openIdTokenManager.getOAuth2MemberNumberFromToken(bearerToken,
-            userSignUpRequestDto.getOAuth2Provider());
+            userSignUpRequestDto.getOauth2Provider());
         String userEmail = openIdTokenManager.getUserEmailFromToken(bearerToken,
-            userSignUpRequestDto.getOAuth2Provider());
+            userSignUpRequestDto.getOauth2Provider());
 
         userService.registerNewUser(userSignUpRequestDto, userProfileImage, oauth2MemberNumber,
             userEmail);
@@ -88,15 +88,15 @@ public class UserController {
     @PostMapping("/users/signin")
     public ResponseEntity<Token> userSignIn(
         @RequestHeader(OIDC) @NotBlank @Pattern(regexp = "^(Bearer)\\s.+") String bearerToken,
-        @RequestBody UserSignInRequestDto userSignInRequestDto) {
+        @Valid @RequestBody UserSignInRequestDto userSignInRequestDto) {
         String userName = openIdTokenManager.getOAuth2MemberNumberFromToken(bearerToken,
-            userSignInRequestDto.getOAuth2Provider());
+            userSignInRequestDto.getOauth2Provider());
         userService.checkRegisteredUser(userName);
         String userEmail = openIdTokenManager.getUserEmailFromToken(bearerToken,
-            userSignInRequestDto.getOAuth2Provider());
+            userSignInRequestDto.getOauth2Provider());
 
         Token token = jwtTokenProvider.createToken(userName, userEmail,
-            userSignInRequestDto.getOAuth2Provider());
+            userSignInRequestDto.getOauth2Provider());
 
         jwtTokenRecorder.record(userName, token.getRefreshToken());
 

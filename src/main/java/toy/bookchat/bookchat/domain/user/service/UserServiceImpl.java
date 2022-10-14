@@ -4,7 +4,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -46,14 +45,14 @@ public class UserServiceImpl implements UserService {
             String prefixedUUIDFileUrl = createFileUrl(prefixedUUIDFileName);
 
             saveUser(userSignUpRequestDto, userName, userEmail, prefixedUUIDFileUrl,
-                userSignUpRequestDto.getOAuth2Provider());
+                userSignUpRequestDto.getOauth2Provider());
 
             storageService.upload(userProfileImage, prefixedUUIDFileName);
             return;
         }
 
         saveUser(userSignUpRequestDto, userName, userEmail, null,
-            userSignUpRequestDto.getOAuth2Provider());
+            userSignUpRequestDto.getOauth2Provider());
     }
 
     private String createFileUrl(String prefixedUUIDFileName) {
@@ -62,9 +61,9 @@ public class UserServiceImpl implements UserService {
 
     private String createFileName(MultipartFile userProfileImage) {
         return storageService.createFileName(
-                imageValidator.getFileExtension(userProfileImage),
-                UUID.randomUUID().toString(),
-                new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+            imageValidator.getFileExtension(userProfileImage),
+            UUID.randomUUID().toString(),
+            new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
     }
 
     @Override

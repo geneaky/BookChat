@@ -77,7 +77,11 @@ include::{snippets}/user-signup/request-headers.adoc[]
 
 `Request`
 
-include::{snippets}/user-signup/request-parameters.adoc[]
+****
+include::{snippets}/user-signup/request-parts.adoc[]
+`userSignUpRequestDto`
+include::{snippets}/user-signup/request-part-userSignUpRequestDto-fields.adoc[]
+****
 include::{snippets}/user-signup/http-request.adoc[]
 
 `Response`
@@ -119,6 +123,7 @@ include::{snippets}/user-signin/request-headers.adoc[]
 
 `Request`
 
+include::{snippets}/user-signin/request-fields.adoc[]
 include::{snippets}/user-signin/http-request.adoc[]
 
 `Response`

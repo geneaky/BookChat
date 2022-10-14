@@ -1,10 +1,10 @@
 package toy.bookchat.bookchat.domain.storage.image;
 
-import java.io.InputStream;
+import javax.imageio.stream.ImageInputStream;
 
 public interface ImageReaderAdapter {
 
-    void setInput(InputStream inputStream);
+    void setInput(ImageInputStream imageInputStream);
 
     int getWidth();
 

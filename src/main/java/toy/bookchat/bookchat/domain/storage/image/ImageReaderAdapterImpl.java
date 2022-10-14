@@ -4,8 +4,8 @@ import static toy.bookchat.bookchat.domain.user.service.dto.SupportedFileExtensi
 
 import com.luciad.imageio.webp.WebPImageReaderSpi;
 import java.io.IOException;
-import java.io.InputStream;
 import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 import org.springframework.stereotype.Component;
 import toy.bookchat.bookchat.domain.user.exception.ImageInputStreamException;
 
@@ -23,8 +23,8 @@ public class ImageReaderAdapterImpl implements ImageReaderAdapter {
     }
 
     @Override
-    public void setInput(InputStream inputStream) {
-        readerInstance.setInput(inputStream);
+    public void setInput(ImageInputStream imageInputStream) {
+        readerInstance.setInput(imageInputStream);
     }
 
     @Override

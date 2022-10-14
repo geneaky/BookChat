@@ -236,7 +236,6 @@ class UserControllerTest extends AuthenticationTestExtension {
     void 사용자_회원가입_요청시_header_openid없는_인증정보_400반환() throws Exception {
         mockMvc.perform(post("/v1/api/users/signup")
                 .header("Authorization", "Bearer ")
-                .header("provider_type", "KAKAO")
                 .param("nickname", "nick")
                 .param("defaultProfileImageType", "2"))
             .andExpect(status().isBadRequest())
@@ -284,7 +283,7 @@ class UserControllerTest extends AuthenticationTestExtension {
         UserSignUpRequestDto requestDto = UserSignUpRequestDto.builder()
             .nickname("nick")
             .defaultProfileImageType(1)
-            .oAuth2Provider(OAuth2Provider.KAKAO)
+            .oauth2Provider(OAuth2Provider.KAKAO)
             .readingTastes(List.of(DEVELOPMENT, ART, SCIENCE))
             .build();
 
@@ -335,7 +334,7 @@ class UserControllerTest extends AuthenticationTestExtension {
         UserSignUpRequestDto userSignUpRequestDto = UserSignUpRequestDto.builder()
             .nickname("nick")
             .defaultProfileImageType(1)
-            .oAuth2Provider(OAuth2Provider.KAKAO)
+            .oauth2Provider(OAuth2Provider.KAKAO)
             .readingTastes(List.of(DEVELOPMENT, ART, SCIENCE))
             .build();
 
@@ -357,7 +356,7 @@ class UserControllerTest extends AuthenticationTestExtension {
                     fieldWithPath("nickname").description("닉네임"),
                     fieldWithPath("defaultProfileImageType").optional().description("기본 이미지 타입"),
                     fieldWithPath("readingTastes").optional().description("독서 취향"),
-                    fieldWithPath("oauth2Provider").description("프로바이더 타입[KAKAO/GOOGLE]")
+                    fieldWithPath("oauth2Provider").description("프로바이더 타입[kakao/google]")
                 )));
 
         verify(userService).registerNewUser(any(UserSignUpRequestDto.class),
@@ -391,7 +390,6 @@ class UserControllerTest extends AuthenticationTestExtension {
 
         mockMvc.perform(post("/v1/api/users/signup")
                 .header("Authorization", "Tearer" + testToken)
-                .header("provider_type", "KAKAO")
                 .param("defaultProfileImageType", "1")
                 .param("nickname", "testName"))
             .andExpect(status().isBadRequest())
@@ -438,7 +436,7 @@ class UserControllerTest extends AuthenticationTestExtension {
             .build();
 
         UserSignInRequestDto userSignInRequestDto = UserSignInRequestDto.builder()
-            .oAuth2Provider(OAuth2Provider.KAKAO)
+            .oauth2Provider(OAuth2Provider.KAKAO)
             .build();
 
         when(jwtTokenProvider.createToken(any(), any(), any())).thenReturn(responseToken);
@@ -453,7 +451,7 @@ class UserControllerTest extends AuthenticationTestExtension {
                 ),
                 requestFields(
                     fieldWithPath("oauth2Provider").type(STRING)
-                        .description("프로바이더 타입[KAKAO/GOOGLE]")
+                        .description("프로바이더 타입[kakao/google]")
                 ),
                 responseFields(
                     fieldWithPath("accessToken").type(STRING).description("Access Token"),
@@ -477,8 +475,7 @@ class UserControllerTest extends AuthenticationTestExtension {
     @Test
     void 로그인_요청시_Header에_토큰이_없으면_예외발생() throws Exception {
         mockMvc.perform(post("/v1/api/users/signin")
-                .header("Authorization", "Bearer ")
-                .header("provider_type", "KAKAO"))
+                .header("OIDC", "Bearer "))
             .andExpect(status().isBadRequest())
             .andDo(document("user-signin-error2"));
     }
@@ -502,8 +499,7 @@ class UserControllerTest extends AuthenticationTestExtension {
             .compact();
 
         mockMvc.perform(post("/v1/api/users/signin")
-                .header("Authorization", "Tearer " + testToken)
-                .header("provider_type", "KAKAO"))
+                .header("OIDC", "Tearer " + testToken))
             .andExpect(status().isBadRequest())
             .andDo(document("user-signin-error3"));
     }
@@ -523,8 +519,7 @@ class UserControllerTest extends AuthenticationTestExtension {
             .signWith(SignatureAlgorithm.RS256, privateKey).compact();
 
         mockMvc.perform(post("/v1/api/users/siginin")
-                .header("Authorization", "Bearer " + testToken)
-                .header("provider_type", "KAKAO"))
+                .header("OIDC", "Bearer " + testToken))
             .andExpect(status().isUnauthorized())
             .andDo(document("user-signin-error4"));
     }

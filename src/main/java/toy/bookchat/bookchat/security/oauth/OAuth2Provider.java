@@ -1,6 +1,9 @@
 package toy.bookchat.bookchat.security.oauth;
 
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum OAuth2Provider {
     GOOGLE("google"), KAKAO("kakao");
 
@@ -10,16 +13,18 @@ public enum OAuth2Provider {
         this.provider = provider;
     }
 
+    @JsonCreator
     public static OAuth2Provider from(String provider) {
-        for (OAuth2Provider oAuth2Provider : OAuth2Provider.values()) {
-            if (oAuth2Provider.getValue().equals(provider)) {
-                return oAuth2Provider;
+        for (OAuth2Provider oauth2Provider : OAuth2Provider.values()) {
+            if (oauth2Provider.getValue().equals(provider)) {
+                return oauth2Provider;
             }
         }
         return null;
     }
 
+    @JsonValue
     public String getValue() {
-        return provider;
+        return this.provider;
     }
 }

@@ -1,5 +1,6 @@
 package toy.bookchat.bookchat.domain.user.service.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -23,11 +24,14 @@ public class UserSignUpRequestDto {
 
     @NotBlank
     private String nickname;
+    @JsonProperty("readingTastes")
+    @NotNull
     private List<ReadingTaste> readingTastes;
     @NotNull
     private Integer defaultProfileImageType;
     @NotNull
-    private OAuth2Provider oAuth2Provider;
+    @JsonProperty("oauth2Provider")
+    private OAuth2Provider oauth2Provider;
 
     public User getUser(String oauth2MemberNumber, String email, String profileImageUrl,
         OAuth2Provider providerType) {

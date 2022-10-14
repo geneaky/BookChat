@@ -7,6 +7,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.InputStream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -66,9 +67,9 @@ class ImageValidatorTest {
 
     @Test
     void 지원하지_않는_이미지_사이즈의_경우_예외발생() throws Exception {
-
         MultipartFile multipartFile = mock(MultipartFile.class);
-        when(imageReaderAdapter.getHeight()).thenReturn(300);
+        when(multipartFile.getInputStream()).thenReturn(mock(InputStream.class));
+        when(imageReaderAdapter.getWidth()).thenReturn(5000);
 
         assertThatThrownBy(() -> {
             imageValidator.hasValidImage(multipartFile);
@@ -78,6 +79,7 @@ class ImageValidatorTest {
     @Test
     void 올바른_이미지의_경우_검증통과() throws Exception {
         MultipartFile multipartFile = mock(MultipartFile.class);
+        when(multipartFile.getInputStream()).thenReturn(mock(InputStream.class));
         when(imageReaderAdapter.getHeight()).thenReturn(150);
         when(imageReaderAdapter.getWidth()).thenReturn(150);
 
