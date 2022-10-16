@@ -1,10 +1,12 @@
 package toy.bookchat.bookchat.domain.bookshelf.repository.query;
 
 import static toy.bookchat.bookchat.domain.bookshelf.QBookShelf.bookShelf;
-import static toy.bookchat.bookchat.domain.user.QUser.user;
 
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
@@ -21,16 +23,24 @@ public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
 
 
     @Override
-    public List<BookShelf> findSpecificStatusBookByUserId(
+    public Page<BookShelf> findSpecificStatusBookByUserId(
         ReadingStatus readingStatus, Pageable pageable, Long userId) {
 
-        return queryFactory.select(bookShelf)
+        JPAQuery<BookShelf> jpaQuery = queryFactory.select(bookShelf)
             .from(bookShelf)
-            .join(bookShelf.user, user).on(user.id.eq(userId))
-            .where(bookShelf.readingStatus.eq(readingStatus))
-//                .and(bookShelf.user.id.eq(userId)))
-            .offset(pageable.getOffset())
+            .where(bookShelf.readingStatus.eq(readingStatus)
+                .and(bookShelf.user.id.eq(userId)));
+
+        List<BookShelf> bookShelves = jpaQuery.offset(pageable.getOffset())
             .limit(pageable.getPageSize())
             .fetch();
+
+        Long size = queryFactory.select(bookShelf.count())
+            .from(bookShelf)
+            .where(bookShelf.readingStatus.eq(readingStatus)
+                .and(bookShelf.user.id.eq(userId)))
+            .fetchOne();
+
+        return new PageImpl<>(bookShelves, pageable, size);
     }
 }

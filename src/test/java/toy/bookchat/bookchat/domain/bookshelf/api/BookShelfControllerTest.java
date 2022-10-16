@@ -41,18 +41,26 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.jaxb.SpringDataJaxb.PageRequestDto;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.config.OpenIdTokenConfig;
 import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
+import toy.bookchat.bookchat.domain.book.Book;
+import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.Star;
 import toy.bookchat.bookchat.domain.bookshelf.service.BookShelfService;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfRequestDto;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfResponseDto;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.SearchBookShelfByReadingStatusDto;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.security.SecurityConfig;
@@ -482,7 +490,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
 
     @Test
     void 읽고있는_책_조회_성공() throws Exception {
-        List<BookShelfResponseDto> result = new ArrayList<>();
+        List<BookShelf> result = new ArrayList<>();
 
         BookShelfResponseDto bookShelfResponseDto = BookShelfResponseDto.builder()
             .title("effectiveJava")
@@ -492,7 +500,21 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
             .star(null)
             .singleLineAssessment(null).build();
 
-        result.add(bookShelfResponseDto);
+        User user = User.builder().build();
+        Book book = new Book("12345", "effectiveJava", List.of("joshua"), "jpub",
+            "testBookCoverImageUrl");
+        BookShelf bookShelf = BookShelf.builder()
+            .book(book)
+            .user(user)
+            .pages(0)
+            .readingStatus(ReadingStatus.READING)
+            .build();
+
+        result.add(bookShelf);
+
+        PageRequest pageRequest = new(0, 1, Sort.by("id,DESC"));
+        new PageImpl<BookShelf>(result, pageRequest);
+        SearchBookShelfByReadingStatusDto searchBookShelfByReadingStatusDto = new SearchBookShelfByReadingStatusDto();
 
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
         when(bookShelfService.takeBooksOutOfBookShelf(any(ReadingStatus.class), any(Pageable.class),

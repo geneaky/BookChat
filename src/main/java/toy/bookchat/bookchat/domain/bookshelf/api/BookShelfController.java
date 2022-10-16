@@ -1,6 +1,5 @@
 package toy.bookchat.bookchat.domain.bookshelf.api;
 
-import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -14,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.service.BookShelfService;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfRequestDto;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfResponseDto;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.SearchBookShelfByReadingStatusDto;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.security.user.CurrentUser;
 
@@ -35,12 +34,12 @@ public class BookShelfController {
     }
 
     @GetMapping("/bookshelf/books")
-    public ResponseEntity<List<BookShelfResponseDto>> takeBookOutOfBookShelf(
+    public ResponseEntity<SearchBookShelfByReadingStatusDto> takeBookOutOfBookShelf(
         ReadingStatus readingStatus, Pageable pageable,
         @CurrentUser User user
     ) {
-        List<BookShelfResponseDto> bookShelfResponseDtos = bookShelfService.takeBooksOutOfBookShelf(
+        SearchBookShelfByReadingStatusDto searchBookShelfByReadingStatusDto = bookShelfService.takeBooksOutOfBookShelf(
             readingStatus, pageable, user);
-        return ResponseEntity.status(HttpStatus.OK).body(bookShelfResponseDtos);
+        return ResponseEntity.status(HttpStatus.OK).body(searchBookShelfByReadingStatusDto);
     }
 }

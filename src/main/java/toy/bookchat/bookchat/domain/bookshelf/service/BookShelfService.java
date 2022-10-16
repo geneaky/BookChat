@@ -1,10 +1,9 @@
 package toy.bookchat.bookchat.domain.bookshelf.service;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,7 +13,7 @@ import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfRequestDto;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfResponseDto;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.SearchBookShelfByReadingStatusDto;
 import toy.bookchat.bookchat.domain.user.User;
 
 @Service
@@ -76,33 +75,13 @@ public class BookShelfService {
     }
 
     @Transactional(readOnly = true)
-    public List<BookShelfResponseDto> takeBooksOutOfBookShelf(ReadingStatus readingStatus,
+    public SearchBookShelfByReadingStatusDto takeBooksOutOfBookShelf(ReadingStatus readingStatus,
         Pageable pageable, User user) {
 
-        List<BookShelf> bookShelves = bookShelfRepository.findSpecificStatusBookByUserId(
+        Page<BookShelf> pagingBookShelves = bookShelfRepository.findSpecificStatusBookByUserId(
             readingStatus, pageable,
             user.getId());
 
-        return getBookShelfSearchResponseDtos(bookShelves);
-    }
-
-    private List<BookShelfResponseDto> getBookShelfSearchResponseDtos(
-        List<BookShelf> bookShelves) {
-        List<BookShelfResponseDto> bookShelfResponseDtos = new ArrayList<>();
-
-        for (BookShelf bookShelf : bookShelves) {
-            BookShelfResponseDto bookShelfResponseDto = BookShelfResponseDto.builder()
-                .title(bookShelf.getBookTitle())
-                .authors(bookShelf.getBookAuthors())
-                .publisher(bookShelf.getBookPublisher())
-                .bookCoverImageUrl(bookShelf.getBookCoverImageUrl())
-                .star(bookShelf.getStar())
-                .singleLineAssessment(bookShelf.getSingleLineAssessment())
-                .pages(bookShelf.getPages())
-                .build();
-
-            bookShelfResponseDtos.add(bookShelfResponseDto);
-        }
-        return bookShelfResponseDtos;
+        return new SearchBookShelfByReadingStatusDto(pagingBookShelves);
     }
 }

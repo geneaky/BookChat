@@ -2,11 +2,14 @@ package toy.bookchat.bookchat.domain.bookshelf.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.json.AutoConfigureJson;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -22,6 +25,7 @@ import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 
 @DataJpaTest
+@AutoConfigureJson
 @Import({JpaAuditingConfig.class, TestConfig.class})
 public class BookShelfRepositoryTest {
 
@@ -31,6 +35,8 @@ public class BookShelfRepositoryTest {
     private UserRepository userRepository;
     @Autowired
     private BookShelfRepository bookShelfRepository;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Test
     public void 책_저장() throws Exception {
@@ -103,8 +109,9 @@ public class BookShelfRepositoryTest {
         bookShelfRepository.save(bookShelf2);
 
         Pageable pageable = PageRequest.of(0, 2, Sort.by(Direction.DESC, "id"));
-        List<BookShelf> bookShelves = bookShelfRepository.findSpecificStatusBookByUserId(
+        Page<BookShelf> pagingBookShelves = bookShelfRepository.findSpecificStatusBookByUserId(
             ReadingStatus.READING, pageable, user.getId());
+        List<BookShelf> bookShelves = pagingBookShelves.getContent();
 
         assertThat(bookShelves.size()).isEqualTo(2);
     }
@@ -146,8 +153,9 @@ public class BookShelfRepositoryTest {
         bookShelfRepository.save(bookShelf2);
 
         Pageable pageable = PageRequest.of(0, 2, Sort.by(Direction.DESC, "id"));
-        List<BookShelf> bookShelves = bookShelfRepository.findSpecificStatusBookByUserId(
+        Page<BookShelf> pagingBookShelves = bookShelfRepository.findSpecificStatusBookByUserId(
             ReadingStatus.COMPLETE, pageable, user.getId());
+        List<BookShelf> bookShelves = pagingBookShelves.getContent();
 
         assertThat(bookShelves.size()).isEqualTo(2);
     }
@@ -193,66 +201,14 @@ public class BookShelfRepositoryTest {
         bookShelfRepository.flush();
 
         user.updateImageUrl("hi");
-//        bookShelf1.getUser().updateImageUrl("by");
+        bookShelf1.getUser().updateImageUrl("by");
 
         Pageable pageable = PageRequest.of(0, 2, Sort.by(Direction.DESC, "id"));
-        List<BookShelf> bookShelves = bookShelfRepository.findSpecificStatusBookByUserId(
+        Page<BookShelf> pagingBookShelves = bookShelfRepository.findSpecificStatusBookByUserId(
             ReadingStatus.WISH, pageable, user.getId());
 
-        for (BookShelf b : bookShelves) {
-//            b.getUser().getId();
-            System.out.println(b.getBook().getTitle());
-        }
+        List<BookShelf> bookShelves = pagingBookShelves.getContent();
 
         assertThat(bookShelves.size()).isEqualTo(2);
     }
-
-    @Test
-    void ts() throws Exception {
-
-        Book book1 = new Book("1234", "effective java", List.of("Joshua"), "insight",
-            "bookCover@naver.com");
-        Book book2 = new Book("12345", "effective java2", List.of("Joshua"), "insight",
-            "bookCove2r@naver.com");
-
-        User user = User.builder().name("hi").build();
-
-        BookShelf bookShelf1 = BookShelf.builder()
-            .book(book1)
-            .readingStatus(ReadingStatus.WISH)
-            .star(Star.ZERO)
-            .singleLineAssessment(null)
-            .build();
-
-        BookShelf bookShelf2 = BookShelf.builder()
-            .book(book2)
-            .readingStatus(ReadingStatus.WISH)
-            .star(Star.ZERO)
-            .singleLineAssessment(null)
-            .build();
-
-        user.setBookShelf(bookShelf1);
-        user.setBookShelf(bookShelf2);
-
-        bookRepository.save(book1);
-        bookRepository.save(book2);
-        userRepository.save(user);
-
-        bookRepository.flush();
-        userRepository.flush();
-
-        User suser = userRepository.findByName("hi").get();
-        List<BookShelf> bookShelves = suser.getBookShelves();
-
-        for (BookShelf bk : bookShelves) {
-            System.out.println(bk.getBookTitle());
-            bookShelfRepository.delete(bk);
-        }
-
-//        suser.getBookShelves().clear();
-
-        bookShelfRepository.flush();
-        userRepository.flush();
-    }
-
 }

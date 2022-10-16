@@ -80,8 +80,8 @@ class ImageValidatorTest {
     void 올바른_이미지의_경우_검증통과() throws Exception {
         MultipartFile multipartFile = mock(MultipartFile.class);
         when(multipartFile.getInputStream()).thenReturn(mock(InputStream.class));
-        when(imageReaderAdapter.getHeight()).thenReturn(150);
-        when(imageReaderAdapter.getWidth()).thenReturn(150);
+        when(imageReaderAdapter.getHeight()).thenReturn(200);
+        when(imageReaderAdapter.getWidth()).thenReturn(200);
 
         assertThat(imageValidator.hasValidImage(multipartFile)).isTrue();
     }
