@@ -43,10 +43,13 @@ public class BookShelf extends BaseEntity {
 
     private String singleLineAssessment;
 
+<<<<<<< HEAD
     public String getIsbn() {
         return this.book.getIsbn();
     }
 
+=======
+>>>>>>> 7bf90f72e39a83acdd9d5f58fe2ee27fad2f6081
     public void setUser(User user) {
         this.user = user;
     }

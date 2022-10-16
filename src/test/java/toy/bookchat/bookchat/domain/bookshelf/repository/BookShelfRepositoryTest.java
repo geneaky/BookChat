@@ -208,7 +208,55 @@ public class BookShelfRepositoryTest {
             ReadingStatus.WISH, pageable, user.getId());
 
         List<BookShelf> bookShelves = pagingBookShelves.getContent();
-
         assertThat(bookShelves.size()).isEqualTo(2);
     }
+
+    @Test
+    void ts() throws Exception {
+
+        Book book1 = new Book("1234", "effective java", List.of("Joshua"), "insight",
+            "bookCover@naver.com");
+        Book book2 = new Book("12345", "effective java2", List.of("Joshua"), "insight",
+            "bookCove2r@naver.com");
+
+        User user = User.builder().name("hi").build();
+
+        BookShelf bookShelf1 = BookShelf.builder()
+            .book(book1)
+            .readingStatus(ReadingStatus.WISH)
+            .star(Star.ZERO)
+            .singleLineAssessment(null)
+            .build();
+
+        BookShelf bookShelf2 = BookShelf.builder()
+            .book(book2)
+            .readingStatus(ReadingStatus.WISH)
+            .star(Star.ZERO)
+            .singleLineAssessment(null)
+            .build();
+
+        user.setBookShelf(bookShelf1);
+        user.setBookShelf(bookShelf2);
+
+        bookRepository.save(book1);
+        bookRepository.save(book2);
+        userRepository.save(user);
+
+        bookRepository.flush();
+        userRepository.flush();
+
+        User suser = userRepository.findByName("hi").get();
+        List<BookShelf> bookShelves = suser.getBookShelves();
+
+        for (BookShelf bk : bookShelves) {
+            System.out.println(bk.getBookTitle());
+            bookShelfRepository.delete(bk);
+        }
+
+//        suser.getBookShelves().clear();
+
+        bookShelfRepository.flush();
+        userRepository.flush();
+    }
+
 }
