@@ -224,6 +224,10 @@ include::{snippets}/book-search-author-paging/http-response.adoc[]
 
 === 읽을 도서 등록
 
+`Request Header`
+
+include::{snippets}/bookshelf-wish/request-headers.adoc[]
+
 `Request`
 
 include::{snippets}/bookshelf-wish/request-fields.adoc[]
@@ -236,6 +240,10 @@ include::{snippets}/bookshelf-wish/http-response.adoc[]
 ---
 
 === 읽고 있는 도서 등록
+
+`Request Header`
+
+include::{snippets}/bookshelf-reading/request-headers.adoc[]
 
 `Request`
 
@@ -250,6 +258,10 @@ include::{snippets}/bookshelf-reading/http-response.adoc[]
 
 === 읽은 도서 등록
 
+`Reqeust Header`
+
+include::{snippets}/bookshelf-complete/request-headers.adoc[]
+
 `Request`
 
 include::{snippets}/bookshelf-complete/request-fields.adoc[]
@@ -262,6 +274,10 @@ include::{snippets}/bookshelf-complete/http-response.adoc[]
 ---
 
 === 읽을 도서 조회
+
+`Request Header`
+
+include::{snippets}/get-bookshelf-wish/request-headers.adoc[]
 
 `Request`
 
@@ -277,6 +293,10 @@ include::{snippets}/get-bookshelf-wish/response-body.adoc[]
 
 === 읽고 있는 도서 조회
 
+`Request Header`
+
+include::{snippets}/get-bookshelf-reading/request-headers.adoc[]
+
 `Request`
 
 include::{snippets}/get-bookshelf-reading/request-parameters.adoc[]
@@ -291,6 +311,10 @@ include::{snippets}/get-bookshelf-reading/response-body.adoc[]
 
 === 읽은 도서 조회
 
+`Request Header`
+
+include::{snippets}/get-bookshelf-complete/request-headers.adoc[]
+
 `Request`
 
 include::{snippets}/get-bookshelf-complete/request-parameters.adoc[]
@@ -302,3 +326,18 @@ include::{snippets}/get-bookshelf-complete/response-fields.adoc[]
 include::{snippets}/get-bookshelf-complete/response-body.adoc[]
 
 ---
+
+=== 읽고 있는 도서 페이지번호 저장
+
+`Request Header`
+
+include::{snippets}/put-bookshelf-pages/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/put-bookshelf-pages/request-fields.adoc[]
+include::{snippets}/put-bookshelf-pages/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/put-bookshelf-pages/http-response.adoc[]

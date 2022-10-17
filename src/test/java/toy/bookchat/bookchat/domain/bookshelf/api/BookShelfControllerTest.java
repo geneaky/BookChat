@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -19,6 +20,7 @@ import static org.springframework.restdocs.request.RequestDocumentation.requestP
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static toy.bookchat.bookchat.domain.user.ROLE.USER;
@@ -47,7 +49,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.MediaType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
@@ -60,6 +61,7 @@ import toy.bookchat.bookchat.domain.bookshelf.Star;
 import toy.bookchat.bookchat.domain.bookshelf.service.BookShelfService;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfRequestDto;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfResponseDto;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.ChangeReadingBookPageRequestDto;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.SearchBookShelfByReadingStatusDto;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
@@ -158,7 +160,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
     void 로그인하지_않은_사용자_요청_401() throws Exception {
         mockMvc.perform(post("/v1/api/bookshelf/books")
                 .content(objectMapper.writeValueAsString(getBookShelfRequestDto(ReadingStatus.READING)))
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
             .andExpect(status().isUnauthorized());
     }
 
@@ -169,7 +171,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
         mockMvc.perform(post("/v1/api/bookshelf/books")
                 .header("Authorization", "Bearer " + getTestToken())
                 .content(objectMapper.writeValueAsString(getBookShelfRequestDto(ReadingStatus.READING)))
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isCreated())
             .andDo(document("bookshelf-reading",
@@ -197,7 +199,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
                 .header("Authorization", "Bearer " + getTestToken())
                 .content(
                     objectMapper.writeValueAsString(getBookShelfRequestDto(ReadingStatus.COMPLETE)))
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isCreated())
             .andDo(document("bookshelf-complete",
@@ -237,7 +239,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
                 .header("Authorization", "Bearer " + getTestToken())
                 .content(
                     objectMapper.writeValueAsString(bookShelfRequestDto))
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isBadRequest());
 
@@ -250,7 +252,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
         mockMvc.perform(post("/v1/api/bookshelf/books")
                 .header("Authorization", "Bearer " + getTestToken())
                 .content(objectMapper.writeValueAsString(getBookShelfRequestDto(ReadingStatus.WISH)))
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isCreated())
             .andDo(document("bookshelf-wish",
@@ -277,7 +279,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
                 .header("Authorization", "Bearer " + getTestToken())
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isBadRequest());
     }
@@ -293,7 +295,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
         mockMvc.perform(post("/v1/api/bookshelf/books")
                 .header("Authorization", "Bearer " + getTestToken())
                 .content(objectMapper.writeValueAsString(bookShelfTestRequestDto))
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isBadRequest());
     }
@@ -313,7 +315,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
         mockMvc.perform(post("/v1/api/bookshelf/books")
                 .header("Authorization", "Bearer " + getTestToken())
                 .content(objectMapper.writeValueAsString(bookShelfRequestDto))
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isBadRequest());
 
@@ -334,7 +336,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
         mockMvc.perform(post("/v1/api/bookshelf/books")
                 .header("Authorization", "Bearer " + getTestToken())
                 .content(objectMapper.writeValueAsString(bookShelfRequestDto))
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isBadRequest());
     }
@@ -355,7 +357,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
         mockMvc.perform(post("/v1/api/bookshelf/books")
                 .header("Authorization", "Bearer " + getTestToken())
                 .content(objectMapper.writeValueAsString(bookShelfRequestDto))
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isBadRequest());
     }
@@ -375,7 +377,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
         mockMvc.perform(post("/v1/api/bookshelf/books")
                 .header("Authorization", "Bearer " + getTestToken())
                 .content(objectMapper.writeValueAsString(bookShelfRequestDto))
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isBadRequest());
     }
@@ -396,7 +398,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
         mockMvc.perform(post("/v1/api/bookshelf/books")
                 .header("Authorization", "Bearer " + getTestToken())
                 .content(objectMapper.writeValueAsString(bookShelfRequestDto))
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isBadRequest());
 
@@ -417,7 +419,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
         mockMvc.perform(post("/v1/api/bookshelf/books")
                 .header("Authorization", "Bearer " + getTestToken())
                 .content(objectMapper.writeValueAsString(bookShelfRequestDto))
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isBadRequest());
 
@@ -439,7 +441,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
         mockMvc.perform(post("/v1/api/bookshelf/books")
                 .header("Authorization", "Bearer " + getTestToken())
                 .content(objectMapper.writeValueAsString(bookShelfRequestDto))
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isBadRequest());
 
@@ -460,7 +462,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
         mockMvc.perform(post("/v1/api/bookshelf/books")
                 .header("Authorization", "Bearer " + getTestToken())
                 .content(objectMapper.writeValueAsString(bookShelfRequestDto))
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isBadRequest());
 
@@ -482,7 +484,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
         mockMvc.perform(post("/v1/api/bookshelf/books")
                 .header("Authorization", "Bearer " + getTestToken())
                 .content(objectMapper.writeValueAsString(bookShelfRequestDto))
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isBadRequest());
 
@@ -710,6 +712,32 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
             any(Pageable.class), any(User.class));
     }
 
+    @Test
+    void 현재_읽고있는_페이지_등록() throws Exception {
+
+        ChangeReadingBookPageRequestDto requestDto = new ChangeReadingBookPageRequestDto(
+            "978-89-94327-80-8", 137);
+
+        when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
+
+        mockMvc.perform(put("/v1/api/bookshelf/books")
+                .header("Authorization", "Bearer " + getTestToken())
+                .with(user(getUserPrincipal()))
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestDto)))
+            .andExpect(status().isOk())
+            .andDo(document("put-bookshelf-pages",
+                requestHeaders(
+                    headerWithName("Authorization").description("Bearer [JWT token]")
+                ),
+                requestFields(
+                    fieldWithPath("isbn").type(STRING).description("ISBN"),
+                    fieldWithPath("pages").type(NUMBER).description("현재 읽고 있는 페이지 번호")
+                )));
+
+        verify(bookShelfService).changeReadingBookPage(any());
+    }
+
     static class BookShelfTestRequestDto {
 
         @JsonProperty
@@ -735,5 +763,4 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
             this.readingStatus = readingStatus;
         }
     }
-
 }
