@@ -1,35 +1,62 @@
 package toy.bookchat.bookchat.domain.bookshelf.repository.query;
 
+import static toy.bookchat.bookchat.domain.book.QBook.book;
 import static toy.bookchat.bookchat.domain.bookshelf.QBookShelf.bookShelf;
 
-import com.querydsl.jpa.JPQLQuery;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
+import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 import org.springframework.stereotype.Repository;
+import toy.bookchat.bookchat.domain.book.exception.BookNotFoundException;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
+import toy.bookchat.bookchat.domain.bookshelf.QBookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 
 @Repository
-public class BookShelfQueryRepositoryImpl extends QuerydslRepositorySupport implements
-    BookShelfQueryRepository {
+public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
 
-    private final JPAQueryFactory jpaQueryFactory;
+    private final JPAQueryFactory queryFactory;
 
-    public BookShelfQueryRepositoryImpl() {
-        super(BookShelf.class);
-        this.jpaQueryFactory = new JPAQueryFactory(getEntityManager());
+    public BookShelfQueryRepositoryImpl(JPAQueryFactory queryFactory) {
+        this.queryFactory = queryFactory;
+    }
+
+
+    @Override
+    public Page<BookShelf> findSpecificStatusBookByUserId(
+        ReadingStatus readingStatus, Pageable pageable, Long userId) {
+
+        JPAQuery<BookShelf> jpaQuery = queryFactory.select(bookShelf)
+            .from(bookShelf)
+            .where(bookShelf.readingStatus.eq(readingStatus)
+                .and(bookShelf.user.id.eq(userId)));
+
+        List<BookShelf> bookShelves = jpaQuery.offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .fetch();
+
+        Long size = queryFactory.select(bookShelf.count())
+            .from(bookShelf)
+            .where(bookShelf.readingStatus.eq(readingStatus)
+                .and(bookShelf.user.id.eq(userId)))
+            .fetchOne();
+
+        return new PageImpl<>(bookShelves, pageable, size);
     }
 
     @Override
-    public List<BookShelf> findSpecificStatusBookByUserId(
-        ReadingStatus readingStatus, Pageable pageable, Long userId) {
-
-        JPQLQuery<BookShelf> jpqlQuery = from(bookShelf)
-            .where(bookShelf.readingStatus.eq(readingStatus));
-
-        return getQuerydsl().applyPagination(pageable, jpqlQuery).fetch();
-
+    public BookShelf findReadingBookByUserIdAndISBN(Long userId, String isbn) {
+        return Optional.ofNullable(queryFactory.select(QBookShelf.bookShelf)
+            .from(QBookShelf.bookShelf).innerJoin(QBookShelf.bookShelf.book, book).fetchJoin()
+            .where(QBookShelf.bookShelf.user.id.eq(userId)
+                .and(QBookShelf.bookShelf.readingStatus.eq(ReadingStatus.READING))
+                .and(QBookShelf.bookShelf.book.isbn.eq(isbn)))
+            .fetchOne()).orElseThrow(() -> {
+            throw new BookNotFoundException("Can't Find Book On BookShelf");
+        });
     }
 }

@@ -1,10 +1,9 @@
 package toy.bookchat.bookchat.domain.bookshelf.service;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,9 +13,9 @@ import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfRequestDto;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfSearchResponseDto;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.ChangeReadingBookPageRequestDto;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.SearchBookShelfByReadingStatusDto;
 import toy.bookchat.bookchat.domain.user.User;
-import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -41,9 +40,7 @@ public class BookShelfService {
     }
 
     private Consumer<Book> putBook(BookShelfRequestDto bookShelfRequestDto, User user) {
-        return (book) -> {
-            putBookOnBookShelf(bookShelfRequestDto, book, user);
-        };
+        return book -> putBookOnBookShelf(bookShelfRequestDto, book, user);
     }
 
     private void putBookOnBookShelf(BookShelfRequestDto bookShelfRequestDto, Book book, User user) {
@@ -51,24 +48,25 @@ public class BookShelfService {
         bookShelfRepository.save(bookShelf);
     }
 
-    private BookShelf createBookShelfByReadingStatus(BookShelfRequestDto bookShelfRequestDto, Book book, User user) {
-        if(isFinishedReading(bookShelfRequestDto)) {
+    private BookShelf createBookShelfByReadingStatus(BookShelfRequestDto bookShelfRequestDto,
+        Book book, User user) {
+        if (isFinishedReading(bookShelfRequestDto)) {
             bookShelfRequestDto.checkCompleteStateField();
 
             return BookShelf.builder()
-                    .book(book)
-                    .readingStatus(bookShelfRequestDto.getReadingStatus())
-                    .user(user)
-                    .star(bookShelfRequestDto.getStar())
-                    .singleLineAssessment(bookShelfRequestDto.getSingleLineAssessment())
-                    .build();
-        }
-
-        return BookShelf.builder()
                 .book(book)
                 .readingStatus(bookShelfRequestDto.getReadingStatus())
                 .user(user)
+                .star(bookShelfRequestDto.getStar())
+                .singleLineAssessment(bookShelfRequestDto.getSingleLineAssessment())
                 .build();
+        }
+
+        return BookShelf.builder()
+            .book(book)
+            .readingStatus(bookShelfRequestDto.getReadingStatus())
+            .user(user)
+            .build();
     }
 
     private boolean isFinishedReading(BookShelfRequestDto bookShelfRequestDto) {
@@ -76,32 +74,23 @@ public class BookShelfService {
     }
 
     @Transactional(readOnly = true)
-    public List<BookShelfSearchResponseDto> takeBooksOutOfBookShelf(ReadingStatus readingStatus,
+    public SearchBookShelfByReadingStatusDto takeBooksOutOfBookShelf(ReadingStatus readingStatus,
         Pageable pageable, User user) {
 
-        List<BookShelf> bookShelves = bookShelfRepository.findSpecificStatusBookByUserId(
+        Page<BookShelf> pagingBookShelves = bookShelfRepository.findSpecificStatusBookByUserId(
             readingStatus, pageable,
             user.getId());
 
-        return getBookShelfSearchResponseDtos(bookShelves);
+        return new SearchBookShelfByReadingStatusDto(pagingBookShelves);
     }
 
-    private List<BookShelfSearchResponseDto> getBookShelfSearchResponseDtos(
-        List<BookShelf> bookShelves) {
-        List<BookShelfSearchResponseDto> bookShelfSearchResponseDtos = new ArrayList<>();
+    @Transactional
+    public void changeReadingBookPage(
+        ChangeReadingBookPageRequestDto changeReadingBookPageRequestDto, User user) {
 
-        for (BookShelf bookShelf : bookShelves) {
-            BookShelfSearchResponseDto bookShelfSearchResponseDto = BookShelfSearchResponseDto.builder()
-                .title(bookShelf.getBookTitle())
-                .authors(bookShelf.getBookAuthors())
-                .publisher(bookShelf.getBookPublisher())
-                .bookCoverImageUrl(bookShelf.getBookCoverImageUrl())
-                .star(bookShelf.getStar())
-                .singleLineAssessment(bookShelf.getSingleLineAssessment())
-                .build();
+        BookShelf bookShelf = bookShelfRepository.findReadingBookByUserIdAndISBN(user.getId(),
+            changeReadingBookPageRequestDto.getIsbn());
 
-            bookShelfSearchResponseDtos.add(bookShelfSearchResponseDto);
-        }
-        return bookShelfSearchResponseDtos;
+        bookShelf.updatePage(changeReadingBookPageRequestDto.getPages());
     }
 }

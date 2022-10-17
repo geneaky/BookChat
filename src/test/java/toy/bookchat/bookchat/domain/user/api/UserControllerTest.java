@@ -349,7 +349,7 @@ class UserControllerTest extends AuthenticationTestExtension {
                     headerWithName("OIDC").description("Bearer [openid token]")
                 ),
                 requestParts(
-                    partWithName("userProfileImage").description("프로필 이미지"),
+                    partWithName("userProfileImage").description("프로필 이미지 [200 x 200].webp"),
                     partWithName("userSignUpRequestDto").description("회원가입 입력 폼")
                 ),
                 requestPartFields("userSignUpRequestDto",

@@ -9,7 +9,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +21,14 @@ import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.user.User;
 
 @Entity
+@Table(uniqueConstraints = {
+    @UniqueConstraint(
+        columnNames = {"user_id", "book_id"}
+    )
+})
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BookShelf extends BaseEntity {
 
@@ -28,7 +38,7 @@ public class BookShelf extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Book book;
-
+    private Integer pages;
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
@@ -40,14 +50,8 @@ public class BookShelf extends BaseEntity {
 
     private String singleLineAssessment;
 
-    @Builder
-    private BookShelf(Book book, User user, ReadingStatus readingStatus, Star star,
-        String singleLineAssessment) {
-        this.book = book;
-        this.user = user;
-        this.readingStatus = readingStatus;
-        this.star = star;
-        this.singleLineAssessment = singleLineAssessment;
+    public String getIsbn() {
+        return this.book.getIsbn();
     }
 
     public void setUser(User user) {
@@ -72,5 +76,13 @@ public class BookShelf extends BaseEntity {
 
     public String getBookCoverImageUrl() {
         return this.book.getBookCoverImageUrl();
+    }
+
+    public boolean isNotReadingStatus() {
+        return this.readingStatus != ReadingStatus.READING;
+    }
+
+    public void updatePage(Integer pages) {
+        this.pages = pages;
     }
 }

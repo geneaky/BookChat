@@ -1,12 +1,14 @@
 package toy.bookchat.bookchat.domain.bookshelf.repository.query;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 
 public interface BookShelfQueryRepository {
 
-    List<BookShelf> findSpecificStatusBookByUserId(
+    Page<BookShelf> findSpecificStatusBookByUserId(
         ReadingStatus readingStatus, Pageable pageable, Long userId);
+
+    BookShelf findReadingBookByUserIdAndISBN(Long userId, String isbn);
 }

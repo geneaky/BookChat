@@ -1,6 +1,5 @@
 package toy.bookchat.bookchat.domain.bookshelf.api;
 
-import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -8,13 +7,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.service.BookShelfService;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfRequestDto;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfSearchResponseDto;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.ChangeReadingBookPageRequestDto;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.SearchBookShelfByReadingStatusDto;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.security.user.CurrentUser;
 
@@ -35,13 +36,21 @@ public class BookShelfController {
     }
 
     @GetMapping("/bookshelf/books")
-    public ResponseEntity<List<BookShelfSearchResponseDto>> takeBookOutOfBookShelf(
+    public ResponseEntity<SearchBookShelfByReadingStatusDto> takeBookOutOfBookShelf(
         ReadingStatus readingStatus, Pageable pageable,
         @CurrentUser User user
     ) {
-
-        List<BookShelfSearchResponseDto> bookShelfSearchResponseDtos = bookShelfService.takeBooksOutOfBookShelf(
+        SearchBookShelfByReadingStatusDto searchBookShelfByReadingStatusDto = bookShelfService.takeBooksOutOfBookShelf(
             readingStatus, pageable, user);
-        return ResponseEntity.status(HttpStatus.OK).body(bookShelfSearchResponseDtos);
+        return ResponseEntity.status(HttpStatus.OK).body(searchBookShelfByReadingStatusDto);
+    }
+
+    @PutMapping("/bookshelf/books")
+    public ResponseEntity<Void> changeReadingBookPagesOnBookShelf(
+        @Valid @RequestBody ChangeReadingBookPageRequestDto changeReadingBookPageRequestDto,
+        @CurrentUser User user
+    ) {
+        bookShelfService.changeReadingBookPage(changeReadingBookPageRequestDto, user);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
