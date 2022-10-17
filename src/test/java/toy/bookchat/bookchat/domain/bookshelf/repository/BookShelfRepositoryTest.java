@@ -27,7 +27,7 @@ import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 @DataJpaTest
 @AutoConfigureJson
 @Import({JpaAuditingConfig.class, TestConfig.class})
-public class BookShelfRepositoryTest {
+class BookShelfRepositoryTest {
 
     @Autowired
     private BookRepository bookRepository;
@@ -39,7 +39,7 @@ public class BookShelfRepositoryTest {
     private ObjectMapper objectMapper;
 
     @Test
-    public void 책_저장() throws Exception {
+    void 책_저장() throws Exception {
         Book book = new Book("1234", "effective java", List.of("Joshua"), "insight",
             "bookCover@naver.com");
 
@@ -48,7 +48,7 @@ public class BookShelfRepositoryTest {
     }
 
     @Test
-    public void 책장에_책을_저장() throws Exception {
+    void 책장에_책을_저장() throws Exception {
 
         BookShelf bookShelf = BookShelf.builder().build();
 
@@ -73,7 +73,7 @@ public class BookShelfRepositoryTest {
     }
 
     @Test
-    public void 읽고있는_책을_조회() throws Exception {
+    void 읽고있는_책을_조회() throws Exception {
         Book book1 = new Book("1234", "effective java", List.of("Joshua"), "insight",
             "bookCover@naver.com");
         Book book2 = new Book("12345", "effective java2", List.of("Joshua"), "insight",
@@ -112,12 +112,12 @@ public class BookShelfRepositoryTest {
         Page<BookShelf> pagingBookShelves = bookShelfRepository.findSpecificStatusBookByUserId(
             ReadingStatus.READING, pageable, user.getId());
         List<BookShelf> bookShelves = pagingBookShelves.getContent();
-
-        assertThat(bookShelves.size()).isEqualTo(2);
+        int result = bookShelves.size();
+        assertThat(result).isEqualTo(2);
     }
 
     @Test
-    public void 읽은_책을_조회() throws Exception {
+    void 읽은_책을_조회() throws Exception {
         Book book1 = new Book("1234", "effective java", List.of("Joshua"), "insight",
             "bookCover@naver.com");
         Book book2 = new Book("12345", "effective java2", List.of("Joshua"), "insight",
@@ -156,12 +156,12 @@ public class BookShelfRepositoryTest {
         Page<BookShelf> pagingBookShelves = bookShelfRepository.findSpecificStatusBookByUserId(
             ReadingStatus.COMPLETE, pageable, user.getId());
         List<BookShelf> bookShelves = pagingBookShelves.getContent();
-
-        assertThat(bookShelves.size()).isEqualTo(2);
+        int result = bookShelves.size();
+        assertThat(result).isEqualTo(2);
     }
 
     @Test
-    public void 읽을_책을_조회() throws Exception {
+    void 읽을_책을_조회() throws Exception {
         Book book1 = new Book("1234", "effective java", List.of("Joshua"), "insight",
             "bookCover@naver.com");
         Book book2 = new Book("12345", "effective java2", List.of("Joshua"), "insight",
@@ -208,55 +208,7 @@ public class BookShelfRepositoryTest {
             ReadingStatus.WISH, pageable, user.getId());
 
         List<BookShelf> bookShelves = pagingBookShelves.getContent();
-        assertThat(bookShelves.size()).isEqualTo(2);
+        int result = bookShelves.size();
+        assertThat(result).isEqualTo(2);
     }
-
-    @Test
-    void ts() throws Exception {
-
-        Book book1 = new Book("1234", "effective java", List.of("Joshua"), "insight",
-            "bookCover@naver.com");
-        Book book2 = new Book("12345", "effective java2", List.of("Joshua"), "insight",
-            "bookCove2r@naver.com");
-
-        User user = User.builder().name("hi").build();
-
-        BookShelf bookShelf1 = BookShelf.builder()
-            .book(book1)
-            .readingStatus(ReadingStatus.WISH)
-            .star(Star.ZERO)
-            .singleLineAssessment(null)
-            .build();
-
-        BookShelf bookShelf2 = BookShelf.builder()
-            .book(book2)
-            .readingStatus(ReadingStatus.WISH)
-            .star(Star.ZERO)
-            .singleLineAssessment(null)
-            .build();
-
-        user.setBookShelf(bookShelf1);
-        user.setBookShelf(bookShelf2);
-
-        bookRepository.save(book1);
-        bookRepository.save(book2);
-        userRepository.save(user);
-
-        bookRepository.flush();
-        userRepository.flush();
-
-        User suser = userRepository.findByName("hi").get();
-        List<BookShelf> bookShelves = suser.getBookShelves();
-
-        for (BookShelf bk : bookShelves) {
-            System.out.println(bk.getBookTitle());
-            bookShelfRepository.delete(bk);
-        }
-
-//        suser.getBookShelves().clear();
-
-        bookShelfRepository.flush();
-        userRepository.flush();
-    }
-
 }

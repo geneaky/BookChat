@@ -39,9 +39,7 @@ public class BookShelfService {
     }
 
     private Consumer<Book> putBook(BookShelfRequestDto bookShelfRequestDto, User user) {
-        return (book) -> {
-            putBookOnBookShelf(bookShelfRequestDto, book, user);
-        };
+        return book -> putBookOnBookShelf(bookShelfRequestDto, book, user);
     }
 
     private void putBookOnBookShelf(BookShelfRequestDto bookShelfRequestDto, Book book, User user) {

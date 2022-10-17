@@ -2,10 +2,12 @@ package toy.bookchat.bookchat.domain.bookshelf.service.dto;
 
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Getter;
 import org.springframework.data.domain.Page;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.common.PageDto;
 
+@Getter
 public class SearchBookShelfByReadingStatusDto extends PageDto {
 
     private List<BookShelfResponseDto> contents;

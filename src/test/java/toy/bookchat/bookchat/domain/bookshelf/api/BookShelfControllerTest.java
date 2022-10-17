@@ -8,6 +8,8 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.headerWit
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
+import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
+import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
@@ -41,12 +43,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.jaxb.SpringDataJaxb.PageRequestDto;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -492,33 +492,26 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
     void 읽고있는_책_조회_성공() throws Exception {
         List<BookShelf> result = new ArrayList<>();
 
-        BookShelfResponseDto bookShelfResponseDto = BookShelfResponseDto.builder()
-            .title("effectiveJava")
-            .authors(List.of("joshua"))
-            .bookCoverImageUrl("testBookCoverImage@naver.com")
-            .publisher("jpub")
-            .star(null)
-            .singleLineAssessment(null).build();
-
         User user = User.builder().build();
         Book book = new Book("12345", "effectiveJava", List.of("joshua"), "jpub",
             "testBookCoverImageUrl");
         BookShelf bookShelf = BookShelf.builder()
             .book(book)
             .user(user)
-            .pages(0)
+            .pages(152)
             .readingStatus(ReadingStatus.READING)
             .build();
 
         result.add(bookShelf);
 
-        PageRequest pageRequest = new(0, 1, Sort.by("id,DESC"));
-        new PageImpl<BookShelf>(result, pageRequest);
-        SearchBookShelfByReadingStatusDto searchBookShelfByReadingStatusDto = new SearchBookShelfByReadingStatusDto();
+        PageRequest pageRequest = PageRequest.of(0, 1, Sort.by("id,DESC"));
+        PageImpl<BookShelf> bookShelves = new PageImpl<>(result, pageRequest, 1);
+        SearchBookShelfByReadingStatusDto searchBookShelfByReadingStatusDto = new SearchBookShelfByReadingStatusDto(
+            bookShelves);
 
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
         when(bookShelfService.takeBooksOutOfBookShelf(any(ReadingStatus.class), any(Pageable.class),
-            any(User.class))).thenReturn(result);
+            any(User.class))).thenReturn(searchBookShelfByReadingStatusDto);
 
         mockMvc.perform(get("/v1/api/bookshelf/books")
                 .header("Authorization", "Bearer " + getTestToken())
@@ -540,14 +533,24 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
                     parameterWithName("sort").description("등록순-id")
                 ),
                 responseFields(
-                    fieldWithPath("[].title").type(STRING).description("제목"),
-                    fieldWithPath("[].bookCoverImageUrl").type(STRING).optional()
+                    fieldWithPath("contents[].title").type(STRING).description("제목"),
+                    fieldWithPath("contents[].isbn").type(STRING).description("ISBN"),
+                    fieldWithPath("contents[].bookCoverImageUrl").type(STRING).optional()
                         .description("책 커버 이미지 URI"),
-                    fieldWithPath("[].authors[]").type(ARRAY).description("저자"),
-                    fieldWithPath("[].publisher").type(STRING).description("출판사"),
-                    fieldWithPath("[].star").type(STRING).optional().description("평점"),
-                    fieldWithPath("[].singleLineAssessment").type(STRING).optional()
-                        .description("한 줄 평")
+                    fieldWithPath("contents[].authors[]").type(ARRAY).description("저자"),
+                    fieldWithPath("contents[].publisher").type(STRING).description("출판사"),
+                    fieldWithPath("contents[].pages").type(NUMBER).description("현재 읽고 있는 페이지 번호"),
+                    fieldWithPath("contents[].star").type(STRING).optional().description("평점"),
+                    fieldWithPath("contents[].singleLineAssessment").type(STRING).optional()
+                        .description("한 줄 평"),
+                    fieldWithPath("totalElements").type(NUMBER).description("전체 ROW 수"),
+                    fieldWithPath("totalPages").type(NUMBER).description("총 페이지 수"),
+                    fieldWithPath("pageSize").type(NUMBER).description("요청한 페이지 사이즈"),
+                    fieldWithPath("pageNumber").type(NUMBER).description("현재 페이지 번호"),
+                    fieldWithPath("offset").type(NUMBER).description("ROW 시작 번호"),
+                    fieldWithPath("first").type(BOOLEAN).description("시작 페이지 여부"),
+                    fieldWithPath("last").type(BOOLEAN).description("마지막 페이지 여부"),
+                    fieldWithPath("empty").type(BOOLEAN).description("content 비어있는지 여부")
                 ))
             );
 
@@ -557,7 +560,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
 
     @Test
     void 읽은_책_조회_성공() throws Exception {
-        List<BookShelfResponseDto> result = new ArrayList<>();
+        List<BookShelf> result = new ArrayList<>();
 
         BookShelfResponseDto bookShelfResponseDto = BookShelfResponseDto.builder()
             .title("effectiveJava")
@@ -567,11 +570,28 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
             .star(Star.FOUR_HALF)
             .singleLineAssessment("it's is best").build();
 
-        result.add(bookShelfResponseDto);
+        User user = User.builder().build();
+        Book book = new Book("12345", "effectiveJava", List.of("joshua"), "jpub",
+            "testBookCoverImageUrl");
+        BookShelf bookShelf = BookShelf.builder()
+            .book(book)
+            .user(user)
+            .pages(0)
+            .readingStatus(ReadingStatus.READING)
+            .star(Star.FOUR_HALF)
+            .singleLineAssessment("it's is best")
+            .build();
+
+        result.add(bookShelf);
+
+        PageRequest pageRequest = PageRequest.of(0, 1, Sort.by("id,DESC"));
+        PageImpl<BookShelf> bookShelves = new PageImpl<>(result, pageRequest, 1);
+        SearchBookShelfByReadingStatusDto searchBookShelfByReadingStatusDto = new SearchBookShelfByReadingStatusDto(
+            bookShelves);
 
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
         when(bookShelfService.takeBooksOutOfBookShelf(any(ReadingStatus.class), any(Pageable.class),
-            any(User.class))).thenReturn(result);
+            any(User.class))).thenReturn(searchBookShelfByReadingStatusDto);
 
         mockMvc.perform(get("/v1/api/bookshelf/books")
                 .header("Authorization", "Bearer " + getTestToken())
@@ -593,13 +613,24 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
                     parameterWithName("sort").description("등록순-id")
                 ),
                 responseFields(
-                    fieldWithPath("[].title").type(STRING).description("제목"),
-                    fieldWithPath("[].bookCoverImageUrl").type(STRING).optional()
+                    fieldWithPath("contents[].title").type(STRING).description("제목"),
+                    fieldWithPath("contents[].isbn").type(STRING).description("ISBN"),
+                    fieldWithPath("contents[].bookCoverImageUrl").type(STRING).optional()
                         .description("책 커버 이미지 URI"),
-                    fieldWithPath("[].authors[]").type(ARRAY).description("저자"),
-                    fieldWithPath("[].publisher").type(STRING).description("출판사"),
-                    fieldWithPath("[].star").type(STRING).description("평점"),
-                    fieldWithPath("[].singleLineAssessment").type(STRING).description("한 줄 평")
+                    fieldWithPath("contents[].authors[]").type(ARRAY).description("저자"),
+                    fieldWithPath("contents[].publisher").type(STRING).description("출판사"),
+                    fieldWithPath("contents[].pages").type(NUMBER).description("현재 읽고 있는 페이지 번호"),
+                    fieldWithPath("contents[].star").type(STRING).description("평점"),
+                    fieldWithPath("contents[].singleLineAssessment").type(STRING)
+                        .description("한 줄 평"),
+                    fieldWithPath("totalElements").type(NUMBER).description("전체 ROW 수"),
+                    fieldWithPath("totalPages").type(NUMBER).description("총 페이지 수"),
+                    fieldWithPath("pageSize").type(NUMBER).description("요청한 페이지 사이즈"),
+                    fieldWithPath("pageNumber").type(NUMBER).description("현재 페이지 번호"),
+                    fieldWithPath("offset").type(NUMBER).description("ROW 시작 번호"),
+                    fieldWithPath("first").type(BOOLEAN).description("시작 페이지 여부"),
+                    fieldWithPath("last").type(BOOLEAN).description("마지막 페이지 여부"),
+                    fieldWithPath("empty").type(BOOLEAN).description("content 비어있는지 여부")
                 ))
             );
 
@@ -609,21 +640,30 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
 
     @Test
     void 읽을_책_조회_성공() throws Exception {
-        List<BookShelfResponseDto> result = new ArrayList<>();
+        List<BookShelf> result = new ArrayList<>();
 
-        BookShelfResponseDto bookShelfResponseDto = BookShelfResponseDto.builder()
-            .title("effectiveJava")
-            .authors(List.of("joshua"))
-            .bookCoverImageUrl("testBookCoverImage@naver.com")
-            .publisher("jpub")
+        User user = User.builder().build();
+        Book book = new Book("12345", "effectiveJava", List.of("joshua"), "jpub",
+            "testBookCoverImageUrl");
+        BookShelf bookShelf = BookShelf.builder()
+            .book(book)
+            .user(user)
+            .pages(0)
+            .readingStatus(ReadingStatus.WISH)
             .star(null)
-            .singleLineAssessment(null).build();
+            .singleLineAssessment(null)
+            .build();
 
-        result.add(bookShelfResponseDto);
+        result.add(bookShelf);
+
+        PageRequest pageRequest = PageRequest.of(0, 1, Sort.by("id,DESC"));
+        PageImpl<BookShelf> bookShelves = new PageImpl<>(result, pageRequest, 1);
+        SearchBookShelfByReadingStatusDto searchBookShelfByReadingStatusDto = new SearchBookShelfByReadingStatusDto(
+            bookShelves);
 
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
         when(bookShelfService.takeBooksOutOfBookShelf(any(ReadingStatus.class), any(Pageable.class),
-            any(User.class))).thenReturn(result);
+            any(User.class))).thenReturn(searchBookShelfByReadingStatusDto);
 
         mockMvc.perform(get("/v1/api/bookshelf/books")
                 .header("Authorization", "Bearer " + getTestToken())
@@ -645,14 +685,24 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
                     parameterWithName("sort").description("등록순-id")
                 ),
                 responseFields(
-                    fieldWithPath("[].title").type(STRING).description("제목"),
-                    fieldWithPath("[].bookCoverImageUrl").type(STRING).optional()
+                    fieldWithPath("contents[].title").type(STRING).description("제목"),
+                    fieldWithPath("contents[].isbn").type(STRING).description("ISBN"),
+                    fieldWithPath("contents[].bookCoverImageUrl").type(STRING).optional()
                         .description("책 커버 이미지 URI"),
-                    fieldWithPath("[].authors[]").type(ARRAY).description("저자"),
-                    fieldWithPath("[].publisher").type(STRING).description("출판사"),
-                    fieldWithPath("[].star").type(STRING).optional().description("평점"),
-                    fieldWithPath("[].singleLineAssessment").type(STRING).optional()
-                        .description("한 줄 평")
+                    fieldWithPath("contents[].authors[]").type(ARRAY).description("저자"),
+                    fieldWithPath("contents[].publisher").type(STRING).description("출판사"),
+                    fieldWithPath("contents[].pages").type(NUMBER).description("현재 읽고 있는 페이지 번호"),
+                    fieldWithPath("contents[].star").type(STRING).optional().description("평점"),
+                    fieldWithPath("contents[].singleLineAssessment").type(STRING).optional()
+                        .description("한 줄 평"),
+                    fieldWithPath("totalElements").type(NUMBER).description("전체 ROW 수"),
+                    fieldWithPath("totalPages").type(NUMBER).description("총 페이지 수"),
+                    fieldWithPath("pageSize").type(NUMBER).description("요청한 페이지 사이즈"),
+                    fieldWithPath("pageNumber").type(NUMBER).description("현재 페이지 번호"),
+                    fieldWithPath("offset").type(NUMBER).description("ROW 시작 번호"),
+                    fieldWithPath("first").type(BOOLEAN).description("시작 페이지 여부"),
+                    fieldWithPath("last").type(BOOLEAN).description("마지막 페이지 여부"),
+                    fieldWithPath("empty").type(BOOLEAN).description("content 비어있는지 여부")
                 ))
             );
 

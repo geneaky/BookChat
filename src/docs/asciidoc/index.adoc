@@ -271,6 +271,7 @@ include::{snippets}/get-bookshelf-wish/http-request.adoc[]
 `Response`
 
 include::{snippets}/get-bookshelf-wish/response-fields.adoc[]
+include::{snippets}/get-bookshelf-wish/response-body.adoc[]
 
 ---
 
@@ -284,6 +285,7 @@ include::{snippets}/get-bookshelf-reading/http-request.adoc[]
 `Response`
 
 include::{snippets}/get-bookshelf-reading/response-fields.adoc[]
+include::{snippets}/get-bookshelf-reading/response-body.adoc[]
 
 ---
 
@@ -297,5 +299,6 @@ include::{snippets}/get-bookshelf-complete/http-request.adoc[]
 `Response`
 
 include::{snippets}/get-bookshelf-complete/response-fields.adoc[]
+include::{snippets}/get-bookshelf-complete/response-body.adoc[]
 
 ---
