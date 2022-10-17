@@ -84,8 +84,13 @@ public class BookShelfService {
         return new SearchBookShelfByReadingStatusDto(pagingBookShelves);
     }
 
+    @Transactional
     public void changeReadingBookPage(
-        ChangeReadingBookPageRequestDto changeReadingBookPageRequestDto) {
-        
+        ChangeReadingBookPageRequestDto changeReadingBookPageRequestDto, User user) {
+
+        BookShelf bookShelf = bookShelfRepository.findReadingBookByUserIdAndISBN(user.getId(),
+            changeReadingBookPageRequestDto.getIsbn());
+
+        bookShelf.updatePage(changeReadingBookPageRequestDto.getPages());
     }
 }

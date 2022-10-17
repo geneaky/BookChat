@@ -9,6 +9,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,6 +21,11 @@ import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.user.User;
 
 @Entity
+@Table(uniqueConstraints = {
+    @UniqueConstraint(
+        columnNames = {"user_id", "book_id"}
+    )
+})
 @Getter
 @Builder
 @AllArgsConstructor
@@ -69,5 +76,13 @@ public class BookShelf extends BaseEntity {
 
     public String getBookCoverImageUrl() {
         return this.book.getBookCoverImageUrl();
+    }
+
+    public boolean isNotReadingStatus() {
+        return this.readingStatus != ReadingStatus.READING;
+    }
+
+    public void updatePage(Integer pages) {
+        this.pages = pages;
     }
 }

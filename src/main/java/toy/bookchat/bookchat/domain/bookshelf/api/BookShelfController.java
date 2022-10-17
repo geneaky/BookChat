@@ -50,7 +50,7 @@ public class BookShelfController {
         @Valid @RequestBody ChangeReadingBookPageRequestDto changeReadingBookPageRequestDto,
         @CurrentUser User user
     ) {
-        bookShelfService.changeReadingBookPage(changeReadingBookPageRequestDto);
+        bookShelfService.changeReadingBookPage(changeReadingBookPageRequestDto, user);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

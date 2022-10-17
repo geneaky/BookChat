@@ -24,6 +24,7 @@ import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.Star;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfRequestDto;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.ChangeReadingBookPageRequestDto;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.SearchBookShelfByReadingStatusDto;
 import toy.bookchat.bookchat.domain.user.User;
 
@@ -218,5 +219,32 @@ class BookShelfServiceTest {
 
         assertThat(searchBookShelfByReadingStatusDto.getContents().get(0).getIsbn()).isEqualTo(
             "1234");
+    }
+
+    @Test
+    void 읽고있는_책_현재쪽수_업데이트_성공() throws Exception {
+        ChangeReadingBookPageRequestDto changeReadingBookPageRequestDto = new ChangeReadingBookPageRequestDto(
+            "1234", 123);
+
+        User user = getUser();
+        Book book = new Book("1234", "toby's Spring", List.of("이일민"), "jpub",
+            "testBookCoverImageUrl");
+
+        BookShelf bookShelf = BookShelf.builder()
+            .user(user)
+            .book(book)
+            .readingStatus(ReadingStatus.READING)
+            .pages(0)
+            .star(null)
+            .singleLineAssessment(null)
+            .build();
+
+        when(bookShelfRepository.findReadingBookByUserIdAndISBN(any(), any())).thenReturn(
+            bookShelf);
+
+        bookShelfService.changeReadingBookPage(changeReadingBookPageRequestDto, user);
+
+        Integer result = bookShelf.getPages();
+        assertThat(result).isEqualTo(123);
     }
 }

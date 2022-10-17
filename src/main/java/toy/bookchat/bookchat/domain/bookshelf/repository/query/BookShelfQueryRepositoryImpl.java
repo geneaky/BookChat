@@ -1,15 +1,19 @@
 package toy.bookchat.bookchat.domain.bookshelf.repository.query;
 
+import static toy.bookchat.bookchat.domain.book.QBook.book;
 import static toy.bookchat.bookchat.domain.bookshelf.QBookShelf.bookShelf;
 
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+import toy.bookchat.bookchat.domain.book.exception.BookNotFoundException;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
+import toy.bookchat.bookchat.domain.bookshelf.QBookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 
 @Repository
@@ -42,5 +46,17 @@ public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
             .fetchOne();
 
         return new PageImpl<>(bookShelves, pageable, size);
+    }
+
+    @Override
+    public BookShelf findReadingBookByUserIdAndISBN(Long userId, String isbn) {
+        return Optional.ofNullable(queryFactory.select(QBookShelf.bookShelf)
+            .from(QBookShelf.bookShelf).innerJoin(QBookShelf.bookShelf.book, book).fetchJoin()
+            .where(QBookShelf.bookShelf.user.id.eq(userId)
+                .and(QBookShelf.bookShelf.readingStatus.eq(ReadingStatus.READING))
+                .and(QBookShelf.bookShelf.book.isbn.eq(isbn)))
+            .fetchOne()).orElseThrow(() -> {
+            throw new BookNotFoundException("Can't Find Book On BookShelf");
+        });
     }
 }

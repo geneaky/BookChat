@@ -9,4 +9,6 @@ public interface BookShelfQueryRepository {
 
     Page<BookShelf> findSpecificStatusBookByUserId(
         ReadingStatus readingStatus, Pageable pageable, Long userId);
+
+    BookShelf findReadingBookByUserIdAndISBN(Long userId, String isbn);
 }

@@ -735,7 +735,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
                     fieldWithPath("pages").type(NUMBER).description("현재 읽고 있는 페이지 번호")
                 )));
 
-        verify(bookShelfService).changeReadingBookPage(any());
+        verify(bookShelfService).changeReadingBookPage(any(), any());
     }
 
     static class BookShelfTestRequestDto {

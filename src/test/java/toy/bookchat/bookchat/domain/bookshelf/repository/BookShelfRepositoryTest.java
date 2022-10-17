@@ -1,6 +1,7 @@
 package toy.bookchat.bookchat.domain.bookshelf.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
@@ -16,6 +17,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import toy.bookchat.bookchat.config.JpaAuditingConfig;
 import toy.bookchat.bookchat.domain.book.Book;
+import toy.bookchat.bookchat.domain.book.exception.BookNotFoundException;
 import toy.bookchat.bookchat.domain.book.repository.BookRepository;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
@@ -210,5 +212,42 @@ class BookShelfRepositoryTest {
         List<BookShelf> bookShelves = pagingBookShelves.getContent();
         int result = bookShelves.size();
         assertThat(result).isEqualTo(2);
+    }
+
+    @Test
+    void 읽고있는_책_isbn으로_조회성공() throws Exception {
+        Book book = new Book("1234", "effective java", List.of("Joshua"), "insight",
+            "bookCover@naver.com");
+
+        bookRepository.save(book);
+
+        User user = User.builder().name("hi").build();
+        userRepository.save(user);
+
+        BookShelf bookShelf = BookShelf.builder()
+            .book(book)
+            .user(user)
+            .readingStatus(ReadingStatus.READING)
+            .star(null)
+            .singleLineAssessment(null)
+            .build();
+
+        bookShelfRepository.save(bookShelf);
+
+        userRepository.flush();
+        bookRepository.flush();
+        bookShelfRepository.flush();
+
+        BookShelf readingBook = bookShelfRepository.findReadingBookByUserIdAndISBN(
+            user.getId(), "1234");
+
+        assertThat(readingBook).isNotNull();
+    }
+
+    @Test
+    void 읽고있는_책_isbn으로_조회시_없으면_예외발생() throws Exception {
+        assertThatThrownBy(() -> {
+            bookShelfRepository.findReadingBookByUserIdAndISBN(1L, "1234");
+        }).isInstanceOf(BookNotFoundException.class);
     }
 }
