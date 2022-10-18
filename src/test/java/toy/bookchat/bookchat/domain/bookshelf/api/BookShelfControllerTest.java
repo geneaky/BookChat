@@ -18,6 +18,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -62,6 +63,7 @@ import toy.bookchat.bookchat.domain.bookshelf.service.BookShelfService;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfRequestDto;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfResponseDto;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.ChangeReadingBookPageRequestDto;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.DeleteBookOnBookShelfRequestDto;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.SearchBookShelfByReadingStatusDto;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
@@ -714,7 +716,6 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
 
     @Test
     void 현재_읽고있는_페이지_등록() throws Exception {
-
         ChangeReadingBookPageRequestDto requestDto = new ChangeReadingBookPageRequestDto(
             "978-89-94327-80-8", 137);
 
@@ -736,6 +737,31 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
                 )));
 
         verify(bookShelfService).changeReadingBookPage(any(), any());
+    }
+
+    @Test
+    void 서재에_넣어둔_책_삭제_성공() throws Exception {
+        when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
+
+        DeleteBookOnBookShelfRequestDto deleteBookOnBookShelfRequestDto = new DeleteBookOnBookShelfRequestDto(
+            "978-89-94327-80-8");
+
+        mockMvc.perform(delete("/v1/api/bookshelf/books")
+                .header("Authorization", "Bearer " + getTestToken())
+                .with(user(getUserPrincipal()))
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper
+                    .writeValueAsString(deleteBookOnBookShelfRequestDto)))
+            .andExpect(status().isOk())
+            .andDo(document("delete-bookshelf-books",
+                requestHeaders(
+                    headerWithName("Authorization").description("Bearer [JWT token]")
+                ),
+                requestFields(
+                    fieldWithPath("isbn").type(STRING).description("ISBN"))
+            ));
+
+        verify(bookShelfService).deleteBookOnBookShelf(any(), any());
     }
 
     static class BookShelfTestRequestDto {

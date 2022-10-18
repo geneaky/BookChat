@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -15,6 +16,7 @@ import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.service.BookShelfService;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfRequestDto;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.ChangeReadingBookPageRequestDto;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.DeleteBookOnBookShelfRequestDto;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.SearchBookShelfByReadingStatusDto;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.security.user.CurrentUser;
@@ -51,6 +53,15 @@ public class BookShelfController {
         @CurrentUser User user
     ) {
         bookShelfService.changeReadingBookPage(changeReadingBookPageRequestDto, user);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @DeleteMapping("/bookshelf/books")
+    public ResponseEntity<Void> deleteBookOnBookShelf(
+        @Valid @RequestBody DeleteBookOnBookShelfRequestDto deleteBookOnBookShelfRequestDto,
+        @CurrentUser User user) {
+
+        bookShelfService.deleteBookOnBookShelf(deleteBookOnBookShelfRequestDto, user);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
