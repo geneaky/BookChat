@@ -8,6 +8,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
 import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
@@ -16,12 +18,11 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static toy.bookchat.bookchat.domain.user.ROLE.USER;
@@ -61,9 +62,7 @@ import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.Star;
 import toy.bookchat.bookchat.domain.bookshelf.service.BookShelfService;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfRequestDto;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfResponseDto;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.ChangeReadingBookPageRequestDto;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.DeleteBookOnBookShelfRequestDto;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.SearchBookShelfByReadingStatusDto;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
@@ -497,8 +496,15 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
         List<BookShelf> result = new ArrayList<>();
 
         User user = User.builder().build();
-        Book book = new Book("12345", "effectiveJava", List.of("joshua"), "jpub",
-            "testBookCoverImageUrl");
+        Book book = Book.builder()
+            .id(1L)
+            .isbn("12345")
+            .title("effectiveJava")
+            .authors(List.of("joshua"))
+            .publisher("jpub")
+            .bookCoverImageUrl("testBookCoverImageUrl")
+            .build();
+
         BookShelf bookShelf = BookShelf.builder()
             .book(book)
             .user(user)
@@ -537,6 +543,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
                     parameterWithName("sort").description("등록순-id")
                 ),
                 responseFields(
+                    fieldWithPath("contents[].bookId").type(NUMBER).description("Book Id"),
                     fieldWithPath("contents[].title").type(STRING).description("제목"),
                     fieldWithPath("contents[].isbn").type(STRING).description("ISBN"),
                     fieldWithPath("contents[].bookCoverImageUrl").type(STRING).optional()
@@ -566,17 +573,17 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
     void 읽은_책_조회_성공() throws Exception {
         List<BookShelf> result = new ArrayList<>();
 
-        BookShelfResponseDto bookShelfResponseDto = BookShelfResponseDto.builder()
+        User user = User.builder().build();
+
+        Book book = Book.builder()
+            .id(1L)
+            .isbn("12345")
             .title("effectiveJava")
             .authors(List.of("joshua"))
-            .bookCoverImageUrl("testBookCoverImage@naver.com")
             .publisher("jpub")
-            .star(Star.FOUR_HALF)
-            .singleLineAssessment("it's is best").build();
+            .bookCoverImageUrl("testBookCoverImageUrl")
+            .build();
 
-        User user = User.builder().build();
-        Book book = new Book("12345", "effectiveJava", List.of("joshua"), "jpub",
-            "testBookCoverImageUrl");
         BookShelf bookShelf = BookShelf.builder()
             .book(book)
             .user(user)
@@ -617,6 +624,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
                     parameterWithName("sort").description("등록순-id")
                 ),
                 responseFields(
+                    fieldWithPath("contents[].bookId").type(NUMBER).description("Book Id"),
                     fieldWithPath("contents[].title").type(STRING).description("제목"),
                     fieldWithPath("contents[].isbn").type(STRING).description("ISBN"),
                     fieldWithPath("contents[].bookCoverImageUrl").type(STRING).optional()
@@ -647,8 +655,15 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
         List<BookShelf> result = new ArrayList<>();
 
         User user = User.builder().build();
-        Book book = new Book("12345", "effectiveJava", List.of("joshua"), "jpub",
-            "testBookCoverImageUrl");
+        Book book = Book.builder()
+            .id(1L)
+            .isbn("12345")
+            .title("effectiveJava")
+            .authors(List.of("joshua"))
+            .publisher("jpub")
+            .bookCoverImageUrl("testBookCoverImageUrl")
+            .build();
+
         BookShelf bookShelf = BookShelf.builder()
             .book(book)
             .user(user)
@@ -689,6 +704,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
                     parameterWithName("sort").description("등록순-id")
                 ),
                 responseFields(
+                    fieldWithPath("contents[].bookId").type(NUMBER).description("Book Id"),
                     fieldWithPath("contents[].title").type(STRING).description("제목"),
                     fieldWithPath("contents[].isbn").type(STRING).description("ISBN"),
                     fieldWithPath("contents[].bookCoverImageUrl").type(STRING).optional()
@@ -716,12 +732,11 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
 
     @Test
     void 현재_읽고있는_페이지_등록() throws Exception {
-        ChangeReadingBookPageRequestDto requestDto = new ChangeReadingBookPageRequestDto(
-            "978-89-94327-80-8", 137);
+        ChangeReadingBookPageRequestDto requestDto = new ChangeReadingBookPageRequestDto(137);
 
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
 
-        mockMvc.perform(put("/v1/api/bookshelf/books")
+        mockMvc.perform(patch("/v1/api/bookshelf/books/{bookId}", 1L)
                 .header("Authorization", "Bearer " + getTestToken())
                 .with(user(getUserPrincipal()))
                 .contentType(APPLICATION_JSON)
@@ -731,37 +746,39 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
                 requestHeaders(
                     headerWithName("Authorization").description("Bearer [JWT token]")
                 ),
+                pathParameters(
+                    parameterWithName("bookId").description("Book Id")
+                ),
                 requestFields(
-                    fieldWithPath("isbn").type(STRING).description("ISBN"),
                     fieldWithPath("pages").type(NUMBER).description("현재 읽고 있는 페이지 번호")
                 )));
 
-        verify(bookShelfService).changeReadingBookPage(any(), any());
+        verify(bookShelfService).changeReadingBookPage(any(), any(), any());
     }
 
     @Test
     void 서재에_넣어둔_책_삭제_성공() throws Exception {
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
 
-        DeleteBookOnBookShelfRequestDto deleteBookOnBookShelfRequestDto = new DeleteBookOnBookShelfRequestDto(
-            "978-89-94327-80-8");
-
-        mockMvc.perform(delete("/v1/api/bookshelf/books")
+        mockMvc.perform(delete("/v1/api/bookshelf/books/{bookId}", 1)
                 .header("Authorization", "Bearer " + getTestToken())
-                .with(user(getUserPrincipal()))
-                .contentType(APPLICATION_JSON)
-                .content(objectMapper
-                    .writeValueAsString(deleteBookOnBookShelfRequestDto)))
+                .with(user(getUserPrincipal())))
             .andExpect(status().isOk())
             .andDo(document("delete-bookshelf-books",
                 requestHeaders(
                     headerWithName("Authorization").description("Bearer [JWT token]")
                 ),
-                requestFields(
-                    fieldWithPath("isbn").type(STRING).description("ISBN"))
+                pathParameters(
+                    parameterWithName("bookId").description("Book Id")
+                )
             ));
 
         verify(bookShelfService).deleteBookOnBookShelf(any(), any());
+    }
+
+    @Test
+    void 독서예정_책_독서중으로_변경_성공() throws Exception {
+//        mockMvc.perform(put("v1/api/bookshelf/books/"))
     }
 
     static class BookShelfTestRequestDto {

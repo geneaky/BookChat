@@ -10,7 +10,8 @@ public interface BookShelfQueryRepository {
     Page<BookShelf> findSpecificStatusBookByUserId(
         ReadingStatus readingStatus, Pageable pageable, Long userId);
 
-    BookShelf findReadingBookByUserIdAndIsbn(Long userId, String isbn);
+    BookShelf findReadingBookByUserIdAndBookId(Long userId, Long bookId);
 
-    void deleteBookByUserIdAndIsbn(Long userId, String isbn);
+    void deleteBookByUserIdAndBookId(Long userId, Long bookId);
+
 }
