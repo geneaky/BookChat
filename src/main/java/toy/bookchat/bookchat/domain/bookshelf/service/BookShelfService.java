@@ -89,7 +89,7 @@ public class BookShelfService {
     public void changeReadingBookPage(
         ChangeReadingBookPageRequestDto changeReadingBookPageRequestDto, User user) {
 
-        BookShelf bookShelf = bookShelfRepository.findReadingBookByUserIdAndISBN(user.getId(),
+        BookShelf bookShelf = bookShelfRepository.findReadingBookByUserIdAndIsbn(user.getId(),
             changeReadingBookPageRequestDto.getIsbn());
 
         bookShelf.updatePage(changeReadingBookPageRequestDto.getPages());
@@ -99,5 +99,7 @@ public class BookShelfService {
     public void deleteBookOnBookShelf(
         DeleteBookOnBookShelfRequestDto deleteBookOnBookShelfRequestDto, User user) {
 
+        bookShelfRepository.deleteBookByUserIdAndIsbn(user.getId(),
+            deleteBookOnBookShelfRequestDto.getIsbn());
     }
 }
