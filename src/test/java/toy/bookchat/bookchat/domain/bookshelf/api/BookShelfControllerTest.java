@@ -778,7 +778,13 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
 
     @Test
     void 독서예정_책_독서중으로_변경_성공() throws Exception {
-//        mockMvc.perform(put("v1/api/bookshelf/books/"))
+        when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
+
+        mockMvc.perform(patch("/v1/api/bookshelf/books/{bookId}/wish",1)
+            .header("Authorization", "Bearer " + getTestToken())
+            .with(user(getUserPrincipal())))
+            .andExpect(status().isOk())
+            .andDo()
     }
 
     static class BookShelfTestRequestDto {
