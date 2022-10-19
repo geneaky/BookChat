@@ -238,7 +238,7 @@ class BookShelfRepositoryTest {
         bookRepository.flush();
         bookShelfRepository.flush();
 
-        BookShelf readingBook = bookShelfRepository.findReadingBookByUserIdAndISBN(
+        BookShelf readingBook = bookShelfRepository.findReadingBookByUserIdAndIsbn(
             user.getId(), "1234");
 
         assertThat(readingBook).isNotNull();
@@ -247,7 +247,37 @@ class BookShelfRepositoryTest {
     @Test
     void 읽고있는_책_isbn으로_조회시_없으면_예외발생() throws Exception {
         assertThatThrownBy(() -> {
-            bookShelfRepository.findReadingBookByUserIdAndISBN(1L, "1234");
+            bookShelfRepository.findReadingBookByUserIdAndIsbn(1L, "1234");
         }).isInstanceOf(BookNotFoundException.class);
+    }
+
+    @Test
+    void 책장에있는_책_isbn으로_삭제_성공() throws Exception {
+        Book book = new Book("1234", "effective java", List.of("Joshua"), "insight",
+            "bookCover@naver.com");
+
+        bookRepository.save(book);
+
+        User user = User.builder().name("hi").build();
+        userRepository.save(user);
+
+        BookShelf bookShelf = BookShelf.builder()
+            .book(book)
+            .user(user)
+            .readingStatus(ReadingStatus.READING)
+            .build();
+
+        bookShelfRepository.save(bookShelf);
+
+        userRepository.flush();
+        bookRepository.flush();
+        bookShelfRepository.flush();
+
+        bookShelfRepository.deleteBookByUserIdAndIsbn(user.getId(), book.getIsbn());
+
+        bookShelfRepository.flush();
+
+        int result = bookShelfRepository.findAll().size();
+        assertThat(result).isZero();
     }
 }

@@ -14,6 +14,7 @@ import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfRequestDto;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.ChangeReadingBookPageRequestDto;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.DeleteBookOnBookShelfRequestDto;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.SearchBookShelfByReadingStatusDto;
 import toy.bookchat.bookchat.domain.user.User;
 
@@ -88,9 +89,17 @@ public class BookShelfService {
     public void changeReadingBookPage(
         ChangeReadingBookPageRequestDto changeReadingBookPageRequestDto, User user) {
 
-        BookShelf bookShelf = bookShelfRepository.findReadingBookByUserIdAndISBN(user.getId(),
+        BookShelf bookShelf = bookShelfRepository.findReadingBookByUserIdAndIsbn(user.getId(),
             changeReadingBookPageRequestDto.getIsbn());
 
         bookShelf.updatePage(changeReadingBookPageRequestDto.getPages());
+    }
+
+    @Transactional
+    public void deleteBookOnBookShelf(
+        DeleteBookOnBookShelfRequestDto deleteBookOnBookShelfRequestDto, User user) {
+
+        bookShelfRepository.deleteBookByUserIdAndIsbn(user.getId(),
+            deleteBookOnBookShelfRequestDto.getIsbn());
     }
 }

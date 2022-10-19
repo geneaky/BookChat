@@ -341,3 +341,20 @@ include::{snippets}/put-bookshelf-pages/http-request.adoc[]
 `Response`
 
 include::{snippets}/put-bookshelf-pages/http-response.adoc[]
+
+---
+
+=== 서재에서 도서 삭제
+
+`Request Header`
+
+include::{snippets}/delete-bookshelf-books/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/delete-bookshelf-books/request-fields.adoc[]
+include::{snippets}/delete-bookshelf-books/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/delete-bookshelf-books/http-response.adoc[]

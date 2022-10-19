@@ -25,6 +25,7 @@ import toy.bookchat.bookchat.domain.bookshelf.Star;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfRequestDto;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.ChangeReadingBookPageRequestDto;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.DeleteBookOnBookShelfRequestDto;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.SearchBookShelfByReadingStatusDto;
 import toy.bookchat.bookchat.domain.user.User;
 
@@ -239,12 +240,21 @@ class BookShelfServiceTest {
             .singleLineAssessment(null)
             .build();
 
-        when(bookShelfRepository.findReadingBookByUserIdAndISBN(any(), any())).thenReturn(
+        when(bookShelfRepository.findReadingBookByUserIdAndIsbn(any(), any())).thenReturn(
             bookShelf);
 
         bookShelfService.changeReadingBookPage(changeReadingBookPageRequestDto, user);
 
         Integer result = bookShelf.getPages();
         assertThat(result).isEqualTo(123);
+    }
+
+    @Test
+    void 책장에서_책_삭제_성공() throws Exception {
+
+        bookShelfService.deleteBookOnBookShelf(mock(DeleteBookOnBookShelfRequestDto.class),
+            mock(User.class));
+
+        verify(bookShelfRepository).deleteBookByUserIdAndIsbn(any(), any());
     }
 }
