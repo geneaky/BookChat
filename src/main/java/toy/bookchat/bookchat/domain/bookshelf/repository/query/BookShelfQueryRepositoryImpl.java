@@ -3,6 +3,7 @@ package toy.bookchat.bookchat.domain.bookshelf.repository.query;
 import static toy.bookchat.bookchat.domain.book.QBook.book;
 import static toy.bookchat.bookchat.domain.bookshelf.QBookShelf.bookShelf;
 
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
@@ -13,7 +14,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import toy.bookchat.bookchat.domain.book.exception.BookNotFoundException;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
-import toy.bookchat.bookchat.domain.bookshelf.QBookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 
 @Repository
@@ -49,14 +49,26 @@ public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
     }
 
     @Override
-    public BookShelf findReadingBookByUserIdAndISBN(Long userId, String isbn) {
-        return Optional.ofNullable(queryFactory.select(QBookShelf.bookShelf)
-            .from(QBookShelf.bookShelf).innerJoin(QBookShelf.bookShelf.book, book).fetchJoin()
-            .where(QBookShelf.bookShelf.user.id.eq(userId)
-                .and(QBookShelf.bookShelf.readingStatus.eq(ReadingStatus.READING))
-                .and(QBookShelf.bookShelf.book.isbn.eq(isbn)))
+    public BookShelf findReadingBookByUserIdAndIsbn(Long userId, String isbn) {
+        return Optional.ofNullable(queryFactory.select(bookShelf)
+            .from(bookShelf).innerJoin(bookShelf.book, book).fetchJoin()
+            .where(bookShelf.user.id.eq(userId)
+                .and(bookShelf.readingStatus.eq(ReadingStatus.READING))
+                .and(bookShelf.book.isbn.eq(isbn)))
             .fetchOne()).orElseThrow(() -> {
             throw new BookNotFoundException("Can't Find Book On BookShelf");
         });
+    }
+
+    @Override
+    public void deleteBookByUserIdAndIsbn(Long userId, String isbn) {
+        queryFactory.delete(bookShelf)
+            .where(bookShelf.user.id.eq(userId)
+                .and(bookShelf.book.id.eq(
+                    JPAExpressions.select(book.id)
+                        .from(book)
+                        .where(book.isbn.eq(isbn))
+                )))
+            .execute();
     }
 }
