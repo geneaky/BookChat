@@ -38,7 +38,6 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private OAuth2Provider provider;
     @OneToMany(mappedBy = "user", orphanRemoval = true)
-    // TODO: 2022/10/10 delete cascade 설정
     private List<BookShelf> bookShelves = new ArrayList<>();
     @ElementCollection
     private List<ReadingTaste> readingTastes = new ArrayList<>();
