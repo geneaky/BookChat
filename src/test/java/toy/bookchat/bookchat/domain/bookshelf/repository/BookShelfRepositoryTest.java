@@ -215,7 +215,7 @@ class BookShelfRepositoryTest {
     }
 
     @Test
-    void 읽고있는_책_isbn으로_조회성공() throws Exception {
+    void 읽고있는_책_book_id로_조회성공() throws Exception {
         Book book = Book.builder()
             .id(1L)
             .isbn("1234")
@@ -251,14 +251,14 @@ class BookShelfRepositoryTest {
     }
 
     @Test
-    void 읽고있는_책_isbn으로_조회시_없으면_예외발생() throws Exception {
+    void 읽고있는_책_book_id로_조회시_없으면_예외발생() throws Exception {
         assertThatThrownBy(() -> {
             bookShelfRepository.findReadingBookByUserIdAndBookId(1L, 1L);
         }).isInstanceOf(BookNotFoundException.class);
     }
 
     @Test
-    void 책장에있는_책_isbn으로_삭제_성공() throws Exception {
+    void 책장에있는_책_book_id로_삭제_성공() throws Exception {
         Book book = Book.builder()
             .isbn("1234")
             .title("effective java")
