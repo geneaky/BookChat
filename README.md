@@ -31,3 +31,4 @@ https://www.erdcloud.com/d/74XWPhiFg3an4Zwsd
 
 ***
 ### System Design
+<img width="1605" alt="시스템구성도" src="https://user-images.githubusercontent.com/53224348/196998256-9115e639-2057-4ab6-b570-a92e81677174.png">
