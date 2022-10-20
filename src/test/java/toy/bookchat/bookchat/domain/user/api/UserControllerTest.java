@@ -12,6 +12,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.multipart;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
@@ -73,6 +74,7 @@ import toy.bookchat.bookchat.domain.user.api.dto.Token;
 import toy.bookchat.bookchat.domain.user.api.dto.UserProfileResponse;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.domain.user.service.UserService;
+import toy.bookchat.bookchat.domain.user.service.dto.ChangeUserNicknameRequestDto;
 import toy.bookchat.bookchat.domain.user.service.dto.UserSignInRequestDto;
 import toy.bookchat.bookchat.domain.user.service.dto.UserSignUpRequestDto;
 import toy.bookchat.bookchat.security.SecurityConfig;
@@ -549,5 +551,39 @@ class UserControllerTest extends AuthenticationTestExtension {
                 )));
 
         verify(userService).deleteUser(any());
+    }
+
+    @Test
+    void 사용자_닉네임_변경성공() throws Exception {
+        User user = User.builder()
+            .email("test@gmail.com")
+            .name("testkakao")
+            .nickname("nickname")
+            .role(ROLE.USER)
+            .profileImageUrl("somethingImageUrl@naver.com")
+            .defaultProfileImageType(1)
+            .build();
+
+        ChangeUserNicknameRequestDto changeUserNicknameRequestDto = new ChangeUserNicknameRequestDto(
+            "newNickname");
+
+        when(userRepository.findByName(any())).thenReturn(Optional.of(user));
+
+        mockMvc.perform(patch("/v1/api/user")
+                .header("Authorization", "Bearer " + getTestToken())
+                .with(user(getUserPrincipal()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(changeUserNicknameRequestDto)))
+            .andExpect(status().isOk())
+            .andDo(document("patch-user-nickname",
+                requestHeaders(
+                    headerWithName("Authorization").description("Bearer [JWT token]")
+                ),
+                requestFields(
+                    fieldWithPath("nickname").type(STRING).description("변경할 닉네임")
+                )
+            ));
+
+        verify(userService).changeUserNickname(any(), any());
     }
 }

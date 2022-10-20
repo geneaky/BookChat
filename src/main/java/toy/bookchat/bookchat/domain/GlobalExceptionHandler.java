@@ -1,7 +1,19 @@
 package toy.bookchat.bookchat.domain;
 
+import static toy.bookchat.bookchat.utils.constants.ResponseConstants.BAD_REQUEST;
+import static toy.bookchat.bookchat.utils.constants.ResponseConstants.BOOK_NOT_FOUND;
+import static toy.bookchat.bookchat.utils.constants.ResponseConstants.CONSTRAINT_VIOLATION;
+import static toy.bookchat.bookchat.utils.constants.ResponseConstants.EXPIRED_PUBLIC_KEY;
+import static toy.bookchat.bookchat.utils.constants.ResponseConstants.IMAGE_PROCESSING_FAIL;
+import static toy.bookchat.bookchat.utils.constants.ResponseConstants.IMAGE_UPLOAD_FAIL;
+import static toy.bookchat.bookchat.utils.constants.ResponseConstants.NOT_VERIFIED_TOKEN;
+import static toy.bookchat.bookchat.utils.constants.ResponseConstants.USER_ALREADY_EXISTED;
+import static toy.bookchat.bookchat.utils.constants.ResponseConstants.USER_NOT_FOUND;
+import static toy.bookchat.bookchat.utils.constants.ResponseConstants.WRONG_KEY_SPEC;
+
 import javax.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MissingRequestValueException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,8 +27,6 @@ import toy.bookchat.bookchat.security.exception.DenidedTokenException;
 import toy.bookchat.bookchat.security.exception.ExpiredPublicKeyCachedException;
 import toy.bookchat.bookchat.security.exception.ExpiredTokenException;
 import toy.bookchat.bookchat.security.exception.WrongKeySpecException;
-
-import static toy.bookchat.bookchat.utils.constants.ResponseConstants.*;
 
 @Slf4j
 @RestControllerAdvice
@@ -93,13 +103,22 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public final ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException exception) {
+    public final ResponseEntity<String> handleIllegalArgumentException(
+        IllegalArgumentException exception) {
         log.info("message = {} :: cause = {}", exception.getMessage(), exception.getCause());
         return BAD_REQUEST;
     }
 
     @ExceptionHandler(MissingRequestValueException.class)
-    public final ResponseEntity<String> test(MissingRequestValueException exception) {
+    public final ResponseEntity<String> handleMissingRequestValueException(
+        MissingRequestValueException exception) {
+        log.info("message = {} :: cause = {}", exception.getMessage(), exception.getCause());
+        return BAD_REQUEST;
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public final ResponseEntity<String> handleDataIntegrityViolationException(
+        DataIntegrityViolationException exception) {
         log.info("message = {} :: cause = {}", exception.getMessage(), exception.getCause());
         return BAD_REQUEST;
     }

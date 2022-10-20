@@ -13,6 +13,7 @@ import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.exception.UserAlreadySignUpException;
 import toy.bookchat.bookchat.domain.user.exception.UserNotFoundException;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
+import toy.bookchat.bookchat.domain.user.service.dto.ChangeUserNicknameRequestDto;
 import toy.bookchat.bookchat.domain.user.service.dto.UserSignUpRequestDto;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
@@ -78,6 +79,13 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void deleteUser(User user) {
         userRepository.delete(user);
+    }
+
+    @Override
+    @Transactional
+    public void changeUserNickname(ChangeUserNicknameRequestDto changeUserNicknameRequestDto,
+        User user) {
+        user.changeUserNickname(changeUserNicknameRequestDto.getNickname());
     }
 
     private void saveUser(UserSignUpRequestDto userSignUpRequestDto, String userName,

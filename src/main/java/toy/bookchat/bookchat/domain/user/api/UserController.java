@@ -11,6 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -22,6 +23,7 @@ import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.api.dto.Token;
 import toy.bookchat.bookchat.domain.user.api.dto.UserProfileResponse;
 import toy.bookchat.bookchat.domain.user.service.UserService;
+import toy.bookchat.bookchat.domain.user.service.dto.ChangeUserNicknameRequestDto;
 import toy.bookchat.bookchat.domain.user.service.dto.UserSignInRequestDto;
 import toy.bookchat.bookchat.domain.user.service.dto.UserSignUpRequestDto;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenProvider;
@@ -67,7 +69,16 @@ public class UserController {
         if (userService.isDuplicatedName(nickname)) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
         }
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/user")
+    public ResponseEntity<Void> changeUserNickName(
+        @Valid @RequestBody ChangeUserNicknameRequestDto changeUserNicknameRequestDto,
+        @CurrentUser User user) {
+
+        userService.changeUserNickname(changeUserNicknameRequestDto, user);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/users/signup")
@@ -102,7 +113,7 @@ public class UserController {
 
         return ResponseEntity.ok(token);
     }
-    
+
     @DeleteMapping("/users")
     public void withdrawUser(@CurrentUser User user) {
         userService.deleteUser(user);
