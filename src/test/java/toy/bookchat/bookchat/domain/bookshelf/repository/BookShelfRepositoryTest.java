@@ -217,7 +217,6 @@ class BookShelfRepositoryTest {
     @Test
     void 읽고있는_책_book_id로_조회성공() throws Exception {
         Book book = Book.builder()
-            .id(1L)
             .isbn("1234")
             .title("effective java")
             .authors(List.of("Joshua"))
