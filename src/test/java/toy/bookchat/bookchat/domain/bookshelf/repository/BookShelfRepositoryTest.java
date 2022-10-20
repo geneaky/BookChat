@@ -215,9 +215,14 @@ class BookShelfRepositoryTest {
     }
 
     @Test
-    void 읽고있는_책_isbn으로_조회성공() throws Exception {
-        Book book = new Book("1234", "effective java", List.of("Joshua"), "insight",
-            "bookCover@naver.com");
+    void 읽고있는_책_book_id로_조회성공() throws Exception {
+        Book book = Book.builder()
+            .isbn("1234")
+            .title("effective java")
+            .authors(List.of("Joshua"))
+            .publisher("insight")
+            .bookCoverImageUrl("bookCover@naver.com")
+            .build();
 
         bookRepository.save(book);
 
@@ -238,23 +243,28 @@ class BookShelfRepositoryTest {
         bookRepository.flush();
         bookShelfRepository.flush();
 
-        BookShelf readingBook = bookShelfRepository.findReadingBookByUserIdAndIsbn(
-            user.getId(), "1234");
+        BookShelf readingBook = bookShelfRepository.findReadingBookByUserIdAndBookId(
+            user.getId(), book.getId());
 
         assertThat(readingBook).isNotNull();
     }
 
     @Test
-    void 읽고있는_책_isbn으로_조회시_없으면_예외발생() throws Exception {
+    void 읽고있는_책_book_id로_조회시_없으면_예외발생() throws Exception {
         assertThatThrownBy(() -> {
-            bookShelfRepository.findReadingBookByUserIdAndIsbn(1L, "1234");
+            bookShelfRepository.findReadingBookByUserIdAndBookId(1L, 1L);
         }).isInstanceOf(BookNotFoundException.class);
     }
 
     @Test
-    void 책장에있는_책_isbn으로_삭제_성공() throws Exception {
-        Book book = new Book("1234", "effective java", List.of("Joshua"), "insight",
-            "bookCover@naver.com");
+    void 책장에있는_책_book_id로_삭제_성공() throws Exception {
+        Book book = Book.builder()
+            .isbn("1234")
+            .title("effective java")
+            .authors(List.of("Joshua"))
+            .publisher("insight")
+            .bookCoverImageUrl("bookCover@naver.com")
+            .build();
 
         bookRepository.save(book);
 
@@ -273,11 +283,50 @@ class BookShelfRepositoryTest {
         bookRepository.flush();
         bookShelfRepository.flush();
 
-        bookShelfRepository.deleteBookByUserIdAndIsbn(user.getId(), book.getIsbn());
+        bookShelfRepository.deleteBookByUserIdAndBookId(user.getId(), book.getId());
 
         bookShelfRepository.flush();
 
         int result = bookShelfRepository.findAll().size();
         assertThat(result).isZero();
+    }
+
+    @Test
+    void user_id_book_id로_서재_조회성공() throws Exception {
+        Book book = Book.builder()
+            .isbn("1234")
+            .title("effective java")
+            .authors(List.of("Joshua"))
+            .publisher("insight")
+            .bookCoverImageUrl("bookCover@naver.com")
+            .build();
+
+        bookRepository.save(book);
+
+        User user = User.builder().name("hi").build();
+        userRepository.save(user);
+
+        BookShelf bookShelf = BookShelf.builder()
+            .book(book)
+            .user(user)
+            .readingStatus(ReadingStatus.READING)
+            .build();
+
+        bookShelfRepository.save(bookShelf);
+
+        userRepository.flush();
+        bookRepository.flush();
+        bookShelfRepository.flush();
+
+        BookShelf findBookShelf = bookShelfRepository.findByUserIdAndBookId(
+            user.getId(), book.getId());
+        assertThat(findBookShelf).isEqualTo(bookShelf);
+    }
+
+    @Test
+    void user_id_book_id로_조회시_없으면_예외발생() throws Exception {
+        assertThatThrownBy(() -> {
+            bookShelfRepository.findByUserIdAndBookId(1L, 1L);
+        }).isInstanceOf(BookNotFoundException.class);
     }
 }

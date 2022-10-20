@@ -331,17 +331,34 @@ include::{snippets}/get-bookshelf-complete/response-body.adoc[]
 
 `Request Header`
 
-include::{snippets}/put-bookshelf-pages/request-headers.adoc[]
+include::{snippets}/patch-bookshelf-pages/request-headers.adoc[]
 
 `Request`
 
-include::{snippets}/put-bookshelf-pages/request-fields.adoc[]
-include::{snippets}/put-bookshelf-pages/http-request.adoc[]
+include::{snippets}/patch-bookshelf-pages/request-fields.adoc[]
+include::{snippets}/patch-bookshelf-pages/http-request.adoc[]
 
 `Response`
 
-include::{snippets}/put-bookshelf-pages/http-response.adoc[]
+include::{snippets}/patch-bookshelf-pages/http-response.adoc[]
 
+---
+
+=== 서재에 있는 도서 (독서예정, 독서중, 독서완료) 상태 변경
+
+`Request Header`
+
+include::{snippets}/patch-bookshelf-book-status/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/patch-bookshelf-book-status/path-parameters.adoc[]
+include::{snippets}/patch-bookshelf-book-status/request-fields.adoc[]
+include::{snippets}/patch-bookshelf-book-status/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/patch-bookshelf-book-status/http-response.adoc[]
 ---
 
 === 서재에서 도서 삭제

@@ -7,16 +7,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.service.BookShelfService;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfRequestDto;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.ChangeBookStatusRequestDto;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.ChangeReadingBookPageRequestDto;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.DeleteBookOnBookShelfRequestDto;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.SearchBookShelfByReadingStatusDto;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.security.user.CurrentUser;
@@ -47,21 +48,33 @@ public class BookShelfController {
         return ResponseEntity.status(HttpStatus.OK).body(searchBookShelfByReadingStatusDto);
     }
 
-    @PutMapping("/bookshelf/books")
+    @PatchMapping("/bookshelf/books/{bookId}/pages")
     public ResponseEntity<Void> changeReadingBookPagesOnBookShelf(
+        @PathVariable Long bookId,
         @Valid @RequestBody ChangeReadingBookPageRequestDto changeReadingBookPageRequestDto,
         @CurrentUser User user
     ) {
-        bookShelfService.changeReadingBookPage(changeReadingBookPageRequestDto, user);
+        bookShelfService.changeReadingBookPage(changeReadingBookPageRequestDto, user, bookId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @DeleteMapping("/bookshelf/books")
-    public ResponseEntity<Void> deleteBookOnBookShelf(
-        @Valid @RequestBody DeleteBookOnBookShelfRequestDto deleteBookOnBookShelfRequestDto,
+    @PatchMapping("/bookshelf/books/{bookId}/status")
+    public ResponseEntity<Void> changeBookStatusOnBookShelf(
+        @PathVariable Long bookId,
+        @Valid @RequestBody ChangeBookStatusRequestDto changeBookStatusRequestDto,
         @CurrentUser User user) {
 
-        bookShelfService.deleteBookOnBookShelf(deleteBookOnBookShelfRequestDto, user);
+        bookShelfService.changeBookStatusOnBookShelf(changeBookStatusRequestDto, user, bookId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
+    @DeleteMapping("/bookshelf/books/{bookId}")
+    public ResponseEntity<Void> deleteBookOnBookShelf(
+        @PathVariable Long bookId, @CurrentUser User user) {
+
+        bookShelfService.deleteBookOnBookShelf(bookId, user);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+
 }

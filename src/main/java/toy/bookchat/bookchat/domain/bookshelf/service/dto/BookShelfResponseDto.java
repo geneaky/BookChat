@@ -12,6 +12,7 @@ import toy.bookchat.bookchat.domain.bookshelf.Star;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class BookShelfResponseDto {
 
+    private Long bookId;
     private String title;
     private String isbn;
     private String bookCoverImageUrl;

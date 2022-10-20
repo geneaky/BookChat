@@ -85,4 +85,12 @@ public class BookShelf extends BaseEntity {
     public void updatePage(Integer pages) {
         this.pages = pages;
     }
+
+    public Long getBookId() {
+        return this.book.getId();
+    }
+
+    public void updateReadingStatus(ReadingStatus readingStatus) {
+        this.readingStatus = readingStatus;
+    }
 }

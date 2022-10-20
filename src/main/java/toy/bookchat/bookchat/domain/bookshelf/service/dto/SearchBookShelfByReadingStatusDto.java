@@ -23,6 +23,7 @@ public class SearchBookShelfByReadingStatusDto extends PageDto {
 
         for (BookShelf bookShelf : bookShelves) {
             BookShelfResponseDto bookShelfResponseDto = BookShelfResponseDto.builder()
+                .bookId(bookShelf.getBookId())
                 .title(bookShelf.getBookTitle())
                 .isbn(bookShelf.getIsbn())
                 .authors(bookShelf.getBookAuthors())

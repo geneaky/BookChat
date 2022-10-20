@@ -1,9 +1,7 @@
 package toy.bookchat.bookchat.domain.bookshelf.repository.query;
 
-import static toy.bookchat.bookchat.domain.book.QBook.book;
 import static toy.bookchat.bookchat.domain.bookshelf.QBookShelf.bookShelf;
 
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
@@ -49,26 +47,34 @@ public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
     }
 
     @Override
-    public BookShelf findReadingBookByUserIdAndIsbn(Long userId, String isbn) {
+    public BookShelf findReadingBookByUserIdAndBookId(Long userId, Long bookId) {
         return Optional.ofNullable(queryFactory.select(bookShelf)
-            .from(bookShelf).innerJoin(bookShelf.book, book).fetchJoin()
-            .where(bookShelf.user.id.eq(userId)
-                .and(bookShelf.readingStatus.eq(ReadingStatus.READING))
-                .and(bookShelf.book.isbn.eq(isbn)))
+            .from(bookShelf)
+            .where(bookShelf.readingStatus.eq(ReadingStatus.READING)
+                .and(bookShelf.user.id.eq(userId))
+                .and(bookShelf.book.id.eq(bookId)))
             .fetchOne()).orElseThrow(() -> {
             throw new BookNotFoundException("Can't Find Book On BookShelf");
         });
+
     }
 
     @Override
-    public void deleteBookByUserIdAndIsbn(Long userId, String isbn) {
+    public void deleteBookByUserIdAndBookId(Long userId, Long bookId) {
         queryFactory.delete(bookShelf)
             .where(bookShelf.user.id.eq(userId)
-                .and(bookShelf.book.id.eq(
-                    JPAExpressions.select(book.id)
-                        .from(book)
-                        .where(book.isbn.eq(isbn))
-                )))
+                .and(bookShelf.book.id.eq(bookId)))
             .execute();
+    }
+
+    @Override
+    public BookShelf findByUserIdAndBookId(Long userId, Long bookId) {
+        return Optional.ofNullable(queryFactory.select(bookShelf)
+            .from(bookShelf)
+            .where(bookShelf.user.id.eq(userId)
+                .and(bookShelf.book.id.eq(bookId)))
+            .fetchOne()).orElseThrow(() -> {
+            throw new BookNotFoundException("BookShelf is not registered");
+        });
     }
 }

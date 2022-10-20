@@ -13,8 +13,8 @@ import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfRequestDto;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.ChangeBookStatusRequestDto;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.ChangeReadingBookPageRequestDto;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.DeleteBookOnBookShelfRequestDto;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.SearchBookShelfByReadingStatusDto;
 import toy.bookchat.bookchat.domain.user.User;
 
@@ -87,19 +87,28 @@ public class BookShelfService {
 
     @Transactional
     public void changeReadingBookPage(
-        ChangeReadingBookPageRequestDto changeReadingBookPageRequestDto, User user) {
+        ChangeReadingBookPageRequestDto changeReadingBookPageRequestDto, User user, Long bookId) {
 
-        BookShelf bookShelf = bookShelfRepository.findReadingBookByUserIdAndIsbn(user.getId(),
-            changeReadingBookPageRequestDto.getIsbn());
+        BookShelf bookShelf = bookShelfRepository.findReadingBookByUserIdAndBookId(user.getId(),
+            bookId);
 
         bookShelf.updatePage(changeReadingBookPageRequestDto.getPages());
     }
 
     @Transactional
-    public void deleteBookOnBookShelf(
-        DeleteBookOnBookShelfRequestDto deleteBookOnBookShelfRequestDto, User user) {
+    public void deleteBookOnBookShelf(Long bookId, User user) {
 
-        bookShelfRepository.deleteBookByUserIdAndIsbn(user.getId(),
-            deleteBookOnBookShelfRequestDto.getIsbn());
+        bookShelfRepository.deleteBookByUserIdAndBookId(user.getId(),
+            bookId);
+    }
+
+    @Transactional
+    public void changeBookStatusOnBookShelf(ChangeBookStatusRequestDto changeBookStatusRequestDto,
+        User user, Long bookId) {
+
+        BookShelf bookShelf = bookShelfRepository.findByUserIdAndBookId(
+            user.getId(), bookId);
+
+        bookShelf.updateReadingStatus(changeBookStatusRequestDto.getReadingStatus());
     }
 }
