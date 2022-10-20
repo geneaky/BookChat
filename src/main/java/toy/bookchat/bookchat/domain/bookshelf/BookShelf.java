@@ -89,4 +89,8 @@ public class BookShelf extends BaseEntity {
     public Long getBookId() {
         return this.book.getId();
     }
+
+    public void updateReadingStatus(ReadingStatus readingStatus) {
+        this.readingStatus = readingStatus;
+    }
 }

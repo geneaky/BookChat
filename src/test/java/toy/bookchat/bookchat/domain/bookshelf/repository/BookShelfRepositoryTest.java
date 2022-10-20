@@ -291,4 +291,43 @@ class BookShelfRepositoryTest {
         int result = bookShelfRepository.findAll().size();
         assertThat(result).isZero();
     }
+
+    @Test
+    void user_id_book_id로_서재_조회성공() throws Exception {
+        Book book = Book.builder()
+            .isbn("1234")
+            .title("effective java")
+            .authors(List.of("Joshua"))
+            .publisher("insight")
+            .bookCoverImageUrl("bookCover@naver.com")
+            .build();
+
+        bookRepository.save(book);
+
+        User user = User.builder().name("hi").build();
+        userRepository.save(user);
+
+        BookShelf bookShelf = BookShelf.builder()
+            .book(book)
+            .user(user)
+            .readingStatus(ReadingStatus.READING)
+            .build();
+
+        bookShelfRepository.save(bookShelf);
+
+        userRepository.flush();
+        bookRepository.flush();
+        bookShelfRepository.flush();
+
+        BookShelf findBookShelf = bookShelfRepository.findByUserIdAndBookId(
+            user.getId(), book.getId());
+        assertThat(findBookShelf).isEqualTo(bookShelf);
+    }
+
+    @Test
+    void user_id_book_id로_조회시_없으면_예외발생() throws Exception {
+        assertThatThrownBy(() -> {
+            bookShelfRepository.findByUserIdAndBookId(1L, 1L);
+        }).isInstanceOf(BookNotFoundException.class);
+    }
 }

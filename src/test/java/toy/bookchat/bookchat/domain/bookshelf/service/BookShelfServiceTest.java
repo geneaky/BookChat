@@ -24,6 +24,7 @@ import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.Star;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfRequestDto;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.ChangeBookStatusRequestDto;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.ChangeReadingBookPageRequestDto;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.SearchBookShelfByReadingStatusDto;
 import toy.bookchat.bookchat.domain.user.User;
@@ -272,5 +273,33 @@ class BookShelfServiceTest {
         bookShelfService.deleteBookOnBookShelf(book.getId(), user);
 
         verify(bookShelfRepository).deleteBookByUserIdAndBookId(any(), any());
+    }
+
+    @Test
+    void 책장에_책_독서상태_변경_성공() throws Exception {
+        User user = getUser();
+
+        Book book = Book.builder()
+            .id(1L)
+            .isbn("1234")
+            .title("toby's Spring")
+            .authors(List.of("이일민"))
+            .publisher("jpub")
+            .bookCoverImageUrl("testBookCoverImageUrl")
+            .build();
+
+        BookShelf bookShelf = BookShelf.builder()
+            .user(user)
+            .book(book)
+            .readingStatus(ReadingStatus.WISH)
+            .build();
+
+        when(bookShelfRepository.findByUserIdAndBookId(any(), any())).thenReturn(bookShelf);
+
+        bookShelfService.changeBookStatusOnBookShelf(
+            new ChangeBookStatusRequestDto(ReadingStatus.READING), user, book.getId());
+
+        ReadingStatus readingStatus = bookShelf.getReadingStatus();
+        assertThat(readingStatus).isEqualTo(ReadingStatus.READING);
     }
 }

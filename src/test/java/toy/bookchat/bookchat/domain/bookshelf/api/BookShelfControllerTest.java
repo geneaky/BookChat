@@ -62,6 +62,7 @@ import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.Star;
 import toy.bookchat.bookchat.domain.bookshelf.service.BookShelfService;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfRequestDto;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.ChangeBookStatusRequestDto;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.ChangeReadingBookPageRequestDto;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.SearchBookShelfByReadingStatusDto;
 import toy.bookchat.bookchat.domain.user.User;
@@ -736,13 +737,13 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
 
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
 
-        mockMvc.perform(patch("/v1/api/bookshelf/books/{bookId}", 1L)
+        mockMvc.perform(patch("/v1/api/bookshelf/books/{bookId}/pages", 1L)
                 .header("Authorization", "Bearer " + getTestToken())
                 .with(user(getUserPrincipal()))
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDto)))
             .andExpect(status().isOk())
-            .andDo(document("put-bookshelf-pages",
+            .andDo(document("patch-bookshelf-pages",
                 requestHeaders(
                     headerWithName("Authorization").description("Bearer [JWT token]")
                 ),
@@ -779,12 +780,26 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
     @Test
     void 독서예정_책_독서중으로_변경_성공() throws Exception {
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(getUser()));
-
-        mockMvc.perform(patch("/v1/api/bookshelf/books/{bookId}/wish",1)
-            .header("Authorization", "Bearer " + getTestToken())
-            .with(user(getUserPrincipal())))
+        ChangeBookStatusRequestDto changeBookStatusRequestDto = new ChangeBookStatusRequestDto(
+            ReadingStatus.READING);
+        mockMvc.perform(patch("/v1/api/bookshelf/books/{bookId}/status", 1)
+                .header("Authorization", "Bearer " + getTestToken())
+                .with(user(getUserPrincipal()))
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(changeBookStatusRequestDto)))
             .andExpect(status().isOk())
-            .andDo()
+            .andDo(document("patch-bookshelf-book-status",
+                requestHeaders(
+                    headerWithName("Authorization").description("Bearer [JWT token]")
+                ),
+                requestFields(
+                    fieldWithPath("readingStatus").type(STRING).description("변경할 상태")
+                ),
+                pathParameters(
+                    parameterWithName("bookId").description("Book Id")
+                )));
+
+        verify(bookShelfService).changeBookStatusOnBookShelf(any(), any(), any());
     }
 
     static class BookShelfTestRequestDto {

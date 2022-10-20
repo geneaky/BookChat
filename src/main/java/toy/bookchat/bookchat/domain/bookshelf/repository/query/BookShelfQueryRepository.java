@@ -14,4 +14,5 @@ public interface BookShelfQueryRepository {
 
     void deleteBookByUserIdAndBookId(Long userId, Long bookId);
 
+    BookShelf findByUserIdAndBookId(Long userId, Long bookId);
 }

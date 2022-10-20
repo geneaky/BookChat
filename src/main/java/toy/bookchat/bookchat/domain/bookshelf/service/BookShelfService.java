@@ -13,6 +13,7 @@ import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfRequestDto;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.ChangeBookStatusRequestDto;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.ChangeReadingBookPageRequestDto;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.SearchBookShelfByReadingStatusDto;
 import toy.bookchat.bookchat.domain.user.User;
@@ -99,5 +100,15 @@ public class BookShelfService {
 
         bookShelfRepository.deleteBookByUserIdAndBookId(user.getId(),
             bookId);
+    }
+
+    @Transactional
+    public void changeBookStatusOnBookShelf(ChangeBookStatusRequestDto changeBookStatusRequestDto,
+        User user, Long bookId) {
+
+        BookShelf bookShelf = bookShelfRepository.findByUserIdAndBookId(
+            user.getId(), bookId);
+
+        bookShelf.updateReadingStatus(changeBookStatusRequestDto.getReadingStatus());
     }
 }
