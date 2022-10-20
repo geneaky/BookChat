@@ -69,6 +69,23 @@ include::{snippets}/user-nickname-error/http-response.adoc[]
 
 ---
 
+=== 사용자 닉네임 변경
+
+`Request Header`
+
+include::{snippets}/patch-user-nickname/request-headers.adoc[]
+
+`Requset`
+
+include::{snippets}/patch-user-nickname/request-fields.adoc[]
+include::{snippets}/patch-user-nickname/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/patch-user-nickname/http-response.adoc[]
+
+---
+
 === 사용자 회원가입
 
 `Request Header`

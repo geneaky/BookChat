@@ -1,12 +1,14 @@
 package toy.bookchat.bookchat.domain.user.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.DataIntegrityViolationException;
 import toy.bookchat.bookchat.config.JpaAuditingConfig;
 import toy.bookchat.bookchat.domain.configuration.TestConfig;
 import toy.bookchat.bookchat.domain.user.ROLE;
@@ -106,5 +108,27 @@ class UserRepositoryTest {
 
         Optional<User> ou = userRepository.findById(user.getId());
         assertThat(ou).isNotPresent();
+    }
+
+    @Test
+    void 변경_요청한_닉네임_이미_있을시_예외발생() throws Exception {
+        User user1 = User.builder()
+            .nickname("user1")
+            .build();
+
+        User user2 = User.builder()
+            .nickname("user2")
+            .build();
+
+        userRepository.save(user1);
+        userRepository.save(user2);
+
+        userRepository.flush();
+
+        user2.changeUserNickname("user1");
+
+        assertThatThrownBy(() -> {
+            userRepository.saveAndFlush(user2);
+        }).isInstanceOf(DataIntegrityViolationException.class);
     }
 }

@@ -21,6 +21,7 @@ import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.exception.UserAlreadySignUpException;
 import toy.bookchat.bookchat.domain.user.exception.UserNotFoundException;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
+import toy.bookchat.bookchat.domain.user.service.dto.ChangeUserNicknameRequestDto;
 import toy.bookchat.bookchat.domain.user.service.dto.UserSignUpRequestDto;
 
 @ExtendWith(MockitoExtension.class)
@@ -97,5 +98,21 @@ class UserServiceTest {
         userService.deleteUser(any(User.class));
 
         verify(userRepository).delete(any());
+    }
+
+    @Test
+    void 사용자_닉네임_변경_성공() throws Exception {
+
+        User user = User.builder()
+            .nickname("user1")
+            .build();
+
+        ChangeUserNicknameRequestDto changeUserNicknameRequestDto = new ChangeUserNicknameRequestDto(
+            "user2");
+
+        userService.changeUserNickname(changeUserNicknameRequestDto, user);
+
+        String nickname = user.getNickname();
+        assertThat(nickname).isEqualTo("user2");
     }
 }
