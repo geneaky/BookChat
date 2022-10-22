@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import toy.bookchat.bookchat.domain.bookreport.BookReport;
+import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 
 @Getter
 @Builder
@@ -22,4 +24,8 @@ public class WriteBookReportRequestDto {
     private String content;
     @NotBlank
     private String hexColorCode;
+
+    public BookReport getBookReport(BookShelf bookShelf) {
+        return new BookReport(this.title, this.content, this.hexColorCode, bookShelf);
+    }
 }
