@@ -29,13 +29,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
 import toy.bookchat.bookchat.domain.user.api.dto.Token;
-import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.security.SecurityConfig;
 import toy.bookchat.bookchat.security.exception.DenidedTokenException;
 import toy.bookchat.bookchat.security.exception.ExpiredTokenException;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.token.dto.RefreshTokenRequestDto;
-import toy.bookchat.bookchat.security.token.jwt.JwtTokenManager;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenProvider;
 
 @WebMvcTest(controllers = TokenController.class,
@@ -44,10 +42,6 @@ import toy.bookchat.bookchat.security.token.jwt.JwtTokenProvider;
 @AutoConfigureRestDocs(uriScheme = "https", uriHost = "bookchat.link", uriPort = 443)
 class TokenControllerTest extends AuthenticationTestExtension {
 
-    @MockBean
-    JwtTokenManager jwtTokenManager;
-    @MockBean
-    UserRepository userRepository;
     @MockBean
     TokenService tokenService;
     @SpyBean

@@ -49,7 +49,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,13 +65,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.Base64Utils;
 import org.springframework.web.multipart.MultipartFile;
-import toy.bookchat.bookchat.config.OpenIdTokenConfig;
 import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
 import toy.bookchat.bookchat.domain.user.ROLE;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.api.dto.Token;
 import toy.bookchat.bookchat.domain.user.api.dto.UserProfileResponse;
-import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.domain.user.service.UserService;
 import toy.bookchat.bookchat.domain.user.service.dto.ChangeUserNicknameRequestDto;
 import toy.bookchat.bookchat.domain.user.service.dto.UserSignInRequestDto;
@@ -80,11 +77,9 @@ import toy.bookchat.bookchat.domain.user.service.dto.UserSignUpRequestDto;
 import toy.bookchat.bookchat.security.SecurityConfig;
 import toy.bookchat.bookchat.security.exception.ExpiredTokenException;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
-import toy.bookchat.bookchat.security.token.jwt.JwtTokenManager;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenProvider;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenRecorder;
 import toy.bookchat.bookchat.security.token.openid.OpenIdTestUtil;
-import toy.bookchat.bookchat.security.token.openid.OpenIdTokenManager;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @WebMvcTest(controllers = UserController.class,
@@ -95,24 +90,10 @@ class UserControllerTest extends AuthenticationTestExtension {
 
     @MockBean
     UserService userService;
-
-    @MockBean
-    UserRepository userRepository;
-
-    @MockBean
-    OpenIdTokenManager openIdTokenManager;
-
-    @MockBean
-    JwtTokenManager jwtTokenManager;
-
     @MockBean
     JwtTokenProvider jwtTokenProvider;
-
     @MockBean
     JwtTokenRecorder jwtTokenRecorder;
-
-    @MockBean
-    OpenIdTokenConfig openIdTokenConfig;
     @Autowired
     ObjectMapper objectMapper;
     OpenIdTestUtil openIdTestUtil;
@@ -164,7 +145,6 @@ class UserControllerTest extends AuthenticationTestExtension {
 
     @Test
     void 사용자_프로필_정보_반환() throws Exception {
-
         String testToken = getTestToken();
 
         String real = objectMapper.writeValueAsString(UserProfileResponse.builder()
@@ -173,17 +153,6 @@ class UserControllerTest extends AuthenticationTestExtension {
             .userProfileImageUri("somethingImageUrl@naver.com")
             .defaultProfileImageType(1)
             .build());
-
-        User user = User.builder()
-            .email("test@gmail.com")
-            .name("testkakao")
-            .nickname("nickname")
-            .role(ROLE.USER)
-            .profileImageUrl("somethingImageUrl@naver.com")
-            .defaultProfileImageType(1)
-            .build();
-
-        when(userRepository.findByName(any())).thenReturn(Optional.of(user));
 
         MvcResult mvcResult = mockMvc.perform(get("/v1/api/users/profile")
                 .with(user(getUserPrincipal()))
@@ -296,8 +265,8 @@ class UserControllerTest extends AuthenticationTestExtension {
             .setClaims(claims)
             .signWith(SignatureAlgorithm.RS256, privateKey).compact();
 
-        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
-        doThrow(ExpiredTokenException.class).when(openIdTokenManager)
+        when(getOpenIdTokenConfig().getPublicKey(any(), any())).thenReturn(publicKey);
+        doThrow(ExpiredTokenException.class).when(getOpenIdTokenManager())
             .getOAuth2MemberNumberFromToken(any(), any());
 
         mockMvc.perform(multipart("/v1/api/users/signup")
@@ -315,10 +284,11 @@ class UserControllerTest extends AuthenticationTestExtension {
         PrivateKey privateKey = getPrivateKey();
         PublicKey publicKey = getPublicKey();
 
-        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
-        when(openIdTokenManager.getOAuth2MemberNumberFromToken(any(), any())).thenReturn(
+        when(getOpenIdTokenConfig().getPublicKey(any(), any())).thenReturn(publicKey);
+        when(getOpenIdTokenManager().getOAuth2MemberNumberFromToken(any(), any())).thenReturn(
             "testkakao");
-        when(openIdTokenManager.getUserEmailFromToken(any(), any())).thenReturn("test@gmail.com");
+        when(getOpenIdTokenManager().getUserEmailFromToken(any(), any())).thenReturn(
+            "test@gmail.com");
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("email", "test@gmail.com");
@@ -419,7 +389,7 @@ class UserControllerTest extends AuthenticationTestExtension {
         PrivateKey privateKey = getPrivateKey();
         PublicKey publicKey = getPublicKey();
 
-        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
+        when(getOpenIdTokenConfig().getPublicKey(any(), any())).thenReturn(publicKey);
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("email", "test@gmail.com");
@@ -487,7 +457,7 @@ class UserControllerTest extends AuthenticationTestExtension {
         PrivateKey privateKey = getPrivateKey();
         PublicKey publicKey = getPublicKey();
 
-        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
+        when(getOpenIdTokenConfig().getPublicKey(any(), any())).thenReturn(publicKey);
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("email", "test@gmail.com");
@@ -511,7 +481,7 @@ class UserControllerTest extends AuthenticationTestExtension {
         PrivateKey privateKey = getPrivateKey();
         PublicKey publicKey = getPublicKey();
 
-        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
+        when(getOpenIdTokenConfig().getPublicKey(any(), any())).thenReturn(publicKey);
 
         Claims claims = Jwts.claims().setIssuer("https://kauth.kakao.com")
             .setSubject("test").setExpiration(new Date(0));
@@ -539,8 +509,6 @@ class UserControllerTest extends AuthenticationTestExtension {
             .defaultProfileImageType(1)
             .build();
 
-        when(userRepository.findByName(any())).thenReturn(Optional.of(user));
-
         mockMvc.perform(delete("/v1/api/users")
                 .with(user(getUserPrincipal()))
                 .header("Authorization", "Bearer " + testToken))
@@ -566,8 +534,6 @@ class UserControllerTest extends AuthenticationTestExtension {
 
         ChangeUserNicknameRequestDto changeUserNicknameRequestDto = new ChangeUserNicknameRequestDto(
             "newNickname");
-
-        when(userRepository.findByName(any())).thenReturn(Optional.of(user));
 
         mockMvc.perform(patch("/v1/api/user")
                 .header("Authorization", "Bearer " + getTestToken())
