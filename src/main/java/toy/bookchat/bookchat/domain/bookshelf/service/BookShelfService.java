@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import toy.bookchat.bookchat.domain.book.Book;
+import toy.bookchat.bookchat.domain.book.exception.BookNotFoundException;
 import toy.bookchat.bookchat.domain.book.repository.BookRepository;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
@@ -107,7 +108,9 @@ public class BookShelfService {
         User user, Long bookId) {
 
         BookShelf bookShelf = bookShelfRepository.findByUserIdAndBookId(
-            user.getId(), bookId);
+            user.getId(), bookId).orElseThrow(() -> {
+            throw new BookNotFoundException("Book is not registered on book shelf");
+        });
 
         bookShelf.updateReadingStatus(changeBookStatusRequestDto.getReadingStatus());
     }

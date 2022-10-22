@@ -68,13 +68,11 @@ public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
     }
 
     @Override
-    public BookShelf findByUserIdAndBookId(Long userId, Long bookId) {
+    public Optional<BookShelf> findByUserIdAndBookId(Long userId, Long bookId) {
         return Optional.ofNullable(queryFactory.select(bookShelf)
             .from(bookShelf)
             .where(bookShelf.user.id.eq(userId)
                 .and(bookShelf.book.id.eq(bookId)))
-            .fetchOne()).orElseThrow(() -> {
-            throw new BookNotFoundException("BookShelf is not registered");
-        });
+            .fetchOne());
     }
 }

@@ -3,11 +3,9 @@ package toy.bookchat.bookchat.domain.bookshelf.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.json.AutoConfigureJson;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
@@ -27,7 +25,6 @@ import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 
 @DataJpaTest
-@AutoConfigureJson
 @Import({JpaAuditingConfig.class, TestConfig.class})
 class BookShelfRepositoryTest {
 
@@ -37,8 +34,6 @@ class BookShelfRepositoryTest {
     private UserRepository userRepository;
     @Autowired
     private BookShelfRepository bookShelfRepository;
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Test
     void 책_저장() throws Exception {
@@ -319,14 +314,7 @@ class BookShelfRepositoryTest {
         bookShelfRepository.flush();
 
         BookShelf findBookShelf = bookShelfRepository.findByUserIdAndBookId(
-            user.getId(), book.getId());
+            user.getId(), book.getId()).get();
         assertThat(findBookShelf).isEqualTo(bookShelf);
-    }
-
-    @Test
-    void user_id_book_id로_조회시_없으면_예외발생() throws Exception {
-        assertThatThrownBy(() -> {
-            bookShelfRepository.findByUserIdAndBookId(1L, 1L);
-        }).isInstanceOf(BookNotFoundException.class);
     }
 }

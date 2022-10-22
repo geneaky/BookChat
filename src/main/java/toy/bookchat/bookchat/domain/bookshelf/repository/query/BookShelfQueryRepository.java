@@ -1,5 +1,6 @@
 package toy.bookchat.bookchat.domain.bookshelf.repository.query;
 
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
@@ -14,5 +15,5 @@ public interface BookShelfQueryRepository {
 
     void deleteBookByUserIdAndBookId(Long userId, Long bookId);
 
-    BookShelf findByUserIdAndBookId(Long userId, Long bookId);
+    Optional<BookShelf> findByUserIdAndBookId(Long userId, Long bookId);
 }

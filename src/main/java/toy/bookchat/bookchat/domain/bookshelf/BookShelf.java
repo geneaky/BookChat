@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import lombok.AccessLevel;
@@ -18,6 +19,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import toy.bookchat.bookchat.domain.BaseEntity;
 import toy.bookchat.bookchat.domain.book.Book;
+import toy.bookchat.bookchat.domain.bookreport.BookReport;
 import toy.bookchat.bookchat.domain.user.User;
 
 @Entity
@@ -32,22 +34,20 @@ import toy.bookchat.bookchat.domain.user.User;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BookShelf extends BaseEntity {
 
+    @OneToOne(fetch = FetchType.LAZY)
+    BookReport bookReport;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @ManyToOne(fetch = FetchType.LAZY)
     private Book book;
     private Integer pages;
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
-
     @Enumerated(EnumType.STRING)
     private ReadingStatus readingStatus;
-
     @Enumerated(EnumType.STRING)
     private Star star;
-
     private String singleLineAssessment;
 
     public String getIsbn() {
@@ -92,5 +92,13 @@ public class BookShelf extends BaseEntity {
 
     public void updateReadingStatus(ReadingStatus readingStatus) {
         this.readingStatus = readingStatus;
+    }
+
+    public void setBookReport(BookReport bookReport) {
+        this.bookReport = bookReport;
+    }
+
+    public void changeToCompleteReading() {
+        this.readingStatus = ReadingStatus.COMPLETE;
     }
 }

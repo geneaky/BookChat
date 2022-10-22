@@ -392,3 +392,23 @@ include::{snippets}/delete-bookshelf-books/http-request.adoc[]
 `Response`
 
 include::{snippets}/delete-bookshelf-books/http-response.adoc[]
+
+== 독후감
+
+=== 독후감 등록
+
+`Request Header`
+
+include::{snippets}/post-book-report/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/post-book-report/request-fields.adoc[]
+include::{snippets}/post-book-report/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/post-book-report/http-response.adoc[]
+
+---
+
