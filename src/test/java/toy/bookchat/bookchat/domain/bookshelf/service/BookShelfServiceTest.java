@@ -1,6 +1,7 @@
 package toy.bookchat.bookchat.domain.bookshelf.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import toy.bookchat.bookchat.domain.book.Book;
+import toy.bookchat.bookchat.domain.book.exception.BookNotFoundException;
 import toy.bookchat.bookchat.domain.book.repository.BookRepository;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
@@ -294,12 +296,32 @@ class BookShelfServiceTest {
             .readingStatus(ReadingStatus.WISH)
             .build();
 
-        when(bookShelfRepository.findByUserIdAndBookId(any(), any())).thenReturn(bookShelf);
+        when(bookShelfRepository.findByUserIdAndBookId(any(), any())).thenReturn(
+            Optional.of(bookShelf));
 
         bookShelfService.changeBookStatusOnBookShelf(
             new ChangeBookStatusRequestDto(ReadingStatus.READING), user, book.getId());
 
         ReadingStatus readingStatus = bookShelf.getReadingStatus();
         assertThat(readingStatus).isEqualTo(ReadingStatus.READING);
+    }
+
+    @Test
+    void 서재에_등록하지_않은_책_상태변경시도시_예외발생() throws Exception {
+        User user = getUser();
+
+        Book book = Book.builder()
+            .id(1L)
+            .isbn("1234")
+            .title("toby's Spring")
+            .authors(List.of("이일민"))
+            .publisher("jpub")
+            .bookCoverImageUrl("testBookCoverImageUrl")
+            .build();
+
+        assertThatThrownBy(() -> {
+            bookShelfService.changeBookStatusOnBookShelf(
+                new ChangeBookStatusRequestDto(ReadingStatus.READING), user, book.getId());
+        }).isInstanceOf(BookNotFoundException.class);
     }
 }

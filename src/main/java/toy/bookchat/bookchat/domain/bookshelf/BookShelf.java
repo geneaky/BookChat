@@ -93,4 +93,12 @@ public class BookShelf extends BaseEntity {
     public void updateReadingStatus(ReadingStatus readingStatus) {
         this.readingStatus = readingStatus;
     }
+
+    public void setBookReport(BookReport bookReport) {
+        this.bookReport = bookReport;
+    }
+
+    public void changeToCompleteReading() {
+        this.readingStatus = ReadingStatus.COMPLETE;
+    }
 }
