@@ -412,3 +412,19 @@ include::{snippets}/post-book-report/http-response.adoc[]
 
 ---
 
+== 고민
+
+=== 고민 폴더 생성
+
+`Request Header`
+
+include::{snippets}/post-agony/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/post-agony/request-fields.adoc[]
+include::{snippets}/post-agony/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/post-agony/http-response.adoc[]

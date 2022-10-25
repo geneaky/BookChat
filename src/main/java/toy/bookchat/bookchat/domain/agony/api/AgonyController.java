@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import toy.bookchat.bookchat.domain.agony.service.AgonyService;
 import toy.bookchat.bookchat.domain.agony.service.dto.CreateBookAgonyRequestDto;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.security.user.CurrentUser;
@@ -15,11 +16,18 @@ import toy.bookchat.bookchat.security.user.CurrentUser;
 @RequestMapping("/v1/api")
 public class AgonyController {
 
+    private final AgonyService agonyService;
+
+    public AgonyController(AgonyService agonyService) {
+        this.agonyService = agonyService;
+    }
+
     @PostMapping("/bookshelf/books/{bookId}/agonies")
     public ResponseEntity<Void> makeBookAgony(@PathVariable Long bookId,
         @Valid @RequestBody CreateBookAgonyRequestDto createBookAgonyRequestDto,
         @CurrentUser User user) {
-        return null;
+        agonyService.storeBookAgony(createBookAgonyRequestDto, user, bookId);
+        return ResponseEntity.ok().build();
     }
 
 }
