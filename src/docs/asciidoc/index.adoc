@@ -422,6 +422,7 @@ include::{snippets}/post-agony/request-headers.adoc[]
 
 `Request`
 
+include::{snippets}/post-agony/path-parameters.adoc[]
 include::{snippets}/post-agony/request-fields.adoc[]
 include::{snippets}/post-agony/http-request.adoc[]
 

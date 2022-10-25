@@ -9,6 +9,8 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static toy.bookchat.bookchat.domain.user.ROLE.USER;
@@ -95,7 +97,7 @@ class AgonyControllerTest extends AuthenticationTestExtension {
     void 고민_생성_성공() throws Exception {
         CreateBookAgonyRequestDto createBookAgonyRequestDto = new CreateBookAgonyRequestDto("title",
             "#062498");
-        mockMvc.perform(post("/v1/api/bookshelf/books/{bookId}/agonies", 1)
+        mockMvc.perform(post("/v1/api/bookshelf/{bookShelfId}/agonies", 1)
                 .header("Authorization", "Bearer " + getTestToken())
                 .with(user(getUserPrincipal()))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -104,6 +106,9 @@ class AgonyControllerTest extends AuthenticationTestExtension {
             .andDo(document("post-agony",
                 requestHeaders(
                     headerWithName("Authorization").description("Bearer [JWT token]")
+                ),
+                pathParameters(
+                    parameterWithName("bookShelfId").description("책 꽂이 ID")
                 ),
                 requestFields(
                     fieldWithPath("title").type(STRING).description("고민 제목"),
