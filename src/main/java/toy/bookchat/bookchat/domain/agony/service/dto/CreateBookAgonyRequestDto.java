@@ -5,6 +5,8 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import toy.bookchat.bookchat.domain.agony.Agony;
+import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 
 @Getter
 @AllArgsConstructor
@@ -16,4 +18,7 @@ public class CreateBookAgonyRequestDto {
     @NotBlank
     private String hexColorCode;
 
+    public Agony getAgony(BookShelf bookShelf) {
+        return new Agony(this.title, this.hexColorCode, bookShelf);
+    }
 }
