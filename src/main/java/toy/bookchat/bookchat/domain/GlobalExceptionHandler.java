@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MissingRequestValueException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import toy.bookchat.bookchat.domain.agony.exception.AgonyNotFoundException;
 import toy.bookchat.bookchat.domain.book.exception.BookNotFoundException;
 import toy.bookchat.bookchat.domain.storage.exception.ImageUploadToStorageException;
 import toy.bookchat.bookchat.domain.user.exception.ImageInputStreamException;
@@ -119,6 +120,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public final ResponseEntity<String> handleDataIntegrityViolationException(
         DataIntegrityViolationException exception) {
+        log.info("message = {} :: cause = {}", exception.getMessage(), exception.getCause());
+        return BAD_REQUEST;
+    }
+
+    @ExceptionHandler(AgonyNotFoundException.class)
+    public final ResponseEntity<String> handleAgonyNotFoundException(
+        AgonyNotFoundException exception) {
         log.info("message = {} :: cause = {}", exception.getMessage(), exception.getCause());
         return BAD_REQUEST;
     }

@@ -1,7 +1,6 @@
 package toy.bookchat.bookchat.domain.bookshelf.api;
 
 import javax.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,10 +23,13 @@ import toy.bookchat.bookchat.security.user.CurrentUser;
 
 @RestController
 @RequestMapping("/v1/api")
-@RequiredArgsConstructor
 public class BookShelfController {
 
     private final BookShelfService bookShelfService;
+
+    public BookShelfController(BookShelfService bookShelfService) {
+        this.bookShelfService = bookShelfService;
+    }
 
     @PostMapping("/bookshelf/books")
     public ResponseEntity<Void> putBookOnBookShelf(

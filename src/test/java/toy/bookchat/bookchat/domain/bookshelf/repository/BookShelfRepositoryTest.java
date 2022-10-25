@@ -62,8 +62,6 @@ class BookShelfRepositoryTest {
 
         BookShelf savedBookShelf = bookShelfRepository.save(bookShelf);
 
-        System.out.println(savedBookShelf.getBook());
-
         assertThat(book).isEqualTo(savedBook);
         assertThat(user).isEqualTo(savedUser);
         assertThat(bookShelf).isEqualTo(savedBookShelf);
