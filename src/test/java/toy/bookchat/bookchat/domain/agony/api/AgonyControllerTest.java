@@ -97,7 +97,7 @@ class AgonyControllerTest extends AuthenticationTestExtension {
     void 고민_생성_성공() throws Exception {
         CreateBookAgonyRequestDto createBookAgonyRequestDto = new CreateBookAgonyRequestDto("title",
             "#062498");
-        mockMvc.perform(post("/v1/api/bookshelf/{bookShelfId}/agonies", 1)
+        mockMvc.perform(post("/v1/api/bookshelf/books/{bookId}/agonies", 1)
                 .header("Authorization", "Bearer " + getTestToken())
                 .with(user(getUserPrincipal()))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -108,7 +108,7 @@ class AgonyControllerTest extends AuthenticationTestExtension {
                     headerWithName("Authorization").description("Bearer [JWT token]")
                 ),
                 pathParameters(
-                    parameterWithName("bookShelfId").description("책 꽂이 ID")
+                    parameterWithName("bookId").description("Book Id")
                 ),
                 requestFields(
                     fieldWithPath("title").type(STRING).description("고민 제목"),

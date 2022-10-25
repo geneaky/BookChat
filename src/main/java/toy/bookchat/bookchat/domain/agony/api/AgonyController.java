@@ -22,11 +22,11 @@ public class AgonyController {
         this.agonyService = agonyService;
     }
 
-    @PostMapping("/bookshelf/{bookShelfId}/agonies")
-    public ResponseEntity<Void> makeBookAgony(@PathVariable Long bookShelfId,
+    @PostMapping("/bookshelf/books/{bookId}/agonies")
+    public ResponseEntity<Void> makeBookAgony(@PathVariable Long bookId,
         @Valid @RequestBody CreateBookAgonyRequestDto createBookAgonyRequestDto,
         @CurrentUser User user) {
-        agonyService.storeBookAgony(createBookAgonyRequestDto, user, bookShelfId);
+        agonyService.storeBookAgony(createBookAgonyRequestDto, user, bookId);
         return ResponseEntity.ok().build();
     }
 
