@@ -7,7 +7,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import toy.bookchat.bookchat.domain.agony.service.AgonyRecordService;
 import toy.bookchat.bookchat.domain.agony.service.AgonyService;
+import toy.bookchat.bookchat.domain.agony.service.dto.CreateAgonyRecordRequestDto;
 import toy.bookchat.bookchat.domain.agony.service.dto.CreateBookAgonyRequestDto;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.security.user.CurrentUser;
@@ -17,9 +19,12 @@ import toy.bookchat.bookchat.security.user.CurrentUser;
 public class AgonyController {
 
     private final AgonyService agonyService;
+    private final AgonyRecordService agonyRecordService;
 
-    public AgonyController(AgonyService agonyService) {
+    public AgonyController(AgonyService agonyService,
+        AgonyRecordService agonyRecordService) {
         this.agonyService = agonyService;
+        this.agonyRecordService = agonyRecordService;
     }
 
     @PostMapping("/bookshelf/books/{bookId}/agonies")
@@ -30,4 +35,12 @@ public class AgonyController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/bookshelf/books/{bookId}/agonies/{agonyId}/records")
+    public ResponseEntity<Void> addAgonyRecordOnBookAgony(@PathVariable Long bookId,
+        @PathVariable Long agonyId,
+        @Valid @RequestBody CreateAgonyRecordRequestDto createAgonyRecordRequestDto,
+        @CurrentUser User user) {
+        agonyRecordService.storeAgonyRecord(createAgonyRecordRequestDto, user, bookId, agonyId);
+        return ResponseEntity.ok().build();
+    }
 }

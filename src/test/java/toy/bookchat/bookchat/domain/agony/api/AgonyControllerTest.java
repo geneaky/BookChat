@@ -37,7 +37,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
+import toy.bookchat.bookchat.domain.agony.service.AgonyRecordService;
 import toy.bookchat.bookchat.domain.agony.service.AgonyService;
+import toy.bookchat.bookchat.domain.agony.service.dto.CreateAgonyRecordRequestDto;
 import toy.bookchat.bookchat.domain.agony.service.dto.CreateBookAgonyRequestDto;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.security.SecurityConfig;
@@ -52,6 +54,8 @@ class AgonyControllerTest extends AuthenticationTestExtension {
 
     @MockBean
     AgonyService agonyService;
+    @MockBean
+    AgonyRecordService agonyRecordService;
     @Autowired
     ObjectMapper objectMapper;
     @Autowired
@@ -116,5 +120,33 @@ class AgonyControllerTest extends AuthenticationTestExtension {
                 )));
 
         verify(agonyService).storeBookAgony(any(), any(), any());
+    }
+
+    @Test
+    void 생성된_고민에_고민기록_추가_성공() throws Exception {
+        CreateAgonyRecordRequestDto createAgonyRecordRequestDto = new CreateAgonyRecordRequestDto(
+            "title", "blabla", "#456234");
+
+        mockMvc.perform(post("/v1/api/bookshelf/books/{bookId}/agonies/{agonyId}/records", 1, 1)
+                .header("Authorization", "Bearer " + getTestToken())
+                .with(user(getUserPrincipal()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(createAgonyRecordRequestDto)))
+            .andExpect(status().isOk())
+            .andDo(document("post-agonyrecord",
+                requestHeaders(
+                    headerWithName("Authorization").description("Bearer [JWT token]")
+                ),
+                pathParameters(
+                    parameterWithName("bookId").description("Book Id"),
+                    parameterWithName("agonyId").description("Agony Id")
+                ),
+                requestFields(
+                    fieldWithPath("title").description("고민기록의 제목"),
+                    fieldWithPath("content").optional().description("고민기록의 내용"),
+                    fieldWithPath("hexColorCode").description("고민기록 색상코드")
+                )));
+
+        verify(agonyRecordService).storeAgonyRecord(any(), any(), any(), any());
     }
 }

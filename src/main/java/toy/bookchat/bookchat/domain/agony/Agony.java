@@ -9,12 +9,13 @@ import javax.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import toy.bookchat.bookchat.domain.BaseEntity;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Agony {
+public class Agony extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

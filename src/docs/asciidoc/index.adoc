@@ -429,3 +429,23 @@ include::{snippets}/post-agony/http-request.adoc[]
 `Response`
 
 include::{snippets}/post-agony/http-response.adoc[]
+
+---
+
+== 고민기록
+
+=== 고민 기록 생성
+
+`Request Header`
+
+include::{snippets}/post-agonyrecord/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/post-agonyrecord/path-parameters.adoc[]
+include::{snippets}/post-agonyrecord/request-fields.adoc[]
+include::{snippets}/post-agonyrecord/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/post-agonyrecord/http-response.adoc[]
