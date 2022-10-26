@@ -34,7 +34,7 @@ class UserServiceTest {
     @Mock
     ImageValidator imageValidator;
     @InjectMocks
-    UserServiceImpl userService;
+    UserService userService;
 
     @Test
     void 사용자_중복된_nickname_체크() throws Exception {
