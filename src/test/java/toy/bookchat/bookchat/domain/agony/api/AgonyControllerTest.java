@@ -170,7 +170,7 @@ class AgonyControllerTest extends AuthenticationTestExtension {
 
         List<Agony> agonies = List.of(new Agony(1L, "고민1", "빨강", mock(BookShelf.class)),
             new Agony(2L, "고민2", "파랑", mock(BookShelf.class)));
-        PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("id,DESC"));
+        PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("id").descending());
         Page<Agony> page = new PageImpl<>(agonies, pageRequest, 1);
         PageOfAgoniesResponse pageOfAgoniesResponse = new PageOfAgoniesResponse(page);
         when(agonyService.searchPageOfAgonies(any(), any(), any())).thenReturn(

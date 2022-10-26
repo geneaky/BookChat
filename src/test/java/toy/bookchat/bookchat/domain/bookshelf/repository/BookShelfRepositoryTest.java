@@ -12,7 +12,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import toy.bookchat.bookchat.config.JpaAuditingConfig;
 import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.book.exception.BookNotFoundException;
@@ -103,7 +102,7 @@ class BookShelfRepositoryTest {
         bookShelfRepository.save(bookShelf1);
         bookShelfRepository.save(bookShelf2);
 
-        Pageable pageable = PageRequest.of(0, 2, Sort.by(Direction.DESC, "id"));
+        Pageable pageable = PageRequest.of(0, 2, Sort.by("id").descending());
         Page<BookShelf> pagingBookShelves = bookShelfRepository.findSpecificStatusBookByUserId(
             ReadingStatus.READING, pageable, user.getId());
         List<BookShelf> bookShelves = pagingBookShelves.getContent();
@@ -147,7 +146,7 @@ class BookShelfRepositoryTest {
         bookShelfRepository.save(bookShelf1);
         bookShelfRepository.save(bookShelf2);
 
-        Pageable pageable = PageRequest.of(0, 2, Sort.by(Direction.DESC, "id"));
+        Pageable pageable = PageRequest.of(0, 2, Sort.by("id").descending());
         Page<BookShelf> pagingBookShelves = bookShelfRepository.findSpecificStatusBookByUserId(
             ReadingStatus.COMPLETE, pageable, user.getId());
         List<BookShelf> bookShelves = pagingBookShelves.getContent();
@@ -198,7 +197,7 @@ class BookShelfRepositoryTest {
         user.updateImageUrl("hi");
         bookShelf1.getUser().updateImageUrl("by");
 
-        Pageable pageable = PageRequest.of(0, 2, Sort.by(Direction.DESC, "id"));
+        Pageable pageable = PageRequest.of(0, 2, Sort.by("id").descending());
         Page<BookShelf> pagingBookShelves = bookShelfRepository.findSpecificStatusBookByUserId(
             ReadingStatus.WISH, pageable, user.getId());
 
