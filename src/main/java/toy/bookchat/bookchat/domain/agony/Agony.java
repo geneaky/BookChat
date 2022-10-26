@@ -30,8 +30,9 @@ public class Agony extends BaseEntity {
     @OneToMany(mappedBy = "agony")
     private List<AgonyRecord> agonyRecords = new ArrayList<>();
 
-    public Agony(String title, String hexColorCode,
+    public Agony(Long id, String title, String hexColorCode,
         BookShelf bookShelf) {
+        this.id = id;
         this.title = title;
         this.hexColorCode = hexColorCode;
         setBookShelf(bookShelf);

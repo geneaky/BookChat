@@ -53,12 +53,11 @@ class AgonyRepositoryTest {
         userRepository.flush();
         bookShelfRepository.flush();
 
-        Agony agony = new Agony("title", "blue", bookShelf);
+        Agony agony = new Agony(null, "title", "blue", bookShelf);
         agonyRepository.saveAndFlush(agony);
         Agony findAgony = agonyRepository.findById(agony.getId()).get();
 
         assertThat(findAgony).isEqualTo(agony);
-
     }
 
     @Test
@@ -82,7 +81,7 @@ class AgonyRepositoryTest {
         userRepository.flush();
         bookShelfRepository.flush();
 
-        Agony agony = new Agony("title", "blue", bookShelf);
+        Agony agony = new Agony(null, "title", "blue", bookShelf);
         agonyRepository.saveAndFlush(agony);
         Agony findAgony = agonyRepository.findUserBookShelfAgony(user.getId(), book.getId(),
             agony.getId()).get();

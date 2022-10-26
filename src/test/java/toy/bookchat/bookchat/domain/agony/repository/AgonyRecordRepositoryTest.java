@@ -51,7 +51,7 @@ class AgonyRecordRepositoryTest {
             .build();
         bookShelfRepository.save(bookShelf);
 
-        Agony agony = new Agony("title", "blue", bookShelf);
+        Agony agony = new Agony(null, "title", "blue", bookShelf);
         agonyRepository.save(agony);
 
         bookRepository.flush();
