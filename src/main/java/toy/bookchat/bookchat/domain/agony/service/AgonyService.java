@@ -37,6 +37,7 @@ public class AgonyService {
 
     @Transactional(readOnly = true)
     public PageOfAgoniesResponse searchPageOfAgonies(Long bookId, Long userId, Pageable pageable) {
-        return null;
+        return new PageOfAgoniesResponse(
+            agonyRepository.findUserBookShelfPageOfAgonies(bookId, userId, pageable));
     }
 }
