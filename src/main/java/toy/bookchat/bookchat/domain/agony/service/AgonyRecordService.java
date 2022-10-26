@@ -1,12 +1,12 @@
 package toy.bookchat.bookchat.domain.agony.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import toy.bookchat.bookchat.domain.agony.Agony;
 import toy.bookchat.bookchat.domain.agony.exception.AgonyNotFoundException;
 import toy.bookchat.bookchat.domain.agony.repository.AgonyRecordRepository;
 import toy.bookchat.bookchat.domain.agony.repository.AgonyRepository;
 import toy.bookchat.bookchat.domain.agony.service.dto.CreateAgonyRecordRequestDto;
-import toy.bookchat.bookchat.domain.user.User;
 
 @Service
 public class AgonyRecordService {
@@ -20,9 +20,11 @@ public class AgonyRecordService {
         this.agonyRepository = agonyRepository;
     }
 
-    public void storeAgonyRecord(CreateAgonyRecordRequestDto createAgonyRecordRequestDto, User user,
+    @Transactional
+    public void storeAgonyRecord(CreateAgonyRecordRequestDto createAgonyRecordRequestDto,
+        Long userId,
         Long bookId, Long agonyId) {
-        Agony agony = agonyRepository.findUserBookShelfAgony(user.getId(), bookId, agonyId)
+        Agony agony = agonyRepository.findUserBookShelfAgony(userId, bookId, agonyId)
             .orElseThrow(() -> {
                 throw new AgonyNotFoundException("Agony is not registered");
             });

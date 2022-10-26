@@ -66,6 +66,14 @@ public class UserPrincipal implements UserDetails, OAuth2User {
         return user;
     }
 
+    /* TODO: 2022-10-26 user entity바로 넘겨주면 user를 수정안하면 상관없는데
+        user와 관련없는 도메인 예를 들어 book shelf service layer에서 public으로 열려있는
+        user의 method를 사용해서 변경을 시도하려고하면 문제가 될 수 있을 것 같네
+        user바로 반환하지말고 UserPayload? 이런식으로 해서 여기서 주거나 아니면
+        security context에서 넣을때 payload의  값을 꺼내서 세팅한 authentication 구현체를
+        넣어주는걸로 대체해야할듯
+     */
+
     public Integer getDefaultProfileImageType() {
         return defaultProfileImageType;
     }

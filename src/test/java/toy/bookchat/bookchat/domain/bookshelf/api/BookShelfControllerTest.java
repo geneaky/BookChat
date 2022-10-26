@@ -463,7 +463,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
 
         result.add(bookShelf);
 
-        PageRequest pageRequest = PageRequest.of(0, 1, Sort.by("id,DESC"));
+        PageRequest pageRequest = PageRequest.of(0, 1, Sort.by("id").descending());
         PageImpl<BookShelf> bookShelves = new PageImpl<>(result, pageRequest, 1);
         SearchBookShelfByReadingStatusDto searchBookShelfByReadingStatusDto = new SearchBookShelfByReadingStatusDto(
             bookShelves);
@@ -543,7 +543,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
 
         result.add(bookShelf);
 
-        PageRequest pageRequest = PageRequest.of(0, 1, Sort.by("id,DESC"));
+        PageRequest pageRequest = PageRequest.of(0, 1, Sort.by("id").descending());
         PageImpl<BookShelf> bookShelves = new PageImpl<>(result, pageRequest, 1);
         SearchBookShelfByReadingStatusDto searchBookShelfByReadingStatusDto = new SearchBookShelfByReadingStatusDto(
             bookShelves);
@@ -622,7 +622,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
 
         result.add(bookShelf);
 
-        PageRequest pageRequest = PageRequest.of(0, 1, Sort.by("id,DESC"));
+        PageRequest pageRequest = PageRequest.of(0, 1, Sort.by("id").descending());
         PageImpl<BookShelf> bookShelves = new PageImpl<>(result, pageRequest, 1);
         SearchBookShelfByReadingStatusDto searchBookShelfByReadingStatusDto = new SearchBookShelfByReadingStatusDto(
             bookShelves);
