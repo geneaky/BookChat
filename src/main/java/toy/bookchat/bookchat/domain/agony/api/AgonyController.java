@@ -14,6 +14,7 @@ import toy.bookchat.bookchat.domain.agony.service.AgonyService;
 import toy.bookchat.bookchat.domain.agony.service.dto.CreateAgonyRecordRequestDto;
 import toy.bookchat.bookchat.domain.agony.service.dto.CreateBookAgonyRequestDto;
 import toy.bookchat.bookchat.domain.agony.service.dto.PageOfAgoniesResponse;
+import toy.bookchat.bookchat.domain.agony.service.dto.PageOfAgonyRecordsResponse;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.security.user.CurrentUser;
 
@@ -53,5 +54,14 @@ public class AgonyController {
         agonyRecordService.storeAgonyRecord(createAgonyRecordRequestDto, user.getId(), bookId,
             agonyId);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/bookshelf/books/{bookId}/agonies/{agonyId}/records")
+    public ResponseEntity<PageOfAgonyRecordsResponse> getAgonyRecordsOnBookAgony(
+        @PathVariable final Long bookId,
+        @PathVariable final Long agonyId, @CurrentUser User user) {
+
+        return ResponseEntity.ok(
+            agonyRecordService.searchPageOfAgonyRecords(bookId, agonyId, user.getId()));
     }
 }

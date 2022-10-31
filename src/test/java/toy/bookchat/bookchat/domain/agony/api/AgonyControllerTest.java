@@ -11,6 +11,7 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
+import static org.springframework.restdocs.payload.JsonFieldType.OBJECT;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
@@ -50,11 +51,13 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
 import toy.bookchat.bookchat.domain.agony.Agony;
+import toy.bookchat.bookchat.domain.agony.AgonyRecord;
 import toy.bookchat.bookchat.domain.agony.service.AgonyRecordService;
 import toy.bookchat.bookchat.domain.agony.service.AgonyService;
 import toy.bookchat.bookchat.domain.agony.service.dto.CreateAgonyRecordRequestDto;
 import toy.bookchat.bookchat.domain.agony.service.dto.CreateBookAgonyRequestDto;
 import toy.bookchat.bookchat.domain.agony.service.dto.PageOfAgoniesResponse;
+import toy.bookchat.bookchat.domain.agony.service.dto.PageOfAgonyRecordsResponse;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.security.SecurityConfig;
@@ -140,7 +143,7 @@ class AgonyControllerTest extends AuthenticationTestExtension {
     @Test
     void 생성된_고민에_고민기록_추가_성공() throws Exception {
         CreateAgonyRecordRequestDto createAgonyRecordRequestDto = new CreateAgonyRecordRequestDto(
-            "title", "blabla", "#456234");
+            "title", "blabla");
 
         mockMvc.perform(post("/v1/api/bookshelf/books/{bookId}/agonies/{agonyId}/records", 1, 1)
                 .header("Authorization", "Bearer " + getTestToken())
@@ -158,8 +161,7 @@ class AgonyControllerTest extends AuthenticationTestExtension {
                 ),
                 requestFields(
                     fieldWithPath("title").description("고민기록의 제목"),
-                    fieldWithPath("content").optional().description("고민기록의 내용"),
-                    fieldWithPath("hexColorCode").description("고민기록 색상코드")
+                    fieldWithPath("content").optional().description("고민기록의 내용")
                 )));
 
         verify(agonyRecordService).storeAgonyRecord(any(), any(), any(), any());
@@ -211,4 +213,57 @@ class AgonyControllerTest extends AuthenticationTestExtension {
                 )
             ));
     }
+
+    @Test
+    void 고민_기록_조회_성공() throws Exception {
+
+        PageRequest pageRequest = PageRequest.of(0, 3, Sort.by("id").descending());
+        List<AgonyRecord> list = List.of(new AgonyRecord("title1", "content1", null),
+            new AgonyRecord("title2", "content2", null));
+        Page<AgonyRecord> page = new PageImpl<>(list, pageRequest, list.size());
+        PageOfAgonyRecordsResponse pageOfAgonyRecordsResponse = new PageOfAgonyRecordsResponse(
+            page);
+        when(agonyRecordService.searchPageOfAgonyRecords(any(), any(), any())).thenReturn(
+            pageOfAgonyRecordsResponse);
+        mockMvc.perform(get("/v1/api/bookshelf/books/{bookId}/agonies/{agonyId}/records", 1, 1)
+                .header("Authorization", "Bearer " + getTestToken())
+                .with(user(getUserPrincipal()))
+                .queryParam("size", "3")
+                .queryParam("page", "0")
+                .queryParam("sort", "id,DESC"))
+            .andExpect(status().isOk())
+            .andDo(document("get-agonies-records",
+                requestHeaders(
+                    headerWithName("Authorization").description("Bearer [JWT token]")
+                ),
+                pathParameters(
+                    parameterWithName("bookId").description("Book Id"),
+                    parameterWithName("agonyId").description("Agony Id")
+                ),
+                requestParameters(
+                    parameterWithName("size").description("page당 size"),
+                    parameterWithName("page").description("출력을 시작할 페이지 번호"),
+                    parameterWithName("sort").description("[최신순] - id,DESC | [등록순] - id,ASC")
+                ),
+                responseFields(
+                    fieldWithPath("agonyRecordResponseList[].agonyRecordId").type(NUMBER)
+                        .description("고민 기록 Id"),
+                    fieldWithPath("agonyRecordResponseList[].title").type(STRING)
+                        .description("고민 기록 제목"),
+                    fieldWithPath("agonyRecordResponseList[].content").type(STRING)
+                        .description("고민 기록 내용"),
+                    fieldWithPath("agonyRecordResponseList[].updatedAt").type(OBJECT)
+                        .description("고민 가장 최근 수정시간"),
+                    fieldWithPath("totalElements").type(NUMBER).description("전체 ROW 수"),
+                    fieldWithPath("totalPages").type(NUMBER).description("총 페이지 수"),
+                    fieldWithPath("pageSize").type(NUMBER).description("요청한 페이지 사이즈"),
+                    fieldWithPath("pageNumber").type(NUMBER).description("현재 페이지 번호"),
+                    fieldWithPath("offset").type(NUMBER).description("ROW 시작 번호"),
+                    fieldWithPath("first").type(BOOLEAN).description("시작 페이지 여부"),
+                    fieldWithPath("last").type(BOOLEAN).description("마지막 페이지 여부"),
+                    fieldWithPath("empty").type(BOOLEAN).description("content 비어있는지 여부")
+                )));
+    }
+
+
 }
