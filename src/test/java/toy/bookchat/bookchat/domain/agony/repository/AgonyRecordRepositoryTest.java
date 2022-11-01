@@ -59,7 +59,8 @@ class AgonyRecordRepositoryTest {
         bookShelfRepository.flush();
         agonyRepository.flush();
 
-        AgonyRecord agonyRecord = new AgonyRecord("recordTitle", "recordContent", agony);
+        AgonyRecord agonyRecord = new AgonyRecord("recordTitle", "recordContent",
+            "recordHexColorCode", agony);
 
         agonyRecordRepository.save(agonyRecord);
 

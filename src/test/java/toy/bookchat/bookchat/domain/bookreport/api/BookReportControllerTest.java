@@ -95,6 +95,7 @@ class BookReportControllerTest extends AuthenticationTestExtension {
             .bookShelfId(1L)
             .title("어렵지만 많이 배웠다")
             .content("요런 요런 내용, 저런저런 내용을 많이 배움")
+            .hexColorCode("#800080")
             .build();
 
         mockMvc.perform(post("/v1/api/bookreports")
@@ -110,7 +111,8 @@ class BookReportControllerTest extends AuthenticationTestExtension {
                 requestFields(
                     fieldWithPath("bookShelfId").type(NUMBER).description("Book Shelf Id"),
                     fieldWithPath("title").type(STRING).description("독후감 제목"),
-                    fieldWithPath("content").type(STRING).description("독후감 내용")
+                    fieldWithPath("content").type(STRING).description("독후감 내용"),
+                    fieldWithPath("hexColorCode").type(STRING).description("독후감 페이지 색상 코드")
                 )));
 
         verify(bookReportService).writeReport(any(), any());

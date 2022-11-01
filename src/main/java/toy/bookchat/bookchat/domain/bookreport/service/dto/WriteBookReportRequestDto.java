@@ -22,8 +22,10 @@ public class WriteBookReportRequestDto {
     private String title;
     @NotBlank
     private String content;
+    @NotBlank
+    private String hexColorCode;
 
     public BookReport getBookReport(BookShelf bookShelf) {
-        return new BookReport(this.title, this.content, bookShelf);
+        return new BookReport(this.title, this.content, this.hexColorCode, bookShelf);
     }
 }

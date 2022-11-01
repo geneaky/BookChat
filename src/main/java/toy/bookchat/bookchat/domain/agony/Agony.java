@@ -20,14 +20,14 @@ import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Agony extends BaseEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    BookShelf bookShelf;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String title;
     private String hexColorCode;
-    @OneToMany(mappedBy = "agony", orphanRemoval = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    BookShelf bookShelf;
+    @OneToMany(mappedBy = "agony")
     private List<AgonyRecord> agonyRecords = new ArrayList<>();
 
     public Agony(Long id, String title, String hexColorCode,
@@ -35,16 +35,11 @@ public class Agony extends BaseEntity {
         this.id = id;
         this.title = title;
         this.hexColorCode = hexColorCode;
-        this.bookShelf = bookShelf;
+        setBookShelf(bookShelf);
     }
 
     public void setBookShelf(BookShelf bookShelf) {
         this.bookShelf = bookShelf;
         bookShelf.getAgonies().add(this);
-    }
-
-    public void addAgonyRecord(AgonyRecord agonyRecord) {
-        this.agonyRecords.add(agonyRecord);
-        agonyRecord.setAgony(this);
     }
 }

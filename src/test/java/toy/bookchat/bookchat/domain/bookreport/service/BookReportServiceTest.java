@@ -36,6 +36,7 @@ class BookReportServiceTest {
             .bookShelfId(1L)
             .title("어렵지만 많이 배웠습니다")
             .content("이런이런 저런저런 내용")
+            .hexColorCode("#800080")
             .build();
     }
 

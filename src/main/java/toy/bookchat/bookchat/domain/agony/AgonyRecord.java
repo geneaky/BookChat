@@ -16,19 +16,21 @@ import toy.bookchat.bookchat.domain.BaseEntity;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class AgonyRecord extends BaseEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    Agony agony;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String title;
     private String content;
+    private String hexColorCode;
+    @ManyToOne(fetch = FetchType.LAZY)
+    Agony agony;
 
-    public AgonyRecord(String title, String content,
+    public AgonyRecord(String title, String content, String hexColorCode,
         Agony agony) {
         this.title = title;
         this.content = content;
-        this.agony = agony;
+        this.hexColorCode = hexColorCode;
+        setAgony(agony);
     }
 
     public void setAgony(Agony agony) {

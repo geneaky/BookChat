@@ -17,8 +17,10 @@ public class CreateAgonyRecordRequestDto {
     private String title;
 
     private String content;
+    @NotBlank
+    private String hexColorCode;
 
     public AgonyRecord generateAgonyRecord(Agony agony) {
-        return new AgonyRecord(this.title, this.content, agony);
+        return new AgonyRecord(this.title, this.content, this.hexColorCode, agony);
     }
 }

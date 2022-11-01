@@ -174,10 +174,10 @@ public class BookControllerTest extends AuthenticationTestExtension {
                 .param("sort", "ACCURACY")
                 .with(user(getUserPrincipal())))
             .andExpect(status().isOk())
-            .andDo(document("book-search-paging",
+            .andDo(document("book-search-isbn-paging",
                 requestHeaders(
                     headerWithName("Authorization").description("Bearer [JWT token]")),
-                requestParameters(parameterWithName("query").description("검색 키워드 [ISBN, 도서명, 저자명]"),
+                requestParameters(parameterWithName("query").description("isbn  번호"),
                     parameterWithName("size").description("한 번에 조회할 책의 수 - page 당 size"),
                     parameterWithName("page").description("한 번에 조회할 page 수"),
                     parameterWithName("sort").description("조회시 정렬 옵션")),
@@ -196,5 +196,110 @@ public class BookControllerTest extends AuthenticationTestExtension {
         verify(bookSearchService).searchByQuery(any(BookSearchRequestDto.class));
         assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo(result);
 
+    }
+
+    @Test
+    public void 사용자가_도서명_검색시_paging_성공() throws Exception {
+        List<BookDto> bookDtos = new ArrayList<>();
+        bookDtos.add(getBookDto("213123", "effectiveJava", List.of("Joshua")));
+
+        Meta meta = Meta.builder()
+            .total_count(5)
+            .pageable_count(5)
+            .is_end(false)
+            .build();
+
+        BookSearchResponseDto bookSearchResponseDto = BookSearchResponseDto.builder()
+            .bookDtos(bookDtos)
+            .meta(meta)
+            .build();
+
+        when(bookSearchService.searchByQuery(any(BookSearchRequestDto.class))).thenReturn(
+            bookSearchResponseDto);
+
+        String result = objectMapper.writeValueAsString(bookSearchResponseDto);
+
+        MvcResult mvcResult = mockMvc.perform(get("/v1/api/books")
+                .header("Authorization", "Bearer " + getTestToken())
+                .param("query", "effectiveJava")
+                .param("size", "5")
+                .param("page", "1")
+                .param("sort", "LATEST")
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isOk())
+            .andDo(document("book-search-title-paging",
+                requestHeaders(
+                    headerWithName("Authorization").description("Bearer [JWT token]")),
+                requestParameters(parameterWithName("query").description("도서명"),
+                    parameterWithName("size").description("한 번에 조회할 책의 수 - page 당 size"),
+                    parameterWithName("page").description("한 번에 조회할 page 수"),
+                    parameterWithName("sort").description("조회시 정렬 옵션")),
+                responseFields(
+                    fieldWithPath("bookDtos[].isbn").type(STRING).description("ISBN"),
+                    fieldWithPath("bookDtos[].title").type(STRING).description("제목"),
+                    fieldWithPath("bookDtos[].author[]").type(ARRAY).description("저자"),
+                    fieldWithPath("bookDtos[].publisher").type(STRING).description("출판사"),
+                    fieldWithPath("bookDtos[].bookCoverImageUrl").type(STRING)
+                        .description("책 표지 이미지"),
+                    fieldWithPath("meta.is_end").type(BOOLEAN).description("마지막 페이지 여부"),
+                    fieldWithPath("meta.pageable_count").type(NUMBER).description("가져온 페이지 수"),
+                    fieldWithPath("meta.total_count").type(NUMBER).description("총 페이지 수")
+                ))).andReturn();
+
+        verify(bookSearchService).searchByQuery(any(BookSearchRequestDto.class));
+        assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo(result);
+
+    }
+
+    @Test
+    public void 사용자가_작가명_검색시_paging_성공() throws Exception {
+        List<BookDto> bookDtos = new ArrayList<>();
+        bookDtos.add(getBookDto("213123", "effectiveJava", List.of("Joshua")));
+
+        Meta meta = Meta.builder()
+            .total_count(5)
+            .pageable_count(5)
+            .is_end(false)
+            .build();
+
+        BookSearchResponseDto bookSearchResponseDto = BookSearchResponseDto.builder()
+            .bookDtos(bookDtos)
+            .meta(meta)
+            .build();
+
+        when(bookSearchService.searchByQuery(any(BookSearchRequestDto.class))).thenReturn(
+            bookSearchResponseDto);
+
+        String result = objectMapper.writeValueAsString(bookSearchResponseDto);
+
+        MvcResult mvcResult = mockMvc.perform(get("/v1/api/books")
+                .header("Authorization", "Bearer " + getTestToken())
+                .param("query", "Joshua")
+                .param("size", "5")
+                .param("page", "1")
+                .param("sort", "LATEST")
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isOk())
+            .andDo(document("book-search-author-paging",
+                requestHeaders(
+                    headerWithName("Authorization").description("Bearer [JWT token]")),
+                requestParameters(parameterWithName("query").description("작가명"),
+                    parameterWithName("size").description("한 번에 조회할 책의 수 - page 당 size"),
+                    parameterWithName("page").description("한 번에 조회할 page 수"),
+                    parameterWithName("sort").description("조회시 정렬 옵션")),
+                responseFields(
+                    fieldWithPath("bookDtos[].isbn").type(STRING).description("ISBN"),
+                    fieldWithPath("bookDtos[].title").type(STRING).description("제목"),
+                    fieldWithPath("bookDtos[].author[]").type(ARRAY).description("저자"),
+                    fieldWithPath("bookDtos[].publisher").type(STRING).description("출판사"),
+                    fieldWithPath("bookDtos[].bookCoverImageUrl").type(STRING)
+                        .description("책 표지 이미지"),
+                    fieldWithPath("meta.is_end").type(BOOLEAN).description("마지막 페이지 여부"),
+                    fieldWithPath("meta.pageable_count").type(NUMBER).description("가져온 페이지 수"),
+                    fieldWithPath("meta.total_count").type(NUMBER).description("총 페이지 수")
+                ))).andReturn();
+
+        verify(bookSearchService).searchByQuery(any(BookSearchRequestDto.class));
+        assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo(result);
     }
 }
