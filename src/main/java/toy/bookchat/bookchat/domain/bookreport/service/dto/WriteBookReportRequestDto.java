@@ -24,6 +24,10 @@ public class WriteBookReportRequestDto {
     private String content;
 
     public BookReport getBookReport(BookShelf bookShelf) {
-        return new BookReport(this.title, this.content, bookShelf);
+        return BookReport.builder()
+            .title(this.title)
+            .content(this.content)
+            .bookShelf(bookShelf)
+            .build();
     }
 }

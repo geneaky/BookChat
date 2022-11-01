@@ -4,21 +4,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import toy.bookchat.bookchat.domain.user.ROLE;
 import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
 @Getter
-@Setter
-@Builder
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor
 public class UserSignUpRequestDto {
 
@@ -33,11 +27,26 @@ public class UserSignUpRequestDto {
     @JsonProperty("oauth2Provider")
     private OAuth2Provider oauth2Provider;
 
-    public User getUser(String oauth2MemberNumber, String email, String profileImageUrl,
-        OAuth2Provider providerType) {
-        return new User(oauth2MemberNumber, email, profileImageUrl, ROLE.USER,
-            providerType, this.getNickname(), this.getReadingTastes(),
-            this.getDefaultProfileImageType());
+    public User getUser(String oauth2MemberNumber, String email, String profileImageUrl) {
+        return User.builder()
+            .name(oauth2MemberNumber)
+            .nickname(this.nickname)
+            .email(email)
+            .profileImageUrl(profileImageUrl)
+            .role(ROLE.USER)
+            .provider(this.oauth2Provider)
+            .readingTastes(this.readingTastes)
+            .defaultProfileImageType(this.defaultProfileImageType)
+            .build();
     }
 
+    @Builder
+    private UserSignUpRequestDto(String nickname,
+        List<ReadingTaste> readingTastes, Integer defaultProfileImageType,
+        OAuth2Provider oauth2Provider) {
+        this.nickname = nickname;
+        this.readingTastes = readingTastes;
+        this.defaultProfileImageType = defaultProfileImageType;
+        this.oauth2Provider = oauth2Provider;
+    }
 }

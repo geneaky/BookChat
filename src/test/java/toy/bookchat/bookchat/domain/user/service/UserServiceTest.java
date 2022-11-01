@@ -59,7 +59,7 @@ class UserServiceTest {
 
         when(storageService.getFileUrl(any())).thenReturn("testBucketUrl");
         when(imageValidator.hasValidImage(any())).thenReturn(true);
-        when(userSignUpRequestDto.getUser(any(), any(), any(), any())).thenReturn(mockUser);
+        when(userSignUpRequestDto.getUser(any(), any(), any())).thenReturn(mockUser);
 
         userService.registerNewUser(userSignUpRequestDto, multipartFile, "memberNumber",
             "test@gmail.com");

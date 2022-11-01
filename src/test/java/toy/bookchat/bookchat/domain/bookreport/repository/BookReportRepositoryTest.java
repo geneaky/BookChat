@@ -21,15 +21,22 @@ class BookReportRepositoryTest {
     @Autowired
     BookShelfRepository bookShelfRepository;
 
+    private BookReport getBookReport(BookShelf bookShelf) {
+        return BookReport.builder()
+            .title("title")
+            .content("content")
+            .bookShelf(bookShelf)
+            .build();
+    }
+
     @Test
     void 독후감_저장_성공() throws Exception {
         BookShelf bookShelf = BookShelf.builder()
             .build();
-
-        BookReport bookReport = new BookReport("title", "content", bookShelf);
-
-        bookReportRepository.save(bookReport);
         bookShelfRepository.save(bookShelf);
+
+        BookReport bookReport = getBookReport(bookShelf);
+        bookReportRepository.save(bookReport);
 
         bookReportRepository.flush();
         bookShelfRepository.flush();

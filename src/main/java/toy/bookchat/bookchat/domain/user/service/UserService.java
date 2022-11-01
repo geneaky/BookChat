@@ -15,7 +15,6 @@ import toy.bookchat.bookchat.domain.user.exception.UserNotFoundException;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.domain.user.service.dto.ChangeUserNicknameRequestDto;
 import toy.bookchat.bookchat.domain.user.service.dto.UserSignUpRequestDto;
-import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
 @Service
 public class UserService {
@@ -43,15 +42,13 @@ public class UserService {
             String prefixedUUIDFileName = createFileName(userProfileImage);
             String prefixedUUIDFileUrl = createFileUrl(prefixedUUIDFileName);
 
-            saveUser(userSignUpRequestDto, userName, userEmail, prefixedUUIDFileUrl,
-                userSignUpRequestDto.getOauth2Provider());
+            saveUser(userSignUpRequestDto, userName, userEmail, prefixedUUIDFileUrl);
 
             storageService.upload(userProfileImage, prefixedUUIDFileName);
             return;
         }
 
-        saveUser(userSignUpRequestDto, userName, userEmail, null,
-            userSignUpRequestDto.getOauth2Provider());
+        saveUser(userSignUpRequestDto, userName, userEmail, null);
     }
 
     private String createFileUrl(String prefixedUUIDFileName) {
@@ -85,13 +82,12 @@ public class UserService {
     }
 
     private void saveUser(UserSignUpRequestDto userSignUpRequestDto, String userName,
-        String email, String profileImageUrl, OAuth2Provider providerType) {
+        String email, String profileImageUrl) {
         Optional<User> optionalUser = userRepository.findByName(userName);
         optionalUser.ifPresentOrElse(u -> {
             throw new UserAlreadySignUpException("user already sign up");
         }, () -> {
-            User user = userSignUpRequestDto.getUser(userName, email, profileImageUrl,
-                providerType);
+            User user = userSignUpRequestDto.getUser(userName, email, profileImageUrl);
             userRepository.save(user);
         });
     }

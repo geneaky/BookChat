@@ -19,6 +19,9 @@ public class CreateBookAgonyRequestDto {
     private String hexColorCode;
 
     public Agony getAgony(BookShelf bookShelf) {
-        return new Agony(null, this.title, this.hexColorCode, bookShelf);
+        return Agony.builder()
+            .hexColorCode(this.hexColorCode)
+            .bookShelf(bookShelf)
+            .build();
     }
 }

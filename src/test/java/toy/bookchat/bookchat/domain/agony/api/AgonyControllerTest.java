@@ -114,6 +114,24 @@ class AgonyControllerTest extends AuthenticationTestExtension {
         return testToken;
     }
 
+    private List<Agony> getAgonies() {
+        Agony agony1 = Agony.builder()
+            .id(1L)
+            .title("고민1")
+            .hexColorCode("빨강")
+            .bookShelf(mock(BookShelf.class))
+            .build();
+
+        Agony agony2 = Agony.builder()
+            .id(2L)
+            .title("고민2")
+            .hexColorCode("파랑")
+            .bookShelf(mock(BookShelf.class))
+            .build();
+
+        return List.of(agony1, agony2);
+    }
+
     @Test
     void 고민_생성_성공() throws Exception {
         CreateBookAgonyRequestDto createBookAgonyRequestDto = new CreateBookAgonyRequestDto("title",
@@ -169,8 +187,7 @@ class AgonyControllerTest extends AuthenticationTestExtension {
     @Test
     void 고민_조회_성공() throws Exception {
 
-        List<Agony> agonies = List.of(new Agony(1L, "고민1", "빨강", mock(BookShelf.class)),
-            new Agony(2L, "고민2", "파랑", mock(BookShelf.class)));
+        List<Agony> agonies = getAgonies();
         PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("id").descending());
         Page<Agony> page = new PageImpl<>(agonies, pageRequest, 1);
         PageOfAgoniesResponse pageOfAgoniesResponse = new PageOfAgoniesResponse(page);

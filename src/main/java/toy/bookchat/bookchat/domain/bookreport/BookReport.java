@@ -6,33 +6,31 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
-import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import toy.bookchat.bookchat.domain.BaseEntity;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 
 @Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BookReport extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
-    String title;
-    String content;
+    private Long id;
+    private String title;
+    private String content;
     @OneToOne(mappedBy = "bookReport", fetch = FetchType.LAZY)
-    BookShelf bookShelf;
+    private BookShelf bookShelf;
 
-    public BookReport(String title, String content, BookShelf bookShelf) {
+    @Builder
+    private BookReport(Long id, String title, String content, BookShelf bookShelf) {
+        this.id = id;
         this.title = title;
         this.content = content;
-        setBookShelf(bookShelf);
+        this.bookShelf = bookShelf;
     }
 
-    public void setBookShelf(BookShelf bookShelf) {
-        this.bookShelf = bookShelf;
-        bookShelf.setBookReport(this);
+    protected BookReport() {
     }
 }
