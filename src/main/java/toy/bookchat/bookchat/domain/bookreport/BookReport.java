@@ -22,14 +22,12 @@ public class BookReport extends BaseEntity {
     Long id;
     String title;
     String content;
-    String hexColorCode;
     @OneToOne(mappedBy = "bookReport", fetch = FetchType.LAZY)
     BookShelf bookShelf;
 
-    public BookReport(String title, String content, String hexColorCode, BookShelf bookShelf) {
+    public BookReport(String title, String content, BookShelf bookShelf) {
         this.title = title;
         this.content = content;
-        this.hexColorCode = hexColorCode;
         setBookShelf(bookShelf);
     }
 

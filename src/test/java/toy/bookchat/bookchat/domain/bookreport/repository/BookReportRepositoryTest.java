@@ -26,7 +26,7 @@ class BookReportRepositoryTest {
         BookShelf bookShelf = BookShelf.builder()
             .build();
 
-        BookReport bookReport = new BookReport("title", "content", "hexColorCode", bookShelf);
+        BookReport bookReport = new BookReport("title", "content", bookShelf);
 
         bookReportRepository.save(bookReport);
         bookShelfRepository.save(bookShelf);
