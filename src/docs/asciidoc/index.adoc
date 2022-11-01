@@ -185,57 +185,21 @@ include::{snippets}/delete-user/http-response.adoc[]
 
 == 도서
 
-=== ISBN 도서 검색
+=== 도서 검색
 
 `Request Header`
 
-include::{snippets}/book-search-isbn-paging/request-headers.adoc[]
+include::{snippets}/book-search-paging/request-headers.adoc[]
 
 `Request`
 
-include::{snippets}/book-search-isbn-paging/request-parameters.adoc[]
-include::{snippets}/book-search-isbn-paging/http-request.adoc[]
+include::{snippets}/book-search-paging/request-parameters.adoc[]
+include::{snippets}/book-search-paging/http-request.adoc[]
 
 `Resopnse`
 
-include::{snippets}/book-search-isbn-paging/response-fields.adoc[]
-include::{snippets}/book-search-isbn-paging/http-response.adoc[]
-
----
-
-=== Title 도서 검색
-
-`Request Header`
-
-include::{snippets}/book-search-title-paging/request-headers.adoc[]
-
-`Request`
-
-include::{snippets}/book-search-title-paging/request-parameters.adoc[]
-include::{snippets}/book-search-title-paging/http-request.adoc[]
-
-`Response`
-
-include::{snippets}/book-search-title-paging/response-fields.adoc[]
-include::{snippets}/book-search-title-paging/http-response.adoc[]
-
----
-
-=== Author 도서 검색
-
-`Request Header`
-
-include::{snippets}/book-search-author-paging/request-headers.adoc[]
-
-`Request`
-
-include::{snippets}/book-search-author-paging/request-parameters.adoc[]
-include::{snippets}/book-search-author-paging/http-request.adoc[]
-
-`Response`
-
-include::{snippets}/book-search-author-paging/response-fields.adoc[]
-include::{snippets}/book-search-author-paging/http-response.adoc[]
+include::{snippets}/book-search-paging/response-fields.adoc[]
+include::{snippets}/book-search-paging/http-response.adoc[]
 
 == 책장
 
@@ -466,3 +430,22 @@ include::{snippets}/post-agonyrecord/http-request.adoc[]
 `Response`
 
 include::{snippets}/post-agonyrecord/http-response.adoc[]
+
+---
+
+=== 고민 기록 조회
+
+`Request Header`
+
+include::{snippets}/get-agonies-records/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/get-agonies-records/path-parameters.adoc[]
+include::{snippets}/get-agonies-records/request-parameters.adoc[]
+include::{snippets}/get-agonies-records/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/get-agonies-records/response-fields.adoc[]
+include::{snippets}/get-agonies-records/http-response.adoc[]
