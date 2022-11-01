@@ -233,8 +233,8 @@ class AgonyControllerTest extends AuthenticationTestExtension {
         Page<AgonyRecord> page = new PageImpl<>(list, pageRequest, list.size());
         PageOfAgonyRecordsResponse pageOfAgonyRecordsResponse = new PageOfAgonyRecordsResponse(
             page);
-        
-        when(agonyRecordService.searchPageOfAgonyRecords(any(), any(), any())).thenReturn(
+
+        when(agonyRecordService.searchPageOfAgonyRecords(any(), any(), any(), any())).thenReturn(
             pageOfAgonyRecordsResponse);
         mockMvc.perform(get("/v1/api/bookshelf/books/{bookId}/agonies/{agonyId}/records", 1, 1)
                 .header("Authorization", "Bearer " + getTestToken())

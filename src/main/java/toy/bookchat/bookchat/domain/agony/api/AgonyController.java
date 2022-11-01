@@ -59,9 +59,9 @@ public class AgonyController {
     @GetMapping("/bookshelf/books/{bookId}/agonies/{agonyId}/records")
     public ResponseEntity<PageOfAgonyRecordsResponse> getAgonyRecordsOnBookAgony(
         @PathVariable final Long bookId,
-        @PathVariable final Long agonyId, @CurrentUser User user) {
+        @PathVariable final Long agonyId, @CurrentUser User user, Pageable pageable) {
 
         return ResponseEntity.ok(
-            agonyRecordService.searchPageOfAgonyRecords(bookId, agonyId, user.getId()));
+            agonyRecordService.searchPageOfAgonyRecords(bookId, agonyId, user.getId(), pageable));
     }
 }

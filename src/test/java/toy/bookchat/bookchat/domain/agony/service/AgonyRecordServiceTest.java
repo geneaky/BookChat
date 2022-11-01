@@ -80,10 +80,11 @@ class AgonyRecordServiceTest {
 
         Pageable pageable = PageRequest.of(0, 2, Sort.by("id").descending());
         Page<AgonyRecord> page = new PageImpl<>(list, pageable, list.size());
-        when(agonyRecordRepository.findPageOfUserAgonyRecords(any(), any(), any())).thenReturn(
+        when(agonyRecordRepository.findPageOfUserAgonyRecords(any(), any(), any(),
+            any())).thenReturn(
             page);
         PageOfAgonyRecordsResponse pageOfAgonyRecordsResponse = agonyRecordService.searchPageOfAgonyRecords(
-            1L, 1L, 1L);
+            1L, 1L, 1L, pageable);
 
         int result = pageOfAgonyRecordsResponse.getAgonyRecordResponseList().size();
         assertThat(result).isEqualTo(2);
