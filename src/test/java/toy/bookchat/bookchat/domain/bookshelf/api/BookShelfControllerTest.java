@@ -155,7 +155,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
                 .content(objectMapper.writeValueAsString(getBookShelfRequestDto(ReadingStatus.READING)))
                 .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
-            .andExpect(status().isCreated())
+            .andExpect(status().isOk())
             .andDo(document("bookshelf-reading",
                 requestHeaders(
                     headerWithName("Authorization").description("Bearer [JWT token]")),
@@ -181,7 +181,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
                     objectMapper.writeValueAsString(getBookShelfRequestDto(ReadingStatus.COMPLETE)))
                 .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
-            .andExpect(status().isCreated())
+            .andExpect(status().isOk())
             .andDo(document("bookshelf-complete",
                 requestHeaders(
                     headerWithName("Authorization").description("Bearer [JWT token]")
@@ -231,7 +231,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
                 .content(objectMapper.writeValueAsString(getBookShelfRequestDto(ReadingStatus.WISH)))
                 .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
-            .andExpect(status().isCreated())
+            .andExpect(status().isOk())
             .andDo(document("bookshelf-wish",
                 requestHeaders(
                     headerWithName("Authorization").description("Bearer [openid token]")

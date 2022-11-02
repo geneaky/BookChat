@@ -1,7 +1,6 @@
 package toy.bookchat.bookchat.domain.bookreport.api;
 
 import javax.validation.Valid;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,11 +21,10 @@ public class BookReportController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> writeBookReport(
+    public void writeBookReport(
         @Valid @RequestBody WriteBookReportRequestDto writeBookReportRequestDto,
         @CurrentUser User user) {
 
         bookReportService.writeReport(writeBookReportRequestDto, user);
-        return ResponseEntity.ok().build();
     }
 }

@@ -56,9 +56,9 @@ public class UserController {
             s3와 cdn을 사용해서 사용자 프로필을 캐시해서 제공해 성능 개선
         */
     @GetMapping("/users/profile")
-    public ResponseEntity<UserProfileResponse> userProfile(
-        @AuthenticationPrincipal UserPrincipal userPrincipal) {
-        return ResponseEntity.ok(UserProfileResponse.of(userPrincipal));
+    public UserProfileResponse userProfile(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+
+        return UserProfileResponse.of(userPrincipal);
     }
 
     /* TODO: 2022-08-29 인터셉터 적용해서 1분안에 50번 요청 보낼시 1시간동안
@@ -73,17 +73,15 @@ public class UserController {
     }
 
     @PatchMapping("/user")
-    public ResponseEntity<Void> changeUserNickName(
+    public void changeUserNickName(
         @Valid @RequestBody ChangeUserNicknameRequestDto changeUserNicknameRequestDto,
         @CurrentUser User user) {
 
         userService.changeUserNickname(changeUserNicknameRequestDto, user);
-        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/users/signup")
-    public void userSignUp(
-        @Valid @RequestPart UserSignUpRequestDto userSignUpRequestDto,
+    public void userSignUp(@Valid @RequestPart UserSignUpRequestDto userSignUpRequestDto,
         @RequestPart(required = false) MultipartFile userProfileImage,
         @RequestHeader(OIDC) @NotBlank @Pattern(regexp = "^(Bearer)\\s.+") String bearerToken) {
 
@@ -97,7 +95,7 @@ public class UserController {
     }
 
     @PostMapping("/users/signin")
-    public ResponseEntity<Token> userSignIn(
+    public Token userSignIn(
         @RequestHeader(OIDC) @NotBlank @Pattern(regexp = "^(Bearer)\\s.+") String bearerToken,
         @Valid @RequestBody UserSignInRequestDto userSignInRequestDto) {
         String userName = openIdTokenManager.getOAuth2MemberNumberFromToken(bearerToken,
@@ -111,7 +109,7 @@ public class UserController {
 
         jwtTokenRecorder.record(userName, token.getRefreshToken());
 
-        return ResponseEntity.ok(token);
+        return token;
     }
 
     @DeleteMapping("/users")
