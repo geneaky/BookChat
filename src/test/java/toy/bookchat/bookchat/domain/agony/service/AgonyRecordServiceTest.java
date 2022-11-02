@@ -24,8 +24,8 @@ import toy.bookchat.bookchat.domain.agony.AgonyRecord;
 import toy.bookchat.bookchat.domain.agony.exception.AgonyNotFoundException;
 import toy.bookchat.bookchat.domain.agony.repository.AgonyRecordRepository;
 import toy.bookchat.bookchat.domain.agony.repository.AgonyRepository;
-import toy.bookchat.bookchat.domain.agony.service.dto.CreateAgonyRecordRequestDto;
-import toy.bookchat.bookchat.domain.agony.service.dto.PageOfAgonyRecordsResponse;
+import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateAgonyRecordRequestDto;
+import toy.bookchat.bookchat.domain.agony.service.dto.response.PageOfAgonyRecordsResponse;
 
 @ExtendWith(MockitoExtension.class)
 class AgonyRecordServiceTest {

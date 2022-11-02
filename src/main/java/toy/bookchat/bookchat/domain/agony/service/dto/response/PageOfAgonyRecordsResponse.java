@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.domain.agony.service.dto;
+package toy.bookchat.bookchat.domain.agony.service.dto.response;
 
 import java.util.ArrayList;
 import java.util.List;

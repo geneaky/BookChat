@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.domain.agony.service.dto;
+package toy.bookchat.bookchat.domain.agony.service.dto.request;
 
 import javax.validation.constraints.NotBlank;
 import lombok.AccessLevel;

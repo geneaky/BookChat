@@ -1,9 +1,10 @@
-package toy.bookchat.bookchat.domain.user.service.dto;
+package toy.bookchat.bookchat.domain.user.service.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +14,7 @@ import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserSignUpRequestDto {
 
     @NotBlank
@@ -41,9 +42,8 @@ public class UserSignUpRequestDto {
     }
 
     @Builder
-    private UserSignUpRequestDto(String nickname,
-        List<ReadingTaste> readingTastes, Integer defaultProfileImageType,
-        OAuth2Provider oauth2Provider) {
+    private UserSignUpRequestDto(String nickname, List<ReadingTaste> readingTastes,
+        Integer defaultProfileImageType, OAuth2Provider oauth2Provider) {
         this.nickname = nickname;
         this.readingTastes = readingTastes;
         this.defaultProfileImageType = defaultProfileImageType;

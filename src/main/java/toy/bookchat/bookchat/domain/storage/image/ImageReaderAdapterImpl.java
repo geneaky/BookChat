@@ -1,6 +1,6 @@
 package toy.bookchat.bookchat.domain.storage.image;
 
-import static toy.bookchat.bookchat.domain.user.service.dto.SupportedFileExtension.WEBP;
+import static toy.bookchat.bookchat.domain.user.exception.SupportedFileExtension.WEBP;
 
 import com.luciad.imageio.webp.WebPImageReaderSpi;
 import java.io.IOException;

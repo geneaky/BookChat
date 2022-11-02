@@ -34,7 +34,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
 import toy.bookchat.bookchat.domain.bookreport.service.BookReportService;
-import toy.bookchat.bookchat.domain.bookreport.service.dto.WriteBookReportRequestDto;
+import toy.bookchat.bookchat.domain.bookreport.service.dto.request.WriteBookReportRequestDto;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.security.SecurityConfig;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;

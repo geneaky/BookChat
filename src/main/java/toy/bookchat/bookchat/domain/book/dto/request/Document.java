@@ -1,13 +1,12 @@
-package toy.bookchat.bookchat.domain.book.dto;
+package toy.bookchat.bookchat.domain.book.dto.request;
 
 import java.util.List;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
-@Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Document {
 
     private List<String> authors;

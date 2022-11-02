@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.domain.bookshelf.service.dto;
+package toy.bookchat.bookchat.domain.bookshelf.service.dto.request;
 
 import java.util.List;
 import javax.validation.Valid;

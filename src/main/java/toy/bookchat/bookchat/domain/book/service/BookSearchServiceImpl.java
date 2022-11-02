@@ -12,9 +12,9 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import toy.bookchat.bookchat.domain.book.dto.BookSearchRequestDto;
-import toy.bookchat.bookchat.domain.book.dto.BookSearchResponseDto;
-import toy.bookchat.bookchat.domain.book.dto.KakaoBook;
+import toy.bookchat.bookchat.domain.book.dto.request.BookSearchRequestDto;
+import toy.bookchat.bookchat.domain.book.dto.request.KakaoBook;
+import toy.bookchat.bookchat.domain.book.dto.response.BookSearchResponseDto;
 import toy.bookchat.bookchat.domain.book.exception.BookNotFoundException;
 
 @Service
@@ -47,7 +47,7 @@ public class BookSearchServiceImpl implements BookSearchService {
             .queryParam(QUERY, bookSearchRequestDto.getQuery())
             .queryParamIfPresent(PAGE, bookSearchRequestDto.getPage())
             .queryParamIfPresent(SIZE, bookSearchRequestDto.getSize())
-            .queryParamIfPresent(SORT, bookSearchRequestDto.getBookSearchSort());
+            .queryParamIfPresent(SORT, bookSearchRequestDto.getSort());
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.set(AUTHORIZATION, header);

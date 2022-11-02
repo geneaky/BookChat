@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.domain.agony.repository;
+package toy.bookchat.bookchat.domain.agony.repository.query;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

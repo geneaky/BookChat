@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.domain.bookshelf.service.dto;
+package toy.bookchat.bookchat.domain.bookshelf.service.dto.response;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +20,10 @@ public class SearchBookShelfByReadingStatusDto extends PageDto {
     private void getBookShelfSearchResponseDtos(
         List<BookShelf> bookShelves) {
         this.contents = new ArrayList<>();
+        fillContentsWithBookShelfResponseDto(bookShelves);
+    }
 
+    private void fillContentsWithBookShelfResponseDto(List<BookShelf> bookShelves) {
         for (BookShelf bookShelf : bookShelves) {
             BookShelfResponseDto bookShelfResponseDto = BookShelfResponseDto.builder()
                 .bookId(bookShelf.getBookId())
