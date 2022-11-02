@@ -21,8 +21,8 @@ import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.exception.UserAlreadySignUpException;
 import toy.bookchat.bookchat.domain.user.exception.UserNotFoundException;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
-import toy.bookchat.bookchat.domain.user.service.dto.ChangeUserNicknameRequestDto;
-import toy.bookchat.bookchat.domain.user.service.dto.UserSignUpRequestDto;
+import toy.bookchat.bookchat.domain.user.service.dto.request.ChangeUserNicknameRequestDto;
+import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignUpRequestDto;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -59,7 +59,7 @@ class UserServiceTest {
 
         when(storageService.getFileUrl(any())).thenReturn("testBucketUrl");
         when(imageValidator.hasValidImage(any())).thenReturn(true);
-        when(userSignUpRequestDto.getUser(any(), any(), any(), any())).thenReturn(mockUser);
+        when(userSignUpRequestDto.getUser(any(), any(), any())).thenReturn(mockUser);
 
         userService.registerNewUser(userSignUpRequestDto, multipartFile, "memberNumber",
             "test@gmail.com");

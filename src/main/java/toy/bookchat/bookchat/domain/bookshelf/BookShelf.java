@@ -1,6 +1,5 @@
 package toy.bookchat.bookchat.domain.bookshelf;
 
-import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -10,17 +9,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import toy.bookchat.bookchat.domain.BaseEntity;
-import toy.bookchat.bookchat.domain.agony.Agony;
 import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.bookreport.BookReport;
 import toy.bookchat.bookchat.domain.user.User;
@@ -32,28 +26,39 @@ import toy.bookchat.bookchat.domain.user.User;
     )
 })
 @Getter
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BookShelf extends BaseEntity {
 
-    @OneToOne(fetch = FetchType.LAZY)
-    BookReport bookReport;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne(fetch = FetchType.LAZY)
-    private User user;
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Book book;
-    @OneToMany(mappedBy = "bookShelf", orphanRemoval = true)
-    private List<Agony> agonies = new ArrayList<>();
     private Integer pages;
     @Enumerated(EnumType.STRING)
     private ReadingStatus readingStatus;
     @Enumerated(EnumType.STRING)
     private Star star;
     private String singleLineAssessment;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Book book;
+    @OneToOne(fetch = FetchType.LAZY)
+    private BookReport bookReport;
+
+    @Builder
+    private BookShelf(Long id, Integer pages, ReadingStatus readingStatus, Star star,
+        String singleLineAssessment, User user, Book book, BookReport bookReport) {
+        this.id = id;
+        this.pages = pages;
+        this.readingStatus = readingStatus;
+        this.star = star;
+        this.singleLineAssessment = singleLineAssessment;
+        this.user = user;
+        this.book = book;
+        this.bookReport = bookReport;
+    }
+
+    protected BookShelf() {
+    }
 
     public String getIsbn() {
         return this.book.getIsbn();

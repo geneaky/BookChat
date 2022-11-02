@@ -11,9 +11,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import toy.bookchat.bookchat.domain.agony.service.AgonyRecordService;
 import toy.bookchat.bookchat.domain.agony.service.AgonyService;
-import toy.bookchat.bookchat.domain.agony.service.dto.CreateAgonyRecordRequestDto;
-import toy.bookchat.bookchat.domain.agony.service.dto.CreateBookAgonyRequestDto;
-import toy.bookchat.bookchat.domain.agony.service.dto.PageOfAgoniesResponse;
+import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateAgonyRecordRequestDto;
+import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateBookAgonyRequestDto;
+import toy.bookchat.bookchat.domain.agony.service.dto.response.PageOfAgoniesResponse;
+import toy.bookchat.bookchat.domain.agony.service.dto.response.PageOfAgonyRecordsResponse;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.security.user.CurrentUser;
 
@@ -53,5 +54,14 @@ public class AgonyController {
         agonyRecordService.storeAgonyRecord(createAgonyRecordRequestDto, user.getId(), bookId,
             agonyId);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/bookshelf/books/{bookId}/agonies/{agonyId}/records")
+    public ResponseEntity<PageOfAgonyRecordsResponse> getAgonyRecordsOnBookAgony(
+        @PathVariable final Long bookId,
+        @PathVariable final Long agonyId, @CurrentUser User user, Pageable pageable) {
+
+        return ResponseEntity.ok(
+            agonyRecordService.searchPageOfAgonyRecords(bookId, agonyId, user.getId(), pageable));
     }
 }

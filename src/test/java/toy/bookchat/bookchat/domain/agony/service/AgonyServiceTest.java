@@ -20,8 +20,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import toy.bookchat.bookchat.domain.agony.Agony;
 import toy.bookchat.bookchat.domain.agony.repository.AgonyRepository;
-import toy.bookchat.bookchat.domain.agony.service.dto.CreateBookAgonyRequestDto;
-import toy.bookchat.bookchat.domain.agony.service.dto.PageOfAgoniesResponse;
+import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateBookAgonyRequestDto;
+import toy.bookchat.bookchat.domain.agony.service.dto.response.PageOfAgoniesResponse;
 import toy.bookchat.bookchat.domain.book.exception.BookNotFoundException;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
@@ -63,8 +63,18 @@ class AgonyServiceTest {
     void 사용자_서재에_등록된_고민_조회_성공() throws Exception {
         PageRequest pageRequest = PageRequest.of(1, 1, Sort.by("id").descending());
 
-        List<Agony> contents = List.of(new Agony(null, "agony1", "red", mock(BookShelf.class)),
-            new Agony(null, "agony2", "blue", mock(BookShelf.class)));
+        Agony agony1 = Agony.builder()
+            .title("agony1")
+            .hexColorCode("red")
+            .bookShelf(mock(BookShelf.class))
+            .build();
+        Agony agony2 = Agony.builder()
+            .title("agony2")
+            .hexColorCode("blue")
+            .bookShelf(mock(BookShelf.class))
+            .build();
+
+        List<Agony> contents = List.of(agony1, agony2);
         Page<Agony> page = new PageImpl<>(contents, pageRequest, 2);
         when(agonyRepository.findUserBookShelfPageOfAgonies(1L, 1L, pageRequest)).thenReturn(page);
         PageOfAgoniesResponse pageOfAgoniesResponse = agonyService.searchPageOfAgonies(1L, 1L,

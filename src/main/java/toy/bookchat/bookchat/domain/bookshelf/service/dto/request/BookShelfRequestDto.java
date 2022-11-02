@@ -1,12 +1,10 @@
-package toy.bookchat.bookchat.domain.bookshelf.service.dto;
+package toy.bookchat.bookchat.domain.bookshelf.service.dto.request;
 
 import java.util.List;
-import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,9 +14,7 @@ import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.Star;
 
 @Getter
-@Builder
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class BookShelfRequestDto {
 
     @NotBlank
@@ -37,8 +33,27 @@ public class BookShelfRequestDto {
     private String singleLineAssessment;
 
     public Book extractBookEntity() {
-        return new Book(getIsbn(), getTitle(), getAuthors(), getPublisher(),
-            getBookCoverImageUrl());
+        return Book.builder()
+            .isbn(this.isbn)
+            .title(this.title)
+            .authors(this.authors)
+            .publisher(this.publisher)
+            .bookCoverImageUrl(this.bookCoverImageUrl)
+            .build();
+    }
+
+    @Builder
+    private BookShelfRequestDto(String isbn, String title,
+        List<@NotBlank String> authors, String publisher, String bookCoverImageUrl,
+        ReadingStatus readingStatus, Star star, String singleLineAssessment) {
+        this.isbn = isbn;
+        this.title = title;
+        this.authors = authors;
+        this.publisher = publisher;
+        this.bookCoverImageUrl = bookCoverImageUrl;
+        this.readingStatus = readingStatus;
+        this.star = star;
+        this.singleLineAssessment = singleLineAssessment;
     }
 
     public void checkCompleteStateField() {

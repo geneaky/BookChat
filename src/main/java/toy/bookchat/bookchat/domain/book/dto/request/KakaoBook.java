@@ -1,14 +1,15 @@
-package toy.bookchat.bookchat.domain.book.dto;
+package toy.bookchat.bookchat.domain.book.dto.request;
 
 import java.util.ArrayList;
 import java.util.List;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import toy.bookchat.bookchat.domain.book.dto.response.BookDto;
+import toy.bookchat.bookchat.domain.book.dto.response.BookSearchResponseDto;
 
 @Getter
-@Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class KakaoBook {
 
     private List<Document> documents;
@@ -16,7 +17,15 @@ public class KakaoBook {
 
     public BookSearchResponseDto getBookSearchResponseDto() {
         List<BookDto> bookDtos = new ArrayList<>();
+        fillBookDtosWithDocuments(bookDtos);
 
+        return BookSearchResponseDto.builder()
+            .bookDtos(bookDtos)
+            .meta(meta)
+            .build();
+    }
+
+    private void fillBookDtosWithDocuments(List<BookDto> bookDtos) {
         for (Document document : documents) {
             bookDtos.add(
                 BookDto.builder()
@@ -28,10 +37,5 @@ public class KakaoBook {
                     .build()
             );
         }
-
-        return BookSearchResponseDto.builder()
-            .bookDtos(bookDtos)
-            .meta(meta)
-            .build();
     }
 }

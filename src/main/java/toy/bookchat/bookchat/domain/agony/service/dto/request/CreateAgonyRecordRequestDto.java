@@ -1,15 +1,13 @@
-package toy.bookchat.bookchat.domain.agony.service.dto;
+package toy.bookchat.bookchat.domain.agony.service.dto.request;
 
 import javax.validation.constraints.NotBlank;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import toy.bookchat.bookchat.domain.agony.Agony;
 import toy.bookchat.bookchat.domain.agony.AgonyRecord;
 
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CreateAgonyRecordRequestDto {
 
@@ -17,10 +15,17 @@ public class CreateAgonyRecordRequestDto {
     private String title;
 
     private String content;
-    @NotBlank
-    private String hexColorCode;
 
     public AgonyRecord generateAgonyRecord(Agony agony) {
-        return new AgonyRecord(this.title, this.content, this.hexColorCode, agony);
+        return AgonyRecord.builder()
+            .title(this.title)
+            .content(this.content)
+            .agony(agony)
+            .build();
+    }
+
+    public CreateAgonyRecordRequestDto(String title, String content) {
+        this.title = title;
+        this.content = content;
     }
 }

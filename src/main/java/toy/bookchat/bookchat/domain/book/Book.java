@@ -7,20 +7,12 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import toy.bookchat.bookchat.domain.BaseEntity;
-import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 
 @Entity
 @Getter
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Book extends BaseEntity {
 
     @Id
@@ -28,15 +20,15 @@ public class Book extends BaseEntity {
     private Long id;
     private String isbn;
     private String title;
-    @ElementCollection
-    private List<String> authors = new ArrayList<>();
     private String publisher;
     private String bookCoverImageUrl;
-    @OneToMany(mappedBy = "book")
-    private List<BookShelf> bookShelves = new ArrayList<>();
+    @ElementCollection
+    private List<String> authors = new ArrayList<>();
 
-    public Book(String isbn, String title, List<String> authors, String publisher,
+    @Builder
+    private Book(Long id, String isbn, String title, List<String> authors, String publisher,
         String bookCoverImageUrl) {
+        this.id = id;
         this.isbn = isbn;
         this.title = title;
         this.authors = authors;
@@ -44,8 +36,6 @@ public class Book extends BaseEntity {
         this.bookCoverImageUrl = bookCoverImageUrl;
     }
 
-    public void setBookShelf(BookShelf bookShelf) {
-        this.getBookShelves().add(bookShelf);
-        bookShelf.setBook(this);
+    protected Book() {
     }
 }

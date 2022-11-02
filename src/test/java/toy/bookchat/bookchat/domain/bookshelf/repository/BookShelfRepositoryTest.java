@@ -34,10 +34,19 @@ class BookShelfRepositoryTest {
     @Autowired
     private BookShelfRepository bookShelfRepository;
 
+    private Book getBook() {
+        return Book.builder()
+            .isbn("1-4133-0454-0")
+            .title("effective java")
+            .authors(List.of("Joshua"))
+            .publisher("insight")
+            .bookCoverImageUrl("bookCover@naver.com")
+            .build();
+    }
+
     @Test
     void 책_저장() throws Exception {
-        Book book = new Book("1234", "effective java", List.of("Joshua"), "insight",
-            "bookCover@naver.com");
+        Book book = getBook();
 
         Book savedBook = bookRepository.save(book);
         assertThat(book).isEqualTo(savedBook);
@@ -46,32 +55,38 @@ class BookShelfRepositoryTest {
     @Test
     void 책장에_책을_저장() throws Exception {
 
-        BookShelf bookShelf = BookShelf.builder().build();
+        Book book = getBook();
+        bookRepository.save(book);
 
-        Book book = new Book("1-4133-0454-0", "effective java", List.of("Joshua"), "insight",
-            "bookCover@naver.com");
+        User user = User.builder().build();
+        userRepository.save(user);
 
-        book.setBookShelf(bookShelf);
-        Book savedBook = bookRepository.save(book);
+        bookRepository.flush();
+        userRepository.flush();
 
-        User user = User.builder()
+        BookShelf bookShelf = BookShelf.builder()
+            .book(book)
+            .user(user)
             .build();
-        user.setBookShelf(bookShelf);
-        User savedUser = userRepository.save(user);
+        bookShelfRepository.save(bookShelf);
+        bookShelfRepository.flush();
 
-        BookShelf savedBookShelf = bookShelfRepository.save(bookShelf);
-
-        assertThat(book).isEqualTo(savedBook);
-        assertThat(user).isEqualTo(savedUser);
-        assertThat(bookShelf).isEqualTo(savedBookShelf);
+        BookShelf findBookShelf = bookShelfRepository.findById(bookShelf.getId()).get();
+        Book findBook = findBookShelf.getBook();
+        assertThat(book).isEqualTo(findBook);
     }
 
     @Test
     void 읽고있는_책을_조회() throws Exception {
-        Book book1 = new Book("1234", "effective java", List.of("Joshua"), "insight",
-            "bookCover@naver.com");
-        Book book2 = new Book("12345", "effective java2", List.of("Joshua"), "insight",
-            "bookCove2r@naver.com");
+        Book book1 = getBook();
+        Book book2 = Book.builder()
+            .isbn("1-4133-0454-0")
+            .title("effective java2")
+            .authors(List.of("Joshua"))
+            .publisher("insight")
+            .bookCoverImageUrl("bookCover@naver.com")
+            .build();
+
         bookRepository.save(book1);
         bookRepository.save(book2);
 
@@ -94,11 +109,6 @@ class BookShelfRepositoryTest {
             .singleLineAssessment(null)
             .build();
 
-        book1.setBookShelf(bookShelf1);
-        book2.setBookShelf(bookShelf2);
-        user.setBookShelf(bookShelf1);
-        user.setBookShelf(bookShelf2);
-
         bookShelfRepository.save(bookShelf1);
         bookShelfRepository.save(bookShelf2);
 
@@ -112,10 +122,14 @@ class BookShelfRepositoryTest {
 
     @Test
     void 읽은_책을_조회() throws Exception {
-        Book book1 = new Book("1234", "effective java", List.of("Joshua"), "insight",
-            "bookCover@naver.com");
-        Book book2 = new Book("12345", "effective java2", List.of("Joshua"), "insight",
-            "bookCove2r@naver.com");
+        Book book1 = getBook();
+        Book book2 = Book.builder()
+            .isbn("1-4133-0454-0")
+            .title("effective java2")
+            .authors(List.of("Joshua"))
+            .publisher("insight")
+            .bookCoverImageUrl("bookCover@naver.com")
+            .build();
         bookRepository.save(book1);
         bookRepository.save(book2);
 
@@ -138,11 +152,6 @@ class BookShelfRepositoryTest {
             .singleLineAssessment("이시대 최고의 도서")
             .build();
 
-        book1.setBookShelf(bookShelf1);
-        book2.setBookShelf(bookShelf2);
-        user.setBookShelf(bookShelf1);
-        user.setBookShelf(bookShelf2);
-
         bookShelfRepository.save(bookShelf1);
         bookShelfRepository.save(bookShelf2);
 
@@ -156,10 +165,15 @@ class BookShelfRepositoryTest {
 
     @Test
     void 읽을_책을_조회() throws Exception {
-        Book book1 = new Book("1234", "effective java", List.of("Joshua"), "insight",
-            "bookCover@naver.com");
-        Book book2 = new Book("12345", "effective java2", List.of("Joshua"), "insight",
-            "bookCove2r@naver.com");
+        Book book1 = getBook();
+        Book book2 = Book.builder()
+            .isbn("1-4133-0454-0")
+            .title("effective java2")
+            .authors(List.of("Joshua"))
+            .publisher("insight")
+            .bookCoverImageUrl("bookCover@naver.com")
+            .build();
+
         bookRepository.save(book1);
         bookRepository.save(book2);
 
@@ -182,11 +196,6 @@ class BookShelfRepositoryTest {
             .singleLineAssessment(null)
             .build();
 
-        book1.setBookShelf(bookShelf1);
-        book2.setBookShelf(bookShelf2);
-        user.setBookShelf(bookShelf1);
-        user.setBookShelf(bookShelf2);
-
         bookShelfRepository.save(bookShelf1);
         bookShelfRepository.save(bookShelf2);
 
@@ -208,13 +217,7 @@ class BookShelfRepositoryTest {
 
     @Test
     void 읽고있는_책_book_id로_조회성공() throws Exception {
-        Book book = Book.builder()
-            .isbn("1234")
-            .title("effective java")
-            .authors(List.of("Joshua"))
-            .publisher("insight")
-            .bookCoverImageUrl("bookCover@naver.com")
-            .build();
+        Book book = getBook();
 
         bookRepository.save(book);
 
@@ -250,13 +253,7 @@ class BookShelfRepositoryTest {
 
     @Test
     void 책장에있는_책_book_id로_삭제_성공() throws Exception {
-        Book book = Book.builder()
-            .isbn("1234")
-            .title("effective java")
-            .authors(List.of("Joshua"))
-            .publisher("insight")
-            .bookCoverImageUrl("bookCover@naver.com")
-            .build();
+        Book book = getBook();
 
         bookRepository.save(book);
 
@@ -285,13 +282,7 @@ class BookShelfRepositoryTest {
 
     @Test
     void user_id_book_id로_서재_조회성공() throws Exception {
-        Book book = Book.builder()
-            .isbn("1234")
-            .title("effective java")
-            .authors(List.of("Joshua"))
-            .publisher("insight")
-            .bookCoverImageUrl("bookCover@naver.com")
-            .build();
+        Book book = getBook();
 
         bookRepository.save(book);
 

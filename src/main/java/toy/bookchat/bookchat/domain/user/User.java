@@ -9,15 +9,11 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import toy.bookchat.bookchat.domain.BaseEntity;
-import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
 @Entity
@@ -27,7 +23,6 @@ import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
     )
 })
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity {
 
     @Id
@@ -44,32 +39,25 @@ public class User extends BaseEntity {
     private Integer defaultProfileImageType;
     @Enumerated(EnumType.STRING)
     private OAuth2Provider provider;
-    @OneToMany(mappedBy = "user", orphanRemoval = true)
-    private List<BookShelf> bookShelves = new ArrayList<>();
     @ElementCollection
     private List<ReadingTaste> readingTastes = new ArrayList<>();
 
     @Builder
-    public User(String name, String email, String profileImageUrl, ROLE role,
-        OAuth2Provider provider, String nickname, List<ReadingTaste> readingTastes,
-        Integer defaultProfileImageType) {
+    private User(Long id, String name, String nickname, String email, String profileImageUrl,
+        ROLE role, Integer defaultProfileImageType, OAuth2Provider provider,
+        List<ReadingTaste> readingTastes) {
+        this.id = id;
         this.name = name;
+        this.nickname = nickname;
         this.email = email;
         this.profileImageUrl = profileImageUrl;
         this.role = role;
-        this.provider = provider;
-        this.nickname = nickname;
-        this.readingTastes = readingTastes;
         this.defaultProfileImageType = defaultProfileImageType;
+        this.provider = provider;
+        this.readingTastes = readingTastes;
     }
 
-    public void setBookShelf(BookShelf bookShelf) {
-        this.getBookShelves().add(bookShelf);
-        bookShelf.setUser(this);
-    }
-
-    public void updateEmail(String email) {
-        this.email = email;
+    protected User() {
     }
 
     public void updateImageUrl(String imageUrl) {

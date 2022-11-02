@@ -5,17 +5,19 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 public class IpBlockManager {
 
     public static final long ONE_DAY = 1800; // 30분으로 임시 변경
     public static final int LIMITED_COUNT = 1000;
     private final AccessIpRepository accessIpRepository;
+
+    public IpBlockManager(AccessIpRepository accessIpRepository) {
+        this.accessIpRepository = accessIpRepository;
+    }
 
     @Transactional
     public void increase(HttpServletRequest request) {

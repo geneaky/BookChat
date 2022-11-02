@@ -2,7 +2,6 @@ package toy.bookchat.bookchat.domain.bookshelf.service;
 
 import java.util.Optional;
 import java.util.function.Consumer;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -13,18 +12,23 @@ import toy.bookchat.bookchat.domain.book.repository.BookRepository;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfRequestDto;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.ChangeBookStatusRequestDto;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.ChangeReadingBookPageRequestDto;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.SearchBookShelfByReadingStatusDto;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookShelfRequestDto;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeBookStatusRequestDto;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeReadingBookPageRequestDto;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.SearchBookShelfByReadingStatusDto;
 import toy.bookchat.bookchat.domain.user.User;
 
 @Service
-@RequiredArgsConstructor
 public class BookShelfService {
 
     private final BookShelfRepository bookShelfRepository;
     private final BookRepository bookRepository;
+
+    public BookShelfService(BookShelfRepository bookShelfRepository,
+        BookRepository bookRepository) {
+        this.bookShelfRepository = bookShelfRepository;
+        this.bookRepository = bookRepository;
+    }
 
     @Transactional
     public void putBookOnBookShelf(BookShelfRequestDto bookShelfRequestDto, User user) {

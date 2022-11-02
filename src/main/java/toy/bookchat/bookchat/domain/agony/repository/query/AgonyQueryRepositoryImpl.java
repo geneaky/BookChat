@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.domain.agony.repository;
+package toy.bookchat.bookchat.domain.agony.repository.query;
 
 import static toy.bookchat.bookchat.domain.agony.QAgony.agony;
 import static toy.bookchat.bookchat.domain.bookshelf.QBookShelf.bookShelf;

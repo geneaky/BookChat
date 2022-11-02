@@ -1,15 +1,13 @@
-package toy.bookchat.bookchat.domain.agony.service.dto;
+package toy.bookchat.bookchat.domain.agony.service.dto.request;
 
 import javax.validation.constraints.NotBlank;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import toy.bookchat.bookchat.domain.agony.Agony;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CreateBookAgonyRequestDto {
 
@@ -19,6 +17,14 @@ public class CreateBookAgonyRequestDto {
     private String hexColorCode;
 
     public Agony getAgony(BookShelf bookShelf) {
-        return new Agony(null, this.title, this.hexColorCode, bookShelf);
+        return Agony.builder()
+            .hexColorCode(this.hexColorCode)
+            .bookShelf(bookShelf)
+            .build();
+    }
+
+    public CreateBookAgonyRequestDto(String title, String hexColorCode) {
+        this.title = title;
+        this.hexColorCode = hexColorCode;
     }
 }

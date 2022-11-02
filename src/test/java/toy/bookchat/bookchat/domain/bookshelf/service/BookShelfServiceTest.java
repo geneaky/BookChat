@@ -25,10 +25,10 @@ import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.Star;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.BookShelfRequestDto;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.ChangeBookStatusRequestDto;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.ChangeReadingBookPageRequestDto;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.SearchBookShelfByReadingStatusDto;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookShelfRequestDto;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeBookStatusRequestDto;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeReadingBookPageRequestDto;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.SearchBookShelfByReadingStatusDto;
 import toy.bookchat.bookchat.domain.user.User;
 
 @ExtendWith(MockitoExtension.class)
@@ -42,8 +42,13 @@ class BookShelfServiceTest {
     BookShelfService bookShelfService;
 
     private Book getBook() {
-        return new Book("12345", "testBook", List.of("test Author"), "test publisher",
-            "test@naver.com");
+        return Book.builder()
+            .isbn("12345")
+            .title("testBook")
+            .authors(List.of("test Author"))
+            .publisher("test publisher")
+            .bookCoverImageUrl("test@naver.com")
+            .build();
     }
 
     private User getUser() {
@@ -135,8 +140,13 @@ class BookShelfServiceTest {
     void 읽고있는_책을_조회_성공() throws Exception {
         Pageable pageable = mock(Pageable.class);
         User user = getUser();
-        Book book = new Book("1234", "toby's Spring", List.of("이일민"), "jpub",
-            "testBookCoverImageUrl");
+        Book book = Book.builder()
+            .isbn("1234")
+            .title("toby's Spring")
+            .authors(List.of("이일민"))
+            .publisher("jpub")
+            .bookCoverImageUrl("testBookCoverImageUrl")
+            .build();
 
         BookShelf bookShelf = BookShelf.builder()
             .user(user)
@@ -166,8 +176,13 @@ class BookShelfServiceTest {
     void 읽은_책을_조회_성공() throws Exception {
         Pageable pageable = mock(Pageable.class);
         User user = getUser();
-        Book book = new Book("1234", "toby's Spring", List.of("이일민"), "jpub",
-            "testBookCoverImageUrl");
+        Book book = Book.builder()
+            .isbn("1234")
+            .title("toby's Spring")
+            .authors(List.of("이일민"))
+            .publisher("jpub")
+            .bookCoverImageUrl("testBookCoverImageUrl")
+            .build();
 
         BookShelf bookShelf = BookShelf.builder()
             .user(user)
@@ -198,8 +213,13 @@ class BookShelfServiceTest {
     void 읽을_책을_조회_성공() throws Exception {
         Pageable pageable = mock(Pageable.class);
         User user = getUser();
-        Book book = new Book("1234", "toby's Spring", List.of("이일민"), "jpub",
-            "testBookCoverImageUrl");
+        Book book = Book.builder()
+            .isbn("1234")
+            .title("toby's Spring")
+            .authors(List.of("이일민"))
+            .publisher("jpub")
+            .bookCoverImageUrl("testBookCoverImageUrl")
+            .build();
         BookShelf bookShelf = BookShelf.builder()
             .user(user)
             .book(book)

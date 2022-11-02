@@ -6,14 +6,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import toy.bookchat.bookchat.domain.BaseEntity;
 
 @Getter
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class AgonyRecord extends BaseEntity {
 
     @Id
@@ -21,20 +19,17 @@ public class AgonyRecord extends BaseEntity {
     private Long id;
     private String title;
     private String content;
-    private String hexColorCode;
     @ManyToOne(fetch = FetchType.LAZY)
     Agony agony;
 
-    public AgonyRecord(String title, String content, String hexColorCode,
-        Agony agony) {
+    @Builder
+    private AgonyRecord(Long id, String title, String content, Agony agony) {
+        this.id = id;
         this.title = title;
         this.content = content;
-        this.hexColorCode = hexColorCode;
-        setAgony(agony);
+        this.agony = agony;
     }
 
-    public void setAgony(Agony agony) {
-        this.agony = agony;
-        agony.getAgonyRecords().add(this);
+    protected AgonyRecord() {
     }
 }
