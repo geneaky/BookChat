@@ -2,7 +2,6 @@ package toy.bookchat.bookchat.domain.agony.api;
 
 import javax.validation.Valid;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,36 +31,33 @@ public class AgonyController {
     }
 
     @PostMapping("/bookshelf/books/{bookId}/agonies")
-    public ResponseEntity<Void> makeBookAgony(@PathVariable final Long bookId,
+    public void makeBookAgony(@PathVariable Long bookId,
         @Valid @RequestBody CreateBookAgonyRequestDto createBookAgonyRequestDto,
         @CurrentUser User user) {
+
         agonyService.storeBookAgony(createBookAgonyRequestDto, user.getId(), bookId);
-        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/bookshelf/books/{bookId}/agonies")
-    public ResponseEntity<PageOfAgoniesResponse> searchPageOfAgonies(
-        @PathVariable final Long bookId,
-        final Pageable pageable, @CurrentUser User user) {
-        return ResponseEntity.ok(agonyService.searchPageOfAgonies(bookId, user.getId(), pageable));
+    public PageOfAgoniesResponse searchPageOfAgonies(@PathVariable Long bookId, Pageable pageable,
+        @CurrentUser User user) {
+
+        return agonyService.searchPageOfAgonies(bookId, user.getId(), pageable);
     }
 
     @PostMapping("/bookshelf/books/{bookId}/agonies/{agonyId}/records")
-    public ResponseEntity<Void> addAgonyRecordOnBookAgony(@PathVariable final Long bookId,
-        @PathVariable final Long agonyId,
-        @Valid @RequestBody final CreateAgonyRecordRequestDto createAgonyRecordRequestDto,
+    public void addAgonyRecordOnBookAgony(@PathVariable Long bookId, @PathVariable Long agonyId,
+        @Valid @RequestBody CreateAgonyRecordRequestDto createAgonyRecordRequestDto,
         @CurrentUser User user) {
+
         agonyRecordService.storeAgonyRecord(createAgonyRecordRequestDto, user.getId(), bookId,
             agonyId);
-        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/bookshelf/books/{bookId}/agonies/{agonyId}/records")
-    public ResponseEntity<PageOfAgonyRecordsResponse> getAgonyRecordsOnBookAgony(
-        @PathVariable final Long bookId,
-        @PathVariable final Long agonyId, @CurrentUser User user, Pageable pageable) {
+    public PageOfAgonyRecordsResponse getAgonyRecordsOnBookAgony(@PathVariable Long bookId,
+        @PathVariable Long agonyId, @CurrentUser User user, Pageable pageable) {
 
-        return ResponseEntity.ok(
-            agonyRecordService.searchPageOfAgonyRecords(bookId, agonyId, user.getId(), pageable));
+        return agonyRecordService.searchPageOfAgonyRecords(bookId, agonyId, user.getId(), pageable);
     }
 }

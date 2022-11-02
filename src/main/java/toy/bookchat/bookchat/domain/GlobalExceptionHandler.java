@@ -130,4 +130,10 @@ public class GlobalExceptionHandler {
         log.info("message = {} :: cause = {}", exception.getMessage(), exception.getCause());
         return BAD_REQUEST;
     }
+
+    @ExceptionHandler(Exception.class)
+    public final ResponseEntity<String> handleUnExpectedException(Exception exception) {
+        log.info("message = {} :: cause = {}", exception.getMessage(), exception.getCause());
+        return BAD_REQUEST;
+    }
 }

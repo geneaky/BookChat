@@ -1,7 +1,6 @@
 package toy.bookchat.bookchat.domain.book.api;
 
 import javax.validation.Valid;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,8 +20,8 @@ public class BookController {
     }
 
     @GetMapping("/books")
-    public ResponseEntity<BookSearchResponseDto> getBookInformation(
+    public BookSearchResponseDto getBookInformation(
         @Valid @ModelAttribute BookSearchRequestDto bookSearchRequestDto) {
-        return ResponseEntity.ok(bookSearchService.searchByQuery(bookSearchRequestDto));
+        return bookSearchService.searchByQuery(bookSearchRequestDto);
     }
 }
