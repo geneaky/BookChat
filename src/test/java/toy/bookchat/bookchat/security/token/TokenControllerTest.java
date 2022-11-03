@@ -10,12 +10,14 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static toy.bookchat.bookchat.domain.user.ROLE.USER;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,10 +30,12 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
+import toy.bookchat.bookchat.domain.user.ReadingTaste;
+import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.api.dto.Token;
+import toy.bookchat.bookchat.exception.security.DenidedTokenException;
+import toy.bookchat.bookchat.exception.security.ExpiredTokenException;
 import toy.bookchat.bookchat.security.SecurityConfig;
-import toy.bookchat.bookchat.security.exception.DenidedTokenException;
-import toy.bookchat.bookchat.security.exception.ExpiredTokenException;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.token.dto.RefreshTokenRequestDto;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenProvider;
@@ -51,17 +55,29 @@ class TokenControllerTest extends AuthenticationTestExtension {
     @Autowired
     private MockMvc mockMvc;
 
+    private User getUser() {
+        return User.builder()
+            .id(1L)
+            .email("test@gmail.com")
+            .nickname("nickname")
+            .role(USER)
+            .name("testGOOGLE")
+            .profileImageUrl("test@gamil.com")
+            .defaultProfileImageType(1)
+            .provider(OAuth2Provider.GOOGLE)
+            .readingTastes(List.of(ReadingTaste.DEVELOPMENT, ReadingTaste.ART))
+            .build();
+    }
+
     @Test
-    public void Access토큰_만료시_만료되지_않은_리프레시_토큰으로_갱신() throws Exception {
-        Token token = jwtTokenProvider.createToken("testGOOGLE", "test@gamil.com",
-            OAuth2Provider.GOOGLE);
+    void Access토큰_만료시_만료되지_않은_리프레시_토큰으로_갱신() throws Exception {
+        Token token = jwtTokenProvider.createToken(getUser());
 
         RefreshTokenRequestDto refreshTokenRequestDto = RefreshTokenRequestDto.builder()
             .refreshToken(token.getRefreshToken())
             .build();
 
-        Token newToken = jwtTokenProvider.createToken("testGOOGLE", "test@gamil.com",
-            OAuth2Provider.GOOGLE);
+        Token newToken = jwtTokenProvider.createToken(getUser());
 
         when(tokenService.generateToken(any())).thenReturn(newToken);
 
@@ -78,7 +94,7 @@ class TokenControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void 리프레시_토큰없이_요청시_400응답() throws Exception {
+    void 리프레시_토큰없이_요청시_400응답() throws Exception {
         RefreshTokenRequestDto refreshTokenRequestDto = RefreshTokenRequestDto.builder()
             .refreshToken(null)
             .build();
@@ -89,7 +105,7 @@ class TokenControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void 만료된_리프레시_토큰으로_요청시_401응답() throws Exception {
+    void 만료된_리프레시_토큰으로_요청시_401응답() throws Exception {
         Map<String, Object> claims = new HashMap<>();
 
         Date date = new Date(0);
@@ -112,9 +128,8 @@ class TokenControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void 유효하지않은_토큰으로_요청시_401응답() throws Exception {
-        Token token = jwtTokenProvider.createToken("testGoogle", "test@gamil.com",
-            OAuth2Provider.GOOGLE);
+    void 유효하지않은_토큰으로_요청시_401응답() throws Exception {
+        Token token = jwtTokenProvider.createToken(getUser());
 
         RefreshTokenRequestDto refreshTokenRequestDto = RefreshTokenRequestDto.builder()
             .refreshToken(token.getRefreshToken() + "invalid")

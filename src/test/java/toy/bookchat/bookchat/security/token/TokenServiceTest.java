@@ -4,11 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static toy.bookchat.bookchat.domain.user.ROLE.USER;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -18,7 +20,11 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import toy.bookchat.bookchat.config.JwtTokenConfig;
+import toy.bookchat.bookchat.domain.user.ReadingTaste;
+import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.api.dto.Token;
+import toy.bookchat.bookchat.domain.user.repository.UserRepository;
+import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.token.dto.RefreshTokenRequestDto;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenManager;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenProvider;
@@ -35,25 +41,42 @@ class TokenServiceTest {
     @Mock
     JwtTokenConfig jwtTokenConfig;
     @Mock
+    UserRepository userRepository;
+    @Mock
     RefreshTokenRepository refreshTokenRepository;
     @InjectMocks
     TokenService tokenService;
 
+    private User getUser() {
+        return User.builder()
+            .id(1L)
+            .email("test@gmail.com")
+            .nickname("nickname")
+            .role(USER)
+            .name("testUser")
+            .profileImageUrl("somethingImageUrl@naver.com")
+            .defaultProfileImageType(1)
+            .provider(OAuth2Provider.KAKAO)
+            .readingTastes(List.of(ReadingTaste.DEVELOPMENT, ReadingTaste.ART))
+            .build();
+    }
+
     @Test
-    public void 리프레시토큰이_아직_유효한_경우_엑세스토큰_재발급_성공() throws Exception {
+    void 리프레시토큰이_아직_유효한_경우_엑세스토큰_재발급_성공() throws Exception {
         String refreshToken = getRefreshToken();
 
         RefreshTokenRequestDto refreshTokenRequestDto = RefreshTokenRequestDto.builder()
             .refreshToken(refreshToken)
             .build();
 
+        when(userRepository.findById(any())).thenReturn(Optional.of(getUser()));
         tokenService.generateToken(refreshTokenRequestDto);
 
-        verify(jwtTokenProvider).createAccessToken(any(), any(), any());
+        verify(jwtTokenProvider).createAccessToken(any());
     }
 
     @Test
-    public void 리프레시토큰의_만료기간이_얼마남지않은경우_리프레시토큰도_재발급() throws Exception {
+    void 리프레시토큰의_만료기간이_얼마남지않은경우_리프레시토큰도_재발급() throws Exception {
         String refreshToken = getRefreshToken();
 
         RefreshTokenRequestDto refreshTokenRequestDto = RefreshTokenRequestDto.builder()
@@ -62,11 +85,12 @@ class TokenServiceTest {
 
         RefreshToken reNewedRefreshToken = RefreshToken.builder()
             .refreshToken(getRefreshToken())
-            .userName("test")
+            .userId(1L)
             .build();
 
-        when(jwtTokenManager.shouldRefreshTokenBeRenewed(any())).thenReturn(true);
-        when(refreshTokenRepository.findByUserName(any())).thenReturn(
+        when(userRepository.findById(any())).thenReturn(Optional.of(getUser()));
+        when(jwtTokenManager.shouldRefreshTokenBeRenew(any())).thenReturn(true);
+        when(refreshTokenRepository.findByUserId(any())).thenReturn(
             Optional.of(reNewedRefreshToken));
 
         Token token = tokenService.generateToken(refreshTokenRequestDto);
@@ -76,6 +100,7 @@ class TokenServiceTest {
 
     private String getRefreshToken() {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", 1L);
         Date date = new Date(new Date().getTime() + 100000L);
         String refreshToken = Jwts.builder()
             .setClaims(claims)

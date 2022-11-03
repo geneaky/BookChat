@@ -13,10 +13,10 @@ public class JwtTokenRecorder {
     }
 
     @Transactional
-    public void record(String userName, String refreshToken) {
-        refreshTokenRepository.findByUserName(userName)
+    public void record(Long userId, String refreshToken) {
+        refreshTokenRepository.findByUserId(userId)
             .ifPresentOrElse(r -> r.changeRefreshToken(refreshToken), () -> {
-                RefreshToken token = new RefreshToken(userName, refreshToken);
+                RefreshToken token = new RefreshToken(userId, refreshToken);
                 refreshTokenRepository.save(token);
             });
     }

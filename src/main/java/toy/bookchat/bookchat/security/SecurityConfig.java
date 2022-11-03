@@ -7,8 +7,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import toy.bookchat.bookchat.domain.user.repository.UserRepository;
-import toy.bookchat.bookchat.security.exception.CustomExceptionHandlingFilter;
+import toy.bookchat.bookchat.exception.security.CustomExceptionHandlingFilter;
 import toy.bookchat.bookchat.security.handler.RestAuthenticationEntryPoint;
 import toy.bookchat.bookchat.security.ipblock.IpBlockCheckingFilter;
 import toy.bookchat.bookchat.security.ipblock.IpBlockManager;
@@ -21,13 +20,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final IpBlockManager ipBlockManager;
     private final JwtTokenManager jwtTokenManager;
-    private final UserRepository userRepository;
 
-    public SecurityConfig(IpBlockManager ipBlockManager, JwtTokenManager jwtTokenManager,
-        UserRepository userRepository) {
+    public SecurityConfig(IpBlockManager ipBlockManager, JwtTokenManager jwtTokenManager) {
         this.ipBlockManager = ipBlockManager;
         this.jwtTokenManager = jwtTokenManager;
-        this.userRepository = userRepository;
     }
 
     @Override
@@ -42,7 +38,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             UsernamePasswordAuthenticationFilter.class);
 
         http.addFilterAt(
-            new JwtAuthenticationFilter(jwtTokenManager, userRepository, ipBlockManager),
+            new JwtAuthenticationFilter(jwtTokenManager, ipBlockManager),
             UsernamePasswordAuthenticationFilter.class);
 
         http.addFilterAfter(

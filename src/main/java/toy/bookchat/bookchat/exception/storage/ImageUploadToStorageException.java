@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.domain.storage.exception;
+package toy.bookchat.bookchat.exception.storage;
 
 public class ImageUploadToStorageException extends RuntimeException {
 

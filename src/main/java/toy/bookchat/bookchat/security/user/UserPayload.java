@@ -8,7 +8,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
-@AuthenticationPrincipal(expression = "user")
-public @interface CurrentUser {
+@AuthenticationPrincipal(expression = "tokenPayload")
+public @interface UserPayload {
 
 }

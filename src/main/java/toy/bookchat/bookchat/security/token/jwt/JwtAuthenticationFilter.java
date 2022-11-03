@@ -5,7 +5,6 @@ import static toy.bookchat.bookchat.utils.constants.AuthConstants.BEARER;
 import static toy.bookchat.bookchat.utils.constants.AuthConstants.BEGIN_INDEX;
 
 import java.io.IOException;
-import java.util.Optional;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -14,23 +13,18 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
-import toy.bookchat.bookchat.domain.user.User;
-import toy.bookchat.bookchat.domain.user.exception.UserNotFoundException;
-import toy.bookchat.bookchat.domain.user.repository.UserRepository;
-import toy.bookchat.bookchat.security.exception.DenidedTokenException;
+import toy.bookchat.bookchat.exception.security.DenidedTokenException;
 import toy.bookchat.bookchat.security.ipblock.IpBlockManager;
+import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenManager jwtTokenManager;
-    private final UserRepository userRepository;
     private final IpBlockManager ipBlockManager;
 
-    public JwtAuthenticationFilter(JwtTokenManager jwtTokenManager, UserRepository userRepository,
-        IpBlockManager ipBlockManager) {
+    public JwtAuthenticationFilter(JwtTokenManager jwtTokenManager, IpBlockManager ipBlockManager) {
         this.jwtTokenManager = jwtTokenManager;
-        this.userRepository = userRepository;
         this.ipBlockManager = ipBlockManager;
     }
 
@@ -47,10 +41,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void authentication(HttpServletRequest request) {
-        String oAuth2MemberNumber = jwtTokenManager.getOAuth2MemberNumberFromToken(
+
+        TokenPayload tokenPayload = jwtTokenManager.getTokenPayloadFromToken(
             getJwtTokenFromRequest(request));
 
-        registerUserAuthenticationOnSecurityContext(userRepository.findByName(oAuth2MemberNumber));
+        registerUserAuthenticationOnSecurityContext(tokenPayload);
     }
 
     private String getJwtTokenFromRequest(HttpServletRequest request) {
@@ -62,12 +57,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         throw new DenidedTokenException("Not Allowed Format Request Exception");
     }
 
-    private void registerUserAuthenticationOnSecurityContext(Optional<User> optionalUser) {
-        User user = optionalUser.orElseThrow(() -> {
-            throw new UserNotFoundException("Not Registered User");
-        });
-
-        UserPrincipal userPrincipal = UserPrincipal.create(user);
+    private void registerUserAuthenticationOnSecurityContext(TokenPayload tokenPayload) {
+        UserPrincipal userPrincipal = UserPrincipal.create(tokenPayload);
 
         SecurityContextHolder
             .getContext()

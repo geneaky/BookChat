@@ -7,7 +7,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,8 +28,8 @@ import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignUpRequestDt
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenProvider;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenRecorder;
 import toy.bookchat.bookchat.security.token.openid.OpenIdTokenManager;
-import toy.bookchat.bookchat.security.user.CurrentUser;
-import toy.bookchat.bookchat.security.user.UserPrincipal;
+import toy.bookchat.bookchat.security.user.TokenPayload;
+import toy.bookchat.bookchat.security.user.UserPayload;
 
 @Validated
 @RestController
@@ -56,9 +55,9 @@ public class UserController {
             s3와 cdn을 사용해서 사용자 프로필을 캐시해서 제공해 성능 개선
         */
     @GetMapping("/users/profile")
-    public UserProfileResponse userProfile(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+    public UserProfileResponse userProfile(@UserPayload TokenPayload tokenPayload) {
 
-        return UserProfileResponse.of(userPrincipal);
+        return UserProfileResponse.of(tokenPayload);
     }
 
     /* TODO: 2022-08-29 인터셉터 적용해서 1분안에 50번 요청 보낼시 1시간동안
@@ -75,16 +74,14 @@ public class UserController {
     @PatchMapping("/user")
     public void changeUserNickName(
         @Valid @RequestBody ChangeUserNicknameRequestDto changeUserNicknameRequestDto,
-        @CurrentUser User user) {
-
-        userService.changeUserNickname(changeUserNicknameRequestDto, user);
+        @UserPayload TokenPayload tokenPayload) {
+        userService.changeUserNickname(changeUserNicknameRequestDto, tokenPayload.getUserId());
     }
 
     @PostMapping("/users/signup")
     public void userSignUp(@Valid @RequestPart UserSignUpRequestDto userSignUpRequestDto,
         @RequestPart(required = false) MultipartFile userProfileImage,
         @RequestHeader(OIDC) @NotBlank @Pattern(regexp = "^(Bearer)\\s.+") String bearerToken) {
-
         String oauth2MemberNumber = openIdTokenManager.getOAuth2MemberNumberFromToken(bearerToken,
             userSignUpRequestDto.getOauth2Provider());
         String userEmail = openIdTokenManager.getUserEmailFromToken(bearerToken,
@@ -100,20 +97,16 @@ public class UserController {
         @Valid @RequestBody UserSignInRequestDto userSignInRequestDto) {
         String userName = openIdTokenManager.getOAuth2MemberNumberFromToken(bearerToken,
             userSignInRequestDto.getOauth2Provider());
-        userService.checkRegisteredUser(userName);
-        String userEmail = openIdTokenManager.getUserEmailFromToken(bearerToken,
-            userSignInRequestDto.getOauth2Provider());
+        User user = userService.findUserByUsername(userName);
 
-        Token token = jwtTokenProvider.createToken(userName, userEmail,
-            userSignInRequestDto.getOauth2Provider());
-
-        jwtTokenRecorder.record(userName, token.getRefreshToken());
+        Token token = jwtTokenProvider.createToken(user);
+        jwtTokenRecorder.record(user.getId(), token.getRefreshToken());
 
         return token;
     }
 
     @DeleteMapping("/users")
-    public void withdrawUser(@CurrentUser User user) {
-        userService.deleteUser(user);
+    public void withdrawUser(@UserPayload TokenPayload tokenPayload) {
+        userService.deleteUser(tokenPayload.getUserId());
     }
 }

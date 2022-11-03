@@ -15,7 +15,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import toy.bookchat.bookchat.domain.book.dto.request.BookSearchRequestDto;
 import toy.bookchat.bookchat.domain.book.dto.request.KakaoBook;
 import toy.bookchat.bookchat.domain.book.dto.response.BookSearchResponseDto;
-import toy.bookchat.bookchat.domain.book.exception.BookNotFoundException;
+import toy.bookchat.bookchat.exception.book.BookNotFoundException;
 
 @Service
 public class BookSearchServiceImpl implements BookSearchService {

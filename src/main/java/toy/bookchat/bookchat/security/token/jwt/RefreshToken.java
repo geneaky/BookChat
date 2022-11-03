@@ -18,12 +18,12 @@ public class RefreshToken extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String userName;
+    private Long userId;
     private String refreshToken;
 
     @Builder
-    public RefreshToken(String userName, String refreshToken) {
-        this.userName = userName;
+    public RefreshToken(Long userId, String refreshToken) {
+        this.userId = userId;
         this.refreshToken = refreshToken;
     }
 

@@ -1,6 +1,7 @@
-package toy.bookchat.bookchat.domain.user.exception;
+package toy.bookchat.bookchat.exception.user;
 
 public class UserNotFoundException extends RuntimeException {
+
     public UserNotFoundException(String message) {
         super(message);
     }

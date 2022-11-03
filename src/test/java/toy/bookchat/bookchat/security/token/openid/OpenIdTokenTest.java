@@ -4,7 +4,6 @@ import static io.jsonwebtoken.JwsHeader.KEY_ID;
 import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -22,16 +21,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.util.Base64Utils;
-import toy.bookchat.bookchat.security.exception.DenidedTokenException;
-import toy.bookchat.bookchat.security.exception.ExpiredTokenException;
-import toy.bookchat.bookchat.security.exception.IllegalStandardTokenException;
-import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
+import toy.bookchat.bookchat.exception.security.DenidedTokenException;
+import toy.bookchat.bookchat.exception.security.ExpiredTokenException;
+import toy.bookchat.bookchat.exception.security.IllegalStandardTokenException;
 
 @ExtendWith(MockitoExtension.class)
 class OpenIdTokenTest {
@@ -42,34 +39,34 @@ class OpenIdTokenTest {
     public void init() throws FileNotFoundException {
         //openssl pkcs8 -topk8 -inform PEM -in private_key.pem -out token_key.pem -nocrypt 생성
         openIdTestUtil = new OpenIdTestUtil(
-                "src/test/java/toy/bookchat/bookchat/security/token/openid/token_key.pem",
-                "src/test/java/toy/bookchat/bookchat/security/token/openid/openidRSA256-public.pem");
+            "src/test/java/toy/bookchat/bookchat/security/token/openid/token_key.pem",
+            "src/test/java/toy/bookchat/bookchat/security/token/openid/openidRSA256-public.pem");
     }
 
     private X509EncodedKeySpec getPublicPkcs8EncodedKeySpec(OpenIdTestUtil openIdTestUtil)
-            throws IOException {
+        throws IOException {
         String publicKey = openIdTestUtil.getPublicKey(9);
         byte[] decodePublicKey = Base64Utils.decode(publicKey.getBytes());
         return new X509EncodedKeySpec(decodePublicKey);
     }
 
     private PKCS8EncodedKeySpec getPrivatePkcs8EncodedKeySpec(OpenIdTestUtil openIdTestUtil)
-            throws IOException {
+        throws IOException {
         String privateKey = openIdTestUtil.getPrivateKey(28);
         byte[] decodePrivateKey = Base64Utils.decode(privateKey.getBytes());
         return new PKCS8EncodedKeySpec(
-                decodePrivateKey);
+            decodePrivateKey);
     }
 
     private PublicKey getPublicKey()
-            throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
+        throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         X509EncodedKeySpec publicKeySpec = getPublicPkcs8EncodedKeySpec(openIdTestUtil);
         return keyFactory.generatePublic(publicKeySpec);
     }
 
     private PrivateKey getPrivateKey()
-            throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
+        throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         PKCS8EncodedKeySpec privateKeySpec = getPrivatePkcs8EncodedKeySpec(openIdTestUtil);
         return keyFactory.generatePrivate(privateKeySpec);
@@ -82,11 +79,11 @@ class OpenIdTokenTest {
         claims.put("email", "test@naver.com");
 
         String token = Jwts.builder()
-                .setHeaderParam(KEY_ID, "abcdedf")
-                .setClaims(claims)
-                .signWith(SignatureAlgorithm.RS256, privateKey)
-                .compact();
-        return  token;
+            .setHeaderParam(KEY_ID, "abcdedf")
+            .setClaims(claims)
+            .signWith(SignatureAlgorithm.RS256, privateKey)
+            .compact();
+        return token;
     }
 
     @Test
@@ -152,10 +149,10 @@ class OpenIdTokenTest {
         claims.put("email", "test@naver.com");
 
         String token = Jwts.builder()
-                .setHeaderParam(KEY_ID, "abcdedf")
-                .setClaims(claims)
-                .signWith(SignatureAlgorithm.RS256, privateKey)
-                .compact();
+            .setHeaderParam(KEY_ID, "abcdedf")
+            .setClaims(claims)
+            .signWith(SignatureAlgorithm.RS256, privateKey)
+            .compact();
 
         OpenIdToken openIdToken = OpenIdToken.of(token);
 
@@ -175,10 +172,10 @@ class OpenIdTokenTest {
         claims.put("email", "test@naver.com");
 
         String token = Jwts.builder()
-                .setHeaderParam(KEY_ID, "abcdedf")
-                .setClaims(claims)
-                .signWith(SignatureAlgorithm.RS256, privateKey)
-                .compact();
+            .setHeaderParam(KEY_ID, "abcdedf")
+            .setClaims(claims)
+            .signWith(SignatureAlgorithm.RS256, privateKey)
+            .compact();
 
         OpenIdToken openIdToken = OpenIdToken.of(token);
 
@@ -198,10 +195,10 @@ class OpenIdTokenTest {
         claims.put("email", "test@naver.com");
 
         String token = Jwts.builder()
-                .setHeaderParam(KEY_ID, "abcdedf")
-                .setClaims(claims)
-                .signWith(SignatureAlgorithm.RS256, privateKey)
-                .compact();
+            .setHeaderParam(KEY_ID, "abcdedf")
+            .setClaims(claims)
+            .signWith(SignatureAlgorithm.RS256, privateKey)
+            .compact();
 
         OpenIdToken openIdToken = OpenIdToken.of(token);
 
@@ -220,10 +217,10 @@ class OpenIdTokenTest {
         claims.put("iss", "https://kauth.kakao.com");
 
         String token = Jwts.builder()
-                .setHeaderParam(KEY_ID, "abcdedf")
-                .setClaims(claims)
-                .signWith(SignatureAlgorithm.RS256, privateKey)
-                .compact();
+            .setHeaderParam(KEY_ID, "abcdedf")
+            .setClaims(claims)
+            .signWith(SignatureAlgorithm.RS256, privateKey)
+            .compact();
 
         OpenIdToken openIdToken = OpenIdToken.of(token);
 
@@ -242,10 +239,10 @@ class OpenIdTokenTest {
         claims.put("email", "test@naver.com");
 
         String token = Jwts.builder()
-                .setHeaderParam(KEY_ID, "abcdedf")
-                .setClaims(claims)
-                .signWith(SignatureAlgorithm.RS256, privateKey)
-                .compact();
+            .setHeaderParam(KEY_ID, "abcdedf")
+            .setClaims(claims)
+            .signWith(SignatureAlgorithm.RS256, privateKey)
+            .compact();
 
         OpenIdToken openIdToken = OpenIdToken.of(token);
 
@@ -264,9 +261,9 @@ class OpenIdTokenTest {
         claims.put("email", "test@naver.com");
 
         String token = Jwts.builder()
-                .setClaims(claims)
-                .signWith(SignatureAlgorithm.RS256, privateKey)
-                .compact();
+            .setClaims(claims)
+            .signWith(SignatureAlgorithm.RS256, privateKey)
+            .compact();
 
         OpenIdToken openIdToken = OpenIdToken.of(token);
 
@@ -285,11 +282,11 @@ class OpenIdTokenTest {
         claims.put("email", "test@naver.com");
 
         String token = Jwts.builder()
-                .setHeaderParam(KEY_ID, "abcdedf")
-                .setClaims(claims)
-                .setExpiration(new Date(0))
-                .signWith(SignatureAlgorithm.RS256, privateKey)
-                .compact();
+            .setHeaderParam(KEY_ID, "abcdedf")
+            .setClaims(claims)
+            .setExpiration(new Date(0))
+            .signWith(SignatureAlgorithm.RS256, privateKey)
+            .compact();
 
         OpenIdToken openIdToken = OpenIdToken.of(token);
 
@@ -303,10 +300,10 @@ class OpenIdTokenTest {
         PrivateKey privateKey = getPrivateKey();
 
         String token = Jwts.builder()
-                .setHeaderParam(KEY_ID, "abcdedf")
-                .setSubject("test")
-                .signWith(SignatureAlgorithm.RS256, privateKey)
-                .compact();
+            .setHeaderParam(KEY_ID, "abcdedf")
+            .setSubject("test")
+            .signWith(SignatureAlgorithm.RS256, privateKey)
+            .compact();
 
         StringBuilder stringBuilder = new StringBuilder();
 

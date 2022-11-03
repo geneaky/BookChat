@@ -2,13 +2,14 @@ package toy.bookchat.bookchat.domain.book.dto.request;
 
 import java.util.Optional;
 import javax.validation.constraints.NotBlank;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import toy.bookchat.bookchat.domain.book.service.BookSearchSort;
 
 @Getter
-@Setter
+@Setter(AccessLevel.PRIVATE)
 public class BookSearchRequestDto {
 
     @NotBlank

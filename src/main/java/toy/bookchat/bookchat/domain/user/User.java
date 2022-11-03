@@ -67,4 +67,8 @@ public class User extends BaseEntity {
     public void changeUserNickname(String nickname) {
         this.nickname = nickname;
     }
+
+    public String getRoleName() {
+        return this.role.getAuthority();
+    }
 }

@@ -33,5 +33,5 @@ public class ResponseConstants {
         ResponseEntity.status(HttpStatus.BAD_REQUEST).body("잘 못된 키 생성 형식");
 
     public static final ResponseEntity<String> BAD_REQUEST =
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body("올바르지 않은 요청 형식입니다");
+        ResponseEntity.status(HttpStatus.BAD_REQUEST).body("올바르지 않은 요청 형식입니다");
 }

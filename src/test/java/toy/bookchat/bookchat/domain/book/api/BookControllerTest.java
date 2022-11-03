@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,8 +37,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
@@ -47,18 +44,20 @@ import toy.bookchat.bookchat.domain.book.dto.request.BookSearchRequestDto;
 import toy.bookchat.bookchat.domain.book.dto.request.Meta;
 import toy.bookchat.bookchat.domain.book.dto.response.BookDto;
 import toy.bookchat.bookchat.domain.book.dto.response.BookSearchResponseDto;
-import toy.bookchat.bookchat.domain.book.exception.BookNotFoundException;
 import toy.bookchat.bookchat.domain.book.service.BookSearchService;
+import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.exception.book.BookNotFoundException;
 import toy.bookchat.bookchat.security.SecurityConfig;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
+import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @WebMvcTest(controllers = BookController.class,
     includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {
         SecurityConfig.class}))
 @AutoConfigureRestDocs(uriScheme = "https", uriHost = "bookchat.link", uriPort = 443)
-public class BookControllerTest extends AuthenticationTestExtension {
+class BookControllerTest extends AuthenticationTestExtension {
 
     @MockBean
     BookSearchService bookSearchService;
@@ -69,24 +68,25 @@ public class BookControllerTest extends AuthenticationTestExtension {
 
     private User getUser() {
         return User.builder()
+            .id(1L)
             .email("test@gmail.com")
+            .nickname("nickname")
             .role(USER)
             .name("testUser")
             .profileImageUrl("somethingImageUrl@naver.com")
+            .defaultProfileImageType(1)
+            .provider(OAuth2Provider.KAKAO)
+            .readingTastes(List.of(ReadingTaste.DEVELOPMENT, ReadingTaste.ART))
             .build();
     }
 
     private UserPrincipal getUserPrincipal() {
-        List<GrantedAuthority> authorities = Collections.singletonList(
-            new SimpleGrantedAuthority("ROLE_USER")
-        );
-
         User user = getUser();
-
-        return new UserPrincipal(1L, user.getEmail(), user.getName(), user.getNickname(),
-            user.getProfileImageUrl(), user.getDefaultProfileImageType(),
-            authorities, user);
-
+        TokenPayload tokenPayload = TokenPayload.of(user.getId(), user.getName(),
+            user.getNickname(),
+            user.getEmail(), user.getProfileImageUrl(), user.getDefaultProfileImageType(),
+            user.getRole());
+        return UserPrincipal.create(tokenPayload);
     }
 
     private BookDto getBookDto(String isbn, String title, List<String> author) {
@@ -118,14 +118,14 @@ public class BookControllerTest extends AuthenticationTestExtension {
 
 
     @Test
-    public void 로그인하지_않은_사용자_요청_401() throws Exception {
+    void 로그인하지_않은_사용자_요청_401() throws Exception {
         mockMvc.perform(get("/v1/api/books")
                 .param("isbn", "234134"))
             .andExpect(status().isUnauthorized());
     }
 
     @Test
-    public void 외부api_검색_요청_실패시_404() throws Exception {
+    void 외부api_검색_요청_실패시_404() throws Exception {
         when(bookSearchService.searchByQuery(any(BookSearchRequestDto.class))).thenThrow(
             BookNotFoundException.class);
 
@@ -137,7 +137,7 @@ public class BookControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void 올바르지않은_요청으로_외부api_검색_요청시_400() throws Exception {
+    void 올바르지않은_요청으로_외부api_검색_요청시_400() throws Exception {
         mockMvc.perform(get("/v1/api/books")
                 .header("Authorization", "Bearer " + getTestToken())
                 .param("query", " ")
@@ -146,7 +146,7 @@ public class BookControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    public void 사용자가_isbn_검색시_paging_성공() throws Exception {
+    void 사용자가_isbn_검색시_paging_성공() throws Exception {
         List<BookDto> bookDtos = new ArrayList<>();
         bookDtos.add(getBookDto("213123", "effectiveJava", List.of("Joshua")));
 

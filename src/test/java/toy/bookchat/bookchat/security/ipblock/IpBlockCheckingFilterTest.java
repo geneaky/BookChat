@@ -13,7 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import toy.bookchat.bookchat.security.ipblock.exception.BlockedIpException;
+import toy.bookchat.bookchat.exception.ipblock.BlockedIpException;
 
 @ExtendWith(MockitoExtension.class)
 class IpBlockCheckingFilterTest {
@@ -25,7 +25,7 @@ class IpBlockCheckingFilterTest {
     IpBlockCheckingFilter ipBlockCheckingFilter;
 
     @Test
-    public void IP가_block일때_다음_필터를_타고_진행_실패() throws Exception {
+    void IP가_block일때_다음_필터를_타고_진행_실패() throws Exception {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
         FilterChain filterChain = mock(FilterChain.class);
@@ -38,7 +38,7 @@ class IpBlockCheckingFilterTest {
     }
 
     @Test
-    public void IP가_block이_아닐때_다음_필터를_타고_진행_성공() throws Exception {
+    void IP가_block이_아닐때_다음_필터를_타고_진행_성공() throws Exception {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
         FilterChain filterChain = mock(FilterChain.class);

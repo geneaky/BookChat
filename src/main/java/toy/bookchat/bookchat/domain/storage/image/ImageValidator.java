@@ -4,7 +4,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-import toy.bookchat.bookchat.domain.user.exception.ImageInputStreamException;
+import toy.bookchat.bookchat.exception.user.ImageInputStreamException;
 
 @Component
 public class ImageValidator {

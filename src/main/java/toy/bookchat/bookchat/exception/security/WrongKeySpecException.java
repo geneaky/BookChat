@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.security.exception;
+package toy.bookchat.bookchat.exception.security;
 
 public class WrongKeySpecException extends
     RuntimeException {

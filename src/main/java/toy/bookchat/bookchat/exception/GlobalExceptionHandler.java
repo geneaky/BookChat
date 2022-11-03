@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.domain;
+package toy.bookchat.bookchat.exception;
 
 import static toy.bookchat.bookchat.utils.constants.ResponseConstants.BAD_REQUEST;
 import static toy.bookchat.bookchat.utils.constants.ResponseConstants.BOOK_NOT_FOUND;
@@ -18,16 +18,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MissingRequestValueException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import toy.bookchat.bookchat.domain.agony.exception.AgonyNotFoundException;
-import toy.bookchat.bookchat.domain.book.exception.BookNotFoundException;
-import toy.bookchat.bookchat.domain.storage.exception.ImageUploadToStorageException;
-import toy.bookchat.bookchat.domain.user.exception.ImageInputStreamException;
-import toy.bookchat.bookchat.domain.user.exception.UserAlreadySignUpException;
-import toy.bookchat.bookchat.domain.user.exception.UserNotFoundException;
-import toy.bookchat.bookchat.security.exception.DenidedTokenException;
-import toy.bookchat.bookchat.security.exception.ExpiredPublicKeyCachedException;
-import toy.bookchat.bookchat.security.exception.ExpiredTokenException;
-import toy.bookchat.bookchat.security.exception.WrongKeySpecException;
+import toy.bookchat.bookchat.exception.agony.AgonyNotFoundException;
+import toy.bookchat.bookchat.exception.book.BookNotFoundException;
+import toy.bookchat.bookchat.exception.security.DenidedTokenException;
+import toy.bookchat.bookchat.exception.security.ExpiredPublicKeyCachedException;
+import toy.bookchat.bookchat.exception.security.ExpiredTokenException;
+import toy.bookchat.bookchat.exception.security.WrongKeySpecException;
+import toy.bookchat.bookchat.exception.storage.ImageUploadToStorageException;
+import toy.bookchat.bookchat.exception.user.ImageInputStreamException;
+import toy.bookchat.bookchat.exception.user.UserAlreadySignUpException;
+import toy.bookchat.bookchat.exception.user.UserNotFoundException;
 
 @Slf4j
 @RestControllerAdvice

@@ -1,9 +1,14 @@
 package toy.bookchat.bookchat.security.token.jwt;
 
+import static toy.bookchat.bookchat.security.token.TokenConstants.DEFAULT_PROFILE_IMAGE_TYPE;
 import static toy.bookchat.bookchat.security.token.TokenConstants.EMAIL;
 import static toy.bookchat.bookchat.security.token.TokenConstants.PROVIDER;
 import static toy.bookchat.bookchat.security.token.TokenConstants.SUB;
+import static toy.bookchat.bookchat.security.token.TokenConstants.USER_ID;
 import static toy.bookchat.bookchat.security.token.TokenConstants.USER_NAME;
+import static toy.bookchat.bookchat.security.token.TokenConstants.USER_NICKNAME;
+import static toy.bookchat.bookchat.security.token.TokenConstants.USER_PROFILE_IMAGE_URI;
+import static toy.bookchat.bookchat.security.token.TokenConstants.USER_ROLE;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -13,8 +18,8 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import toy.bookchat.bookchat.config.JwtTokenConfig;
+import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.api.dto.Token;
-import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
 @Slf4j
 @Component
@@ -26,48 +31,46 @@ public class JwtTokenProvider {
         this.jwtTokenConfig = jwtTokenConfig;
     }
 
-    public Token createToken(String userName, String userEmail, OAuth2Provider oAuth2Provider) {
+    public Token createToken(User user) {
         return Token.builder()
-            .accessToken(createAccessToken(userName, userEmail, oAuth2Provider))
-            .refreshToken(createRefreshToken(userName, userEmail, oAuth2Provider))
+            .accessToken(createAccessToken(user))
+            .refreshToken(createRefreshToken(user))
             .build();
     }
 
-    public String createRefreshToken(String userName, String userEmail,
-        OAuth2Provider oAuth2Provider) {
-        Map<String, Object> claims = createClaims(userName, userEmail, oAuth2Provider.getValue());
-
+    public String createRefreshToken(User user) {
         Date date = new Date();
         date.setTime(date.getTime() + jwtTokenConfig.getRefreshTokenExpiredTime());
 
         return Jwts.builder()
-            .setClaims(claims)
+            .setClaims(createClaims(user))
             .setExpiration(date)
             .signWith(SignatureAlgorithm.HS256, jwtTokenConfig.getSecret())
             .compact();
     }
 
-    public String createAccessToken(String userName, String userEmail,
-        OAuth2Provider oAuth2Provider) {
-        Map<String, Object> claims = createClaims(userName, userEmail, oAuth2Provider.getValue());
-
+    public String createAccessToken(User user) {
         Date date = new Date();
         date.setTime(date.getTime() + jwtTokenConfig.getAccessTokenExpiredTime());
 
         return Jwts.builder()
-            .setClaims(claims)
+            .setClaims(createClaims(user))
             .setExpiration(date)
             .signWith(SignatureAlgorithm.HS256, jwtTokenConfig.getSecret())
             .compact();
     }
 
-    private Map<String, Object> createClaims(String userName, String userEmail,
-        String oAuth2Provider) {
+    private Map<String, Object> createClaims(User user) {
         Map<String, Object> claims = new HashMap<>();
         claims.put(SUB, "BookChat");
-        claims.put(PROVIDER, oAuth2Provider);
-        claims.put(USER_NAME, userName);
-        claims.put(EMAIL, userEmail);
+        claims.put(PROVIDER, user.getProvider());
+        claims.put(USER_ID, user.getId().toString());
+        claims.put(USER_NAME, user.getName());
+        claims.put(USER_NICKNAME, user.getNickname());
+        claims.put(EMAIL, user.getEmail());
+        claims.put(USER_PROFILE_IMAGE_URI, user.getProfileImageUrl());
+        claims.put(DEFAULT_PROFILE_IMAGE_TYPE, user.getDefaultProfileImageType());
+        claims.put(USER_ROLE, user.getRoleName());
         return claims;
     }
 }

@@ -1,22 +1,16 @@
 package toy.bookchat.bookchat.domain.storage;
 
-import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 import toy.bookchat.bookchat.config.aws.S3Config;
-import toy.bookchat.bookchat.domain.storage.exception.ImageUploadToStorageException;
+import toy.bookchat.bookchat.exception.storage.ImageUploadToStorageException;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -41,13 +35,15 @@ class StorageServiceTest {
         MultipartFile multipartFile = mock(MultipartFile.class);
         when(s3Config.getBucketName()).thenReturn("testBucketName");
         when(multipartFile.getInputStream()).thenReturn(mock(InputStream.class));
-        storageService.upload(multipartFile,"test");
-        verify(amazonS3Client).putObject(anyString(), anyString(), any(InputStream.class), any(ObjectMetadata.class));
+        storageService.upload(multipartFile, "test");
+        verify(amazonS3Client).putObject(anyString(), anyString(), any(InputStream.class),
+            any(ObjectMetadata.class));
     }
 
     @Test
     void 이미지_업로드중_S3예외_발생시_커스텀예외_던지기_성공() throws Exception {
-        when(amazonS3Client.putObject(any(),any(), any(), any())).thenThrow(ImageUploadToStorageException.class);
+        when(amazonS3Client.putObject(any(), any(), any(), any())).thenThrow(
+            ImageUploadToStorageException.class);
         when(s3Config.getBucketName()).thenReturn("testBucketName");
         assertThatThrownBy(() -> {
             storageService.upload(mock(MultipartFile.class), "test");

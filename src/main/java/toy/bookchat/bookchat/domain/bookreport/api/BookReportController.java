@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import toy.bookchat.bookchat.domain.bookreport.service.BookReportService;
 import toy.bookchat.bookchat.domain.bookreport.service.dto.request.WriteBookReportRequestDto;
-import toy.bookchat.bookchat.domain.user.User;
-import toy.bookchat.bookchat.security.user.CurrentUser;
+import toy.bookchat.bookchat.security.user.TokenPayload;
+import toy.bookchat.bookchat.security.user.UserPayload;
 
 @RestController
 @RequestMapping("/v1/api/bookreports")
@@ -23,8 +23,8 @@ public class BookReportController {
     @PostMapping
     public void writeBookReport(
         @Valid @RequestBody WriteBookReportRequestDto writeBookReportRequestDto,
-        @CurrentUser User user) {
+        @UserPayload TokenPayload tokenPayload) {
 
-        bookReportService.writeReport(writeBookReportRequestDto, user);
+        bookReportService.writeReport(writeBookReportRequestDto, tokenPayload.getUserId());
     }
 }

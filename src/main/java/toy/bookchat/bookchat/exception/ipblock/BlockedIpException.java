@@ -1,6 +1,7 @@
-package toy.bookchat.bookchat.security.ipblock.exception;
+package toy.bookchat.bookchat.exception.ipblock;
 
 public class BlockedIpException extends RuntimeException {
+
     public BlockedIpException(String message) {
         super(message);
     }
@@ -13,7 +14,8 @@ public class BlockedIpException extends RuntimeException {
         super(cause);
     }
 
-    protected BlockedIpException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    protected BlockedIpException(String message, Throwable cause, boolean enableSuppression,
+        boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

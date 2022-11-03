@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.domain.agony.exception;
+package toy.bookchat.bookchat.exception.agony;
 
 public class AgonyNotFoundException extends RuntimeException {
 

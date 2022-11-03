@@ -1,6 +1,7 @@
-package toy.bookchat.bookchat.security.exception;
+package toy.bookchat.bookchat.exception.security;
 
 public class IllegalStandardTokenException extends RuntimeException {
+
     public IllegalStandardTokenException(String message) {
         super(message);
     }
@@ -13,7 +14,8 @@ public class IllegalStandardTokenException extends RuntimeException {
         super(cause);
     }
 
-    protected IllegalStandardTokenException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    protected IllegalStandardTokenException(String message, Throwable cause,
+        boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

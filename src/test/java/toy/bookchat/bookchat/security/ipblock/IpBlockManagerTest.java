@@ -23,7 +23,7 @@ class IpBlockManagerTest {
     IpBlockManager ipBlockManager;
 
     @Test
-    public void XFF가없을때_지정된_횟수보다_더_많이_유효하지않은_요청을_보낸경우_false() throws Exception {
+    void XFF가없을때_지정된_횟수보다_더_많이_유효하지않은_요청을_보낸경우_false() throws Exception {
         AccessIp accessIp = new AccessIp("0.0.0.0", 10001L);
         HttpServletRequest request = mock(HttpServletRequest.class);
 
@@ -36,7 +36,7 @@ class IpBlockManagerTest {
     }
 
     @Test
-    public void XFF가있을때_지정된_횟수보다_적게_유효하지않은_요청을_보낸경우_true() throws Exception {
+    void XFF가있을때_지정된_횟수보다_적게_유효하지않은_요청을_보낸경우_true() throws Exception {
         AccessIp accessIp = new AccessIp("0.0.0.0", 1L);
         HttpServletRequest request = mock(HttpServletRequest.class);
 
@@ -48,7 +48,7 @@ class IpBlockManagerTest {
     }
 
     @Test
-    public void 마지막_실패_요청으로부터_하루가_지난경우_실패횟수를_초기화() throws Exception {
+    void 마지막_실패_요청으로부터_하루가_지난경우_실패횟수를_초기화() throws Exception {
         AccessIp accessIp = new AccessIp("0.0.0.0", 100L);
         accessIp.setUpdatedAt(LocalDateTime.now().minusDays(1L).minusMinutes(5L));
 

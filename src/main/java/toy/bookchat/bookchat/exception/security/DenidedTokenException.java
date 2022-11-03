@@ -1,6 +1,7 @@
-package toy.bookchat.bookchat.security.exception;
+package toy.bookchat.bookchat.exception.security;
 
 public class DenidedTokenException extends RuntimeException {
+
     public DenidedTokenException(String message) {
         super(message);
     }
