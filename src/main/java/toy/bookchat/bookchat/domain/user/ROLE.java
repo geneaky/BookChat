@@ -1,20 +1,29 @@
 package toy.bookchat.bookchat.domain.user;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 
-@Getter
-@RequiredArgsConstructor
 public enum ROLE implements GrantedAuthority {
     USER("ROLE_USER"),
     ADMIN("ROLE_ADMIN");
 
+    private final String authority;
 
-    private final String roleName;
+    ROLE(String authority) {
+        this.authority = authority;
+    }
+
+    public static ROLE value(String authority) {
+        for (ROLE role : ROLE.values()) {
+            if (role.authority.equals(authority)) {
+                return role;
+            }
+        }
+
+        return null;
+    }
 
     @Override
     public String getAuthority() {
-        return ROLE.USER.toString();
+        return this.authority;
     }
 }

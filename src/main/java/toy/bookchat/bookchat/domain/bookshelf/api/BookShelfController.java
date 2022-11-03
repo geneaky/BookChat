@@ -16,8 +16,8 @@ import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookShelfReque
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeBookStatusRequestDto;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeReadingBookPageRequestDto;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.SearchBookShelfByReadingStatusDto;
-import toy.bookchat.bookchat.domain.user.User;
-import toy.bookchat.bookchat.security.user.CurrentUser;
+import toy.bookchat.bookchat.security.user.TokenPayload;
+import toy.bookchat.bookchat.security.user.UserPayload;
 
 @RestController
 @RequestMapping("/v1/api")
@@ -31,36 +31,40 @@ public class BookShelfController {
 
     @PostMapping("/bookshelf/books")
     public void putBookOnBookShelf(@RequestBody @Valid BookShelfRequestDto bookShelfRequestDto,
-        @CurrentUser User user) {
+        @UserPayload TokenPayload tokenPayload) {
 
-        bookShelfService.putBookOnBookShelf(bookShelfRequestDto, user);
+        bookShelfService.putBookOnBookShelf(bookShelfRequestDto, tokenPayload.getUserId());
     }
 
     @GetMapping("/bookshelf/books")
     public SearchBookShelfByReadingStatusDto takeBookOutOfBookShelf(ReadingStatus readingStatus,
-        Pageable pageable, @CurrentUser User user) {
-        return bookShelfService.takeBooksOutOfBookShelf(readingStatus, pageable, user);
+        Pageable pageable, @UserPayload TokenPayload tokenPayload) {
+        return bookShelfService.takeBooksOutOfBookShelf(readingStatus, pageable,
+            tokenPayload.getUserId());
     }
 
     @PatchMapping("/bookshelf/books/{bookId}/pages")
     public void changeReadingBookPagesOnBookShelf(@PathVariable Long bookId,
         @Valid @RequestBody ChangeReadingBookPageRequestDto changeReadingBookPageRequestDto,
-        @CurrentUser User user) {
+        @UserPayload TokenPayload tokenPayload) {
 
-        bookShelfService.changeReadingBookPage(changeReadingBookPageRequestDto, user, bookId);
+        bookShelfService.changeReadingBookPage(changeReadingBookPageRequestDto,
+            tokenPayload.getUserId(), bookId);
     }
 
     @PatchMapping("/bookshelf/books/{bookId}/status")
     public void changeBookStatusOnBookShelf(@PathVariable Long bookId,
         @Valid @RequestBody ChangeBookStatusRequestDto changeBookStatusRequestDto,
-        @CurrentUser User user) {
+        @UserPayload TokenPayload tokenPayload) {
 
-        bookShelfService.changeBookStatusOnBookShelf(changeBookStatusRequestDto, user, bookId);
+        bookShelfService.changeBookStatusOnBookShelf(changeBookStatusRequestDto,
+            tokenPayload.getUserId(), bookId);
     }
 
     @DeleteMapping("/bookshelf/books/{bookId}")
-    public void deleteBookOnBookShelf(@PathVariable Long bookId, @CurrentUser User user) {
+    public void deleteBookOnBookShelf(@PathVariable Long bookId,
+        @UserPayload TokenPayload tokenPayload) {
 
-        bookShelfService.deleteBookOnBookShelf(bookId, user);
+        bookShelfService.deleteBookOnBookShelf(bookId, tokenPayload.getUserId());
     }
 }

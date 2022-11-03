@@ -17,7 +17,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 import toy.bookchat.bookchat.domain.storage.image.ImageReaderAdapter;
 import toy.bookchat.bookchat.domain.storage.image.ImageValidator;
-import toy.bookchat.bookchat.domain.user.exception.ImageInputStreamException;
+import toy.bookchat.bookchat.exception.user.ImageInputStreamException;
 
 @ExtendWith(MockitoExtension.class)
 class ImageValidatorTest {

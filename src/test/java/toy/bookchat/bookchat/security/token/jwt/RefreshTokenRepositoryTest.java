@@ -17,8 +17,8 @@ class RefreshTokenRepositoryTest {
     RefreshTokenRepository refreshTokenRepository;
 
     @Test
-    public void 리프레시토큰_저장_성공() throws Exception {
-        RefreshToken refreshToken = new RefreshToken("v4cB4utk", "3L2");
+    void 리프레시토큰_저장_성공() throws Exception {
+        RefreshToken refreshToken = new RefreshToken(1L, "3L2");
 
         refreshTokenRepository.save(refreshToken);
         refreshTokenRepository.flush();
@@ -29,13 +29,14 @@ class RefreshTokenRepositoryTest {
     }
 
     @Test
-    public void 리프레시토큰_이름으로_조회_성공() throws Exception {
-        RefreshToken refreshToken = new RefreshToken("aEKrR", "aFK0");
+    void 리프레시토큰_이름으로_조회_성공() throws Exception {
+        RefreshToken refreshToken = new RefreshToken(1L, "aFK0");
 
         refreshTokenRepository.save(refreshToken);
         refreshTokenRepository.flush();
 
-        RefreshToken findRefreshToken = refreshTokenRepository.findByUserName("aEKrR").get();
+        RefreshToken findRefreshToken = refreshTokenRepository.findByUserId(
+            refreshToken.getUserId()).get();
 
         assertThat(refreshToken).isEqualTo(findRefreshToken);
     }

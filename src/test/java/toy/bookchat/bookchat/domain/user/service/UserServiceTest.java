@@ -18,11 +18,11 @@ import org.springframework.web.multipart.MultipartFile;
 import toy.bookchat.bookchat.domain.storage.StorageService;
 import toy.bookchat.bookchat.domain.storage.image.ImageValidator;
 import toy.bookchat.bookchat.domain.user.User;
-import toy.bookchat.bookchat.domain.user.exception.UserAlreadySignUpException;
-import toy.bookchat.bookchat.domain.user.exception.UserNotFoundException;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.domain.user.service.dto.request.ChangeUserNicknameRequestDto;
 import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignUpRequestDto;
+import toy.bookchat.bookchat.exception.user.UserAlreadySignUpException;
+import toy.bookchat.bookchat.exception.user.UserNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -89,28 +89,30 @@ class UserServiceTest {
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(null));
 
         assertThatThrownBy(() -> {
-            userService.checkRegisteredUser("username");
+            userService.findUserByUsername("username");
         }).isInstanceOf(UserNotFoundException.class);
     }
 
     @Test
     void 사용자_회원탈퇴_요청시_삭제_성공() throws Exception {
-        userService.deleteUser(any(User.class));
+        userService.deleteUser(any());
 
-        verify(userRepository).delete(any());
+        verify(userRepository).deleteById(any());
     }
 
     @Test
     void 사용자_닉네임_변경_성공() throws Exception {
 
         User user = User.builder()
+            .id(1L)
             .nickname("user1")
             .build();
 
         ChangeUserNicknameRequestDto changeUserNicknameRequestDto = new ChangeUserNicknameRequestDto(
             "user2");
 
-        userService.changeUserNickname(changeUserNicknameRequestDto, user);
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        userService.changeUserNickname(changeUserNicknameRequestDto, user.getId());
 
         String nickname = user.getNickname();
         assertThat(nickname).isEqualTo("user2");

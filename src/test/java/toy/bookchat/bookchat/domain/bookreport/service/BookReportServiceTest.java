@@ -13,13 +13,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import toy.bookchat.bookchat.domain.book.exception.BookNotFoundException;
 import toy.bookchat.bookchat.domain.bookreport.repository.BookReportRepository;
 import toy.bookchat.bookchat.domain.bookreport.service.dto.request.WriteBookReportRequestDto;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.exception.book.BookNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class BookReportServiceTest {
@@ -50,7 +50,7 @@ class BookReportServiceTest {
         when(bookShelfRepository.findByUserIdAndBookId(any(), any())).thenReturn(
             Optional.of(bookShelf));
 
-        bookReportService.writeReport(writeBookReportRequestDto, user);
+        bookReportService.writeReport(writeBookReportRequestDto, user.getId());
 
         verify(bookReportRepository).save(any());
     }
@@ -68,7 +68,7 @@ class BookReportServiceTest {
         when(bookShelfRepository.findByUserIdAndBookId(any(), any())).thenReturn(
             Optional.of(bookShelf));
 
-        bookReportService.writeReport(writeBookReportRequestDto, user);
+        bookReportService.writeReport(writeBookReportRequestDto, user.getId());
 
         ReadingStatus result = bookShelf.getReadingStatus();
         assertThat(result).isEqualTo(ReadingStatus.COMPLETE);
@@ -80,7 +80,7 @@ class BookReportServiceTest {
         User user = mock(User.class);
 
         assertThatThrownBy(() -> {
-            bookReportService.writeReport(writeBookReportRequestDto, user);
+            bookReportService.writeReport(writeBookReportRequestDto, user.getId());
         }).isInstanceOf(BookNotFoundException.class);
     }
 }

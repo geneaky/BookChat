@@ -3,6 +3,7 @@ package toy.bookchat.bookchat.security.token.jwt;
 import org.springframework.stereotype.Component;
 import toy.bookchat.bookchat.config.JwtTokenConfig;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
+import toy.bookchat.bookchat.security.user.TokenPayload;
 
 @Component
 public class JwtTokenManagerImpl implements JwtTokenManager {
@@ -11,6 +12,12 @@ public class JwtTokenManagerImpl implements JwtTokenManager {
 
     public JwtTokenManagerImpl(JwtTokenConfig jwtTokenConfig) {
         this.jwtTokenConfig = jwtTokenConfig;
+    }
+
+    @Override
+    public Long getUserIdFromToken(String token) {
+        JwtToken jwtToken = JwtToken.of(token);
+        return jwtToken.getUserId(jwtTokenConfig.getSecret());
     }
 
     @Override
@@ -32,9 +39,15 @@ public class JwtTokenManagerImpl implements JwtTokenManager {
     }
 
     @Override
-    public boolean shouldRefreshTokenBeRenewed(String token) {
+    public boolean shouldRefreshTokenBeRenew(String token) {
         JwtToken jwtToken = JwtToken.of(token);
         return jwtToken.hasNotRemainingTime(jwtTokenConfig.getSecret(),
             jwtTokenConfig.getReissuePeriod());
+    }
+
+    @Override
+    public TokenPayload getTokenPayloadFromToken(String token) {
+        JwtToken jwtToken = JwtToken.of(token);
+        return jwtToken.getPayload(jwtTokenConfig.getSecret());
     }
 }

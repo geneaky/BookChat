@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import toy.bookchat.bookchat.domain.agony.repository.AgonyRepository;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateBookAgonyRequestDto;
 import toy.bookchat.bookchat.domain.agony.service.dto.response.PageOfAgoniesResponse;
-import toy.bookchat.bookchat.domain.book.exception.BookNotFoundException;
+import toy.bookchat.bookchat.exception.book.BookNotFoundException;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
 

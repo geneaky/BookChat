@@ -10,11 +10,11 @@ import org.springframework.web.multipart.MultipartFile;
 import toy.bookchat.bookchat.domain.storage.StorageService;
 import toy.bookchat.bookchat.domain.storage.image.ImageValidator;
 import toy.bookchat.bookchat.domain.user.User;
-import toy.bookchat.bookchat.domain.user.exception.UserAlreadySignUpException;
-import toy.bookchat.bookchat.domain.user.exception.UserNotFoundException;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.domain.user.service.dto.request.ChangeUserNicknameRequestDto;
 import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignUpRequestDto;
+import toy.bookchat.bookchat.exception.user.UserAlreadySignUpException;
+import toy.bookchat.bookchat.exception.user.UserNotFoundException;
 
 @Service
 public class UserService {
@@ -63,21 +63,24 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public void checkRegisteredUser(String oauth2MemberNumber) {
-        userRepository.findByName(oauth2MemberNumber)
+    public User findUserByUsername(String oauth2MemberNumber) {
+        return userRepository.findByName(oauth2MemberNumber)
             .orElseThrow(() -> {
                 throw new UserNotFoundException("Not Registered User");
             });
     }
 
     @Transactional
-    public void deleteUser(User user) {
-        userRepository.delete(user);
+    public void deleteUser(Long userId) {
+        userRepository.deleteById(userId);
     }
 
     @Transactional
     public void changeUserNickname(ChangeUserNicknameRequestDto changeUserNicknameRequestDto,
-        User user) {
+        Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> {
+            throw new UserNotFoundException("Can't find User");
+        });
         user.changeUserNickname(changeUserNicknameRequestDto.getNickname());
     }
 

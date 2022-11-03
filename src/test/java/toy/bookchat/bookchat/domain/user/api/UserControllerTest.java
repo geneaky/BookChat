@@ -26,6 +26,7 @@ import static org.springframework.restdocs.request.RequestDocumentation.requestP
 import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static toy.bookchat.bookchat.domain.user.ROLE.USER;
 import static toy.bookchat.bookchat.domain.user.ReadingTaste.ART;
 import static toy.bookchat.bookchat.domain.user.ReadingTaste.DEVELOPMENT;
 import static toy.bookchat.bookchat.domain.user.ReadingTaste.SCIENCE;
@@ -44,7 +45,6 @@ import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -59,14 +59,13 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.Base64Utils;
 import org.springframework.web.multipart.MultipartFile;
 import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
 import toy.bookchat.bookchat.domain.user.ROLE;
+import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.api.dto.Token;
 import toy.bookchat.bookchat.domain.user.api.dto.UserProfileResponse;
@@ -74,12 +73,13 @@ import toy.bookchat.bookchat.domain.user.service.UserService;
 import toy.bookchat.bookchat.domain.user.service.dto.request.ChangeUserNicknameRequestDto;
 import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignInRequestDto;
 import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignUpRequestDto;
+import toy.bookchat.bookchat.exception.security.ExpiredTokenException;
 import toy.bookchat.bookchat.security.SecurityConfig;
-import toy.bookchat.bookchat.security.exception.ExpiredTokenException;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenProvider;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenRecorder;
 import toy.bookchat.bookchat.security.token.openid.OpenIdTestUtil;
+import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @WebMvcTest(controllers = UserController.class,
@@ -121,19 +121,27 @@ class UserControllerTest extends AuthenticationTestExtension {
             "src/test/java/toy/bookchat/bookchat/security/token/openid/openidRSA256-public.pem");
     }
 
-    private UserPrincipal getUserPrincipal() {
-        List<GrantedAuthority> authorities = Collections.singletonList(
-            new SimpleGrantedAuthority("ROLE_USER")
-        );
-        User user = User.builder()
+    private User getUser() {
+        return User.builder()
+            .id(1L)
             .email("test@gmail.com")
-            .name("testkakao")
+            .nickname("nickname")
+            .role(USER)
+            .name("testUser")
             .profileImageUrl("somethingImageUrl@naver.com")
+            .defaultProfileImageType(1)
+            .provider(OAuth2Provider.KAKAO)
+            .readingTastes(List.of(ReadingTaste.DEVELOPMENT, ReadingTaste.ART))
             .build();
+    }
 
-        return new UserPrincipal(1L, user.getEmail(),
-            user.getName(), user.getNickname(), user.getProfileImageUrl(),
-            user.getDefaultProfileImageType(), authorities, user);
+    private UserPrincipal getUserPrincipal() {
+        User user = getUser();
+        TokenPayload tokenPayload = TokenPayload.of(user.getId(), user.getName(),
+            user.getNickname(),
+            user.getEmail(), user.getProfileImageUrl(), user.getDefaultProfileImageType(),
+            user.getRole());
+        return UserPrincipal.create(tokenPayload);
     }
 
     @Test
@@ -385,7 +393,7 @@ class UserControllerTest extends AuthenticationTestExtension {
     }
 
     @Test
-    void 사용자_성공적으로_로그인시_응답_header에_jwt_token삽입() throws Exception {
+    void 사용자_성공적으로_로그인시_토큰_반환() throws Exception {
         PrivateKey privateKey = getPrivateKey();
         PublicKey publicKey = getPublicKey();
 
@@ -411,7 +419,8 @@ class UserControllerTest extends AuthenticationTestExtension {
             .oauth2Provider(OAuth2Provider.KAKAO)
             .build();
 
-        when(jwtTokenProvider.createToken(any(), any(), any())).thenReturn(responseToken);
+        when(jwtTokenProvider.createToken(any())).thenReturn(responseToken);
+        when(userService.findUserByUsername(any())).thenReturn(getUser());
         MvcResult mvcResult = mockMvc.perform(post("/v1/api/users/signin")
                 .header("OIDC", "Bearer " + testToken)
                 .contentType(MediaType.APPLICATION_JSON)

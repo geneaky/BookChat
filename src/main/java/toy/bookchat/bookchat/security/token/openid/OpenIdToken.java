@@ -10,9 +10,9 @@ import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import toy.bookchat.bookchat.security.exception.DenidedTokenException;
-import toy.bookchat.bookchat.security.exception.ExpiredTokenException;
-import toy.bookchat.bookchat.security.exception.IllegalStandardTokenException;
+import toy.bookchat.bookchat.exception.security.DenidedTokenException;
+import toy.bookchat.bookchat.exception.security.ExpiredTokenException;
+import toy.bookchat.bookchat.exception.security.IllegalStandardTokenException;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
 @Slf4j

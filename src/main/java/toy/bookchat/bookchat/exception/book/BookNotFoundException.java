@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.domain.book.exception;
+package toy.bookchat.bookchat.exception.book;
 
 public class BookNotFoundException extends RuntimeException {
 

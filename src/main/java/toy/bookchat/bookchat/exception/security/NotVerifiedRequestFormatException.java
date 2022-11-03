@@ -1,6 +1,7 @@
-package toy.bookchat.bookchat.security.exception;
+package toy.bookchat.bookchat.exception.security;
 
-public class NotVerifiedRequestFormatException extends RuntimeException{
+public class NotVerifiedRequestFormatException extends RuntimeException {
+
     public NotVerifiedRequestFormatException(String message) {
         super(message);
     }
@@ -13,7 +14,8 @@ public class NotVerifiedRequestFormatException extends RuntimeException{
         super(cause);
     }
 
-    protected NotVerifiedRequestFormatException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    protected NotVerifiedRequestFormatException(String message, Throwable cause,
+        boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

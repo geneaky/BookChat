@@ -35,7 +35,6 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,8 +49,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
 import toy.bookchat.bookchat.domain.book.Book;
@@ -63,9 +60,11 @@ import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookShelfReque
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeBookStatusRequestDto;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeReadingBookPageRequestDto;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.SearchBookShelfByReadingStatusDto;
+import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.security.SecurityConfig;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
+import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @WebMvcTest(controllers = BookShelfController.class,
@@ -83,22 +82,25 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
 
     private User getUser() {
         return User.builder()
+            .id(1L)
             .email("test@gmail.com")
+            .nickname("nickname")
             .role(USER)
             .name("testUser")
             .profileImageUrl("somethingImageUrl@naver.com")
+            .defaultProfileImageType(1)
+            .provider(OAuth2Provider.KAKAO)
+            .readingTastes(List.of(ReadingTaste.DEVELOPMENT, ReadingTaste.ART))
             .build();
     }
 
     private UserPrincipal getUserPrincipal() {
-        List<GrantedAuthority> authorities = Collections.singletonList(
-            new SimpleGrantedAuthority("ROLE_USER")
-        );
         User user = getUser();
-
-        return new UserPrincipal(1L, user.getEmail(), user.getName(), user.getNickname(),
-            user.getProfileImageUrl(),
-            user.getDefaultProfileImageType(), authorities, user);
+        TokenPayload tokenPayload = TokenPayload.of(user.getId(), user.getName(),
+            user.getNickname(),
+            user.getEmail(), user.getProfileImageUrl(), user.getDefaultProfileImageType(),
+            user.getRole());
+        return UserPrincipal.create(tokenPayload);
     }
 
     private BookShelfRequestDto getBookShelfRequestDto(ReadingStatus readingStatus) {
@@ -169,8 +171,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
                     fieldWithPath("star").ignored(),
                     fieldWithPath("singleLineAssessment").ignored())));
 
-        verify(bookShelfService).putBookOnBookShelf(any(BookShelfRequestDto.class),
-            any(User.class));
+        verify(bookShelfService).putBookOnBookShelf(any(BookShelfRequestDto.class), any());
     }
 
     @Test
@@ -197,7 +198,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
                     fieldWithPath("singleLineAssessment").type(STRING).description("한 줄 평"))));
 
         verify(bookShelfService).putBookOnBookShelf(any(BookShelfRequestDto.class),
-            any(User.class));
+            any());
     }
 
     @Test
@@ -247,7 +248,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
                     fieldWithPath("singleLineAssessment").ignored())));
 
         verify(bookShelfService).putBookOnBookShelf(any(BookShelfRequestDto.class),
-            any(User.class));
+            any());
     }
 
     @Test
@@ -469,7 +470,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
             bookShelves);
 
         when(bookShelfService.takeBooksOutOfBookShelf(any(ReadingStatus.class), any(Pageable.class),
-            any(User.class))).thenReturn(searchBookShelfByReadingStatusDto);
+            any())).thenReturn(searchBookShelfByReadingStatusDto);
 
         mockMvc.perform(get("/v1/api/bookshelf/books")
                 .header("Authorization", "Bearer " + getTestToken())
@@ -514,7 +515,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
             );
 
         verify(bookShelfService).takeBooksOutOfBookShelf(any(ReadingStatus.class),
-            any(Pageable.class), any(User.class));
+            any(Pageable.class), any());
     }
 
     @Test
@@ -549,7 +550,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
             bookShelves);
 
         when(bookShelfService.takeBooksOutOfBookShelf(any(ReadingStatus.class), any(Pageable.class),
-            any(User.class))).thenReturn(searchBookShelfByReadingStatusDto);
+            any())).thenReturn(searchBookShelfByReadingStatusDto);
 
         mockMvc.perform(get("/v1/api/bookshelf/books")
                 .header("Authorization", "Bearer " + getTestToken())
@@ -594,7 +595,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
             );
 
         verify(bookShelfService).takeBooksOutOfBookShelf(any(ReadingStatus.class),
-            any(Pageable.class), any(User.class));
+            any(Pageable.class), any());
     }
 
     @Test
@@ -628,7 +629,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
             bookShelves);
 
         when(bookShelfService.takeBooksOutOfBookShelf(any(ReadingStatus.class), any(Pageable.class),
-            any(User.class))).thenReturn(searchBookShelfByReadingStatusDto);
+            any())).thenReturn(searchBookShelfByReadingStatusDto);
 
         mockMvc.perform(get("/v1/api/bookshelf/books")
                 .header("Authorization", "Bearer " + getTestToken())
@@ -673,7 +674,7 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
             );
 
         verify(bookShelfService).takeBooksOutOfBookShelf(any(ReadingStatus.class),
-            any(Pageable.class), any(User.class));
+            any(Pageable.class), any());
     }
 
     @Test

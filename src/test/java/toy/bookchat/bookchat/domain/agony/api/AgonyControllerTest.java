@@ -26,10 +26,6 @@ import static toy.bookchat.bookchat.domain.user.ROLE.USER;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,8 +41,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
 import toy.bookchat.bookchat.domain.agony.Agony;
@@ -58,9 +52,11 @@ import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateBookAgonyReq
 import toy.bookchat.bookchat.domain.agony.service.dto.response.PageOfAgoniesResponse;
 import toy.bookchat.bookchat.domain.agony.service.dto.response.PageOfAgonyRecordsResponse;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
+import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.security.SecurityConfig;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
+import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @WebMvcTest(controllers = AgonyController.class,
@@ -80,26 +76,28 @@ class AgonyControllerTest extends AuthenticationTestExtension {
 
     private User getUser() {
         return User.builder()
+            .id(1L)
             .email("test@gmail.com")
+            .nickname("nickname")
             .role(USER)
             .name("testUser")
             .profileImageUrl("somethingImageUrl@naver.com")
+            .defaultProfileImageType(1)
+            .provider(OAuth2Provider.KAKAO)
+            .readingTastes(List.of(ReadingTaste.DEVELOPMENT, ReadingTaste.ART))
             .build();
     }
 
     private UserPrincipal getUserPrincipal() {
-        List<GrantedAuthority> authorities = Collections.singletonList(
-            new SimpleGrantedAuthority("ROLE_USER")
-        );
         User user = getUser();
-
-        return new UserPrincipal(1L, user.getEmail(), user.getName(), user.getNickname(),
-            user.getProfileImageUrl(),
-            user.getDefaultProfileImageType(), authorities, user);
+        TokenPayload tokenPayload = TokenPayload.of(user.getId(), user.getName(),
+            user.getNickname(),
+            user.getEmail(), user.getProfileImageUrl(), user.getDefaultProfileImageType(),
+            user.getRole());
+        return UserPrincipal.create(tokenPayload);
     }
 
-    private String getTestToken()
-        throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
+    private String getTestToken() throws Exception {
         Map<String, Object> claims = new HashMap<>();
         claims.put("sub", "test");
         claims.put("name", "google123");

@@ -17,7 +17,6 @@ import static toy.bookchat.bookchat.domain.user.ROLE.USER;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,15 +28,15 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
 import toy.bookchat.bookchat.domain.bookreport.service.BookReportService;
 import toy.bookchat.bookchat.domain.bookreport.service.dto.request.WriteBookReportRequestDto;
+import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.security.SecurityConfig;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
+import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @WebMvcTest(controllers = BookReportController.class,
@@ -55,22 +54,25 @@ class BookReportControllerTest extends AuthenticationTestExtension {
 
     private User getUser() {
         return User.builder()
+            .id(1L)
             .email("test@gmail.com")
+            .nickname("nickname")
             .role(USER)
             .name("testUser")
             .profileImageUrl("somethingImageUrl@naver.com")
+            .defaultProfileImageType(1)
+            .provider(OAuth2Provider.KAKAO)
+            .readingTastes(List.of(ReadingTaste.DEVELOPMENT, ReadingTaste.ART))
             .build();
     }
 
     private UserPrincipal getUserPrincipal() {
-        List<GrantedAuthority> authorities = Collections.singletonList(
-            new SimpleGrantedAuthority("ROLE_USER")
-        );
         User user = getUser();
-
-        return new UserPrincipal(1L, user.getEmail(), user.getName(), user.getNickname(),
-            user.getProfileImageUrl(),
-            user.getDefaultProfileImageType(), authorities, user);
+        TokenPayload tokenPayload = TokenPayload.of(user.getId(), user.getName(),
+            user.getNickname(),
+            user.getEmail(), user.getProfileImageUrl(), user.getDefaultProfileImageType(),
+            user.getRole());
+        return UserPrincipal.create(tokenPayload);
     }
 
     private String getTestToken() throws Exception {

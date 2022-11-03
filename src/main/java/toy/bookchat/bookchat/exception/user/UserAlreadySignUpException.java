@@ -1,6 +1,7 @@
-package toy.bookchat.bookchat.domain.user.exception;
+package toy.bookchat.bookchat.exception.user;
 
-public class UserAlreadySignUpException extends RuntimeException{
+public class UserAlreadySignUpException extends RuntimeException {
+
     public UserAlreadySignUpException(String message) {
         super(message);
     }

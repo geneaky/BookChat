@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.domain.user.exception;
+package toy.bookchat.bookchat.exception.user;
 
 public class ImageInputStreamException extends RuntimeException {
 

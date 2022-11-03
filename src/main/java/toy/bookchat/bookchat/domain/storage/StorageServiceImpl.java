@@ -7,7 +7,7 @@ import java.io.IOException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import toy.bookchat.bookchat.config.aws.S3Config;
-import toy.bookchat.bookchat.domain.storage.exception.ImageUploadToStorageException;
+import toy.bookchat.bookchat.exception.storage.ImageUploadToStorageException;
 
 @Service
 public class StorageServiceImpl implements StorageService {

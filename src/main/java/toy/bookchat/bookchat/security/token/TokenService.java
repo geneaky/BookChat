@@ -3,8 +3,10 @@ package toy.bookchat.bookchat.security.token;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.api.dto.Token;
-import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
+import toy.bookchat.bookchat.domain.user.repository.UserRepository;
+import toy.bookchat.bookchat.exception.user.UserNotFoundException;
 import toy.bookchat.bookchat.security.token.dto.RefreshTokenRequestDto;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenManager;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenProvider;
@@ -17,18 +19,21 @@ public class TokenService {
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtTokenManager jwtTokenManager;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final UserRepository userRepository;
 
     public TokenService(JwtTokenProvider jwtTokenProvider, JwtTokenManager jwtTokenManager,
-        RefreshTokenRepository refreshTokenRepository) {
+        RefreshTokenRepository refreshTokenRepository,
+        UserRepository userRepository) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.jwtTokenManager = jwtTokenManager;
         this.refreshTokenRepository = refreshTokenRepository;
+        this.userRepository = userRepository;
     }
 
     @Transactional
     public Token generateToken(RefreshTokenRequestDto refreshTokenRequestDto) {
-        String accessToken = createAccessToken(refreshTokenRequestDto);
-        String refreshToken = createOrDefaultRefreshToken(refreshTokenRequestDto);
+        String accessToken = generateAccessToken(refreshTokenRequestDto);
+        String refreshToken = generateOrUsingDefaultRefreshToken(refreshTokenRequestDto);
 
         return Token.builder()
             .accessToken(accessToken)
@@ -36,38 +41,47 @@ public class TokenService {
             .build();
     }
 
-    private String createAccessToken(RefreshTokenRequestDto refreshTokenRequestDto) {
-        String userName = jwtTokenManager.getOAuth2MemberNumberFromToken(
-            refreshTokenRequestDto.getRefreshToken());
-        String userEmail = jwtTokenManager.getUserEmailFromToken(
-            refreshTokenRequestDto.getRefreshToken());
-        OAuth2Provider oAuth2Provider = jwtTokenManager.getOAuth2ProviderFromToken(
-            refreshTokenRequestDto.getRefreshToken());
+    private String generateAccessToken(RefreshTokenRequestDto refreshTokenRequestDto) {
 
-        return jwtTokenProvider.createAccessToken(userName, userEmail,
-            oAuth2Provider);
+        return jwtTokenProvider.createAccessToken(
+            getUserFromRefreshToken(refreshTokenRequestDto));
     }
 
-    private String createOrDefaultRefreshToken(RefreshTokenRequestDto refreshTokenRequestDto) {
-        String userName = jwtTokenManager.getOAuth2MemberNumberFromToken(
-            refreshTokenRequestDto.getRefreshToken());
-        String userEmail = jwtTokenManager.getUserEmailFromToken(
-            refreshTokenRequestDto.getRefreshToken());
-        OAuth2Provider oAuth2Provider = jwtTokenManager.getOAuth2ProviderFromToken(
-            refreshTokenRequestDto.getRefreshToken());
-
+    private String generateOrUsingDefaultRefreshToken(
+        RefreshTokenRequestDto refreshTokenRequestDto) {
         String refreshToken = refreshTokenRequestDto.getRefreshToken();
 
-        if (jwtTokenManager.shouldRefreshTokenBeRenewed(refreshToken)) {
-            refreshToken = jwtTokenProvider.createRefreshToken(userName, userEmail, oAuth2Provider);
-            refreshTokenRepository.findByUserName(userName)
-                .orElseThrow(() -> {
-                    throw new IllegalStateException();
-                })
-                .changeRefreshToken(refreshToken);
+        if (shouldBeRenew(refreshToken)) {
+            refreshToken = renewRefreshToken(refreshTokenRequestDto);
         }
 
         return refreshToken;
+    }
+
+    private String renewRefreshToken(RefreshTokenRequestDto refreshTokenRequestDto) {
+        String refreshToken;
+        refreshToken = jwtTokenProvider.createRefreshToken(
+            getUserFromRefreshToken(refreshTokenRequestDto));
+
+        refreshTokenRepository.findByUserId(jwtTokenManager.getUserIdFromToken(refreshToken))
+            .orElseThrow(() -> {
+                throw new IllegalStateException();
+            })
+            .changeRefreshToken(refreshToken);
+
+        return refreshToken;
+    }
+
+    private boolean shouldBeRenew(String refreshToken) {
+        return jwtTokenManager.shouldRefreshTokenBeRenew(refreshToken);
+    }
+
+    private User getUserFromRefreshToken(RefreshTokenRequestDto refreshTokenRequestDto) {
+        return userRepository.findById(
+                jwtTokenManager.getUserIdFromToken(refreshTokenRequestDto.getRefreshToken()))
+            .orElseThrow(() -> {
+                throw new UserNotFoundException("Can't Find User");
+            });
     }
 
 }

@@ -7,7 +7,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import toy.bookchat.bookchat.domain.book.Book;
-import toy.bookchat.bookchat.domain.book.exception.BookNotFoundException;
 import toy.bookchat.bookchat.domain.book.repository.BookRepository;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
@@ -17,45 +16,55 @@ import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeBookStat
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeReadingBookPageRequestDto;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.SearchBookShelfByReadingStatusDto;
 import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.repository.UserRepository;
+import toy.bookchat.bookchat.exception.book.BookNotFoundException;
+import toy.bookchat.bookchat.exception.user.UserNotFoundException;
 
 @Service
 public class BookShelfService {
 
     private final BookShelfRepository bookShelfRepository;
     private final BookRepository bookRepository;
+    private final UserRepository userRepository;
 
     public BookShelfService(BookShelfRepository bookShelfRepository,
-        BookRepository bookRepository) {
+        BookRepository bookRepository,
+        UserRepository userRepository) {
         this.bookShelfRepository = bookShelfRepository;
         this.bookRepository = bookRepository;
+        this.userRepository = userRepository;
     }
 
     @Transactional
-    public void putBookOnBookShelf(BookShelfRequestDto bookShelfRequestDto, User user) {
+    public void putBookOnBookShelf(BookShelfRequestDto bookShelfRequestDto, Long userId) {
         Optional<Book> optionalBook = bookRepository.findByIsbn(bookShelfRequestDto.getIsbn());
-        optionalBook.ifPresentOrElse(putBook(bookShelfRequestDto, user),
-            saveBookBeforePuttingBookOnBookShelf(bookShelfRequestDto, user));
+        optionalBook.ifPresentOrElse(putBook(bookShelfRequestDto, userId),
+            saveBookBeforePuttingBookOnBookShelf(bookShelfRequestDto, userId));
     }
 
     private Runnable saveBookBeforePuttingBookOnBookShelf(BookShelfRequestDto bookShelfRequestDto,
-        User user) {
+        Long userId) {
         return () -> {
             Book book = bookRepository.save(bookShelfRequestDto.extractBookEntity());
-            putBookOnBookShelf(bookShelfRequestDto, book, user);
+            putBookOnBookShelf(bookShelfRequestDto, book, userId);
         };
     }
 
-    private Consumer<Book> putBook(BookShelfRequestDto bookShelfRequestDto, User user) {
-        return book -> putBookOnBookShelf(bookShelfRequestDto, book, user);
+    private Consumer<Book> putBook(BookShelfRequestDto bookShelfRequestDto, Long userId) {
+        return book -> putBookOnBookShelf(bookShelfRequestDto, book, userId);
     }
 
-    private void putBookOnBookShelf(BookShelfRequestDto bookShelfRequestDto, Book book, User user) {
-        BookShelf bookShelf = createBookShelfByReadingStatus(bookShelfRequestDto, book, user);
+    private void putBookOnBookShelf(BookShelfRequestDto bookShelfRequestDto, Book book,
+        Long userId) {
+        BookShelf bookShelf = createBookShelfByReadingStatus(bookShelfRequestDto, book, userId);
         bookShelfRepository.save(bookShelf);
     }
 
     private BookShelf createBookShelfByReadingStatus(BookShelfRequestDto bookShelfRequestDto,
-        Book book, User user) {
+        Book book, Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> {
+            throw new UserNotFoundException("Can't find User");
+        });
         if (isFinishedReading(bookShelfRequestDto)) {
             bookShelfRequestDto.checkCompleteStateField();
 
@@ -81,38 +90,37 @@ public class BookShelfService {
 
     @Transactional(readOnly = true)
     public SearchBookShelfByReadingStatusDto takeBooksOutOfBookShelf(ReadingStatus readingStatus,
-        Pageable pageable, User user) {
+        Pageable pageable, Long userId) {
 
         Page<BookShelf> pagingBookShelves = bookShelfRepository.findSpecificStatusBookByUserId(
             readingStatus, pageable,
-            user.getId());
+            userId);
 
         return new SearchBookShelfByReadingStatusDto(pagingBookShelves);
     }
 
     @Transactional
     public void changeReadingBookPage(
-        ChangeReadingBookPageRequestDto changeReadingBookPageRequestDto, User user, Long bookId) {
+        ChangeReadingBookPageRequestDto changeReadingBookPageRequestDto, Long userId, Long bookId) {
 
-        BookShelf bookShelf = bookShelfRepository.findReadingBookByUserIdAndBookId(user.getId(),
-            bookId);
+        BookShelf bookShelf = bookShelfRepository.findReadingBookByUserIdAndBookId(userId, bookId);
 
         bookShelf.updatePage(changeReadingBookPageRequestDto.getPages());
     }
 
     @Transactional
-    public void deleteBookOnBookShelf(Long bookId, User user) {
+    public void deleteBookOnBookShelf(Long bookId, Long userId) {
 
-        bookShelfRepository.deleteBookByUserIdAndBookId(user.getId(),
+        bookShelfRepository.deleteBookByUserIdAndBookId(userId,
             bookId);
     }
 
     @Transactional
     public void changeBookStatusOnBookShelf(ChangeBookStatusRequestDto changeBookStatusRequestDto,
-        User user, Long bookId) {
+        Long userId, Long bookId) {
 
         BookShelf bookShelf = bookShelfRepository.findByUserIdAndBookId(
-            user.getId(), bookId).orElseThrow(() -> {
+            userId, bookId).orElseThrow(() -> {
             throw new BookNotFoundException("Book is not registered on book shelf");
         });
 

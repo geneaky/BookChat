@@ -17,7 +17,6 @@ import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,9 +27,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.util.Base64Utils;
 import toy.bookchat.bookchat.config.OpenIdTokenConfig;
-import toy.bookchat.bookchat.security.exception.DenidedTokenException;
-import toy.bookchat.bookchat.security.exception.ExpiredTokenException;
-import toy.bookchat.bookchat.security.exception.IllegalStandardTokenException;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
 @ExtendWith(MockitoExtension.class)
@@ -67,14 +63,14 @@ class OpenIdTokenManagerTest {
     }
 
     private PublicKey getPublicKey()
-            throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
+        throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         X509EncodedKeySpec publicKeySpec = getPublicPkcs8EncodedKeySpec(openIdTestUtil);
         return keyFactory.generatePublic(publicKeySpec);
     }
 
     private PrivateKey getPrivateKey()
-            throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
+        throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         PKCS8EncodedKeySpec privateKeySpec = getPrivatePkcs8EncodedKeySpec(openIdTestUtil);
         return keyFactory.generatePrivate(privateKeySpec);
