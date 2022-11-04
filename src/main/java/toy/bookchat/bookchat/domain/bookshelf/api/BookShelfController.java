@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.service.BookShelfService;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookShelfRequestDto;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeBookStatusRequestDto;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeReadingBookPageRequestDto;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.SearchBookShelfByReadingStatusDto;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookShelfRequest;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeBookStatusRequest;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeReadingBookPageRequest;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.SearchBookShelfByReadingStatus;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPayload;
 
@@ -30,14 +30,14 @@ public class BookShelfController {
     }
 
     @PostMapping("/bookshelf/books")
-    public void putBookOnBookShelf(@RequestBody @Valid BookShelfRequestDto bookShelfRequestDto,
+    public void putBookOnBookShelf(@RequestBody @Valid BookShelfRequest bookShelfRequest,
         @UserPayload TokenPayload tokenPayload) {
 
-        bookShelfService.putBookOnBookShelf(bookShelfRequestDto, tokenPayload.getUserId());
+        bookShelfService.putBookOnBookShelf(bookShelfRequest, tokenPayload.getUserId());
     }
 
     @GetMapping("/bookshelf/books")
-    public SearchBookShelfByReadingStatusDto takeBookOutOfBookShelf(ReadingStatus readingStatus,
+    public SearchBookShelfByReadingStatus takeBookOutOfBookShelf(ReadingStatus readingStatus,
         Pageable pageable, @UserPayload TokenPayload tokenPayload) {
         return bookShelfService.takeBooksOutOfBookShelf(readingStatus, pageable,
             tokenPayload.getUserId());
@@ -45,19 +45,19 @@ public class BookShelfController {
 
     @PatchMapping("/bookshelf/books/{bookId}/pages")
     public void changeReadingBookPagesOnBookShelf(@PathVariable Long bookId,
-        @Valid @RequestBody ChangeReadingBookPageRequestDto changeReadingBookPageRequestDto,
+        @Valid @RequestBody ChangeReadingBookPageRequest changeReadingBookPageRequest,
         @UserPayload TokenPayload tokenPayload) {
 
-        bookShelfService.changeReadingBookPage(changeReadingBookPageRequestDto,
+        bookShelfService.changeReadingBookPage(changeReadingBookPageRequest,
             tokenPayload.getUserId(), bookId);
     }
 
     @PatchMapping("/bookshelf/books/{bookId}/status")
     public void changeBookStatusOnBookShelf(@PathVariable Long bookId,
-        @Valid @RequestBody ChangeBookStatusRequestDto changeBookStatusRequestDto,
+        @Valid @RequestBody ChangeBookStatusRequest changeBookStatusRequest,
         @UserPayload TokenPayload tokenPayload) {
 
-        bookShelfService.changeBookStatusOnBookShelf(changeBookStatusRequestDto,
+        bookShelfService.changeBookStatusOnBookShelf(changeBookStatusRequest,
             tokenPayload.getUserId(), bookId);
     }
 

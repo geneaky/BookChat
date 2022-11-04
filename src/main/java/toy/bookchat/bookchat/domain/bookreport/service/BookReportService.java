@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import toy.bookchat.bookchat.domain.bookreport.BookReport;
 import toy.bookchat.bookchat.domain.bookreport.repository.BookReportRepository;
-import toy.bookchat.bookchat.domain.bookreport.service.dto.request.WriteBookReportRequestDto;
+import toy.bookchat.bookchat.domain.bookreport.service.dto.request.WriteBookReportRequest;
 import toy.bookchat.bookchat.domain.bookreport.service.dto.response.BookReportResponse;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
@@ -24,14 +24,14 @@ public class BookReportService {
     }
 
     @Transactional
-    public void writeReport(WriteBookReportRequestDto writeBookReportRequestDto, Long bookId,
+    public void writeReport(WriteBookReportRequest writeBookReportRequest, Long bookId,
         Long userId) {
 
         BookShelf bookShelf = bookShelfRepository.findByUserIdAndBookId(userId, bookId)
             .orElseThrow(bookNotFound());
 
         bookShelf.changeToCompleteReading();
-        BookReport bookReport = writeBookReportRequestDto.getBookReport(bookShelf);
+        BookReport bookReport = writeBookReportRequest.getBookReport(bookShelf);
         bookReportRepository.save(bookReport);
     }
 

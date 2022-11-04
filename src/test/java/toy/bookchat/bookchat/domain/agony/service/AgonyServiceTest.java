@@ -20,11 +20,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import toy.bookchat.bookchat.domain.agony.Agony;
 import toy.bookchat.bookchat.domain.agony.repository.AgonyRepository;
-import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateBookAgonyRequestDto;
-import toy.bookchat.bookchat.domain.agony.service.dto.response.PageOfAgoniesResponse;
-import toy.bookchat.bookchat.exception.book.BookNotFoundException;
+import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateBookAgonyRequest;
+import toy.bookchat.bookchat.domain.agony.service.dto.response.BasePageOfAgoniesResponse;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
+import toy.bookchat.bookchat.exception.book.BookNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class AgonyServiceTest {
@@ -40,22 +40,22 @@ class AgonyServiceTest {
     void 고민_생성_성공() throws Exception {
 
         BookShelf bookShelf = mock(BookShelf.class);
-        CreateBookAgonyRequestDto createBookAgonyRequestDto = mock(CreateBookAgonyRequestDto.class);
+        CreateBookAgonyRequest createBookAgonyRequest = mock(CreateBookAgonyRequest.class);
 
         when(bookShelfRepository.findByUserIdAndBookId(any(), any())).thenReturn(
             Optional.of(bookShelf));
 
-        agonyService.storeBookAgony(createBookAgonyRequestDto, 1L, 1L);
+        agonyService.storeBookAgony(createBookAgonyRequest, 1L, 1L);
 
         verify(agonyRepository).save(any());
     }
 
     @Test
     void 서재등록_없이_고민_생성시_예외발생() throws Exception {
-        CreateBookAgonyRequestDto createBookAgonyRequestDto = mock(CreateBookAgonyRequestDto.class);
+        CreateBookAgonyRequest createBookAgonyRequest = mock(CreateBookAgonyRequest.class);
 
         assertThatThrownBy(() -> {
-            agonyService.storeBookAgony(createBookAgonyRequestDto, 1L, 1L);
+            agonyService.storeBookAgony(createBookAgonyRequest, 1L, 1L);
         }).isInstanceOf(BookNotFoundException.class);
     }
 
@@ -77,7 +77,7 @@ class AgonyServiceTest {
         List<Agony> contents = List.of(agony1, agony2);
         Page<Agony> page = new PageImpl<>(contents, pageRequest, 2);
         when(agonyRepository.findUserBookShelfPageOfAgonies(1L, 1L, pageRequest)).thenReturn(page);
-        PageOfAgoniesResponse pageOfAgoniesResponse = agonyService.searchPageOfAgonies(1L, 1L,
+        BasePageOfAgoniesResponse pageOfAgoniesResponse = agonyService.searchPageOfAgonies(1L, 1L,
             pageRequest);
 
         String title = pageOfAgoniesResponse.getAgonyResponseList().get(0).getTitle();

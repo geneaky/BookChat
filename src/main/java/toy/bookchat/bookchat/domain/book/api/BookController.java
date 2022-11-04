@@ -5,9 +5,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import toy.bookchat.bookchat.domain.book.dto.request.BookSearchRequestDto;
-import toy.bookchat.bookchat.domain.book.dto.response.BookSearchResponseDto;
 import toy.bookchat.bookchat.domain.book.service.BookSearchService;
+import toy.bookchat.bookchat.domain.book.service.dto.request.BookSearchRequest;
+import toy.bookchat.bookchat.domain.book.service.dto.response.BookSearchResponse;
 
 @RestController
 @RequestMapping("/v1/api")
@@ -20,8 +20,8 @@ public class BookController {
     }
 
     @GetMapping("/books")
-    public BookSearchResponseDto getBookInformation(
-        @Valid @ModelAttribute BookSearchRequestDto bookSearchRequestDto) {
-        return bookSearchService.searchByQuery(bookSearchRequestDto);
+    public BookSearchResponse getBookInformation(
+        @Valid @ModelAttribute BookSearchRequest bookSearchRequest) {
+        return bookSearchService.searchByQuery(bookSearchRequest);
     }
 }

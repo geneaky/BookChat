@@ -14,7 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import toy.bookchat.bookchat.domain.bookreport.repository.BookReportRepository;
-import toy.bookchat.bookchat.domain.bookreport.service.dto.request.WriteBookReportRequestDto;
+import toy.bookchat.bookchat.domain.bookreport.service.dto.request.WriteBookReportRequest;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
@@ -31,8 +31,8 @@ class BookReportServiceTest {
     @InjectMocks
     private BookReportService bookReportService;
 
-    private static WriteBookReportRequestDto getWriteBookReportRequestDto() {
-        return WriteBookReportRequestDto.builder()
+    private static WriteBookReportRequest getWriteBookReportRequest() {
+        return WriteBookReportRequest.builder()
             .title("어렵지만 많이 배웠습니다")
             .content("이런이런 저런저런 내용")
             .build();
@@ -40,7 +40,7 @@ class BookReportServiceTest {
 
     @Test
     void 독후감_등록_성공() throws Exception {
-        WriteBookReportRequestDto writeBookReportRequestDto = getWriteBookReportRequestDto();
+        WriteBookReportRequest writeBookReportRequest = getWriteBookReportRequest();
 
         User user = mock(User.class);
         BookShelf bookShelf = mock(BookShelf.class);
@@ -49,14 +49,14 @@ class BookReportServiceTest {
         when(bookShelfRepository.findByUserIdAndBookId(any(), any())).thenReturn(
             Optional.of(bookShelf));
 
-        bookReportService.writeReport(writeBookReportRequestDto, 1L, user.getId());
+        bookReportService.writeReport(writeBookReportRequest, 1L, user.getId());
 
         verify(bookReportRepository).save(any());
     }
 
     @Test
     void 독후감_등록시_서재_독서완료_변경_성공() throws Exception {
-        WriteBookReportRequestDto writeBookReportRequestDto = getWriteBookReportRequestDto();
+        WriteBookReportRequest writeBookReportRequest = getWriteBookReportRequest();
 
         User user = mock(User.class);
         BookShelf bookShelf = BookShelf.builder()
@@ -67,7 +67,7 @@ class BookReportServiceTest {
         when(bookShelfRepository.findByUserIdAndBookId(any(), any())).thenReturn(
             Optional.of(bookShelf));
 
-        bookReportService.writeReport(writeBookReportRequestDto, 1L, user.getId());
+        bookReportService.writeReport(writeBookReportRequest, 1L, user.getId());
 
         ReadingStatus result = bookShelf.getReadingStatus();
         assertThat(result).isEqualTo(ReadingStatus.COMPLETE);
@@ -75,11 +75,11 @@ class BookReportServiceTest {
 
     @Test
     void 서재에_등록되지_않는_책_독후감_작성시도시_예외발생() throws Exception {
-        WriteBookReportRequestDto writeBookReportRequestDto = getWriteBookReportRequestDto();
+        WriteBookReportRequest writeBookReportRequest = getWriteBookReportRequest();
         User user = mock(User.class);
 
         assertThatThrownBy(() -> {
-            bookReportService.writeReport(writeBookReportRequestDto, 1L, user.getId());
+            bookReportService.writeReport(writeBookReportRequest, 1L, user.getId());
         }).isInstanceOf(BookNotFoundException.class);
     }
 }

@@ -9,7 +9,7 @@ import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class CreateBookAgonyRequestDto {
+public class CreateBookAgonyRequest {
 
     @NotBlank
     private String title;
@@ -23,7 +23,7 @@ public class CreateBookAgonyRequestDto {
             .build();
     }
 
-    public CreateBookAgonyRequestDto(String title, String hexColorCode) {
+    public CreateBookAgonyRequest(String title, String hexColorCode) {
         this.title = title;
         this.hexColorCode = hexColorCode;
     }

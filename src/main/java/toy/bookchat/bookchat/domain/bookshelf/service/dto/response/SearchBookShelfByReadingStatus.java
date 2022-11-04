@@ -5,14 +5,14 @@ import java.util.List;
 import lombok.Getter;
 import org.springframework.data.domain.Page;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
-import toy.bookchat.bookchat.domain.common.PageDto;
+import toy.bookchat.bookchat.domain.common.BasePage;
 
 @Getter
-public class SearchBookShelfByReadingStatusDto extends PageDto {
+public class SearchBookShelfByReadingStatus extends BasePage {
 
-    private List<BookShelfResponseDto> contents;
+    private List<BookShelfResponse> contents;
 
-    public SearchBookShelfByReadingStatusDto(Page<BookShelf> pagingBookShelves) {
+    public SearchBookShelfByReadingStatus(Page<BookShelf> pagingBookShelves) {
         super(pagingBookShelves);
         getBookShelfSearchResponseDtos(pagingBookShelves.getContent());
     }
@@ -25,7 +25,7 @@ public class SearchBookShelfByReadingStatusDto extends PageDto {
 
     private void fillContentsWithBookShelfResponseDto(List<BookShelf> bookShelves) {
         for (BookShelf bookShelf : bookShelves) {
-            BookShelfResponseDto bookShelfResponseDto = BookShelfResponseDto.builder()
+            BookShelfResponse bookShelfResponse = BookShelfResponse.builder()
                 .bookId(bookShelf.getBookId())
                 .title(bookShelf.getBookTitle())
                 .isbn(bookShelf.getIsbn())
@@ -37,7 +37,7 @@ public class SearchBookShelfByReadingStatusDto extends PageDto {
                 .pages(bookShelf.getPages())
                 .build();
 
-            this.contents.add(bookShelfResponseDto);
+            this.contents.add(bookShelfResponse);
         }
     }
 }

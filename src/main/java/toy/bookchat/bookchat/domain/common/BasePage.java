@@ -4,7 +4,7 @@ import lombok.Getter;
 import org.springframework.data.domain.Page;
 
 @Getter
-public abstract class PageDto {
+public abstract class BasePage {
 
     private final Long totalElements;
 
@@ -22,7 +22,7 @@ public abstract class PageDto {
 
     private final boolean empty;
 
-    public PageDto(Page<?> page) {
+    public BasePage(Page<?> page) {
         this.totalElements = page.getTotalElements();
         this.totalPages = page.getTotalPages();
         this.pageSize = page.getPageable().getPageSize();

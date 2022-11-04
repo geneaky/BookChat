@@ -37,7 +37,7 @@ import toy.bookchat.bookchat.exception.security.DenidedTokenException;
 import toy.bookchat.bookchat.exception.security.ExpiredTokenException;
 import toy.bookchat.bookchat.security.SecurityConfig;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
-import toy.bookchat.bookchat.security.token.dto.RefreshTokenRequestDto;
+import toy.bookchat.bookchat.security.token.dto.RefreshTokenRequest;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenProvider;
 
 @WebMvcTest(controllers = TokenController.class,
@@ -73,7 +73,7 @@ class TokenControllerTest extends AuthenticationTestExtension {
     void Access토큰_만료시_만료되지_않은_리프레시_토큰으로_갱신() throws Exception {
         Token token = jwtTokenProvider.createToken(getUser());
 
-        RefreshTokenRequestDto refreshTokenRequestDto = RefreshTokenRequestDto.builder()
+        RefreshTokenRequest refreshTokenRequest = RefreshTokenRequest.builder()
             .refreshToken(token.getRefreshToken())
             .build();
 
@@ -82,7 +82,7 @@ class TokenControllerTest extends AuthenticationTestExtension {
         when(tokenService.generateToken(any())).thenReturn(newToken);
 
         mockMvc.perform(post("/v1/api/auth/token")
-                .content(objectMapper.writeValueAsString(refreshTokenRequestDto))
+                .content(objectMapper.writeValueAsString(refreshTokenRequest))
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andDo(document("token-reissue", requestFields(
@@ -95,12 +95,12 @@ class TokenControllerTest extends AuthenticationTestExtension {
 
     @Test
     void 리프레시_토큰없이_요청시_400응답() throws Exception {
-        RefreshTokenRequestDto refreshTokenRequestDto = RefreshTokenRequestDto.builder()
+        RefreshTokenRequest refreshTokenRequest = RefreshTokenRequest.builder()
             .refreshToken(null)
             .build();
 
         mockMvc.perform(post("/v1/api/auth/token").contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(refreshTokenRequestDto)))
+                .content(objectMapper.writeValueAsString(refreshTokenRequest)))
             .andExpect(status().isBadRequest());
     }
 
@@ -115,7 +115,7 @@ class TokenControllerTest extends AuthenticationTestExtension {
             .signWith(SignatureAlgorithm.HS256, "test")
             .compact();
 
-        RefreshTokenRequestDto refreshTokenRequestDto = RefreshTokenRequestDto.builder()
+        RefreshTokenRequest refreshTokenRequest = RefreshTokenRequest.builder()
             .refreshToken(expiredRefreshToken)
             .build();
 
@@ -123,7 +123,7 @@ class TokenControllerTest extends AuthenticationTestExtension {
             .generateToken(any());
 
         mockMvc.perform(post("/v1/api/auth/token").contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(refreshTokenRequestDto)))
+                .content(objectMapper.writeValueAsString(refreshTokenRequest)))
             .andExpect(status().isUnauthorized());
     }
 
@@ -131,7 +131,7 @@ class TokenControllerTest extends AuthenticationTestExtension {
     void 유효하지않은_토큰으로_요청시_401응답() throws Exception {
         Token token = jwtTokenProvider.createToken(getUser());
 
-        RefreshTokenRequestDto refreshTokenRequestDto = RefreshTokenRequestDto.builder()
+        RefreshTokenRequest refreshTokenRequest = RefreshTokenRequest.builder()
             .refreshToken(token.getRefreshToken() + "invalid")
             .build();
 
@@ -139,7 +139,7 @@ class TokenControllerTest extends AuthenticationTestExtension {
             .generateToken(any());
 
         mockMvc.perform(post("/v1/api/auth/token").contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(refreshTokenRequestDto)))
+                .content(objectMapper.writeValueAsString(refreshTokenRequest)))
             .andExpect(status().isUnauthorized());
     }
 }

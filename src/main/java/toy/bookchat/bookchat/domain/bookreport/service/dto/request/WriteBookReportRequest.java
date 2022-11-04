@@ -10,7 +10,7 @@ import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class WriteBookReportRequestDto {
+public class WriteBookReportRequest {
 
     @NotBlank
     private String title;
@@ -26,7 +26,7 @@ public class WriteBookReportRequestDto {
     }
 
     @Builder
-    private WriteBookReportRequestDto(String title, String content) {
+    private WriteBookReportRequest(String title, String content) {
         this.title = title;
         this.content = content;
     }

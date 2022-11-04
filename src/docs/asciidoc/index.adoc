@@ -96,8 +96,8 @@ include::{snippets}/user-signup/request-headers.adoc[]
 
 ****
 include::{snippets}/user-signup/request-parts.adoc[]
-`userSignUpRequestDto`
-include::{snippets}/user-signup/request-part-userSignUpRequestDto-fields.adoc[]
+`userSignUpRequest`
+include::{snippets}/user-signup/request-part-userSignUpRequest-fields.adoc[]
 ****
 include::{snippets}/user-signup/http-request.adoc[]
 

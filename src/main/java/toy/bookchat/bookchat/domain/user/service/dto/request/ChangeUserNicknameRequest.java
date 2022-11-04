@@ -7,12 +7,12 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class ChangeUserNicknameRequestDto {
+public class ChangeUserNicknameRequest {
 
     @NotBlank
     private String nickname;
 
-    public ChangeUserNicknameRequestDto(String nickname) {
+    public ChangeUserNicknameRequest(String nickname) {
         this.nickname = nickname;
     }
 }

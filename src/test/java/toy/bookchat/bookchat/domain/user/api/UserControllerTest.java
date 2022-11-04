@@ -70,9 +70,9 @@ import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.api.dto.Token;
 import toy.bookchat.bookchat.domain.user.api.dto.UserProfileResponse;
 import toy.bookchat.bookchat.domain.user.service.UserService;
-import toy.bookchat.bookchat.domain.user.service.dto.request.ChangeUserNicknameRequestDto;
-import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignInRequestDto;
-import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignUpRequestDto;
+import toy.bookchat.bookchat.domain.user.service.dto.request.ChangeUserNicknameRequest;
+import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignInRequest;
+import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignUpRequest;
 import toy.bookchat.bookchat.exception.security.ExpiredTokenException;
 import toy.bookchat.bookchat.security.SecurityConfig;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
@@ -259,7 +259,7 @@ class UserControllerTest extends AuthenticationTestExtension {
         MockMultipartFile multipartFile = new MockMultipartFile("userProfileImage",
             "testImage".getBytes());
 
-        UserSignUpRequestDto requestDto = UserSignUpRequestDto.builder()
+        UserSignUpRequest userSignUpRequest = UserSignUpRequest.builder()
             .nickname("nick")
             .defaultProfileImageType(1)
             .oauth2Provider(OAuth2Provider.KAKAO)
@@ -279,8 +279,8 @@ class UserControllerTest extends AuthenticationTestExtension {
 
         mockMvc.perform(multipart("/v1/api/users/signup")
                 .file(multipartFile)
-                .file(new MockMultipartFile("userSignUpRequestDto", "", "application/json",
-                    objectMapper.writeValueAsString(requestDto)
+                .file(new MockMultipartFile("userSignUpRequest", "", "application/json",
+                    objectMapper.writeValueAsString(userSignUpRequest)
                         .getBytes(StandardCharsets.UTF_8)))
                 .header("OIDC", "Bearer " + testToken))
             .andExpect(status().isUnauthorized())
@@ -311,7 +311,7 @@ class UserControllerTest extends AuthenticationTestExtension {
 
         MockMultipartFile multipartFile = new MockMultipartFile("userProfileImage",
             "test".getBytes());
-        UserSignUpRequestDto userSignUpRequestDto = UserSignUpRequestDto.builder()
+        UserSignUpRequest userSignUpRequest = UserSignUpRequest.builder()
             .nickname("nick")
             .defaultProfileImageType(1)
             .oauth2Provider(OAuth2Provider.KAKAO)
@@ -320,8 +320,8 @@ class UserControllerTest extends AuthenticationTestExtension {
 
         mockMvc.perform(multipart("/v1/api/users/signup")
                 .file(multipartFile)
-                .file(new MockMultipartFile("userSignUpRequestDto", "", "application/json",
-                    objectMapper.writeValueAsString(userSignUpRequestDto)
+                .file(new MockMultipartFile("userSignUpRequest", "", "application/json",
+                    objectMapper.writeValueAsString(userSignUpRequest)
                         .getBytes(StandardCharsets.UTF_8)))
                 .header("OIDC", "Bearer " + testToken))
             .andExpect(status().isOk())
@@ -330,16 +330,16 @@ class UserControllerTest extends AuthenticationTestExtension {
                 ),
                 requestParts(
                     partWithName("userProfileImage").description("프로필 이미지 [200 x 200].webp"),
-                    partWithName("userSignUpRequestDto").description("회원가입 입력 폼")
+                    partWithName("userSignUpRequest").description("회원가입 입력 폼")
                 ),
-                requestPartFields("userSignUpRequestDto",
+                requestPartFields("userSignUpRequest",
                     fieldWithPath("nickname").description("닉네임"),
                     fieldWithPath("defaultProfileImageType").optional().description("기본 이미지 타입"),
                     fieldWithPath("readingTastes").optional().description("독서 취향"),
                     fieldWithPath("oauth2Provider").description("프로바이더 타입[kakao/google]")
                 )));
 
-        verify(userService).registerNewUser(any(UserSignUpRequestDto.class),
+        verify(userService).registerNewUser(any(UserSignUpRequest.class),
             any(MultipartFile.class),
             anyString(),
             anyString());
@@ -415,7 +415,7 @@ class UserControllerTest extends AuthenticationTestExtension {
             .refreshToken("refreshToken")
             .build();
 
-        UserSignInRequestDto userSignInRequestDto = UserSignInRequestDto.builder()
+        UserSignInRequest userSignInRequest = UserSignInRequest.builder()
             .oauth2Provider(OAuth2Provider.KAKAO)
             .build();
 
@@ -424,7 +424,7 @@ class UserControllerTest extends AuthenticationTestExtension {
         MvcResult mvcResult = mockMvc.perform(post("/v1/api/users/signin")
                 .header("OIDC", "Bearer " + testToken)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(userSignInRequestDto)))
+                .content(objectMapper.writeValueAsString(userSignInRequest)))
             .andExpect(status().isOk())
             .andDo(document("user-signin",
                 requestHeaders(
@@ -541,14 +541,14 @@ class UserControllerTest extends AuthenticationTestExtension {
             .defaultProfileImageType(1)
             .build();
 
-        ChangeUserNicknameRequestDto changeUserNicknameRequestDto = new ChangeUserNicknameRequestDto(
+        ChangeUserNicknameRequest changeUserNicknameRequest = new ChangeUserNicknameRequest(
             "newNickname");
 
         mockMvc.perform(patch("/v1/api/user")
                 .header("Authorization", "Bearer " + getTestToken())
                 .with(user(getUserPrincipal()))
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(changeUserNicknameRequestDto)))
+                .content(objectMapper.writeValueAsString(changeUserNicknameRequest)))
             .andExpect(status().isOk())
             .andDo(document("patch-user-nickname",
                 requestHeaders(

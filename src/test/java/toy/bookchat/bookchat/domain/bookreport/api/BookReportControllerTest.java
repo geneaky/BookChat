@@ -37,7 +37,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
 import toy.bookchat.bookchat.domain.bookreport.BookReport;
 import toy.bookchat.bookchat.domain.bookreport.service.BookReportService;
-import toy.bookchat.bookchat.domain.bookreport.service.dto.request.WriteBookReportRequestDto;
+import toy.bookchat.bookchat.domain.bookreport.service.dto.request.WriteBookReportRequest;
 import toy.bookchat.bookchat.domain.bookreport.service.dto.response.BookReportResponse;
 import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.domain.user.User;
@@ -100,7 +100,7 @@ class BookReportControllerTest extends AuthenticationTestExtension {
     @Test
     void 다_읽은_책_독후감_작성_성공() throws Exception {
 
-        WriteBookReportRequestDto writeBookReportRequestDto = WriteBookReportRequestDto.builder()
+        WriteBookReportRequest writeBookReportRequest = WriteBookReportRequest.builder()
             .title("어렵지만 많이 배웠다")
             .content("요런 요런 내용, 저런저런 내용을 많이 배움")
             .build();
@@ -109,7 +109,7 @@ class BookReportControllerTest extends AuthenticationTestExtension {
                 .header("Authorization", "Bearer " + getTestToken())
                 .with(user(getUserPrincipal()))
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(writeBookReportRequestDto)))
+                .content(objectMapper.writeValueAsString(writeBookReportRequest)))
             .andExpect(status().isOk())
             .andDo(document("post-book-report",
                 requestHeaders(

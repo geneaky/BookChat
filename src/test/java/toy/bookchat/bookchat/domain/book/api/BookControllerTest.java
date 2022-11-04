@@ -40,11 +40,11 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
-import toy.bookchat.bookchat.domain.book.dto.request.BookSearchRequestDto;
-import toy.bookchat.bookchat.domain.book.dto.request.Meta;
-import toy.bookchat.bookchat.domain.book.dto.response.BookDto;
-import toy.bookchat.bookchat.domain.book.dto.response.BookSearchResponseDto;
 import toy.bookchat.bookchat.domain.book.service.BookSearchService;
+import toy.bookchat.bookchat.domain.book.service.dto.request.BookSearchRequest;
+import toy.bookchat.bookchat.domain.book.service.dto.request.Meta;
+import toy.bookchat.bookchat.domain.book.service.dto.response.BookResponse;
+import toy.bookchat.bookchat.domain.book.service.dto.response.BookSearchResponse;
 import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.exception.book.BookNotFoundException;
@@ -89,15 +89,15 @@ class BookControllerTest extends AuthenticationTestExtension {
         return UserPrincipal.create(tokenPayload);
     }
 
-    private BookDto getBookDto(String isbn, String title, List<String> author) {
-        BookDto bookDto = BookDto.builder()
+    private BookResponse getBookResponse(String isbn, String title, List<String> author) {
+        BookResponse bookResponse = BookResponse.builder()
             .isbn(isbn)
             .title(title)
             .author(author)
             .publisher("testPublisher")
             .bookCoverImageUrl("bookCoverImageUrl")
             .build();
-        return bookDto;
+        return bookResponse;
     }
 
     private String getTestToken()
@@ -126,7 +126,7 @@ class BookControllerTest extends AuthenticationTestExtension {
 
     @Test
     void 외부api_검색_요청_실패시_404() throws Exception {
-        when(bookSearchService.searchByQuery(any(BookSearchRequestDto.class))).thenThrow(
+        when(bookSearchService.searchByQuery(any(BookSearchRequest.class))).thenThrow(
             BookNotFoundException.class);
 
         mockMvc.perform(get("/v1/api/books")
@@ -147,8 +147,8 @@ class BookControllerTest extends AuthenticationTestExtension {
 
     @Test
     void 사용자가_isbn_검색시_paging_성공() throws Exception {
-        List<BookDto> bookDtos = new ArrayList<>();
-        bookDtos.add(getBookDto("213123", "effectiveJava", List.of("Joshua")));
+        List<BookResponse> bookResponses = new ArrayList<>();
+        bookResponses.add(getBookResponse("213123", "effectiveJava", List.of("Joshua")));
 
         Meta meta = Meta.builder()
             .total_count(5)
@@ -156,15 +156,15 @@ class BookControllerTest extends AuthenticationTestExtension {
             .is_end(false)
             .build();
 
-        BookSearchResponseDto bookSearchResponseDto = BookSearchResponseDto.builder()
-            .bookDtos(bookDtos)
+        BookSearchResponse bookSearchResponse = BookSearchResponse.builder()
+            .bookResponses(bookResponses)
             .meta(meta)
             .build();
 
-        when(bookSearchService.searchByQuery(any(BookSearchRequestDto.class))).thenReturn(
-            bookSearchResponseDto);
+        when(bookSearchService.searchByQuery(any(BookSearchRequest.class))).thenReturn(
+            bookSearchResponse);
 
-        String result = objectMapper.writeValueAsString(bookSearchResponseDto);
+        String result = objectMapper.writeValueAsString(bookSearchResponse);
 
         MvcResult mvcResult = mockMvc.perform(get("/v1/api/books")
                 .header("Authorization", "Bearer " + getTestToken())
@@ -182,18 +182,18 @@ class BookControllerTest extends AuthenticationTestExtension {
                     parameterWithName("page").description("한 번에 조회할 page 수"),
                     parameterWithName("sort").description("조회시 정렬 옵션")),
                 responseFields(
-                    fieldWithPath("bookDtos[].isbn").type(STRING).description("ISBN"),
-                    fieldWithPath("bookDtos[].title").type(STRING).description("제목"),
-                    fieldWithPath("bookDtos[].author[]").type(ARRAY).description("저자"),
-                    fieldWithPath("bookDtos[].publisher").type(STRING).description("출판사"),
-                    fieldWithPath("bookDtos[].bookCoverImageUrl").type(STRING)
+                    fieldWithPath("bookResponses[].isbn").type(STRING).description("ISBN"),
+                    fieldWithPath("bookResponses[].title").type(STRING).description("제목"),
+                    fieldWithPath("bookResponses[].author[]").type(ARRAY).description("저자"),
+                    fieldWithPath("bookResponses[].publisher").type(STRING).description("출판사"),
+                    fieldWithPath("bookResponses[].bookCoverImageUrl").type(STRING)
                         .description("책 표지 이미지"),
                     fieldWithPath("meta.is_end").type(BOOLEAN).description("마지막 페이지 여부"),
                     fieldWithPath("meta.pageable_count").type(NUMBER).description("가져온 페이지 수"),
                     fieldWithPath("meta.total_count").type(NUMBER).description("총 페이지 수")
                 ))).andReturn();
 
-        verify(bookSearchService).searchByQuery(any(BookSearchRequestDto.class));
+        verify(bookSearchService).searchByQuery(any(BookSearchRequest.class));
         assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo(result);
 
     }

@@ -19,8 +19,8 @@ import toy.bookchat.bookchat.domain.storage.StorageService;
 import toy.bookchat.bookchat.domain.storage.image.ImageValidator;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
-import toy.bookchat.bookchat.domain.user.service.dto.request.ChangeUserNicknameRequestDto;
-import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignUpRequestDto;
+import toy.bookchat.bookchat.domain.user.service.dto.request.ChangeUserNicknameRequest;
+import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignUpRequest;
 import toy.bookchat.bookchat.exception.user.UserAlreadySignUpException;
 import toy.bookchat.bookchat.exception.user.UserNotFoundException;
 
@@ -53,15 +53,15 @@ class UserServiceTest {
 
     @Test
     void 처음_가입하는_회원의_경우_회원가입_성공() throws Exception {
-        UserSignUpRequestDto userSignUpRequestDto = mock(UserSignUpRequestDto.class);
+        UserSignUpRequest userSignUpRequest = mock(UserSignUpRequest.class);
         User mockUser = mock(User.class);
         MultipartFile multipartFile = mock(MultipartFile.class);
 
         when(storageService.getFileUrl(any())).thenReturn("testBucketUrl");
         when(imageValidator.hasValidImage(any())).thenReturn(true);
-        when(userSignUpRequestDto.getUser(any(), any(), any())).thenReturn(mockUser);
+        when(userSignUpRequest.getUser(any(), any(), any())).thenReturn(mockUser);
 
-        userService.registerNewUser(userSignUpRequestDto, multipartFile, "memberNumber",
+        userService.registerNewUser(userSignUpRequest, multipartFile, "memberNumber",
             "test@gmail.com");
 
         verify(userRepository).save(any(User.class));
@@ -70,14 +70,14 @@ class UserServiceTest {
 
     @Test
     void 이미_가입된_사용자일경우_예외발생() throws Exception {
-        UserSignUpRequestDto userSignUpRequestDto = mock(UserSignUpRequestDto.class);
+        UserSignUpRequest userSignUpRequest = mock(UserSignUpRequest.class);
         User mockUser = mock(User.class);
         MultipartFile multipartFile = mock(MultipartFile.class);
 
         when(userRepository.findByName(any())).thenReturn(Optional.of(mockUser));
 
         assertThatThrownBy(() -> {
-            userService.registerNewUser(userSignUpRequestDto, multipartFile, "testMemberNumber",
+            userService.registerNewUser(userSignUpRequest, multipartFile, "testMemberNumber",
                 "test@gmail.com"
             );
         }).isInstanceOf(UserAlreadySignUpException.class);
@@ -108,11 +108,11 @@ class UserServiceTest {
             .nickname("user1")
             .build();
 
-        ChangeUserNicknameRequestDto changeUserNicknameRequestDto = new ChangeUserNicknameRequestDto(
+        ChangeUserNicknameRequest changeUserNicknameRequest = new ChangeUserNicknameRequest(
             "user2");
 
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-        userService.changeUserNickname(changeUserNicknameRequestDto, user.getId());
+        userService.changeUserNickname(changeUserNicknameRequest, user.getId());
 
         String nickname = user.getNickname();
         assertThat(nickname).isEqualTo("user2");

@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.domain.book.dto.request;
+package toy.bookchat.bookchat.domain.book.service.dto.request;
 
 import java.util.List;
 import lombok.AccessLevel;

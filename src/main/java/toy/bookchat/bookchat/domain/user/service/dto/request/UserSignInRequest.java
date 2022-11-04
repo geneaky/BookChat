@@ -10,14 +10,14 @@ import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class UserSignInRequestDto {
+public class UserSignInRequest {
 
     @NotNull
     @JsonProperty("oauth2Provider")
     private OAuth2Provider oauth2Provider;
 
     @Builder
-    public UserSignInRequestDto(OAuth2Provider oauth2Provider) {
+    public UserSignInRequest(OAuth2Provider oauth2Provider) {
         this.oauth2Provider = oauth2Provider;
     }
 }

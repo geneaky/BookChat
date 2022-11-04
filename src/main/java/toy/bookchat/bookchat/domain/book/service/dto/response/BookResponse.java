@@ -1,11 +1,11 @@
-package toy.bookchat.bookchat.domain.book.dto.response;
+package toy.bookchat.bookchat.domain.book.service.dto.response;
 
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class BookDto {
+public class BookResponse {
 
     private String isbn;
     private String title;
@@ -14,7 +14,7 @@ public class BookDto {
     private String bookCoverImageUrl;
 
     @Builder
-    private BookDto(String isbn, String title, List<String> author, String publisher,
+    private BookResponse(String isbn, String title, List<String> author, String publisher,
         String bookCoverImageUrl) {
         this.isbn = isbn;
         this.title = title;

@@ -21,11 +21,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import toy.bookchat.bookchat.domain.agony.Agony;
 import toy.bookchat.bookchat.domain.agony.AgonyRecord;
-import toy.bookchat.bookchat.exception.agony.AgonyNotFoundException;
 import toy.bookchat.bookchat.domain.agony.repository.AgonyRecordRepository;
 import toy.bookchat.bookchat.domain.agony.repository.AgonyRepository;
-import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateAgonyRecordRequestDto;
-import toy.bookchat.bookchat.domain.agony.service.dto.response.PageOfAgonyRecordsResponse;
+import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateAgonyRecordRequest;
+import toy.bookchat.bookchat.domain.agony.service.dto.response.BasePageOfAgonyRecordsResponse;
+import toy.bookchat.bookchat.exception.agony.AgonyNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class AgonyRecordServiceTest {
@@ -39,25 +39,25 @@ class AgonyRecordServiceTest {
 
     @Test
     void 고민에_고민기록_등록_성공() throws Exception {
-        CreateAgonyRecordRequestDto createAgonyRecordRequestDto = mock(
-            CreateAgonyRecordRequestDto.class);
+        CreateAgonyRecordRequest createAgonyRecordRequest = mock(
+            CreateAgonyRecordRequest.class);
         Agony agony = mock(Agony.class);
 
         when(agonyRepository.findUserBookShelfAgony(any(), any(), any())).thenReturn(
             Optional.of(agony));
 
-        agonyRecordService.storeAgonyRecord(createAgonyRecordRequestDto, 1L, 1L, 1L);
+        agonyRecordService.storeAgonyRecord(createAgonyRecordRequest, 1L, 1L, 1L);
 
         verify(agonyRecordRepository).save(any());
     }
 
     @Test
     void 본인이_생성한_고민없이_고민기록_등록시도시_예외발생() throws Exception {
-        CreateAgonyRecordRequestDto createAgonyRecordRequestDto = mock(
-            CreateAgonyRecordRequestDto.class);
+        CreateAgonyRecordRequest createAgonyRecordRequest = mock(
+            CreateAgonyRecordRequest.class);
 
         assertThatThrownBy(() -> {
-            agonyRecordService.storeAgonyRecord(createAgonyRecordRequestDto, 1L, 1L, 1L);
+            agonyRecordService.storeAgonyRecord(createAgonyRecordRequest, 1L, 1L, 1L);
         }).isInstanceOf(AgonyNotFoundException.class);
     }
 
@@ -83,7 +83,7 @@ class AgonyRecordServiceTest {
         when(agonyRecordRepository.findPageOfUserAgonyRecords(any(), any(), any(),
             any())).thenReturn(
             page);
-        PageOfAgonyRecordsResponse pageOfAgonyRecordsResponse = agonyRecordService.searchPageOfAgonyRecords(
+        BasePageOfAgonyRecordsResponse pageOfAgonyRecordsResponse = agonyRecordService.searchPageOfAgonyRecords(
             1L, 1L, 1L, pageable);
 
         int result = pageOfAgonyRecordsResponse.getAgonyRecordResponseList().size();

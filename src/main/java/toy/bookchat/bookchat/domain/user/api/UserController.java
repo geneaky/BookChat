@@ -22,9 +22,9 @@ import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.api.dto.Token;
 import toy.bookchat.bookchat.domain.user.api.dto.UserProfileResponse;
 import toy.bookchat.bookchat.domain.user.service.UserService;
-import toy.bookchat.bookchat.domain.user.service.dto.request.ChangeUserNicknameRequestDto;
-import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignInRequestDto;
-import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignUpRequestDto;
+import toy.bookchat.bookchat.domain.user.service.dto.request.ChangeUserNicknameRequest;
+import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignInRequest;
+import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignUpRequest;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenProvider;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenRecorder;
 import toy.bookchat.bookchat.security.token.openid.OpenIdTokenManager;
@@ -73,30 +73,30 @@ public class UserController {
 
     @PatchMapping("/user")
     public void changeUserNickName(
-        @Valid @RequestBody ChangeUserNicknameRequestDto changeUserNicknameRequestDto,
+        @Valid @RequestBody ChangeUserNicknameRequest changeUserNicknameRequest,
         @UserPayload TokenPayload tokenPayload) {
-        userService.changeUserNickname(changeUserNicknameRequestDto, tokenPayload.getUserId());
+        userService.changeUserNickname(changeUserNicknameRequest, tokenPayload.getUserId());
     }
 
     @PostMapping("/users/signup")
-    public void userSignUp(@Valid @RequestPart UserSignUpRequestDto userSignUpRequestDto,
+    public void userSignUp(@Valid @RequestPart UserSignUpRequest userSignUpRequest,
         @RequestPart(required = false) MultipartFile userProfileImage,
         @RequestHeader(OIDC) @NotBlank @Pattern(regexp = "^(Bearer)\\s.+") String bearerToken) {
         String oauth2MemberNumber = openIdTokenManager.getOAuth2MemberNumberFromToken(bearerToken,
-            userSignUpRequestDto.getOauth2Provider());
+            userSignUpRequest.getOauth2Provider());
         String userEmail = openIdTokenManager.getUserEmailFromToken(bearerToken,
-            userSignUpRequestDto.getOauth2Provider());
+            userSignUpRequest.getOauth2Provider());
 
-        userService.registerNewUser(userSignUpRequestDto, userProfileImage, oauth2MemberNumber,
+        userService.registerNewUser(userSignUpRequest, userProfileImage, oauth2MemberNumber,
             userEmail);
     }
 
     @PostMapping("/users/signin")
     public Token userSignIn(
         @RequestHeader(OIDC) @NotBlank @Pattern(regexp = "^(Bearer)\\s.+") String bearerToken,
-        @Valid @RequestBody UserSignInRequestDto userSignInRequestDto) {
+        @Valid @RequestBody UserSignInRequest userSignInRequest) {
         String userName = openIdTokenManager.getOAuth2MemberNumberFromToken(bearerToken,
-            userSignInRequestDto.getOauth2Provider());
+            userSignInRequest.getOauth2Provider());
         User user = userService.findUserByUsername(userName);
 
         Token token = jwtTokenProvider.createToken(user);

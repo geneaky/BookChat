@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import toy.bookchat.bookchat.domain.bookreport.service.BookReportService;
-import toy.bookchat.bookchat.domain.bookreport.service.dto.request.WriteBookReportRequestDto;
+import toy.bookchat.bookchat.domain.bookreport.service.dto.request.WriteBookReportRequest;
 import toy.bookchat.bookchat.domain.bookreport.service.dto.response.BookReportResponse;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPayload;
@@ -25,10 +25,10 @@ public class BookReportController {
 
     @PostMapping
     public void writeBookReport(
-        @Valid @RequestBody WriteBookReportRequestDto writeBookReportRequestDto,
+        @Valid @RequestBody WriteBookReportRequest writeBookReportRequest,
         @PathVariable Long bookId, @UserPayload TokenPayload tokenPayload) {
 
-        bookReportService.writeReport(writeBookReportRequestDto, bookId, tokenPayload.getUserId());
+        bookReportService.writeReport(writeBookReportRequest, bookId, tokenPayload.getUserId());
     }
 
     @GetMapping
