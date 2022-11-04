@@ -11,4 +11,7 @@ public interface AgonyRecordQueryRepository {
 
 
     void deleteAgony(Long userId, Long bookId, Long agonyId, Long recordId);
+
+    void reviseAgonyRecord(Long userId, Long bookId, Long agonyId, Long recordId,
+        String recordTitle, String recordContent);
 }

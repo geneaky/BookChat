@@ -91,7 +91,7 @@ public class AgonyController {
     }
 
     @PutMapping("/{agonyId}/records/{recordId}")
-    public void reviceAgonyRecord(@PathVariable Long bookId, @PathVariable Long agonyId,
+    public void reviseAgonyRecord(@PathVariable Long bookId, @PathVariable Long agonyId,
         @PathVariable Long recordId,
         @Valid @RequestBody ReviseAgonyRecordRequest reviseAgonyRecordRequest,
         @UserPayload TokenPayload tokenPayload) {
