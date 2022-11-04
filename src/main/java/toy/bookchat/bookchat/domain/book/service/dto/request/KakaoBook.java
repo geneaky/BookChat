@@ -1,12 +1,12 @@
-package toy.bookchat.bookchat.domain.book.dto.request;
+package toy.bookchat.bookchat.domain.book.service.dto.request;
 
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import toy.bookchat.bookchat.domain.book.dto.response.BookDto;
-import toy.bookchat.bookchat.domain.book.dto.response.BookSearchResponseDto;
+import toy.bookchat.bookchat.domain.book.service.dto.response.BookResponse;
+import toy.bookchat.bookchat.domain.book.service.dto.response.BookSearchResponse;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -15,20 +15,20 @@ public class KakaoBook {
     private List<Document> documents;
     private Meta meta;
 
-    public BookSearchResponseDto getBookSearchResponseDto() {
-        List<BookDto> bookDtos = new ArrayList<>();
-        fillBookDtosWithDocuments(bookDtos);
+    public BookSearchResponse getBookSearchResponse() {
+        List<BookResponse> bookResponses = new ArrayList<>();
+        fillBookResponsesWithDocuments(bookResponses);
 
-        return BookSearchResponseDto.builder()
-            .bookDtos(bookDtos)
+        return BookSearchResponse.builder()
+            .bookResponses(bookResponses)
             .meta(meta)
             .build();
     }
 
-    private void fillBookDtosWithDocuments(List<BookDto> bookDtos) {
+    private void fillBookResponsesWithDocuments(List<BookResponse> bookResponses) {
         for (Document document : documents) {
-            bookDtos.add(
-                BookDto.builder()
+            bookResponses.add(
+                BookResponse.builder()
                     .isbn(document.getIsbn())
                     .title(document.getTitle())
                     .author(document.getAuthors())

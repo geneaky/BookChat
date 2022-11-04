@@ -7,7 +7,7 @@ import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.api.dto.Token;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.exception.user.UserNotFoundException;
-import toy.bookchat.bookchat.security.token.dto.RefreshTokenRequestDto;
+import toy.bookchat.bookchat.security.token.dto.RefreshTokenRequest;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenManager;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenProvider;
 import toy.bookchat.bookchat.security.token.jwt.RefreshTokenRepository;
@@ -31,9 +31,9 @@ public class TokenService {
     }
 
     @Transactional
-    public Token generateToken(RefreshTokenRequestDto refreshTokenRequestDto) {
-        String accessToken = generateAccessToken(refreshTokenRequestDto);
-        String refreshToken = generateOrUsingDefaultRefreshToken(refreshTokenRequestDto);
+    public Token generateToken(RefreshTokenRequest refreshTokenRequest) {
+        String accessToken = generateAccessToken(refreshTokenRequest);
+        String refreshToken = generateOrUsingDefaultRefreshToken(refreshTokenRequest);
 
         return Token.builder()
             .accessToken(accessToken)
@@ -41,27 +41,27 @@ public class TokenService {
             .build();
     }
 
-    private String generateAccessToken(RefreshTokenRequestDto refreshTokenRequestDto) {
+    private String generateAccessToken(RefreshTokenRequest refreshTokenRequest) {
 
         return jwtTokenProvider.createAccessToken(
-            getUserFromRefreshToken(refreshTokenRequestDto));
+            getUserFromRefreshToken(refreshTokenRequest));
     }
 
     private String generateOrUsingDefaultRefreshToken(
-        RefreshTokenRequestDto refreshTokenRequestDto) {
-        String refreshToken = refreshTokenRequestDto.getRefreshToken();
+        RefreshTokenRequest refreshTokenRequest) {
+        String refreshToken = refreshTokenRequest.getRefreshToken();
 
         if (shouldBeRenew(refreshToken)) {
-            refreshToken = renewRefreshToken(refreshTokenRequestDto);
+            refreshToken = renewRefreshToken(refreshTokenRequest);
         }
 
         return refreshToken;
     }
 
-    private String renewRefreshToken(RefreshTokenRequestDto refreshTokenRequestDto) {
+    private String renewRefreshToken(RefreshTokenRequest refreshTokenRequest) {
         String refreshToken;
         refreshToken = jwtTokenProvider.createRefreshToken(
-            getUserFromRefreshToken(refreshTokenRequestDto));
+            getUserFromRefreshToken(refreshTokenRequest));
 
         refreshTokenRepository.findByUserId(jwtTokenManager.getUserIdFromToken(refreshToken))
             .orElseThrow(() -> {
@@ -76,9 +76,9 @@ public class TokenService {
         return jwtTokenManager.shouldRefreshTokenBeRenew(refreshToken);
     }
 
-    private User getUserFromRefreshToken(RefreshTokenRequestDto refreshTokenRequestDto) {
+    private User getUserFromRefreshToken(RefreshTokenRequest refreshTokenRequest) {
         return userRepository.findById(
-                jwtTokenManager.getUserIdFromToken(refreshTokenRequestDto.getRefreshToken()))
+                jwtTokenManager.getUserIdFromToken(refreshTokenRequest.getRefreshToken()))
             .orElseThrow(() -> {
                 throw new UserNotFoundException("Can't Find User");
             });

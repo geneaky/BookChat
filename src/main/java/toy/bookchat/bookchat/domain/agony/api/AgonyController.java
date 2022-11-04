@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import toy.bookchat.bookchat.domain.agony.service.AgonyRecordService;
 import toy.bookchat.bookchat.domain.agony.service.AgonyService;
-import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateAgonyRecordRequestDto;
-import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateBookAgonyRequestDto;
-import toy.bookchat.bookchat.domain.agony.service.dto.response.PageOfAgoniesResponse;
-import toy.bookchat.bookchat.domain.agony.service.dto.response.PageOfAgonyRecordsResponse;
+import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateAgonyRecordRequest;
+import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateBookAgonyRequest;
+import toy.bookchat.bookchat.domain.agony.service.dto.response.BasePageOfAgoniesResponse;
+import toy.bookchat.bookchat.domain.agony.service.dto.response.BasePageOfAgonyRecordsResponse;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPayload;
 
@@ -32,14 +32,15 @@ public class AgonyController {
 
     @PostMapping("/bookshelf/books/{bookId}/agonies")
     public void makeBookAgony(@PathVariable Long bookId,
-        @Valid @RequestBody CreateBookAgonyRequestDto createBookAgonyRequestDto,
+        @Valid @RequestBody CreateBookAgonyRequest createBookAgonyRequest,
         @UserPayload TokenPayload tokenPayload) {
 
-        agonyService.storeBookAgony(createBookAgonyRequestDto, tokenPayload.getUserId(), bookId);
+        agonyService.storeBookAgony(createBookAgonyRequest, tokenPayload.getUserId(), bookId);
     }
 
     @GetMapping("/bookshelf/books/{bookId}/agonies")
-    public PageOfAgoniesResponse searchPageOfAgonies(@PathVariable Long bookId, Pageable pageable,
+    public BasePageOfAgoniesResponse searchPageOfAgonies(@PathVariable Long bookId,
+        Pageable pageable,
         @UserPayload TokenPayload tokenPayload) {
 
         return agonyService.searchPageOfAgonies(bookId, tokenPayload.getUserId(), pageable);
@@ -47,16 +48,16 @@ public class AgonyController {
 
     @PostMapping("/bookshelf/books/{bookId}/agonies/{agonyId}/records")
     public void addAgonyRecordOnBookAgony(@PathVariable Long bookId, @PathVariable Long agonyId,
-        @Valid @RequestBody CreateAgonyRecordRequestDto createAgonyRecordRequestDto,
+        @Valid @RequestBody CreateAgonyRecordRequest createAgonyRecordRequest,
         @UserPayload TokenPayload tokenPayload) {
 
-        agonyRecordService.storeAgonyRecord(createAgonyRecordRequestDto, tokenPayload.getUserId(),
+        agonyRecordService.storeAgonyRecord(createAgonyRecordRequest, tokenPayload.getUserId(),
             bookId,
             agonyId);
     }
 
     @GetMapping("/bookshelf/books/{bookId}/agonies/{agonyId}/records")
-    public PageOfAgonyRecordsResponse getAgonyRecordsOnBookAgony(@PathVariable Long bookId,
+    public BasePageOfAgonyRecordsResponse getAgonyRecordsOnBookAgony(@PathVariable Long bookId,
         @PathVariable Long agonyId, @UserPayload TokenPayload tokenPayload, Pageable pageable) {
 
         return agonyRecordService.searchPageOfAgonyRecords(bookId, agonyId,

@@ -4,11 +4,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import toy.bookchat.bookchat.domain.agony.repository.AgonyRepository;
-import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateBookAgonyRequestDto;
-import toy.bookchat.bookchat.domain.agony.service.dto.response.PageOfAgoniesResponse;
-import toy.bookchat.bookchat.exception.book.BookNotFoundException;
+import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateBookAgonyRequest;
+import toy.bookchat.bookchat.domain.agony.service.dto.response.BasePageOfAgoniesResponse;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
+import toy.bookchat.bookchat.exception.book.BookNotFoundException;
 
 @Service
 public class AgonyService {
@@ -24,7 +24,7 @@ public class AgonyService {
     }
 
     @Transactional
-    public void storeBookAgony(CreateBookAgonyRequestDto createBookAgonyRequestDto, Long userId,
+    public void storeBookAgony(CreateBookAgonyRequest createBookAgonyRequest, Long userId,
         Long bookId) {
 
         BookShelf bookShelf = bookShelfRepository.findByUserIdAndBookId(userId, bookId)
@@ -32,12 +32,13 @@ public class AgonyService {
                 throw new BookNotFoundException("Not Registered Book");
             });
 
-        agonyRepository.save(createBookAgonyRequestDto.getAgony(bookShelf));
+        agonyRepository.save(createBookAgonyRequest.getAgony(bookShelf));
     }
 
     @Transactional(readOnly = true)
-    public PageOfAgoniesResponse searchPageOfAgonies(Long bookId, Long userId, Pageable pageable) {
-        return new PageOfAgoniesResponse(
+    public BasePageOfAgoniesResponse searchPageOfAgonies(Long bookId, Long userId,
+        Pageable pageable) {
+        return new BasePageOfAgoniesResponse(
             agonyRepository.findUserBookShelfPageOfAgonies(bookId, userId, pageable));
     }
 }

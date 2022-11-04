@@ -96,8 +96,8 @@ include::{snippets}/user-signup/request-headers.adoc[]
 
 ****
 include::{snippets}/user-signup/request-parts.adoc[]
-`userSignUpRequestDto`
-include::{snippets}/user-signup/request-part-userSignUpRequestDto-fields.adoc[]
+`userSignUpRequest`
+include::{snippets}/user-signup/request-part-userSignUpRequest-fields.adoc[]
 ****
 include::{snippets}/user-signup/http-request.adoc[]
 
@@ -367,6 +367,7 @@ include::{snippets}/post-book-report/request-headers.adoc[]
 
 `Request`
 
+include::{snippets}/post-book-report/path-parameters.adoc[]
 include::{snippets}/post-book-report/request-fields.adoc[]
 include::{snippets}/post-book-report/http-request.adoc[]
 
@@ -375,6 +376,22 @@ include::{snippets}/post-book-report/http-request.adoc[]
 include::{snippets}/post-book-report/http-response.adoc[]
 
 ---
+
+=== 독후감 조회
+
+`Request Header`
+
+include::{snippets}/get-book-report/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/get-book-report/path-parameters.adoc[]
+include::{snippets}/get-book-report/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/get-book-report/response-fields.adoc[]
+include::{snippets}/get-book-report/http-response.adoc[]
 
 == 고민
 

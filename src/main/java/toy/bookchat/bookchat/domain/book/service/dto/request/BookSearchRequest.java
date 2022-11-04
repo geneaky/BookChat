@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.domain.book.dto.request;
+package toy.bookchat.bookchat.domain.book.service.dto.request;
 
 import java.util.Optional;
 import javax.validation.constraints.NotBlank;
@@ -10,7 +10,7 @@ import toy.bookchat.bookchat.domain.book.service.BookSearchSort;
 
 @Getter
 @Setter(AccessLevel.PRIVATE)
-public class BookSearchRequestDto {
+public class BookSearchRequest {
 
     @NotBlank
     private String query;
@@ -19,7 +19,7 @@ public class BookSearchRequestDto {
     private BookSearchSort sort;
 
     @Builder
-    private BookSearchRequestDto(String query, Integer size, Integer page,
+    private BookSearchRequest(String query, Integer size, Integer page,
         BookSearchSort sort) {
         this.query = query;
         this.size = size;

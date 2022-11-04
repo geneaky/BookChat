@@ -24,10 +24,10 @@ import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.Star;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookShelfRequestDto;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeBookStatusRequestDto;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeReadingBookPageRequestDto;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.SearchBookShelfByReadingStatusDto;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookShelfRequest;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeBookStatusRequest;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeReadingBookPageRequest;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.SearchBookShelfByReadingStatus;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.exception.book.BookNotFoundException;
@@ -59,9 +59,9 @@ class BookShelfServiceTest {
             .build();
     }
 
-    private BookShelfRequestDto getBookShelfRequestDto(ReadingStatus readingStatus) {
+    private BookShelfRequest getBookShelfRequest(ReadingStatus readingStatus) {
         if (readingStatus == ReadingStatus.COMPLETE) {
-            return BookShelfRequestDto.builder()
+            return BookShelfRequest.builder()
                 .isbn("12345")
                 .title("testBook")
                 .authors(List.of("test Author"))
@@ -72,7 +72,7 @@ class BookShelfServiceTest {
                 .singleLineAssessment("very good")
                 .build();
         }
-        return BookShelfRequestDto.builder()
+        return BookShelfRequest.builder()
             .isbn("12345")
             .title("testBook")
             .authors(List.of("test Author"))
@@ -84,14 +84,14 @@ class BookShelfServiceTest {
 
     @Test
     void 내부에_등록된_책을_책장에_저장() throws Exception {
-        BookShelfRequestDto bookShelfRequestDto = getBookShelfRequestDto(ReadingStatus.READING);
+        BookShelfRequest bookShelfRequest = getBookShelfRequest(ReadingStatus.READING);
         Book book = getBook();
 
-        when(bookRepository.findByIsbn(bookShelfRequestDto.getIsbn())).thenReturn(
+        when(bookRepository.findByIsbn(bookShelfRequest.getIsbn())).thenReturn(
             Optional.of(book));
         when(userRepository.findById(any())).thenReturn(Optional.of(mock(User.class)));
 
-        bookShelfService.putBookOnBookShelf(bookShelfRequestDto, 1L);
+        bookShelfService.putBookOnBookShelf(bookShelfRequest, 1L);
 
         verify(bookShelfRepository).save(any(BookShelf.class));
     }
@@ -99,11 +99,11 @@ class BookShelfServiceTest {
 
     @Test
     void 내부에_등록되지_않은_책을_책장에_저장() throws Exception {
-        BookShelfRequestDto bookShelfRequestDto = getBookShelfRequestDto(ReadingStatus.READING);
+        BookShelfRequest bookShelfRequest = getBookShelfRequest(ReadingStatus.READING);
 
-        when(bookRepository.findByIsbn(bookShelfRequestDto.getIsbn())).thenReturn(Optional.empty());
+        when(bookRepository.findByIsbn(bookShelfRequest.getIsbn())).thenReturn(Optional.empty());
         when(userRepository.findById(any())).thenReturn(Optional.of(mock(User.class)));
-        bookShelfService.putBookOnBookShelf(bookShelfRequestDto, 1L);
+        bookShelfService.putBookOnBookShelf(bookShelfRequest, 1L);
 
         verify(bookRepository).save(any(Book.class));
         verify(bookShelfRepository).save(any(BookShelf.class));
@@ -111,21 +111,21 @@ class BookShelfServiceTest {
 
     @Test
     void 읽은_책_저장_성공() throws Exception {
-        BookShelfRequestDto bookShelfRequestDto = getBookShelfRequestDto(ReadingStatus.COMPLETE);
+        BookShelfRequest bookShelfRequest = getBookShelfRequest(ReadingStatus.COMPLETE);
         Book book = getBook();
 
         when(bookRepository.findByIsbn(any())).thenReturn(
             Optional.of(book));
         when(userRepository.findById(any())).thenReturn(Optional.of(mock(User.class)));
 
-        bookShelfService.putBookOnBookShelf(bookShelfRequestDto, 1L);
+        bookShelfService.putBookOnBookShelf(bookShelfRequest, 1L);
 
         verify(bookShelfRepository).save(any(BookShelf.class));
     }
 
     @Test
     void 읽은_책_저장시_평점과_한줄평이_없으면_예외발생() throws Exception {
-        BookShelfRequestDto bookShelfRequestDto = BookShelfRequestDto.builder()
+        BookShelfRequest bookShelfRequest = BookShelfRequest.builder()
             .isbn("12345")
             .title("testBook")
             .authors(List.of("test Author"))
@@ -134,12 +134,12 @@ class BookShelfServiceTest {
             .readingStatus(ReadingStatus.COMPLETE)
             .build();
 
-        when(bookRepository.findByIsbn(bookShelfRequestDto.getIsbn())).thenReturn(Optional.empty());
+        when(bookRepository.findByIsbn(bookShelfRequest.getIsbn())).thenReturn(Optional.empty());
         when(userRepository.findById(any())).thenReturn(Optional.of(mock(User.class)));
 
         User user = getUser();
         Assertions.assertThatThrownBy(() -> {
-            bookShelfService.putBookOnBookShelf(bookShelfRequestDto, user.getId());
+            bookShelfService.putBookOnBookShelf(bookShelfRequest, user.getId());
         }).isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -168,13 +168,13 @@ class BookShelfServiceTest {
 
         when(bookShelfRepository.findSpecificStatusBookByUserId(any(), any(), any())).thenReturn(
             bookShelves);
-        SearchBookShelfByReadingStatusDto searchBookShelfByReadingStatusDto = bookShelfService.takeBooksOutOfBookShelf(
+        SearchBookShelfByReadingStatus searchBookShelfByReadingStatus = bookShelfService.takeBooksOutOfBookShelf(
             ReadingStatus.READING, pageable, user.getId());
 
         verify(bookShelfRepository).findSpecificStatusBookByUserId(ReadingStatus.READING,
             pageable, user.getId());
 
-        assertThat(searchBookShelfByReadingStatusDto.getContents().get(0).getIsbn()).isEqualTo(
+        assertThat(searchBookShelfByReadingStatus.getContents().get(0).getIsbn()).isEqualTo(
             "1234");
     }
 
@@ -204,13 +204,13 @@ class BookShelfServiceTest {
         when(bookShelfRepository.findSpecificStatusBookByUserId(any(), any(), any())).thenReturn(
             bookShelves);
 
-        SearchBookShelfByReadingStatusDto searchBookShelfByReadingStatusDto = bookShelfService.takeBooksOutOfBookShelf(
+        SearchBookShelfByReadingStatus searchBookShelfByReadingStatus = bookShelfService.takeBooksOutOfBookShelf(
             ReadingStatus.COMPLETE, pageable, user.getId());
 
         verify(bookShelfRepository).findSpecificStatusBookByUserId(ReadingStatus.COMPLETE,
             pageable, user.getId());
 
-        assertThat(searchBookShelfByReadingStatusDto.getContents().get(0).getIsbn()).isEqualTo(
+        assertThat(searchBookShelfByReadingStatus.getContents().get(0).getIsbn()).isEqualTo(
             "1234");
     }
 
@@ -238,19 +238,19 @@ class BookShelfServiceTest {
         when(bookShelfRepository.findSpecificStatusBookByUserId(any(), any(), any())).thenReturn(
             bookShelves);
 
-        SearchBookShelfByReadingStatusDto searchBookShelfByReadingStatusDto = bookShelfService.takeBooksOutOfBookShelf(
+        SearchBookShelfByReadingStatus searchBookShelfByReadingStatus = bookShelfService.takeBooksOutOfBookShelf(
             ReadingStatus.WISH, pageable, user.getId());
 
         verify(bookShelfRepository).findSpecificStatusBookByUserId(ReadingStatus.WISH,
             pageable, user.getId());
 
-        assertThat(searchBookShelfByReadingStatusDto.getContents().get(0).getIsbn()).isEqualTo(
+        assertThat(searchBookShelfByReadingStatus.getContents().get(0).getIsbn()).isEqualTo(
             "1234");
     }
 
     @Test
     void 읽고있는_책_현재쪽수_업데이트_성공() throws Exception {
-        ChangeReadingBookPageRequestDto changeReadingBookPageRequestDto = new ChangeReadingBookPageRequestDto(
+        ChangeReadingBookPageRequest changeReadingBookPageRequest = new ChangeReadingBookPageRequest(
             123);
 
         User user = getUser();
@@ -276,7 +276,7 @@ class BookShelfServiceTest {
         when(bookShelfRepository.findReadingBookByUserIdAndBookId(any(), any())).thenReturn(
             bookShelf);
 
-        bookShelfService.changeReadingBookPage(changeReadingBookPageRequestDto, user.getId(),
+        bookShelfService.changeReadingBookPage(changeReadingBookPageRequest, user.getId(),
             book.getId());
 
         Integer result = bookShelf.getPages();
@@ -325,7 +325,7 @@ class BookShelfServiceTest {
             Optional.of(bookShelf));
 
         bookShelfService.changeBookStatusOnBookShelf(
-            new ChangeBookStatusRequestDto(ReadingStatus.READING), user.getId(), book.getId());
+            new ChangeBookStatusRequest(ReadingStatus.READING), user.getId(), book.getId());
 
         ReadingStatus readingStatus = bookShelf.getReadingStatus();
         assertThat(readingStatus).isEqualTo(ReadingStatus.READING);
@@ -346,7 +346,7 @@ class BookShelfServiceTest {
 
         assertThatThrownBy(() -> {
             bookShelfService.changeBookStatusOnBookShelf(
-                new ChangeBookStatusRequestDto(ReadingStatus.READING), user.getId(), book.getId());
+                new ChangeBookStatusRequest(ReadingStatus.READING), user.getId(), book.getId());
         }).isInstanceOf(BookNotFoundException.class);
     }
 }

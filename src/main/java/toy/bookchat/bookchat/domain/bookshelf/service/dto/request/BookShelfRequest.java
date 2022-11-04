@@ -15,7 +15,7 @@ import toy.bookchat.bookchat.domain.bookshelf.Star;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class BookShelfRequestDto {
+public class BookShelfRequest {
 
     @NotBlank
     private String isbn;
@@ -43,7 +43,7 @@ public class BookShelfRequestDto {
     }
 
     @Builder
-    private BookShelfRequestDto(String isbn, String title,
+    private BookShelfRequest(String isbn, String title,
         List<@NotBlank String> authors, String publisher, String bookCoverImageUrl,
         ReadingStatus readingStatus, Star star, String singleLineAssessment) {
         this.isbn = isbn;

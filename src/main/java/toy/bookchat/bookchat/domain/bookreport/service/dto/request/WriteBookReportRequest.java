@@ -1,7 +1,6 @@
 package toy.bookchat.bookchat.domain.bookreport.service.dto.request;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,10 +10,8 @@ import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class WriteBookReportRequestDto {
+public class WriteBookReportRequest {
 
-    @NotNull
-    private Long bookShelfId;
     @NotBlank
     private String title;
     @NotBlank
@@ -29,8 +26,7 @@ public class WriteBookReportRequestDto {
     }
 
     @Builder
-    private WriteBookReportRequestDto(Long bookShelfId, String title, String content) {
-        this.bookShelfId = bookShelfId;
+    private WriteBookReportRequest(String title, String content) {
         this.title = title;
         this.content = content;
     }

@@ -6,11 +6,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import toy.bookchat.bookchat.domain.agony.Agony;
 import toy.bookchat.bookchat.domain.agony.AgonyRecord;
-import toy.bookchat.bookchat.exception.agony.AgonyNotFoundException;
 import toy.bookchat.bookchat.domain.agony.repository.AgonyRecordRepository;
 import toy.bookchat.bookchat.domain.agony.repository.AgonyRepository;
-import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateAgonyRecordRequestDto;
-import toy.bookchat.bookchat.domain.agony.service.dto.response.PageOfAgonyRecordsResponse;
+import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateAgonyRecordRequest;
+import toy.bookchat.bookchat.domain.agony.service.dto.response.BasePageOfAgonyRecordsResponse;
+import toy.bookchat.bookchat.exception.agony.AgonyNotFoundException;
 
 @Service
 public class AgonyRecordService {
@@ -25,21 +25,21 @@ public class AgonyRecordService {
     }
 
     @Transactional
-    public void storeAgonyRecord(CreateAgonyRecordRequestDto createAgonyRecordRequestDto,
+    public void storeAgonyRecord(CreateAgonyRecordRequest createAgonyRecordRequest,
         Long userId,
         Long bookId, Long agonyId) {
         Agony agony = agonyRepository.findUserBookShelfAgony(userId, bookId, agonyId)
             .orElseThrow(() -> {
                 throw new AgonyNotFoundException("Agony is not registered");
             });
-        agonyRecordRepository.save(createAgonyRecordRequestDto.generateAgonyRecord(agony));
+        agonyRecordRepository.save(createAgonyRecordRequest.generateAgonyRecord(agony));
     }
 
     @Transactional(readOnly = true)
-    public PageOfAgonyRecordsResponse searchPageOfAgonyRecords(Long bookId, Long agonyId,
+    public BasePageOfAgonyRecordsResponse searchPageOfAgonyRecords(Long bookId, Long agonyId,
         Long userId, Pageable pageable) {
         Page<AgonyRecord> agonyRecordPage = agonyRecordRepository.findPageOfUserAgonyRecords(bookId,
             agonyId, userId, pageable);
-        return new PageOfAgonyRecordsResponse(agonyRecordPage);
+        return new BasePageOfAgonyRecordsResponse(agonyRecordPage);
     }
 }

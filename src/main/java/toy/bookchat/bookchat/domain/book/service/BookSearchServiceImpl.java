@@ -12,9 +12,9 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import toy.bookchat.bookchat.domain.book.dto.request.BookSearchRequestDto;
-import toy.bookchat.bookchat.domain.book.dto.request.KakaoBook;
-import toy.bookchat.bookchat.domain.book.dto.response.BookSearchResponseDto;
+import toy.bookchat.bookchat.domain.book.service.dto.request.BookSearchRequest;
+import toy.bookchat.bookchat.domain.book.service.dto.request.KakaoBook;
+import toy.bookchat.bookchat.domain.book.service.dto.response.BookSearchResponse;
 import toy.bookchat.bookchat.exception.book.BookNotFoundException;
 
 @Service
@@ -36,18 +36,18 @@ public class BookSearchServiceImpl implements BookSearchService {
     }
 
     @Override
-    public BookSearchResponseDto searchByQuery(BookSearchRequestDto bookSearchRequestDto) {
-        return fetchBooks(bookSearchRequestDto);
+    public BookSearchResponse searchByQuery(BookSearchRequest bookSearchRequest) {
+        return fetchBooks(bookSearchRequest);
     }
 
 
-    private BookSearchResponseDto fetchBooks(BookSearchRequestDto bookSearchRequestDto) {
+    private BookSearchResponse fetchBooks(BookSearchRequest bookSearchRequest) {
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder
             .fromUri(URI.create(apiUri))
-            .queryParam(QUERY, bookSearchRequestDto.getQuery())
-            .queryParamIfPresent(PAGE, bookSearchRequestDto.getPage())
-            .queryParamIfPresent(SIZE, bookSearchRequestDto.getSize())
-            .queryParamIfPresent(SORT, bookSearchRequestDto.getSort());
+            .queryParam(QUERY, bookSearchRequest.getQuery())
+            .queryParamIfPresent(PAGE, bookSearchRequest.getPage())
+            .queryParamIfPresent(SIZE, bookSearchRequest.getSize())
+            .queryParamIfPresent(SORT, bookSearchRequest.getSort());
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.set(AUTHORIZATION, header);
@@ -62,7 +62,7 @@ public class BookSearchServiceImpl implements BookSearchService {
             httpEntity, KakaoBook.class).getBody();
 
         if (Optional.ofNullable(kakaoBook).isPresent()) {
-            return kakaoBook.getBookSearchResponseDto();
+            return kakaoBook.getBookSearchResponse();
         }
 
         throw new BookNotFoundException("can't find book");

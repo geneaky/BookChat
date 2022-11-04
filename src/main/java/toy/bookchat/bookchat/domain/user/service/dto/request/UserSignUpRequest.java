@@ -15,7 +15,7 @@ import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class UserSignUpRequestDto {
+public class UserSignUpRequest {
 
     @NotBlank
     private String nickname;
@@ -42,7 +42,7 @@ public class UserSignUpRequestDto {
     }
 
     @Builder
-    private UserSignUpRequestDto(String nickname, List<ReadingTaste> readingTastes,
+    private UserSignUpRequest(String nickname, List<ReadingTaste> readingTastes,
         Integer defaultProfileImageType, OAuth2Provider oauth2Provider) {
         this.nickname = nickname;
         this.readingTastes = readingTastes;

@@ -11,8 +11,8 @@ import toy.bookchat.bookchat.domain.storage.StorageService;
 import toy.bookchat.bookchat.domain.storage.image.ImageValidator;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
-import toy.bookchat.bookchat.domain.user.service.dto.request.ChangeUserNicknameRequestDto;
-import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignUpRequestDto;
+import toy.bookchat.bookchat.domain.user.service.dto.request.ChangeUserNicknameRequest;
+import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignUpRequest;
 import toy.bookchat.bookchat.exception.user.UserAlreadySignUpException;
 import toy.bookchat.bookchat.exception.user.UserNotFoundException;
 
@@ -36,19 +36,19 @@ public class UserService {
     }
 
     @Transactional
-    public void registerNewUser(UserSignUpRequestDto userSignUpRequestDto,
+    public void registerNewUser(UserSignUpRequest userSignUpRequest,
         MultipartFile userProfileImage, String userName, String userEmail) {
         if (imageValidator.hasValidImage(userProfileImage)) {
             String prefixedUUIDFileName = createFileName(userProfileImage);
             String prefixedUUIDFileUrl = createFileUrl(prefixedUUIDFileName);
 
-            saveUser(userSignUpRequestDto, userName, userEmail, prefixedUUIDFileUrl);
+            saveUser(userSignUpRequest, userName, userEmail, prefixedUUIDFileUrl);
 
             storageService.upload(userProfileImage, prefixedUUIDFileName);
             return;
         }
 
-        saveUser(userSignUpRequestDto, userName, userEmail, null);
+        saveUser(userSignUpRequest, userName, userEmail, null);
     }
 
     private String createFileUrl(String prefixedUUIDFileName) {
@@ -76,21 +76,21 @@ public class UserService {
     }
 
     @Transactional
-    public void changeUserNickname(ChangeUserNicknameRequestDto changeUserNicknameRequestDto,
+    public void changeUserNickname(ChangeUserNicknameRequest changeUserNicknameRequest,
         Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> {
             throw new UserNotFoundException("Can't find User");
         });
-        user.changeUserNickname(changeUserNicknameRequestDto.getNickname());
+        user.changeUserNickname(changeUserNicknameRequest.getNickname());
     }
 
-    private void saveUser(UserSignUpRequestDto userSignUpRequestDto, String userName,
+    private void saveUser(UserSignUpRequest userSignUpRequest, String userName,
         String email, String profileImageUrl) {
         Optional<User> optionalUser = userRepository.findByName(userName);
         optionalUser.ifPresentOrElse(u -> {
             throw new UserAlreadySignUpException("user already sign up");
         }, () -> {
-            User user = userSignUpRequestDto.getUser(userName, email, profileImageUrl);
+            User user = userSignUpRequest.getUser(userName, email, profileImageUrl);
             userRepository.save(user);
         });
     }

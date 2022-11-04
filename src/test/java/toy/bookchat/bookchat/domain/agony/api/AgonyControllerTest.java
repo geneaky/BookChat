@@ -47,10 +47,10 @@ import toy.bookchat.bookchat.domain.agony.Agony;
 import toy.bookchat.bookchat.domain.agony.AgonyRecord;
 import toy.bookchat.bookchat.domain.agony.service.AgonyRecordService;
 import toy.bookchat.bookchat.domain.agony.service.AgonyService;
-import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateAgonyRecordRequestDto;
-import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateBookAgonyRequestDto;
-import toy.bookchat.bookchat.domain.agony.service.dto.response.PageOfAgoniesResponse;
-import toy.bookchat.bookchat.domain.agony.service.dto.response.PageOfAgonyRecordsResponse;
+import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateAgonyRecordRequest;
+import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateBookAgonyRequest;
+import toy.bookchat.bookchat.domain.agony.service.dto.response.BasePageOfAgoniesResponse;
+import toy.bookchat.bookchat.domain.agony.service.dto.response.BasePageOfAgonyRecordsResponse;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.domain.user.User;
@@ -132,13 +132,13 @@ class AgonyControllerTest extends AuthenticationTestExtension {
 
     @Test
     void 고민_생성_성공() throws Exception {
-        CreateBookAgonyRequestDto createBookAgonyRequestDto = new CreateBookAgonyRequestDto("title",
+        CreateBookAgonyRequest createBookAgonyRequest = new CreateBookAgonyRequest("title",
             "#062498");
         mockMvc.perform(post("/v1/api/bookshelf/books/{bookId}/agonies", 1)
                 .header("Authorization", "Bearer " + getTestToken())
                 .with(user(getUserPrincipal()))
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(createBookAgonyRequestDto)))
+                .content(objectMapper.writeValueAsString(createBookAgonyRequest)))
             .andExpect(status().isOk())
             .andDo(document("post-agony",
                 requestHeaders(
@@ -157,14 +157,14 @@ class AgonyControllerTest extends AuthenticationTestExtension {
 
     @Test
     void 생성된_고민에_고민기록_추가_성공() throws Exception {
-        CreateAgonyRecordRequestDto createAgonyRecordRequestDto = new CreateAgonyRecordRequestDto(
+        CreateAgonyRecordRequest createAgonyRecordRequest = new CreateAgonyRecordRequest(
             "title", "blabla");
 
         mockMvc.perform(post("/v1/api/bookshelf/books/{bookId}/agonies/{agonyId}/records", 1, 1)
                 .header("Authorization", "Bearer " + getTestToken())
                 .with(user(getUserPrincipal()))
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(createAgonyRecordRequestDto)))
+                .content(objectMapper.writeValueAsString(createAgonyRecordRequest)))
             .andExpect(status().isOk())
             .andDo(document("post-agonyrecord",
                 requestHeaders(
@@ -188,7 +188,7 @@ class AgonyControllerTest extends AuthenticationTestExtension {
         List<Agony> agonies = getAgonies();
         PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("id").descending());
         Page<Agony> page = new PageImpl<>(agonies, pageRequest, 1);
-        PageOfAgoniesResponse pageOfAgoniesResponse = new PageOfAgoniesResponse(page);
+        BasePageOfAgoniesResponse pageOfAgoniesResponse = new BasePageOfAgoniesResponse(page);
         when(agonyService.searchPageOfAgonies(any(), any(), any())).thenReturn(
             pageOfAgoniesResponse);
         mockMvc.perform(get("/v1/api/bookshelf/books/{bookId}/agonies", 1)
@@ -246,7 +246,7 @@ class AgonyControllerTest extends AuthenticationTestExtension {
         List<AgonyRecord> list = List.of(agonyRecord1, agonyRecord2);
         PageRequest pageRequest = PageRequest.of(0, 3, Sort.by("id").descending());
         Page<AgonyRecord> page = new PageImpl<>(list, pageRequest, list.size());
-        PageOfAgonyRecordsResponse pageOfAgonyRecordsResponse = new PageOfAgonyRecordsResponse(
+        BasePageOfAgonyRecordsResponse pageOfAgonyRecordsResponse = new BasePageOfAgonyRecordsResponse(
             page);
 
         when(agonyRecordService.searchPageOfAgonyRecords(any(), any(), any(), any())).thenReturn(

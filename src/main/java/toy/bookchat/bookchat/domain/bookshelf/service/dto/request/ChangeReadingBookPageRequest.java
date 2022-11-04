@@ -7,12 +7,12 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class ChangeReadingBookPageRequestDto {
+public class ChangeReadingBookPageRequest {
 
     @NotNull
     private Integer pages;
 
-    public ChangeReadingBookPageRequestDto(Integer pages) {
+    public ChangeReadingBookPageRequest(Integer pages) {
         this.pages = pages;
     }
 }

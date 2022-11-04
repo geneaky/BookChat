@@ -2,14 +2,18 @@ package toy.bookchat.bookchat.domain.bookreport.api;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
-import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static toy.bookchat.bookchat.domain.user.ROLE.USER;
@@ -17,6 +21,7 @@ import static toy.bookchat.bookchat.domain.user.ROLE.USER;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,8 +35,10 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
+import toy.bookchat.bookchat.domain.bookreport.BookReport;
 import toy.bookchat.bookchat.domain.bookreport.service.BookReportService;
-import toy.bookchat.bookchat.domain.bookreport.service.dto.request.WriteBookReportRequestDto;
+import toy.bookchat.bookchat.domain.bookreport.service.dto.request.WriteBookReportRequest;
+import toy.bookchat.bookchat.domain.bookreport.service.dto.response.BookReportResponse;
 import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.security.SecurityConfig;
@@ -93,28 +100,57 @@ class BookReportControllerTest extends AuthenticationTestExtension {
     @Test
     void 다_읽은_책_독후감_작성_성공() throws Exception {
 
-        WriteBookReportRequestDto writeBookReportRequestDto = WriteBookReportRequestDto.builder()
-            .bookShelfId(1L)
+        WriteBookReportRequest writeBookReportRequest = WriteBookReportRequest.builder()
             .title("어렵지만 많이 배웠다")
             .content("요런 요런 내용, 저런저런 내용을 많이 배움")
             .build();
 
-        mockMvc.perform(post("/v1/api/bookreports")
+        mockMvc.perform(post("/v1/api/books/{bookId}/report", 1L)
                 .header("Authorization", "Bearer " + getTestToken())
                 .with(user(getUserPrincipal()))
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(writeBookReportRequestDto)))
+                .content(objectMapper.writeValueAsString(writeBookReportRequest)))
             .andExpect(status().isOk())
             .andDo(document("post-book-report",
                 requestHeaders(
                     headerWithName("Authorization").description("Bearer [JWT token]")
                 ),
+                pathParameters(
+                    parameterWithName("bookId").description("Book Id")
+                ),
                 requestFields(
-                    fieldWithPath("bookShelfId").type(NUMBER).description("Book Shelf Id"),
                     fieldWithPath("title").type(STRING).description("독후감 제목"),
                     fieldWithPath("content").type(STRING).description("독후감 내용")
                 )));
 
-        verify(bookReportService).writeReport(any(), any());
+        verify(bookReportService).writeReport(any(), any(), any());
+    }
+
+    @Test
+    void 읽은책_독후감_조회_성공() throws Exception {
+
+        BookReport bookReport = BookReport.builder()
+            .title("재미있네")
+            .content("다 읽은 후기 알려드립니다")
+            .build();
+        bookReport.setCreatedAt(LocalDateTime.now());
+        BookReportResponse bookReportResponse = BookReportResponse.from(bookReport);
+        when(bookReportService.getBookReportResponse(any(), any())).thenReturn(bookReportResponse);
+        mockMvc.perform(get("/v1/api/books/{bookId}/report", 1L)
+                .header("Authorization", "Bearer " + getTestToken())
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isOk())
+            .andDo(document("get-book-report",
+                requestHeaders(
+                    headerWithName("Authorization").description("Bearer [JWT token]")
+                ),
+                pathParameters(
+                    parameterWithName("bookId").description("Book Id")
+                ),
+                responseFields(
+                    fieldWithPath("reportTitle").type(STRING).description("독후감 제목"),
+                    fieldWithPath("reportContent").type(STRING).description("독후감 내용"),
+                    fieldWithPath("reportCreatedAt").type(STRING).description("독후감 작성 시간")
+                )));
     }
 }

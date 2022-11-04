@@ -6,7 +6,7 @@ import lombok.Getter;
 import toy.bookchat.bookchat.domain.bookshelf.Star;
 
 @Getter
-public class BookShelfResponseDto {
+public class BookShelfResponse {
 
     private Long bookId;
     private String title;
@@ -19,7 +19,7 @@ public class BookShelfResponseDto {
     private Integer pages;
 
     @Builder
-    private BookShelfResponseDto(Long bookId, String title, String isbn,
+    private BookShelfResponse(Long bookId, String title, String isbn,
         String bookCoverImageUrl, List<String> authors, String publisher,
         Star star, String singleLineAssessment, Integer pages) {
         this.bookId = bookId;

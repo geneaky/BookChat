@@ -25,7 +25,7 @@ import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.api.dto.Token;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
-import toy.bookchat.bookchat.security.token.dto.RefreshTokenRequestDto;
+import toy.bookchat.bookchat.security.token.dto.RefreshTokenRequest;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenManager;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenProvider;
 import toy.bookchat.bookchat.security.token.jwt.RefreshToken;
@@ -65,12 +65,12 @@ class TokenServiceTest {
     void 리프레시토큰이_아직_유효한_경우_엑세스토큰_재발급_성공() throws Exception {
         String refreshToken = getRefreshToken();
 
-        RefreshTokenRequestDto refreshTokenRequestDto = RefreshTokenRequestDto.builder()
+        RefreshTokenRequest refreshTokenRequest = RefreshTokenRequest.builder()
             .refreshToken(refreshToken)
             .build();
 
         when(userRepository.findById(any())).thenReturn(Optional.of(getUser()));
-        tokenService.generateToken(refreshTokenRequestDto);
+        tokenService.generateToken(refreshTokenRequest);
 
         verify(jwtTokenProvider).createAccessToken(any());
     }
@@ -79,7 +79,7 @@ class TokenServiceTest {
     void 리프레시토큰의_만료기간이_얼마남지않은경우_리프레시토큰도_재발급() throws Exception {
         String refreshToken = getRefreshToken();
 
-        RefreshTokenRequestDto refreshTokenRequestDto = RefreshTokenRequestDto.builder()
+        RefreshTokenRequest refreshTokenRequest = RefreshTokenRequest.builder()
             .refreshToken(refreshToken)
             .build();
 
@@ -93,7 +93,7 @@ class TokenServiceTest {
         when(refreshTokenRepository.findByUserId(any())).thenReturn(
             Optional.of(reNewedRefreshToken));
 
-        Token token = tokenService.generateToken(refreshTokenRequestDto);
+        Token token = tokenService.generateToken(refreshTokenRequest);
 
         assertThat(refreshToken).isNotEqualTo(token.getRefreshToken());
     }

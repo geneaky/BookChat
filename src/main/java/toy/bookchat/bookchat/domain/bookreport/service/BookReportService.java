@@ -1,10 +1,12 @@
 package toy.bookchat.bookchat.domain.bookreport.service;
 
+import java.util.function.Supplier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import toy.bookchat.bookchat.domain.bookreport.BookReport;
 import toy.bookchat.bookchat.domain.bookreport.repository.BookReportRepository;
-import toy.bookchat.bookchat.domain.bookreport.service.dto.request.WriteBookReportRequestDto;
+import toy.bookchat.bookchat.domain.bookreport.service.dto.request.WriteBookReportRequest;
+import toy.bookchat.bookchat.domain.bookreport.service.dto.response.BookReportResponse;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.exception.book.BookNotFoundException;
@@ -22,16 +24,28 @@ public class BookReportService {
     }
 
     @Transactional
-    public void writeReport(WriteBookReportRequestDto writeBookReportRequestDto, Long userId) {
+    public void writeReport(WriteBookReportRequest writeBookReportRequest, Long bookId,
+        Long userId) {
 
-        BookShelf bookShelf = bookShelfRepository.findByUserIdAndBookId(userId,
-                writeBookReportRequestDto.getBookShelfId())
-            .orElseThrow(() -> {
-                throw new BookNotFoundException("Book is not registered on book shelf");
-            });
+        BookShelf bookShelf = bookShelfRepository.findByUserIdAndBookId(userId, bookId)
+            .orElseThrow(bookNotFound());
 
         bookShelf.changeToCompleteReading();
-        BookReport bookReport = writeBookReportRequestDto.getBookReport(bookShelf);
+        BookReport bookReport = writeBookReportRequest.getBookReport(bookShelf);
         bookReportRepository.save(bookReport);
+    }
+
+    @Transactional(readOnly = true)
+    public BookReportResponse getBookReportResponse(Long bookId, Long userId) {
+        BookShelf bookShelf = bookShelfRepository.findByUserIdAndBookId(userId, bookId)
+            .orElseThrow(bookNotFound());
+
+        return BookReportResponse.from(bookShelf.getBookReport());
+    }
+
+    private Supplier<RuntimeException> bookNotFound() {
+        return () -> {
+            throw new BookNotFoundException("Book is not registered on book shelf");
+        };
     }
 }

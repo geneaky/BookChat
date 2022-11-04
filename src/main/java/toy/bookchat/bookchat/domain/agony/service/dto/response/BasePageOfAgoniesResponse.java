@@ -5,14 +5,14 @@ import java.util.List;
 import lombok.Getter;
 import org.springframework.data.domain.Page;
 import toy.bookchat.bookchat.domain.agony.Agony;
-import toy.bookchat.bookchat.domain.common.PageDto;
+import toy.bookchat.bookchat.domain.common.BasePage;
 
 @Getter
-public class PageOfAgoniesResponse extends PageDto {
+public class BasePageOfAgoniesResponse extends BasePage {
 
     private List<AgonyResponse> agonyResponseList;
 
-    public PageOfAgoniesResponse(Page<Agony> page) {
+    public BasePageOfAgoniesResponse(Page<Agony> page) {
         super(page);
         this.agonyResponseList = from(page.getContent());
     }

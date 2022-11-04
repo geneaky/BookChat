@@ -9,13 +9,15 @@ import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class ChangeBookStatusRequestDto {
+public class ChangeBookStatusRequest {
 
     @NotNull
     @JsonProperty("readingStatus")
     private ReadingStatus readingStatus;
 
-    public ChangeBookStatusRequestDto(ReadingStatus readingStatus) {
+    /* TODO: 2022-11-04 독서 완료시 별점 입력하는 필드 추가
+     */
+    public ChangeBookStatusRequest(ReadingStatus readingStatus) {
         this.readingStatus = readingStatus;
     }
 }

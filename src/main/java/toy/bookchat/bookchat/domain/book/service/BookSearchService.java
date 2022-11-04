@@ -1,9 +1,9 @@
 package toy.bookchat.bookchat.domain.book.service;
 
-import toy.bookchat.bookchat.domain.book.dto.request.BookSearchRequestDto;
-import toy.bookchat.bookchat.domain.book.dto.response.BookSearchResponseDto;
+import toy.bookchat.bookchat.domain.book.service.dto.request.BookSearchRequest;
+import toy.bookchat.bookchat.domain.book.service.dto.response.BookSearchResponse;
 
 public interface BookSearchService {
 
-    BookSearchResponseDto searchByQuery(BookSearchRequestDto bookSearchRequestDto);
+    BookSearchResponse searchByQuery(BookSearchRequest bookSearchRequest);
 }

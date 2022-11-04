@@ -1,18 +1,20 @@
 package toy.bookchat.bookchat.security.token.dto;
 
-import lombok.*;
-
 import javax.validation.constraints.NotBlank;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class RefreshTokenRequestDto {
+public class RefreshTokenRequest {
 
     @NotBlank
     private String refreshToken;
 
     @Builder
-    public RefreshTokenRequestDto(String refreshToken) {
+    public RefreshTokenRequest(String refreshToken) {
         this.refreshToken = refreshToken;
     }
 }

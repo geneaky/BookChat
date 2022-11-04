@@ -9,7 +9,7 @@ import toy.bookchat.bookchat.domain.agony.AgonyRecord;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class CreateAgonyRecordRequestDto {
+public class CreateAgonyRecordRequest {
 
     @NotBlank
     private String title;
@@ -24,7 +24,7 @@ public class CreateAgonyRecordRequestDto {
             .build();
     }
 
-    public CreateAgonyRecordRequestDto(String title, String content) {
+    public CreateAgonyRecordRequest(String title, String content) {
         this.title = title;
         this.content = content;
     }
