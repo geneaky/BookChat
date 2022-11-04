@@ -22,6 +22,7 @@ import toy.bookchat.bookchat.domain.agony.Agony;
 import toy.bookchat.bookchat.domain.agony.repository.AgonyRecordRepository;
 import toy.bookchat.bookchat.domain.agony.repository.AgonyRepository;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateBookAgonyRequest;
+import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.response.BasePageOfAgoniesResponse;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
@@ -104,5 +105,24 @@ class AgonyServiceTest {
         assertThatThrownBy(() -> {
             agonyService.deleteAgony(1L, 1L, 1L);
         }).isInstanceOf(AgonyNotFoundException.class);
+    }
+
+    @Test
+    void 고민폴더_수정_성공() throws Exception {
+        Agony agony = Agony.builder()
+            .title("폴더")
+            .hexColorCode("파랑")
+            .build();
+        ReviseAgonyRequest reviseAgonyRequest = ReviseAgonyRequest.builder()
+            .agonyTitle("폴더 이름 바꾸기")
+            .agonyColor("보라색")
+            .build();
+        when(agonyRepository.findUserBookShelfAgony(any(), any(), any())).thenReturn(
+            Optional.of(agony));
+
+        agonyService.reviseAgony(1L, 1L, 1L, reviseAgonyRequest);
+
+        String result = agony.getHexColorCode();
+        assertThat(result).isEqualTo("보라색");
     }
 }

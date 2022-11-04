@@ -490,6 +490,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_고민_폴더_생성">고민 폴더 생성</a></li>
 <li><a href="#_고민_폴더_조회">고민 폴더 조회</a></li>
 <li><a href="#_고민_폴더_삭제">고민 폴더 삭제</a></li>
+<li><a href="#_고민_폴더_수정">고민 폴더 수정</a></li>
 </ul>
 </li>
 <li><a href="#_고민기록">고민기록</a>
@@ -578,7 +579,7 @@ Content-Type: application/json;charset=UTF-8
 Content-Length: 395
 Host: bookchat.link
 
-{"refreshToken":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJCb29rQ2hhdCIsImRlZmF1bHRQcm9maWxlSW1hZ2VUeXBlIjoxLCJwcm92aWRlciI6Imdvb2dsZSIsInVzZXJOaWNrbmFtZSI6Im5pY2tuYW1lIiwidXNlck5hbWUiOiJ0ZXN0R09PR0xFIiwidXNlclByb2ZpbGVJbWFnZVVyaSI6InRlc3RAZ2FtaWwuY29tIiwidXNlclJvbGUiOiJST0xFX1VTRVIiLCJleHAiOjE2Njg3NTc0ODksInVzZXJJZCI6IjEiLCJlbWFpbCI6InRlc3RAZ21haWwuY29tIn0.dQVNbQOdzHB82M4peVVn9saRFidgGB_FSXNF1i7LXPI"}</code></pre>
+{"refreshToken":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJCb29rQ2hhdCIsImRlZmF1bHRQcm9maWxlSW1hZ2VUeXBlIjoxLCJwcm92aWRlciI6Imdvb2dsZSIsInVzZXJOaWNrbmFtZSI6Im5pY2tuYW1lIiwidXNlck5hbWUiOiJ0ZXN0R09PR0xFIiwidXNlclByb2ZpbGVJbWFnZVVyaSI6InRlc3RAZ2FtaWwuY29tIiwidXNlclJvbGUiOiJST0xFX1VTRVIiLCJleHAiOjE2Njg3NjExMTcsInVzZXJJZCI6IjEiLCJlbWFpbCI6InRlc3RAZ21haWwuY29tIn0.Ns_zGvrWgmk2uXmY_un1-n0aykGxg2OWwEsMI2rFT44"}</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -616,7 +617,7 @@ Host: bookchat.link
 Content-Type: application/json
 Content-Length: 788
 
-{"accessToken":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJCb29rQ2hhdCIsImRlZmF1bHRQcm9maWxlSW1hZ2VUeXBlIjoxLCJwcm92aWRlciI6Imdvb2dsZSIsInVzZXJOaWNrbmFtZSI6Im5pY2tuYW1lIiwidXNlck5hbWUiOiJ0ZXN0R09PR0xFIiwidXNlclByb2ZpbGVJbWFnZVVyaSI6InRlc3RAZ2FtaWwuY29tIiwidXNlclJvbGUiOiJST0xFX1VTRVIiLCJleHAiOjE2Njc1NDkyODksInVzZXJJZCI6IjEiLCJlbWFpbCI6InRlc3RAZ21haWwuY29tIn0.Q3KGXy6cmzqSekPnD31zj9zC02IlbY3xobevIcjBqKA","refreshToken":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJCb29rQ2hhdCIsImRlZmF1bHRQcm9maWxlSW1hZ2VUeXBlIjoxLCJwcm92aWRlciI6Imdvb2dsZSIsInVzZXJOaWNrbmFtZSI6Im5pY2tuYW1lIiwidXNlck5hbWUiOiJ0ZXN0R09PR0xFIiwidXNlclByb2ZpbGVJbWFnZVVyaSI6InRlc3RAZ2FtaWwuY29tIiwidXNlclJvbGUiOiJST0xFX1VTRVIiLCJleHAiOjE2Njg3NTc0ODksInVzZXJJZCI6IjEiLCJlbWFpbCI6InRlc3RAZ21haWwuY29tIn0.dQVNbQOdzHB82M4peVVn9saRFidgGB_FSXNF1i7LXPI"}</code></pre>
+{"accessToken":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJCb29rQ2hhdCIsImRlZmF1bHRQcm9maWxlSW1hZ2VUeXBlIjoxLCJwcm92aWRlciI6Imdvb2dsZSIsInVzZXJOaWNrbmFtZSI6Im5pY2tuYW1lIiwidXNlck5hbWUiOiJ0ZXN0R09PR0xFIiwidXNlclByb2ZpbGVJbWFnZVVyaSI6InRlc3RAZ2FtaWwuY29tIiwidXNlclJvbGUiOiJST0xFX1VTRVIiLCJleHAiOjE2Njc1NTI5MTcsInVzZXJJZCI6IjEiLCJlbWFpbCI6InRlc3RAZ21haWwuY29tIn0.nurswWR_J0hqGRj4S1XX9NRk-H7eeHjdyz4sHzMlwqo","refreshToken":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJCb29rQ2hhdCIsImRlZmF1bHRQcm9maWxlSW1hZ2VUeXBlIjoxLCJwcm92aWRlciI6Imdvb2dsZSIsInVzZXJOaWNrbmFtZSI6Im5pY2tuYW1lIiwidXNlck5hbWUiOiJ0ZXN0R09PR0xFIiwidXNlclByb2ZpbGVJbWFnZVVyaSI6InRlc3RAZ2FtaWwuY29tIiwidXNlclJvbGUiOiJST0xFX1VTRVIiLCJleHAiOjE2Njg3NjExMTcsInVzZXJJZCI6IjEiLCJlbWFpbCI6InRlc3RAZ21haWwuY29tIn0.Ns_zGvrWgmk2uXmY_un1-n0aykGxg2OWwEsMI2rFT44"}</code></pre>
 </div>
 </div>
 </div>
@@ -3291,6 +3292,111 @@ Strict-Transport-Security: max-age=31536000 ; includeSubDomains
 X-Frame-Options: DENY</code></pre>
 </div>
 </div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_고민_폴더_수정">고민 폴더 수정</h3>
+<div class="paragraph">
+<p><code>Request Header</code></p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Authorization</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Bearer [JWT token]</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><code>Request</code></p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 9. /v1/api/bookshelf/books/{bookId}/agonies/{agonyId}</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bookId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Book Id</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>agonyId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Agony Id</p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Field</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>agonyTitle</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">String</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>false</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">고민 폴더 이름</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>agonyColor</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">String</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>false</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">고민 폴더 색</p></td>
+</tr>
+</tbody>
+</table>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">PUT /v1/api/bookshelf/books/1/agonies/1 HTTP/1.1
+Content-Type: application/json;charset=UTF-8
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwicHJvdmlkZXIiOiJnb29nbGUiLCJuYW1lIjoiZ29vZ2xlMTIzIiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSJ9.LKub56oLOIJFlTzNiwxqH0V4SubOOBiIZESje9yJDco
+Content-Length: 58
+Host: bookchat.link
+
+{"agonyTitle":"고민 바꾸기","agonyColor":"보라색"}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>Response</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+Strict-Transport-Security: max-age=31536000 ; includeSubDomains
+X-Frame-Options: DENY</code></pre>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -3324,7 +3430,7 @@ X-Frame-Options: DENY</code></pre>
 <p><code>Request</code></p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 9. /v1/api/bookshelf/books/{bookId}/agonies/{agonyId}/records</caption>
+<caption class="title">Table 10. /v1/api/bookshelf/books/{bookId}/agonies/{agonyId}/records</caption>
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -3429,7 +3535,7 @@ X-Frame-Options: DENY</code></pre>
 <p><code>Request</code></p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 10. /v1/api/bookshelf/books/{bookId}/agonies/{agonyId}/records</caption>
+<caption class="title">Table 11. /v1/api/bookshelf/books/{bookId}/agonies/{agonyId}/records</caption>
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -3588,7 +3694,7 @@ Content-Length: 350
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-11-04 16:39:06 +0900
+Last updated 2022-11-04 17:38:59 +0900
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>

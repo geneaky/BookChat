@@ -482,6 +482,24 @@ include::{snippets}/delete-agony/http-request.adoc[]
 
 include::{snippets}/delete-agony/http-response.adoc[]
 
+---
+
+=== 고민 폴더 수정
+
+`Request Header`
+
+include::{snippets}/put-agony/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/put-agony/path-parameters.adoc[]
+include::{snippets}/put-agony/request-fields.adoc[]
+include::{snippets}/put-agony/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/put-agony/http-response.adoc[]
+
 == 고민기록
 
 === 고민 기록 생성
