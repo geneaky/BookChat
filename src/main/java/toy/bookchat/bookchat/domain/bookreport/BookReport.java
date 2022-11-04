@@ -33,4 +33,12 @@ public class BookReport extends BaseEntity {
 
     protected BookReport() {
     }
+
+    public void reviseTitle(String title) {
+        this.title = title;
+    }
+
+    public void reviseContent(String content) {
+        this.content = content;
+    }
 }

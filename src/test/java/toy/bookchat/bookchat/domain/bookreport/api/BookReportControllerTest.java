@@ -9,6 +9,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
@@ -38,6 +39,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
 import toy.bookchat.bookchat.domain.bookreport.BookReport;
 import toy.bookchat.bookchat.domain.bookreport.service.BookReportService;
+import toy.bookchat.bookchat.domain.bookreport.service.dto.request.ReviseBookReportRequest;
 import toy.bookchat.bookchat.domain.bookreport.service.dto.request.WriteBookReportRequest;
 import toy.bookchat.bookchat.domain.bookreport.service.dto.response.BookReportResponse;
 import toy.bookchat.bookchat.domain.user.ReadingTaste;
@@ -170,5 +172,34 @@ class BookReportControllerTest extends AuthenticationTestExtension {
                 )));
 
         verify(bookReportService).deleteBookReport(any(), any());
+    }
+
+    @Test
+    void 독후감_수정_성공() throws Exception {
+        ReviseBookReportRequest reviseBookReportRequest = ReviseBookReportRequest.builder()
+            .reportTitle("제목 바꿔버리기")
+            .reportContent(
+                "내용은 바꿀수도 아닐수도 있기 때문에 이전 상태 값을 완전히 가지고있기 때문에 똑같이 보내주거나 바꿔서 보내주세요 put으로 멱등성을 보장해줍시다.")
+            .build();
+
+        mockMvc.perform(put("/v1/api/books/{bookId}/report", 1L)
+                .header("Authorization", "Bearer " + getTestToken())
+                .with(user(getUserPrincipal()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(reviseBookReportRequest)))
+            .andExpect(status().isOk())
+            .andDo(document("put-book-report",
+                requestHeaders(
+                    headerWithName("Authorization").description("Bearer [JWT token]")
+                ),
+                pathParameters(
+                    parameterWithName("bookId").description("Book Id")
+                ),
+                requestFields(
+                    fieldWithPath("reportTitle").type(STRING).description("독후감 제목"),
+                    fieldWithPath("reportContent").type(STRING).description("독후감 내용")
+                )));
+
+        verify(bookReportService).reviseBookReport(any(), any(), any());
     }
 }

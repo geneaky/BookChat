@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import toy.bookchat.bookchat.domain.bookreport.BookReport;
 import toy.bookchat.bookchat.domain.bookreport.repository.BookReportRepository;
+import toy.bookchat.bookchat.domain.bookreport.service.dto.request.ReviseBookReportRequest;
 import toy.bookchat.bookchat.domain.bookreport.service.dto.request.WriteBookReportRequest;
 import toy.bookchat.bookchat.domain.bookreport.service.dto.response.BookReportResponse;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
@@ -126,5 +127,31 @@ class BookReportServiceTest {
 
         BookReport result = bookShelf.getBookReport();
         assertThat(result).isNull();
+    }
+
+    @Test
+    void 서재에_등록된_책_독후감_수정_성공() throws Exception {
+        ReviseBookReportRequest reviseBookReportRequest = ReviseBookReportRequest.builder()
+            .reportTitle("title2")
+            .reportContent("content2")
+            .build();
+        BookReport bookReport = BookReport.builder()
+            .title("title")
+            .content("content")
+            .build();
+
+        bookReport.setCreatedAt(LocalDateTime.now());
+
+        BookShelf bookShelf = BookShelf.builder()
+            .bookReport(bookReport)
+            .build();
+
+        when(bookShelfRepository.findByUserIdAndBookId(any(), any())).thenReturn(
+            Optional.of(bookShelf));
+
+        bookReportService.reviseBookReport(1L, 1L, reviseBookReportRequest);
+
+        String result = bookReport.getTitle();
+        assertThat(result).isEqualTo("title2");
     }
 }
