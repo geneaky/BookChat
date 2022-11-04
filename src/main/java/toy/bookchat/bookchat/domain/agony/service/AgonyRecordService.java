@@ -49,8 +49,10 @@ public class AgonyRecordService {
         agonyRecordRepository.deleteAgony(userId, bookId, agonyId, recordId);
     }
 
+    @Transactional
     public void reviseAgonyRecord(Long bookId, Long agonyId, Long recordId, Long userId,
         ReviseAgonyRecordRequest reviseAgonyRecordRequest) {
-
+        agonyRecordRepository.reviseAgonyRecord(userId, bookId, agonyId, recordId,
+            reviseAgonyRecordRequest.getRecordTitle(), reviseAgonyRecordRequest.getRecordContent());
     }
 }
