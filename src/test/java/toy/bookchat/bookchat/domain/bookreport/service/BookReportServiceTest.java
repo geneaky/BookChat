@@ -33,7 +33,6 @@ class BookReportServiceTest {
 
     private static WriteBookReportRequestDto getWriteBookReportRequestDto() {
         return WriteBookReportRequestDto.builder()
-            .bookShelfId(1L)
             .title("어렵지만 많이 배웠습니다")
             .content("이런이런 저런저런 내용")
             .build();
@@ -50,7 +49,7 @@ class BookReportServiceTest {
         when(bookShelfRepository.findByUserIdAndBookId(any(), any())).thenReturn(
             Optional.of(bookShelf));
 
-        bookReportService.writeReport(writeBookReportRequestDto, user.getId());
+        bookReportService.writeReport(writeBookReportRequestDto, 1L, user.getId());
 
         verify(bookReportRepository).save(any());
     }
@@ -68,7 +67,7 @@ class BookReportServiceTest {
         when(bookShelfRepository.findByUserIdAndBookId(any(), any())).thenReturn(
             Optional.of(bookShelf));
 
-        bookReportService.writeReport(writeBookReportRequestDto, user.getId());
+        bookReportService.writeReport(writeBookReportRequestDto, 1L, user.getId());
 
         ReadingStatus result = bookShelf.getReadingStatus();
         assertThat(result).isEqualTo(ReadingStatus.COMPLETE);
@@ -80,7 +79,7 @@ class BookReportServiceTest {
         User user = mock(User.class);
 
         assertThatThrownBy(() -> {
-            bookReportService.writeReport(writeBookReportRequestDto, user.getId());
+            bookReportService.writeReport(writeBookReportRequestDto, 1L, user.getId());
         }).isInstanceOf(BookNotFoundException.class);
     }
 }

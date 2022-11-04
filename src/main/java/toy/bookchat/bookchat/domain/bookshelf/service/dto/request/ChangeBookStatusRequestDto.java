@@ -15,6 +15,8 @@ public class ChangeBookStatusRequestDto {
     @JsonProperty("readingStatus")
     private ReadingStatus readingStatus;
 
+    /* TODO: 2022-11-04 독서 완료시 별점 입력하는 필드 추가
+     */
     public ChangeBookStatusRequestDto(ReadingStatus readingStatus) {
         this.readingStatus = readingStatus;
     }
