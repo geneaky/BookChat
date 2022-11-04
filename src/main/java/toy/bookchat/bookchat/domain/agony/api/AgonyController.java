@@ -2,6 +2,7 @@ package toy.bookchat.bookchat.domain.agony.api;
 
 import javax.validation.Valid;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +19,7 @@ import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPayload;
 
 @RestController
-@RequestMapping("/v1/api")
+@RequestMapping("/v1/api/bookshelf/books/{bookId}/agonies")
 public class AgonyController {
 
     private final AgonyService agonyService;
@@ -30,7 +31,7 @@ public class AgonyController {
         this.agonyRecordService = agonyRecordService;
     }
 
-    @PostMapping("/bookshelf/books/{bookId}/agonies")
+    @PostMapping
     public void makeBookAgony(@PathVariable Long bookId,
         @Valid @RequestBody CreateBookAgonyRequest createBookAgonyRequest,
         @UserPayload TokenPayload tokenPayload) {
@@ -38,7 +39,7 @@ public class AgonyController {
         agonyService.storeBookAgony(createBookAgonyRequest, tokenPayload.getUserId(), bookId);
     }
 
-    @GetMapping("/bookshelf/books/{bookId}/agonies")
+    @GetMapping
     public BasePageOfAgoniesResponse searchPageOfAgonies(@PathVariable Long bookId,
         Pageable pageable,
         @UserPayload TokenPayload tokenPayload) {
@@ -46,7 +47,7 @@ public class AgonyController {
         return agonyService.searchPageOfAgonies(bookId, tokenPayload.getUserId(), pageable);
     }
 
-    @PostMapping("/bookshelf/books/{bookId}/agonies/{agonyId}/records")
+    @PostMapping("/{agonyId}/records")
     public void addAgonyRecordOnBookAgony(@PathVariable Long bookId, @PathVariable Long agonyId,
         @Valid @RequestBody CreateAgonyRecordRequest createAgonyRecordRequest,
         @UserPayload TokenPayload tokenPayload) {
@@ -56,11 +57,18 @@ public class AgonyController {
             agonyId);
     }
 
-    @GetMapping("/bookshelf/books/{bookId}/agonies/{agonyId}/records")
+    @GetMapping("/{agonyId}/records")
     public BasePageOfAgonyRecordsResponse getAgonyRecordsOnBookAgony(@PathVariable Long bookId,
         @PathVariable Long agonyId, @UserPayload TokenPayload tokenPayload, Pageable pageable) {
 
         return agonyRecordService.searchPageOfAgonyRecords(bookId, agonyId,
             tokenPayload.getUserId(), pageable);
+    }
+
+    @DeleteMapping("/{agonyId}")
+    public void deleteAgony(@PathVariable Long bookId, @PathVariable Long agonyId,
+        @UserPayload TokenPayload tokenPayload) {
+
+        agonyService.deleteAgony(bookId, agonyId, tokenPayload.getUserId());
     }
 }
