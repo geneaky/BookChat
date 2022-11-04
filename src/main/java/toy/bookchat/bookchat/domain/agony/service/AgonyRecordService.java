@@ -43,7 +43,8 @@ public class AgonyRecordService {
         return new BasePageOfAgonyRecordsResponse(agonyRecordPage);
     }
 
+    @Transactional
     public void deleteAgonyRecord(Long bookId, Long agonyId, Long recordId, Long userId) {
-
+        agonyRecordRepository.deleteAgony(userId, bookId, agonyId, recordId);
     }
 }
