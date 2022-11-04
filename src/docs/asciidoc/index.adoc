@@ -393,6 +393,23 @@ include::{snippets}/get-book-report/http-request.adoc[]
 include::{snippets}/get-book-report/response-fields.adoc[]
 include::{snippets}/get-book-report/http-response.adoc[]
 
+---
+
+=== 독후감 삭제
+
+`Request Header`
+
+include::{snippets}/delete-book-report/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/delete-book-report/path-parameters.adoc[]
+include::{snippets}/delete-book-report/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/delete-book-report/http-response.adoc[]
+
 == 고민
 
 === 고민 폴더 생성

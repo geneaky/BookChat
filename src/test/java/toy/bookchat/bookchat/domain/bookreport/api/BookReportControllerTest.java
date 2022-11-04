@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
@@ -152,5 +153,22 @@ class BookReportControllerTest extends AuthenticationTestExtension {
                     fieldWithPath("reportContent").type(STRING).description("독후감 내용"),
                     fieldWithPath("reportCreatedAt").type(STRING).description("독후감 작성 시간")
                 )));
+    }
+
+    @Test
+    void 독후감_삭제_성공() throws Exception {
+        mockMvc.perform(delete("/v1/api/books/{bookId}/report", 1L)
+                .header("Authorization", "Bearer " + getTestToken())
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isOk())
+            .andDo(document("delete-book-report",
+                requestHeaders(
+                    headerWithName("Authorization").description("Bearer [JWT token]")
+                ),
+                pathParameters(
+                    parameterWithName("bookId").description("Book Id")
+                )));
+
+        verify(bookReportService).deleteBookReport(any(), any());
     }
 }

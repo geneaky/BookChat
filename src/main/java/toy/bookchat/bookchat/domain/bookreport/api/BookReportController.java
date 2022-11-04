@@ -1,6 +1,7 @@
 package toy.bookchat.bookchat.domain.bookreport.api;
 
 import javax.validation.Valid;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,5 +37,12 @@ public class BookReportController {
         @UserPayload TokenPayload tokenPayload) {
 
         return bookReportService.getBookReportResponse(bookId, tokenPayload.getUserId());
+    }
+
+    @DeleteMapping
+    public void deleteBookReport(@PathVariable Long bookId,
+        @UserPayload TokenPayload tokenPayload) {
+
+        bookReportService.deleteBookReport(bookId, tokenPayload.getUserId());
     }
 }
