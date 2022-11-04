@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import toy.bookchat.bookchat.domain.bookreport.BookReport;
 import toy.bookchat.bookchat.domain.bookreport.repository.BookReportRepository;
+import toy.bookchat.bookchat.domain.bookreport.service.dto.request.ReviseBookReportRequest;
 import toy.bookchat.bookchat.domain.bookreport.service.dto.request.WriteBookReportRequest;
 import toy.bookchat.bookchat.domain.bookreport.service.dto.response.BookReportResponse;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
@@ -53,7 +54,12 @@ public class BookReportService {
     public void deleteBookReport(Long bookId, Long userId) {
         BookShelf bookShelf = bookShelfRepository.findByUserIdAndBookId(userId, bookId)
             .orElseThrow(bookNotFound());
-        
+
         bookShelf.deleteBookReport();
+    }
+
+    public void reviseBookReport(Long bookId, Long userId,
+        ReviseBookReportRequest reviseBookReportRequest) {
+
     }
 }
