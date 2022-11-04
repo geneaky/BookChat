@@ -551,3 +551,21 @@ include::{snippets}/delete-agony-record/http-request.adoc[]
 `Response`
 
 include::{snippets}/delete-agony-record/http-response.adoc[]
+
+---
+
+=== 고민 기록 수정
+
+`Reqeust Header`
+
+include::{snippets}/put-agony-record/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/put-agony-record/path-parameters.adoc[]
+include::{snippets}/put-agony-record/request-fields.adoc[]
+include::{snippets}/put-agony-record/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/put-agony-record/http-response.adoc[]

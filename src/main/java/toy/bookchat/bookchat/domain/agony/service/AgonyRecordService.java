@@ -9,6 +9,7 @@ import toy.bookchat.bookchat.domain.agony.AgonyRecord;
 import toy.bookchat.bookchat.domain.agony.repository.AgonyRecordRepository;
 import toy.bookchat.bookchat.domain.agony.repository.AgonyRepository;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateAgonyRecordRequest;
+import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRecordRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.response.BasePageOfAgonyRecordsResponse;
 import toy.bookchat.bookchat.exception.agony.AgonyNotFoundException;
 
@@ -46,5 +47,10 @@ public class AgonyRecordService {
     @Transactional
     public void deleteAgonyRecord(Long bookId, Long agonyId, Long recordId, Long userId) {
         agonyRecordRepository.deleteAgony(userId, bookId, agonyId, recordId);
+    }
+
+    public void reviseAgonyRecord(Long bookId, Long agonyId, Long recordId, Long userId,
+        ReviseAgonyRecordRequest reviseAgonyRecordRequest) {
+
     }
 }
