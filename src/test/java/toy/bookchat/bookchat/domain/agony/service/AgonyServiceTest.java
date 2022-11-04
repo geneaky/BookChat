@@ -19,11 +19,13 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import toy.bookchat.bookchat.domain.agony.Agony;
+import toy.bookchat.bookchat.domain.agony.repository.AgonyRecordRepository;
 import toy.bookchat.bookchat.domain.agony.repository.AgonyRepository;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateBookAgonyRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.response.BasePageOfAgoniesResponse;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
+import toy.bookchat.bookchat.exception.agony.AgonyNotFoundException;
 import toy.bookchat.bookchat.exception.book.BookNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,6 +35,8 @@ class AgonyServiceTest {
     private BookShelfRepository bookShelfRepository;
     @Mock
     private AgonyRepository agonyRepository;
+    @Mock
+    private AgonyRecordRepository agonyRecordRepository;
     @InjectMocks
     private AgonyService agonyService;
 
@@ -82,5 +86,23 @@ class AgonyServiceTest {
 
         String title = pageOfAgoniesResponse.getAgonyResponseList().get(0).getTitle();
         assertThat(title).isEqualTo("agony1");
+    }
+
+    @Test
+    void 고민폴더_삭제_성공() throws Exception {
+        when(agonyRepository.findUserBookShelfAgony(any(), any(), any())).thenReturn(
+            Optional.of(mock(Agony.class)));
+
+        agonyService.deleteAgony(1L, 1L, 1L);
+
+        verify(agonyRecordRepository).deleteByAgony(any(Agony.class));
+        verify(agonyRepository).delete(any(Agony.class));
+    }
+
+    @Test
+    void 등록되지않은_고민폴더_삭제_요청시_예외발생() throws Exception {
+        assertThatThrownBy(() -> {
+            agonyService.deleteAgony(1L, 1L, 1L);
+        }).isInstanceOf(AgonyNotFoundException.class);
     }
 }
