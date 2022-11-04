@@ -77,11 +77,6 @@ class AgonyRepositoryTest {
         Agony agony = getAgony(bookShelf);
         agonyRepository.save(agony);
 
-        bookRepository.flush();
-        userRepository.flush();
-        bookShelfRepository.flush();
-        agonyRepository.flush();
-
         Agony findAgony = agonyRepository.findById(agony.getId()).get();
 
         assertThat(findAgony).isEqualTo(agony);
@@ -100,11 +95,6 @@ class AgonyRepositoryTest {
 
         Agony agony = getAgony(bookShelf);
         agonyRepository.save(agony);
-
-        bookRepository.flush();
-        userRepository.flush();
-        bookShelfRepository.flush();
-        agonyRepository.flush();
 
         Agony findAgony = agonyRepository.findUserBookShelfAgony(user.getId(), book.getId(),
             agony.getId()).get();
@@ -137,11 +127,6 @@ class AgonyRepositoryTest {
         ;
         List<Agony> agonyList = List.of(agony1, agony2, agony3);
         agonyRepository.saveAll(agonyList);
-
-        bookRepository.flush();
-        userRepository.flush();
-        bookShelfRepository.flush();
-        agonyRepository.flush();
 
         PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("id").descending());
         Page<Agony> pageOfAgonies = agonyRepository.findUserBookShelfPageOfAgonies(

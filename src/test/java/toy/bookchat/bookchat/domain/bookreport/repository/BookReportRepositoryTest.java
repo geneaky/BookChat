@@ -38,9 +38,6 @@ class BookReportRepositoryTest {
         BookReport bookReport = getBookReport(bookShelf);
         bookReportRepository.save(bookReport);
 
-        bookReportRepository.flush();
-        bookShelfRepository.flush();
-
         BookReport findBookReport = bookReportRepository.findById(bookReport.getId()).get();
 
         assertThat(findBookReport).isEqualTo(bookReport);

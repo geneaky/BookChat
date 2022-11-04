@@ -51,7 +51,7 @@ public class AgonyRecordQueryRepositoryImpl implements AgonyRecordQueryRepositor
                     .join(subAgonyRecord.agony, agony).on(agony.id.eq(agonyId))
                     .join(agony.bookShelf, bookShelf).on(bookShelf.user.id.eq(userId)
                         .and(bookShelf.book.id.eq(bookId)))
-            )).execute();
+            ).and(agonyRecord.id.eq(recordId))).execute();
     }
 
 }
