@@ -60,6 +60,11 @@ public class BookReportService {
 
     public void reviseBookReport(Long bookId, Long userId,
         ReviseBookReportRequest reviseBookReportRequest) {
+        BookShelf bookShelf = bookShelfRepository.findByUserIdAndBookId(userId, bookId)
+            .orElseThrow(bookNotFound());
+        BookReport bookReport = bookShelf.getBookReport();
 
+        bookReport.reviseTitle(reviseBookReportRequest.getReportTitle());
+        bookReport.reviseContent(reviseBookReportRequest.getReportContent());
     }
 }
