@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
@@ -291,5 +292,21 @@ class AgonyControllerTest extends AuthenticationTestExtension {
                 )));
     }
 
+    @Test
+    void 고민_폴더_삭제_성공() throws Exception {
+        mockMvc.perform(delete("/v1/api/bookshelf/books/{bookId}/agonies/{agonyId}", 1L, 1L)
+                .header("Authorization", "Bearer " + getTestToken())
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isOk())
+            .andDo(document("delete-agony",
+                requestHeaders(
+                    headerWithName("Authorization").description("Bearer [JWT token]")
+                ),
+                pathParameters(
+                    parameterWithName("bookId").description("Book Id"),
+                    parameterWithName("agonyId").description("Agony Id")
+                )));
 
+        verify(agonyService).deleteAgony(any(), any(), any());
+    }
 }

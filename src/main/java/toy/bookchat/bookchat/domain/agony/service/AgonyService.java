@@ -41,4 +41,8 @@ public class AgonyService {
         return new BasePageOfAgoniesResponse(
             agonyRepository.findUserBookShelfPageOfAgonies(bookId, userId, pageable));
     }
+
+    public void deleteAgony(Long bookId, Long agonyId, Long userId) {
+        
+    }
 }
