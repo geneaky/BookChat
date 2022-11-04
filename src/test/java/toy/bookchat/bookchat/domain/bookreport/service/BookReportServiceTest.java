@@ -7,14 +7,17 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import toy.bookchat.bookchat.domain.bookreport.BookReport;
 import toy.bookchat.bookchat.domain.bookreport.repository.BookReportRepository;
 import toy.bookchat.bookchat.domain.bookreport.service.dto.request.WriteBookReportRequest;
+import toy.bookchat.bookchat.domain.bookreport.service.dto.response.BookReportResponse;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
@@ -81,5 +84,26 @@ class BookReportServiceTest {
         assertThatThrownBy(() -> {
             bookReportService.writeReport(writeBookReportRequest, 1L, user.getId());
         }).isInstanceOf(BookNotFoundException.class);
+    }
+
+    @Test
+    void 서재에_등록된_책_독후감_조회_성공() throws Exception {
+        BookReport bookReport = BookReport.builder()
+            .title("title")
+            .content("content")
+            .build();
+
+        bookReport.setCreatedAt(LocalDateTime.now());
+
+        BookShelf bookShelf = BookShelf.builder()
+            .bookReport(bookReport)
+            .build();
+
+        when(bookShelfRepository.findByUserIdAndBookId(any(), any())).thenReturn(
+            Optional.of(bookShelf));
+        BookReportResponse bookReportResponse = bookReportService.getBookReportResponse(1L, 1L);
+
+        String result = bookReportResponse.getReportTitle();
+        assertThat(result).isEqualTo("title");
     }
 }
