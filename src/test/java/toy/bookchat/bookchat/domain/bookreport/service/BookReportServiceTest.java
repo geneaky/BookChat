@@ -79,10 +79,9 @@ class BookReportServiceTest {
     @Test
     void 서재에_등록되지_않는_책_독후감_작성시도시_예외발생() throws Exception {
         WriteBookReportRequest writeBookReportRequest = getWriteBookReportRequest();
-        User user = mock(User.class);
 
         assertThatThrownBy(() -> {
-            bookReportService.writeReport(writeBookReportRequest, 1L, user.getId());
+            bookReportService.writeReport(writeBookReportRequest, 1L, 1L);
         }).isInstanceOf(BookNotFoundException.class);
     }
 
@@ -105,5 +104,27 @@ class BookReportServiceTest {
 
         String result = bookReportResponse.getReportTitle();
         assertThat(result).isEqualTo("title");
+    }
+
+    @Test
+    void 서재에_등록된_책_독후감_삭제_성공() throws Exception {
+        BookReport bookReport = BookReport.builder()
+            .title("title")
+            .content("content")
+            .build();
+
+        bookReport.setCreatedAt(LocalDateTime.now());
+
+        BookShelf bookShelf = BookShelf.builder()
+            .bookReport(bookReport)
+            .build();
+
+        when(bookShelfRepository.findByUserIdAndBookId(any(), any())).thenReturn(
+            Optional.of(bookShelf));
+
+        bookReportService.deleteBookReport(1L, 1L);
+
+        BookReport result = bookShelf.getBookReport();
+        assertThat(result).isNull();
     }
 }

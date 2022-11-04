@@ -111,4 +111,8 @@ public class BookShelf extends BaseEntity {
     public void changeToCompleteReading() {
         this.readingStatus = ReadingStatus.COMPLETE;
     }
+
+    public void deleteBookReport() {
+        this.bookReport = null;
+    }
 }
