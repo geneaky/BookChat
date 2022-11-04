@@ -48,4 +48,12 @@ public class BookReportService {
             throw new BookNotFoundException("Book is not registered on book shelf");
         };
     }
+
+    @Transactional
+    public void deleteBookReport(Long bookId, Long userId) {
+        BookShelf bookShelf = bookShelfRepository.findByUserIdAndBookId(userId, bookId)
+            .orElseThrow(bookNotFound());
+        
+        bookShelf.deleteBookReport();
+    }
 }

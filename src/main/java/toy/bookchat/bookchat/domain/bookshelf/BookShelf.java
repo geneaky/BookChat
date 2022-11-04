@@ -41,7 +41,7 @@ public class BookShelf extends BaseEntity {
     private User user;
     @ManyToOne(fetch = FetchType.LAZY)
     private Book book;
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, orphanRemoval = true)
     private BookReport bookReport;
 
     @Builder
@@ -110,5 +110,9 @@ public class BookShelf extends BaseEntity {
 
     public void changeToCompleteReading() {
         this.readingStatus = ReadingStatus.COMPLETE;
+    }
+
+    public void deleteBookReport() {
+        this.bookReport = null;
     }
 }
