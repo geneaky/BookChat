@@ -536,3 +536,18 @@ include::{snippets}/get-agonies-records/http-request.adoc[]
 
 include::{snippets}/get-agonies-records/response-fields.adoc[]
 include::{snippets}/get-agonies-records/http-response.adoc[]
+
+=== 고민 기록 삭제
+
+`Request Header`
+
+include::{snippets}/delete-agony-record/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/delete-agony-record/path-parameters.adoc[]
+include::{snippets}/delete-agony-record/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/delete-agony-record/http-response.adoc[]

@@ -42,4 +42,8 @@ public class AgonyRecordService {
             agonyId, userId, pageable);
         return new BasePageOfAgonyRecordsResponse(agonyRecordPage);
     }
+
+    public void deleteAgonyRecord(Long bookId, Long agonyId, Long recordId, Long userId) {
+
+    }
 }

@@ -81,4 +81,11 @@ public class AgonyController {
 
         agonyService.reviseAgony(bookId, agonyId, tokenPayload.getUserId(), reviseAgonyRequest);
     }
+
+    @DeleteMapping("/{agonyId}/records/{recordId}")
+    public void deleteAgonyRecord(@PathVariable Long bookId, @PathVariable Long agonyId,
+        @PathVariable Long recordId, @UserPayload TokenPayload tokenPayload) {
+
+        agonyRecordService.deleteAgonyRecord(bookId, agonyId, recordId, tokenPayload.getUserId());
+    }
 }

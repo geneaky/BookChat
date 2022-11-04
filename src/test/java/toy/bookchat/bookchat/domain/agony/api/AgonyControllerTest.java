@@ -340,4 +340,25 @@ class AgonyControllerTest extends AuthenticationTestExtension {
 
         verify(agonyService).reviseAgony(any(), any(), any(), any());
     }
+
+    @Test
+    void 고민기록_삭제_성공() throws Exception {
+        mockMvc.perform(
+                delete("/v1/api/bookshelf/books/{bookId}/agonies/{agonyId}/records/{recordId}", 1L, 1L,
+                    1L)
+                    .header("Authorization", "Bearer " + getTestToken())
+                    .with(user(getUserPrincipal())))
+            .andExpect(status().isOk())
+            .andDo(document("delete-agony-record",
+                requestHeaders(
+                    headerWithName("Authorization").description("Bearer [JWT token]")
+                ),
+                pathParameters(
+                    parameterWithName("bookId").description("Book Id"),
+                    parameterWithName("agonyId").description("Agony Id"),
+                    parameterWithName("recordId").description("Record Id")
+                )));
+
+        verify(agonyRecordService).deleteAgonyRecord(any(), any(), any(), any());
+    }
 }
