@@ -8,4 +8,7 @@ public interface AgonyRecordQueryRepository {
 
     Page<AgonyRecord> findPageOfUserAgonyRecords(Long bookId, Long agonyId, Long userId,
         Pageable pageable);
+
+
+    void deleteAgony(Long userId, Long bookId, Long agonyId, Long recordId);
 }

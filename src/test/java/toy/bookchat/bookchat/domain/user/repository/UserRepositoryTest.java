@@ -83,7 +83,6 @@ class UserRepositoryTest {
             .build();
 
         userRepository.save(user);
-        userRepository.flush();
 
         User findUser = userRepository.findByName(userName).get();
 
@@ -102,7 +101,6 @@ class UserRepositoryTest {
             .build();
 
         userRepository.save(user);
-        userRepository.flush();
 
         userRepository.delete(user);
 
@@ -122,8 +120,6 @@ class UserRepositoryTest {
 
         userRepository.save(user1);
         userRepository.save(user2);
-
-        userRepository.flush();
 
         user2.changeUserNickname("user1");
 

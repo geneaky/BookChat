@@ -91,12 +91,6 @@ class AgonyRecordRepositoryTest {
         AgonyRecord agonyRecord = getAgonyRecord(agony);
         agonyRecordRepository.save(agonyRecord);
 
-        bookRepository.flush();
-        userRepository.flush();
-        bookShelfRepository.flush();
-        agonyRepository.flush();
-        agonyRecordRepository.flush();
-
         AgonyRecord findAgonyRecord = agonyRecordRepository.findById(agonyRecord.getId()).get();
 
         assertThat(agonyRecord).isEqualTo(findAgonyRecord);
@@ -119,16 +113,34 @@ class AgonyRecordRepositoryTest {
         AgonyRecord agonyRecord = getAgonyRecord(agony);
         agonyRecordRepository.save(agonyRecord);
 
-        bookRepository.flush();
-        userRepository.flush();
-        bookShelfRepository.flush();
-        agonyRepository.flush();
-        agonyRecordRepository.flush();
-
         Pageable pageable = PageRequest.of(0, 1, Sort.by("id").descending());
         List<AgonyRecord> content = agonyRecordRepository.findPageOfUserAgonyRecords(
             book.getId(), agony.getId(), user.getId(), pageable).getContent();
 
         assertThat(content).containsExactly(agonyRecord);
+    }
+
+    @Test
+    void 사용자_고민기록_삭제_성공() throws Exception {
+        Book book = getBook();
+        bookRepository.save(book);
+
+        User user = getUser();
+        userRepository.save(user);
+
+        BookShelf bookShelf = getBookShelf(user, book);
+        bookShelfRepository.save(bookShelf);
+
+        Agony agony = getAgony(bookShelf);
+        agonyRepository.save(agony);
+
+        AgonyRecord agonyRecord = getAgonyRecord(agony);
+        agonyRecordRepository.save(agonyRecord);
+
+        agonyRecordRepository.deleteAgony(user.getId(), book.getId(), agony.getId(),
+            agonyRecord.getId());
+
+        List<AgonyRecord> all = agonyRecordRepository.findAll();
+        assertThat(all).isEmpty();
     }
 }

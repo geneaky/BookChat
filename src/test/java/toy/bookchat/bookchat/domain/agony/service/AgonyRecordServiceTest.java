@@ -7,6 +7,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -64,17 +65,18 @@ class AgonyRecordServiceTest {
     @Test
     void 본인이_생성한_고민_조회_성공() throws Exception {
 
-        AgonyRecord agonyRecord1 = mock(AgonyRecord.class);
-        AgonyRecord agonyRecord2 = mock(AgonyRecord.class);
-
-        when(agonyRecord1.getId()).thenReturn(1L);
-        when(agonyRecord1.getTitle()).thenReturn("title1");
-        when(agonyRecord1.getContent()).thenReturn("content1");
-        when(agonyRecord1.getCreateTimeInYearMonthDayFormat()).thenReturn("2022-11-01");
-        when(agonyRecord2.getId()).thenReturn(2L);
-        when(agonyRecord2.getTitle()).thenReturn("title2");
-        when(agonyRecord2.getContent()).thenReturn("content2");
-        when(agonyRecord2.getCreateTimeInYearMonthDayFormat()).thenReturn("2022-11-01");
+        AgonyRecord agonyRecord1 = AgonyRecord.builder()
+            .id(1L)
+            .title("title1")
+            .content("content1")
+            .build();
+        agonyRecord1.setCreatedAt(LocalDateTime.now());
+        AgonyRecord agonyRecord2 = AgonyRecord.builder()
+            .id(2L)
+            .title("title2")
+            .content("content2")
+            .build();
+        agonyRecord2.setCreatedAt(LocalDateTime.now());
 
         List<AgonyRecord> list = List.of(agonyRecord1, agonyRecord2);
 
@@ -88,5 +90,12 @@ class AgonyRecordServiceTest {
 
         int result = pageOfAgonyRecordsResponse.getAgonyRecordResponseList().size();
         assertThat(result).isEqualTo(2);
+    }
+
+    @Test
+    void 본인이_생성한_고민_기록_삭제_성공() throws Exception {
+        agonyRecordService.deleteAgonyRecord(1L, 1L, 1L, 1L);
+
+        verify(agonyRecordRepository).deleteAgony(any(), any(), any(), any());
     }
 }

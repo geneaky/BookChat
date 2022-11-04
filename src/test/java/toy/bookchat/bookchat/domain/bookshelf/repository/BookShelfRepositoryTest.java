@@ -61,15 +61,11 @@ class BookShelfRepositoryTest {
         User user = User.builder().build();
         userRepository.save(user);
 
-        bookRepository.flush();
-        userRepository.flush();
-
         BookShelf bookShelf = BookShelf.builder()
             .book(book)
             .user(user)
             .build();
         bookShelfRepository.save(bookShelf);
-        bookShelfRepository.flush();
 
         BookShelf findBookShelf = bookShelfRepository.findById(bookShelf.getId()).get();
         Book findBook = findBookShelf.getBook();
@@ -199,10 +195,6 @@ class BookShelfRepositoryTest {
         bookShelfRepository.save(bookShelf1);
         bookShelfRepository.save(bookShelf2);
 
-        userRepository.flush();
-        bookRepository.flush();
-        bookShelfRepository.flush();
-
         user.updateImageUrl("hi");
         bookShelf1.getUser().updateImageUrl("by");
 
@@ -234,10 +226,6 @@ class BookShelfRepositoryTest {
 
         bookShelfRepository.save(bookShelf);
 
-        userRepository.flush();
-        bookRepository.flush();
-        bookShelfRepository.flush();
-
         BookShelf readingBook = bookShelfRepository.findReadingBookByUserIdAndBookId(
             user.getId(), book.getId());
 
@@ -268,13 +256,7 @@ class BookShelfRepositoryTest {
 
         bookShelfRepository.save(bookShelf);
 
-        userRepository.flush();
-        bookRepository.flush();
-        bookShelfRepository.flush();
-
         bookShelfRepository.deleteBookByUserIdAndBookId(user.getId(), book.getId());
-
-        bookShelfRepository.flush();
 
         int result = bookShelfRepository.findAll().size();
         assertThat(result).isZero();
@@ -296,10 +278,6 @@ class BookShelfRepositoryTest {
             .build();
 
         bookShelfRepository.save(bookShelf);
-
-        userRepository.flush();
-        bookRepository.flush();
-        bookShelfRepository.flush();
 
         BookShelf findBookShelf = bookShelfRepository.findByUserIdAndBookId(
             user.getId(), book.getId()).get();
