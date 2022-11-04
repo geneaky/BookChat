@@ -10,6 +10,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
@@ -50,6 +51,7 @@ import toy.bookchat.bookchat.domain.agony.service.AgonyRecordService;
 import toy.bookchat.bookchat.domain.agony.service.AgonyService;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateAgonyRecordRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateBookAgonyRequest;
+import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.response.BasePageOfAgoniesResponse;
 import toy.bookchat.bookchat.domain.agony.service.dto.response.BasePageOfAgonyRecordsResponse;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
@@ -308,5 +310,34 @@ class AgonyControllerTest extends AuthenticationTestExtension {
                 )));
 
         verify(agonyService).deleteAgony(any(), any(), any());
+    }
+
+    @Test
+    void 고민_폴더_수정_성공() throws Exception {
+        ReviseAgonyRequest reviseAgonyRequest = ReviseAgonyRequest.builder()
+            .agonyTitle("고민 바꾸기")
+            .agonyColor("보라색")
+            .build();
+
+        mockMvc.perform(put("/v1/api/bookshelf/books/{bookId}/agonies/{agonyId}", 1L, 1L)
+                .header("Authorization", "Bearer " + getTestToken())
+                .with(user(getUserPrincipal()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(reviseAgonyRequest)))
+            .andExpect(status().isOk())
+            .andDo(document("put-agony",
+                requestHeaders(
+                    headerWithName("Authorization").description("Bearer [JWT token]")
+                ),
+                pathParameters(
+                    parameterWithName("bookId").description("Book Id"),
+                    parameterWithName("agonyId").description("Agony Id")
+                ),
+                requestFields(
+                    fieldWithPath("agonyTitle").type(STRING).description("고민 폴더 이름"),
+                    fieldWithPath("agonyColor").type(STRING).description("고민 폴더 색")
+                )));
+
+        verify(agonyService).reviseAgony(any(), any(), any(), any());
     }
 }

@@ -33,4 +33,12 @@ public class Agony extends BaseEntity {
 
     protected Agony() {
     }
+
+    public void changeTitle(String agonyTitle) {
+        this.title = agonyTitle;
+    }
+
+    public void changeHexColorCode(String agonyColor) {
+        this.hexColorCode = agonyColor;
+    }
 }

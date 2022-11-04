@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,6 +14,7 @@ import toy.bookchat.bookchat.domain.agony.service.AgonyRecordService;
 import toy.bookchat.bookchat.domain.agony.service.AgonyService;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateAgonyRecordRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateBookAgonyRequest;
+import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.response.BasePageOfAgoniesResponse;
 import toy.bookchat.bookchat.domain.agony.service.dto.response.BasePageOfAgonyRecordsResponse;
 import toy.bookchat.bookchat.security.user.TokenPayload;
@@ -70,5 +72,13 @@ public class AgonyController {
         @UserPayload TokenPayload tokenPayload) {
 
         agonyService.deleteAgony(bookId, agonyId, tokenPayload.getUserId());
+    }
+
+    @PutMapping("/{agonyId}")
+    public void reviseAgony(@PathVariable Long bookId, @PathVariable Long agonyId,
+        @Valid @RequestBody ReviseAgonyRequest reviseAgonyRequest,
+        @UserPayload TokenPayload tokenPayload) {
+
+        agonyService.reviseAgony(bookId, agonyId, tokenPayload.getUserId(), reviseAgonyRequest);
     }
 }
