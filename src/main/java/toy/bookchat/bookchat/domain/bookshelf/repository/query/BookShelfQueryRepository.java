@@ -11,7 +11,8 @@ public interface BookShelfQueryRepository {
     Page<BookShelf> findSpecificStatusBookByUserId(
         ReadingStatus readingStatus, Pageable pageable, Long userId);
 
-    BookShelf findReadingBookByUserIdAndBookId(Long userId, Long bookId);
+    BookShelf findOneOnConditionByUserIdAndBookId(Long userId, Long bookId,
+        ReadingStatus readingStatus);
 
     void deleteBookByUserIdAndBookId(Long userId, Long bookId);
 

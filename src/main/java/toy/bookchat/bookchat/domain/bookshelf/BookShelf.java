@@ -115,4 +115,8 @@ public class BookShelf extends BaseEntity {
     public void deleteBookReport() {
         this.bookReport = null;
     }
+
+    public void changeStar(Star star) {
+        this.star = star;
+    }
 }

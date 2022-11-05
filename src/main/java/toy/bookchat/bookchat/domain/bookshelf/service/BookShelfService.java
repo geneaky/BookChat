@@ -14,6 +14,7 @@ import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookShelfRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeBookStatusRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeReadingBookPageRequest;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ReviseBookShelfStarRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.SearchBookShelfByReadingStatus;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
@@ -103,7 +104,8 @@ public class BookShelfService {
     public void changeReadingBookPage(
         ChangeReadingBookPageRequest changeReadingBookPageRequest, Long userId, Long bookId) {
 
-        BookShelf bookShelf = bookShelfRepository.findReadingBookByUserIdAndBookId(userId, bookId);
+        BookShelf bookShelf = bookShelfRepository.findOneOnConditionByUserIdAndBookId(userId,
+            bookId, ReadingStatus.READING);
 
         bookShelf.updatePage(changeReadingBookPageRequest.getPages());
     }
@@ -125,5 +127,14 @@ public class BookShelfService {
         });
 
         bookShelf.updateReadingStatus(changeBookStatusRequest.getReadingStatus());
+    }
+
+    @Transactional
+    public void reviseBookStar(Long bookId, Long userId,
+        ReviseBookShelfStarRequest reviseBookShelfStarRequest) {
+        BookShelf bookShelf = bookShelfRepository.findOneOnConditionByUserIdAndBookId(
+            userId, bookId, ReadingStatus.COMPLETE);
+
+        bookShelf.changeStar(reviseBookShelfStarRequest.getStar());
     }
 }

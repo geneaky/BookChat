@@ -226,8 +226,8 @@ class BookShelfRepositoryTest {
 
         bookShelfRepository.save(bookShelf);
 
-        BookShelf readingBook = bookShelfRepository.findReadingBookByUserIdAndBookId(
-            user.getId(), book.getId());
+        BookShelf readingBook = bookShelfRepository.findOneOnConditionByUserIdAndBookId(
+            user.getId(), book.getId(), ReadingStatus.READING);
 
         assertThat(readingBook).isNotNull();
     }
@@ -235,7 +235,7 @@ class BookShelfRepositoryTest {
     @Test
     void 읽고있는_책_book_id로_조회시_없으면_예외발생() throws Exception {
         assertThatThrownBy(() -> {
-            bookShelfRepository.findReadingBookByUserIdAndBookId(1L, 1L);
+            bookShelfRepository.findOneOnConditionByUserIdAndBookId(1L, 1L, ReadingStatus.READING);
         }).isInstanceOf(BookNotFoundException.class);
     }
 

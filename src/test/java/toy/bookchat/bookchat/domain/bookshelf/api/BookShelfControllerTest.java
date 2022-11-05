@@ -27,7 +27,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static toy.bookchat.bookchat.domain.user.ROLE.USER;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -59,6 +58,7 @@ import toy.bookchat.bookchat.domain.bookshelf.service.BookShelfService;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookShelfRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeBookStatusRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeReadingBookPageRequest;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ReviseBookShelfStarRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.SearchBookShelfByReadingStatus;
 import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.domain.user.User;
@@ -255,20 +255,6 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
     void null로_요청_실패() throws Exception {
         mockMvc.perform(post("/v1/api/bookshelf/books")
                 .header("Authorization", "Bearer " + getTestToken())
-                .contentType(APPLICATION_JSON)
-                .with(user(getUserPrincipal())))
-            .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void 존재하지않은_readingstatus_책_등록_실패() throws Exception {
-        BookShelfTestRequestDto bookShelfTestRequestDto = new BookShelfTestRequestDto("124151214",
-            "effectiveJava", List.of("Joshua"), "oreilly",
-            "bookCoverImage.com", "NOT_EXISTED_READING_STATUS");
-
-        mockMvc.perform(post("/v1/api/bookshelf/books")
-                .header("Authorization", "Bearer " + getTestToken())
-                .content(objectMapper.writeValueAsString(bookShelfTestRequestDto))
                 .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isBadRequest());
@@ -743,29 +729,27 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
         verify(bookShelfService).changeBookStatusOnBookShelf(any(), any(), any());
     }
 
-    static class BookShelfTestRequestDto {
+    @Test
+    void 독서완료_책_별점_수정_성공() throws Exception {
+        ReviseBookShelfStarRequest reviseBookShelfStarRequest = ReviseBookShelfStarRequest.of(
+            Star.FOUR);
+        mockMvc.perform(patch("/v1/api/bookshelf/books/{bookId}/star", 1L, 1L)
+                .header("Authorization", "Bearer " + getTestToken())
+                .with(user(getUserPrincipal()))
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(reviseBookShelfStarRequest)))
+            .andExpect(status().isOk())
+            .andDo(document("patch-bookshelf-book-star",
+                requestHeaders(
+                    headerWithName("Authorization").description("Bearer [JWT token]")
+                ),
+                pathParameters(
+                    parameterWithName("bookId").description("Book Id")
+                ),
+                requestFields(
+                    fieldWithPath("star").description("별점")
+                )));
 
-        @JsonProperty
-        String isbn;
-        @JsonProperty
-        String title;
-        @JsonProperty
-        List<String> author;
-        @JsonProperty
-        String publisher;
-        @JsonProperty
-        String bookCoverImageUrl;
-        @JsonProperty
-        String readingStatus;
-
-        public BookShelfTestRequestDto(String isbn, String title, List<String> author,
-            String publisher, String bookCoverImageUrl, String readingStatus) {
-            this.isbn = isbn;
-            this.title = title;
-            this.author = author;
-            this.publisher = publisher;
-            this.bookCoverImageUrl = bookCoverImageUrl;
-            this.readingStatus = readingStatus;
-        }
+        verify(bookShelfService).reviseBookStar(any(), any(), any());
     }
 }
