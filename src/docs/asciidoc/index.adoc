@@ -357,6 +357,24 @@ include::{snippets}/delete-bookshelf-books/http-request.adoc[]
 
 include::{snippets}/delete-bookshelf-books/http-response.adoc[]
 
+---
+
+=== 독서완료 도서 별점 수정
+
+`Request Header`
+
+include::{snippets}/patch-bookshelf-book-star/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/patch-bookshelf-book-star/path-parameters.adoc[]
+include::{snippets}/patch-bookshelf-book-star/request-fields.adoc[]
+include::{snippets}/patch-bookshelf-book-star/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/patch-bookshelf-book-star/http-response.adoc[]
+
 == 독후감
 
 === 독후감 등록

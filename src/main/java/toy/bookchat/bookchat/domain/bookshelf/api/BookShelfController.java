@@ -15,6 +15,7 @@ import toy.bookchat.bookchat.domain.bookshelf.service.BookShelfService;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookShelfRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeBookStatusRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeReadingBookPageRequest;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ReviseBookShelfStarRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.SearchBookShelfByReadingStatus;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPayload;
@@ -66,5 +67,13 @@ public class BookShelfController {
         @UserPayload TokenPayload tokenPayload) {
 
         bookShelfService.deleteBookOnBookShelf(bookId, tokenPayload.getUserId());
+    }
+
+    @PatchMapping("/bookshelf/books/{bookId}/star")
+    public void changeBookStarOnBookShelf(@PathVariable Long bookId, @Valid @RequestBody
+    ReviseBookShelfStarRequest reviseBookShelfStarRequest, @UserPayload TokenPayload tokenPayload) {
+
+        bookShelfService.reviseBookStar(bookId, tokenPayload.getUserId(),
+            reviseBookShelfStarRequest);
     }
 }
