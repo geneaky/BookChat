@@ -10,9 +10,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
-import toy.bookchat.bookchat.exception.book.BookNotFoundException;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
+import toy.bookchat.bookchat.exception.book.BookNotFoundException;
 
 @Repository
 public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
@@ -47,10 +47,11 @@ public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
     }
 
     @Override
-    public BookShelf findReadingBookByUserIdAndBookId(Long userId, Long bookId) {
+    public BookShelf findOneOnConditionByUserIdAndBookId(Long userId, Long bookId,
+        ReadingStatus readingStatus) {
         return Optional.ofNullable(queryFactory.select(bookShelf)
             .from(bookShelf)
-            .where(bookShelf.readingStatus.eq(ReadingStatus.READING)
+            .where(bookShelf.readingStatus.eq(readingStatus)
                 .and(bookShelf.user.id.eq(userId))
                 .and(bookShelf.book.id.eq(bookId)))
             .fetchOne()).orElseThrow(() -> {

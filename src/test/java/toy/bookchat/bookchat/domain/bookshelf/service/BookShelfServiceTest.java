@@ -27,6 +27,7 @@ import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookShelfRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeBookStatusRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeReadingBookPageRequest;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ReviseBookShelfStarRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.SearchBookShelfByReadingStatus;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
@@ -273,7 +274,8 @@ class BookShelfServiceTest {
             .singleLineAssessment(null)
             .build();
 
-        when(bookShelfRepository.findReadingBookByUserIdAndBookId(any(), any())).thenReturn(
+        when(bookShelfRepository.findOneOnConditionByUserIdAndBookId(any(), any(),
+            any())).thenReturn(
             bookShelf);
 
         bookShelfService.changeReadingBookPage(changeReadingBookPageRequest, user.getId(),
@@ -348,5 +350,21 @@ class BookShelfServiceTest {
             bookShelfService.changeBookStatusOnBookShelf(
                 new ChangeBookStatusRequest(ReadingStatus.READING), user.getId(), book.getId());
         }).isInstanceOf(BookNotFoundException.class);
+    }
+
+    @Test
+    void 독서완료_서재_별점수정_성공() throws Exception {
+        BookShelf bookShelf = BookShelf.builder()
+            .star(Star.HALF)
+            .build();
+        ReviseBookShelfStarRequest reviseBookShelfStarRequest = ReviseBookShelfStarRequest.of(
+            Star.FIVE);
+
+        when(bookShelfRepository.findOneOnConditionByUserIdAndBookId(1L, 1L,
+            ReadingStatus.COMPLETE)).thenReturn(bookShelf);
+        bookShelfService.reviseBookStar(1L, 1L, reviseBookShelfStarRequest);
+
+        Star result = bookShelf.getStar();
+        assertThat(result).isEqualTo(Star.FIVE);
     }
 }

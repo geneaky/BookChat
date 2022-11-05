@@ -104,7 +104,8 @@ public class BookShelfService {
     public void changeReadingBookPage(
         ChangeReadingBookPageRequest changeReadingBookPageRequest, Long userId, Long bookId) {
 
-        BookShelf bookShelf = bookShelfRepository.findReadingBookByUserIdAndBookId(userId, bookId);
+        BookShelf bookShelf = bookShelfRepository.findOneOnConditionByUserIdAndBookId(userId,
+            bookId, ReadingStatus.READING);
 
         bookShelf.updatePage(changeReadingBookPageRequest.getPages());
     }
@@ -131,6 +132,9 @@ public class BookShelfService {
     @Transactional
     public void reviseBookStar(Long bookId, Long userId,
         ReviseBookShelfStarRequest reviseBookShelfStarRequest) {
+        BookShelf bookShelf = bookShelfRepository.findOneOnConditionByUserIdAndBookId(
+            userId, bookId, ReadingStatus.COMPLETE);
 
+        bookShelf.changeStar(reviseBookShelfStarRequest.getStar());
     }
 }
