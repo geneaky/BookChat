@@ -25,6 +25,7 @@ import toy.bookchat.bookchat.domain.agony.AgonyRecord;
 import toy.bookchat.bookchat.domain.agony.repository.AgonyRecordRepository;
 import toy.bookchat.bookchat.domain.agony.repository.AgonyRepository;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateAgonyRecordRequest;
+import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRecordRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.response.BasePageOfAgonyRecordsResponse;
 import toy.bookchat.bookchat.exception.agony.AgonyNotFoundException;
 
@@ -97,5 +98,17 @@ class AgonyRecordServiceTest {
         agonyRecordService.deleteAgonyRecord(1L, 1L, 1L, 1L);
 
         verify(agonyRecordRepository).deleteAgony(any(), any(), any(), any());
+    }
+
+    @Test
+    void 본인이_생성한_고민_기록_수정_성공() throws Exception {
+        ReviseAgonyRecordRequest reviseAgonyRecordRequest = ReviseAgonyRecordRequest.builder()
+            .recordTitle("수정 제목")
+            .recordContent("수정 내용")
+            .build();
+
+        agonyRecordService.reviseAgonyRecord(1L, 1L, 1L, 1L, reviseAgonyRecordRequest);
+
+        verify(agonyRecordRepository).reviseAgonyRecord(any(), any(), any(), any(), any(), any());
     }
 }

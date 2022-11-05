@@ -3,6 +3,8 @@ package toy.bookchat.bookchat.domain.agony.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -35,6 +37,8 @@ class AgonyRecordRepositoryTest {
     private UserRepository userRepository;
     @Autowired
     private BookShelfRepository bookShelfRepository;
+    @PersistenceContext
+    private EntityManager em;
 
     private Book getBook() {
         return Book.builder()
@@ -142,5 +146,30 @@ class AgonyRecordRepositoryTest {
 
         List<AgonyRecord> all = agonyRecordRepository.findAll();
         assertThat(all).isEmpty();
+    }
+
+    @Test
+    void 고민기록_수정_성공() throws Exception {
+        Book book = getBook();
+        bookRepository.save(book);
+
+        User user = getUser();
+        userRepository.save(user);
+
+        BookShelf bookShelf = getBookShelf(user, book);
+        bookShelfRepository.save(bookShelf);
+
+        Agony agony = getAgony(bookShelf);
+        agonyRepository.save(agony);
+
+        AgonyRecord agonyRecord = getAgonyRecord(agony);
+        agonyRecordRepository.save(agonyRecord);
+
+        agonyRecordRepository.reviseAgonyRecord(user.getId(), book.getId(), agony.getId(),
+            agonyRecord.getId(), "수정 제목", "수정 내용");
+        em.flush();
+        em.clear();
+        String result = agonyRecordRepository.findById(agonyRecord.getId()).get().getTitle();
+        assertThat(result).isEqualTo("수정 제목");
     }
 }

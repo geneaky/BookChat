@@ -49,9 +49,30 @@ public class AgonyRecordQueryRepositoryImpl implements AgonyRecordQueryRepositor
                 JPAExpressions.select(subAgonyRecord.id)
                     .from(subAgonyRecord)
                     .join(subAgonyRecord.agony, agony).on(agony.id.eq(agonyId))
-                    .join(agony.bookShelf, bookShelf).on(bookShelf.user.id.eq(userId)
+                    .join(agony.bookShelf, bookShelf).on(agony.bookShelf.id.eq(bookShelf.id)
+                        .and(bookShelf.user.id.eq(userId))
                         .and(bookShelf.book.id.eq(bookId)))
-            ).and(agonyRecord.id.eq(recordId))).execute();
+                    .where(subAgonyRecord.id.eq(recordId))
+            )).execute();
+    }
+
+    @Override
+    public void reviseAgonyRecord(Long userId, Long bookId, Long agonyId,
+        Long recordId, String recordTitle, String recordContent) {
+        QAgonyRecord subAgonyRecord = new QAgonyRecord("subAgonyRecord");
+        queryFactory.update(agonyRecord)
+            .set(agonyRecord.title, recordTitle)
+            .set(agonyRecord.content, recordContent)
+            .where(agony.id.eq(
+                JPAExpressions.select(subAgonyRecord.id)
+                    .from(subAgonyRecord)
+                    .join(subAgonyRecord.agony, agony).on(subAgonyRecord.agony.id.eq(agony.id)
+                        .and(agony.id.eq(agonyId)))
+                    .join(agony.bookShelf, bookShelf).on(agony.bookShelf.id.eq(bookShelf.id)
+                        .and(bookShelf.user.id.eq(userId))
+                        .and(bookShelf.book.id.eq(bookId)))
+                    .where(subAgonyRecord.id.eq(recordId))
+            )).execute();
     }
 
 }

@@ -51,6 +51,7 @@ import toy.bookchat.bookchat.domain.agony.service.AgonyRecordService;
 import toy.bookchat.bookchat.domain.agony.service.AgonyService;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateAgonyRecordRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateBookAgonyRequest;
+import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRecordRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.response.BasePageOfAgoniesResponse;
 import toy.bookchat.bookchat.domain.agony.service.dto.response.BasePageOfAgonyRecordsResponse;
@@ -360,5 +361,36 @@ class AgonyControllerTest extends AuthenticationTestExtension {
                 )));
 
         verify(agonyRecordService).deleteAgonyRecord(any(), any(), any(), any());
+    }
+
+    @Test
+    void 고민기록_수정_성공() throws Exception {
+        ReviseAgonyRecordRequest reviseAgonyRecordRequest = ReviseAgonyRecordRequest.builder()
+            .recordTitle("수정된 고민 기록 제목")
+            .recordContent("수정된 고민 기록 내용")
+            .build();
+
+        mockMvc.perform(
+                put("/v1/api/bookshelf/books/{bookId}/agonies/{agonyId}/records/{recordId}", 1L, 1L, 1L)
+                    .header("Authorization", "Bearer " + getTestToken())
+                    .with(user(getUserPrincipal()))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(reviseAgonyRecordRequest)))
+            .andExpect(status().isOk())
+            .andDo(document("put-agony-record",
+                requestHeaders(
+                    headerWithName("Authorization").description("Bearer [JWT token]")
+                ),
+                pathParameters(
+                    parameterWithName("bookId").description("Book Id"),
+                    parameterWithName("agonyId").description("Agony Id"),
+                    parameterWithName("recordId").description("Record Id")
+                ),
+                requestFields(
+                    fieldWithPath("recordTitle").type(STRING).description("고민 기록 제목"),
+                    fieldWithPath("recordContent").type(STRING).description("고민 기록 내용")
+                )));
+
+        verify(agonyRecordService).reviseAgonyRecord(any(), any(), any(), any(), any());
     }
 }

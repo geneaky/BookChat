@@ -14,6 +14,7 @@ import toy.bookchat.bookchat.domain.agony.service.AgonyRecordService;
 import toy.bookchat.bookchat.domain.agony.service.AgonyService;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateAgonyRecordRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateBookAgonyRequest;
+import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRecordRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.response.BasePageOfAgoniesResponse;
 import toy.bookchat.bookchat.domain.agony.service.dto.response.BasePageOfAgonyRecordsResponse;
@@ -87,5 +88,15 @@ public class AgonyController {
         @PathVariable Long recordId, @UserPayload TokenPayload tokenPayload) {
 
         agonyRecordService.deleteAgonyRecord(bookId, agonyId, recordId, tokenPayload.getUserId());
+    }
+
+    @PutMapping("/{agonyId}/records/{recordId}")
+    public void reviseAgonyRecord(@PathVariable Long bookId, @PathVariable Long agonyId,
+        @PathVariable Long recordId,
+        @Valid @RequestBody ReviseAgonyRecordRequest reviseAgonyRecordRequest,
+        @UserPayload TokenPayload tokenPayload) {
+
+        agonyRecordService.reviseAgonyRecord(bookId, agonyId, recordId, tokenPayload.getUserId(),
+            reviseAgonyRecordRequest);
     }
 }
