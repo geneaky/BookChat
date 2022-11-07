@@ -89,10 +89,12 @@ class BookControllerTest extends AuthenticationTestExtension {
         return UserPrincipal.create(tokenPayload);
     }
 
-    private BookResponse getBookResponse(String isbn, String title, List<String> author) {
+    private BookResponse getBookResponse(String isbn, String title, String datetime,
+        List<String> author) {
         BookResponse bookResponse = BookResponse.builder()
             .isbn(isbn)
             .title(title)
+            .datetime(datetime.substring(0, 10))
             .author(author)
             .publisher("testPublisher")
             .bookCoverImageUrl("bookCoverImageUrl")
@@ -148,7 +150,9 @@ class BookControllerTest extends AuthenticationTestExtension {
     @Test
     void 사용자가_isbn_검색시_paging_성공() throws Exception {
         List<BookResponse> bookResponses = new ArrayList<>();
-        bookResponses.add(getBookResponse("213123", "effectiveJava", List.of("Joshua")));
+        bookResponses.add(
+            getBookResponse("213123", "effectiveJava", "2014-11-17T00:00:00.000+09:00",
+                List.of("Joshua")));
 
         Meta meta = Meta.builder()
             .total_count(5)
@@ -184,6 +188,7 @@ class BookControllerTest extends AuthenticationTestExtension {
                 responseFields(
                     fieldWithPath("bookResponses[].isbn").type(STRING).description("ISBN"),
                     fieldWithPath("bookResponses[].title").type(STRING).description("제목"),
+                    fieldWithPath("bookResponses[].datetime").type(STRING).description("출간일"),
                     fieldWithPath("bookResponses[].author[]").type(ARRAY).description("저자"),
                     fieldWithPath("bookResponses[].publisher").type(STRING).description("출판사"),
                     fieldWithPath("bookResponses[].bookCoverImageUrl").type(STRING)

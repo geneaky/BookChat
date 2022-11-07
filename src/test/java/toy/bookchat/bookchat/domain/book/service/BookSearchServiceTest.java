@@ -22,6 +22,7 @@ class BookSearchServiceTest {
 
     private final String isbn = "8996991341 9788996991342";
     private final String title = "미움받을 용기";
+    private final String datetime = "2014-11-17";
     private final String[] authors = {"기시미 이치로", "고가 후미타케"};
     private final String publisher = "인플루엔셜";
     private final String bookCoverImageUrl = "https://search1.kakaocdn.net/thumb/R120x174.q85/?fname=http%3A%2F%2Ft1.daumcdn.net%2Flbook%2Fimage%2F1467038%3Ftimestamp%3D20220505201559";
@@ -60,6 +61,7 @@ class BookSearchServiceTest {
 
         assertThat(bookSearchResponse.getBookResponses().get(0).getIsbn()).isEqualTo(isbn);
         assertThat(bookSearchResponse.getBookResponses().get(0).getTitle()).isEqualTo(title);
+        assertThat(bookSearchResponse.getBookResponses().get(0).getDatetime()).isEqualTo(datetime);
         assertThat(bookSearchResponse.getBookResponses().get(0).getPublisher()).isEqualTo(
             publisher);
         assertThat(bookSearchResponse.getBookResponses().get(0).getAuthor()).isEqualTo(
@@ -86,6 +88,7 @@ class BookSearchServiceTest {
 
         assertThat(bookSearchResponse.getBookResponses().get(0).getIsbn()).isEqualTo(isbn);
         assertThat(bookSearchResponse.getBookResponses().get(0).getTitle()).isEqualTo(title);
+        assertThat(bookSearchResponse.getBookResponses().get(0).getDatetime()).isEqualTo(datetime);
         assertThat(bookSearchResponse.getBookResponses().get(0).getPublisher()).isEqualTo(
             publisher);
         assertThat(bookSearchResponse.getBookResponses().get(0).getAuthor()).isEqualTo(
@@ -112,6 +115,7 @@ class BookSearchServiceTest {
 
         assertThat(bookSearchResponse.getBookResponses().get(0).getIsbn()).isEqualTo(isbn);
         assertThat(bookSearchResponse.getBookResponses().get(0).getTitle()).isEqualTo(title);
+        assertThat(bookSearchResponse.getBookResponses().get(0).getDatetime()).isEqualTo(datetime);
         assertThat(bookSearchResponse.getBookResponses().get(0).getPublisher()).isEqualTo(
             publisher);
         assertThat(bookSearchResponse.getBookResponses().get(0).getAuthor()).isEqualTo(
