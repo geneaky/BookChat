@@ -21,4 +21,8 @@ public class Document {
     private String title;
     private List<String> translators;
     private String url;
+
+    public String getYearMonthDay() {
+        return this.datetime.substring(0, 10);
+    }
 }
