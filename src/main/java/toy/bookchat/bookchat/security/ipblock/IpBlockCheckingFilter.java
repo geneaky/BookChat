@@ -19,9 +19,13 @@ public class IpBlockCheckingFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
         FilterChain filterChain) throws ServletException, IOException {
-        if (!ipBlockManager.validateRequest(request)) {
-            throw new BlockedIpException("You Are Blocked");
-        }
+        checkIfBlockedUser(request);
         filterChain.doFilter(request, response);
+    }
+
+    private void checkIfBlockedUser(HttpServletRequest request) {
+        if (!ipBlockManager.validateRequest(request)) {
+            throw new BlockedIpException();
+        }
     }
 }

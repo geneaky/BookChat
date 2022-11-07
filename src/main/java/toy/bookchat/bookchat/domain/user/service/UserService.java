@@ -65,9 +65,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public User findUserByUsername(String oauth2MemberNumber) {
         return userRepository.findByName(oauth2MemberNumber)
-            .orElseThrow(() -> {
-                throw new UserNotFoundException("Not Registered User");
-            });
+            .orElseThrow(UserNotFoundException::new);
     }
 
     @Transactional
@@ -78,17 +76,15 @@ public class UserService {
     @Transactional
     public void changeUserNickname(ChangeUserNicknameRequest changeUserNicknameRequest,
         Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> {
-            throw new UserNotFoundException("Can't find User");
-        });
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         user.changeUserNickname(changeUserNicknameRequest.getNickname());
     }
 
     private void saveUser(UserSignUpRequest userSignUpRequest, String userName,
         String email, String profileImageUrl) {
         Optional<User> optionalUser = userRepository.findByName(userName);
-        optionalUser.ifPresentOrElse(u -> {
-            throw new UserAlreadySignUpException("user already sign up");
+        optionalUser.ifPresentOrElse(user -> {
+            throw new UserAlreadySignUpException();
         }, () -> {
             User user = userSignUpRequest.getUser(userName, email, profileImageUrl);
             userRepository.save(user);

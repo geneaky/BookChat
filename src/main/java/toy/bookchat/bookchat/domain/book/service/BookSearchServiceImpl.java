@@ -65,6 +65,6 @@ public class BookSearchServiceImpl implements BookSearchService {
             return kakaoBook.getBookSearchResponse();
         }
 
-        throw new BookNotFoundException("can't find book");
+        throw new BookNotFoundException();
     }
 }

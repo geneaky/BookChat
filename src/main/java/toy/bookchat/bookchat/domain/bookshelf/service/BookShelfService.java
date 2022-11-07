@@ -63,9 +63,7 @@ public class BookShelfService {
 
     private BookShelf createBookShelfByReadingStatus(BookShelfRequest bookShelfRequest,
         Book book, Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> {
-            throw new UserNotFoundException("Can't find User");
-        });
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         if (isFinishedReading(bookShelfRequest)) {
             bookShelfRequest.checkCompleteStateField();
 
@@ -122,9 +120,7 @@ public class BookShelfService {
         Long userId, Long bookId) {
 
         BookShelf bookShelf = bookShelfRepository.findByUserIdAndBookId(
-            userId, bookId).orElseThrow(() -> {
-            throw new BookNotFoundException("Book is not registered on book shelf");
-        });
+            userId, bookId).orElseThrow(BookNotFoundException::new);
 
         bookShelf.updateReadingStatus(changeBookStatusRequest.getReadingStatus());
     }

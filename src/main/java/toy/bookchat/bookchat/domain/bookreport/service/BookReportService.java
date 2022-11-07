@@ -1,6 +1,5 @@
 package toy.bookchat.bookchat.domain.bookreport.service;
 
-import java.util.function.Supplier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import toy.bookchat.bookchat.domain.bookreport.BookReport;
@@ -29,7 +28,7 @@ public class BookReportService {
         Long userId) {
 
         BookShelf bookShelf = bookShelfRepository.findByUserIdAndBookId(userId, bookId)
-            .orElseThrow(bookNotFound());
+            .orElseThrow(BookNotFoundException::new);
 
         bookShelf.changeToCompleteReading();
         BookReport bookReport = writeBookReportRequest.getBookReport(bookShelf);
@@ -39,21 +38,15 @@ public class BookReportService {
     @Transactional(readOnly = true)
     public BookReportResponse getBookReportResponse(Long bookId, Long userId) {
         BookShelf bookShelf = bookShelfRepository.findByUserIdAndBookId(userId, bookId)
-            .orElseThrow(bookNotFound());
+            .orElseThrow(BookNotFoundException::new);
 
         return BookReportResponse.from(bookShelf.getBookReport());
-    }
-
-    private Supplier<RuntimeException> bookNotFound() {
-        return () -> {
-            throw new BookNotFoundException("Book is not registered on book shelf");
-        };
     }
 
     @Transactional
     public void deleteBookReport(Long bookId, Long userId) {
         BookShelf bookShelf = bookShelfRepository.findByUserIdAndBookId(userId, bookId)
-            .orElseThrow(bookNotFound());
+            .orElseThrow(BookNotFoundException::new);
 
         bookShelf.deleteBookReport();
     }
@@ -61,7 +54,7 @@ public class BookReportService {
     public void reviseBookReport(Long bookId, Long userId,
         ReviseBookReportRequest reviseBookReportRequest) {
         BookShelf bookShelf = bookShelfRepository.findByUserIdAndBookId(userId, bookId)
-            .orElseThrow(bookNotFound());
+            .orElseThrow(BookNotFoundException::new);
         BookReport bookReport = bookShelf.getBookReport();
 
         bookReport.reviseTitle(reviseBookReportRequest.getReportTitle());

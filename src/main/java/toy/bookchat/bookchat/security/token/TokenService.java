@@ -79,9 +79,7 @@ public class TokenService {
     private User getUserFromRefreshToken(RefreshTokenRequest refreshTokenRequest) {
         return userRepository.findById(
                 jwtTokenManager.getUserIdFromToken(refreshTokenRequest.getRefreshToken()))
-            .orElseThrow(() -> {
-                throw new UserNotFoundException("Can't Find User");
-            });
+            .orElseThrow(UserNotFoundException::new);
     }
 
 }

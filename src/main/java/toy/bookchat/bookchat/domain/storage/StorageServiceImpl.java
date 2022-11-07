@@ -26,7 +26,7 @@ public class StorageServiceImpl implements StorageService {
             amazonS3Client.putObject(s3Config.getBucketName(), fileName,
                 multipartFile.getInputStream(), abstractObjectMetadataFrom(multipartFile));
         } catch (SdkClientException | IOException exception) {
-            throw new ImageUploadToStorageException(exception.getMessage(), exception.getCause());
+            throw new ImageUploadToStorageException(exception.getMessage());
         }
     }
 

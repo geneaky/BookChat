@@ -45,13 +45,12 @@ public class OpenIdToken {
             return stringBuilder.toString();
         }
 
-        throw new DenidedTokenException("Not Allowed Format Token Exception");
+        throw new DenidedTokenException();
     }
 
     public String getEmail(Key publicKey) {
-        return (String) Optional.ofNullable(getBody(publicKey).get(EMAIL)).orElseThrow(() -> {
-            throw new IllegalStandardTokenException("Email is not existed");
-        });
+        return (String) Optional.ofNullable(getBody(publicKey).get(EMAIL))
+            .orElseThrow(IllegalStandardTokenException::new);
     }
 
     private Claims getBody(Key publicKey) {
@@ -62,32 +61,27 @@ public class OpenIdToken {
                 .getBody();
 
         } catch (ExpiredJwtException exception) {
-            log.info("Token :: {} :: is expired", this.token);
-            throw new ExpiredTokenException(exception.getMessage(), exception);
+            log.info("Token Is Expired :: {}", this.token);
+            throw new ExpiredTokenException(exception.getMessage());
         } catch (JwtException | IllegalStateException exception) {
-            log.info("Token :: {} :: is denied", this.token);
-            throw new DenidedTokenException(exception.getMessage(), exception);
+            log.info("Token Is Denied :: {}", this.token);
+            throw new DenidedTokenException(exception.getMessage());
         }
     }
 
     private String getIssuer(Key publicKey) {
         return Optional.ofNullable(getBody(publicKey).getIssuer())
-            .orElseThrow(() -> {
-                throw new IllegalStandardTokenException("Issuer is not existed");
-            });
+            .orElseThrow(IllegalStandardTokenException::new);
     }
 
     private String getSubject(Key publicKey) {
-        return Optional.ofNullable(getBody(publicKey).getSubject()).orElseThrow(() -> {
-            throw new IllegalStandardTokenException("Subject is not existed");
-        });
+        return Optional.ofNullable(getBody(publicKey).getSubject())
+            .orElseThrow(IllegalStandardTokenException::new);
     }
 
     public String getKeyId() {
         return (String) Optional.ofNullable(getHeader()
-            .get(KID)).orElseThrow(() -> {
-            throw new IllegalStandardTokenException("KeyId is not existed");
-        });
+            .get(KID)).orElseThrow(IllegalStandardTokenException::new);
     }
 
     private Header getHeader() {
@@ -97,14 +91,14 @@ public class OpenIdToken {
                 .parse(getUnsignedTokenBuilder(this.token))
                 .getHeader();
         } catch (ExpiredJwtException exception) {
-            log.info("Token :: {} :: is expired", this.token);
-            throw new ExpiredTokenException(exception.getMessage(), exception);
+            log.info("Token Is Expired :: {}", this.token);
+            throw new ExpiredTokenException(exception.getMessage());
         }
     }
 
     private void validateTokenLength() {
         if (this.token.split("\\.").length != STANDARD_TOKEN_LENGTH) {
-            throw new IllegalStandardTokenException("Illegal Standard Token Length");
+            throw new IllegalStandardTokenException();
         }
     }
 

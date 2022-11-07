@@ -54,9 +54,7 @@ public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
             .where(bookShelf.readingStatus.eq(readingStatus)
                 .and(bookShelf.user.id.eq(userId))
                 .and(bookShelf.book.id.eq(bookId)))
-            .fetchOne()).orElseThrow(() -> {
-            throw new BookNotFoundException("Can't Find Book On BookShelf");
-        });
+            .fetchOne()).orElseThrow(BookNotFoundException::new);
 
     }
 

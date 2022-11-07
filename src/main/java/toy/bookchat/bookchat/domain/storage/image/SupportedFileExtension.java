@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.exception.user;
+package toy.bookchat.bookchat.domain.storage.image;
 
 public enum SupportedFileExtension {
     WEBP("webp");
