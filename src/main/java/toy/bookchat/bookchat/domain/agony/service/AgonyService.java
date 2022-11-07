@@ -1,6 +1,5 @@
 package toy.bookchat.bookchat.domain.agony.service;
 
-import java.util.function.Supplier;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,9 +35,7 @@ public class AgonyService {
         Long bookId) {
 
         BookShelf bookShelf = bookShelfRepository.findByUserIdAndBookId(userId, bookId)
-            .orElseThrow(() -> {
-                throw new BookNotFoundException("Not Registered Book");
-            });
+            .orElseThrow(BookNotFoundException::new);
 
         agonyRepository.save(createBookAgonyRequest.getAgony(bookShelf));
     }
@@ -53,7 +50,7 @@ public class AgonyService {
     @Transactional
     public void deleteAgony(Long bookId, Long agonyId, Long userId) {
         Agony agony = agonyRepository.findUserBookShelfAgony(userId, bookId, agonyId)
-            .orElseThrow(AgonyNotFound());
+            .orElseThrow(AgonyNotFoundException::new);
         agonyRecordRepository.deleteByAgony(agony);
         agonyRepository.delete(agony);
     }
@@ -62,14 +59,8 @@ public class AgonyService {
     public void reviseAgony(Long bookId, Long agonyId, Long userId,
         ReviseAgonyRequest reviseAgonyRequest) {
         Agony agony = agonyRepository.findUserBookShelfAgony(userId, bookId, agonyId)
-            .orElseThrow(AgonyNotFound());
+            .orElseThrow(AgonyNotFoundException::new);
         agony.changeTitle(reviseAgonyRequest.getAgonyTitle());
         agony.changeHexColorCode(reviseAgonyRequest.getAgonyColor());
-    }
-
-    private Supplier<RuntimeException> AgonyNotFound() {
-        return () -> {
-            throw new AgonyNotFoundException("Not Registered Agony");
-        };
     }
 }

@@ -30,9 +30,7 @@ public class AgonyRecordService {
         Long userId,
         Long bookId, Long agonyId) {
         Agony agony = agonyRepository.findUserBookShelfAgony(userId, bookId, agonyId)
-            .orElseThrow(() -> {
-                throw new AgonyNotFoundException("Agony is not registered");
-            });
+            .orElseThrow(AgonyNotFoundException::new);
         agonyRecordRepository.save(createAgonyRecordRequest.generateAgonyRecord(agony));
     }
 

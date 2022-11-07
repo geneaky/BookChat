@@ -27,7 +27,7 @@ public class KakaoPublicKeys implements OAuthPublicKey {
         try {
             return searchPublicKey(keyId, keyFactory);
         } catch (InvalidKeySpecException exception) {
-            throw new WrongKeySpecException("Wrong KeySpec");
+            throw new WrongKeySpecException();
         }
     }
 
@@ -38,7 +38,7 @@ public class KakaoPublicKeys implements OAuthPublicKey {
                 return generateKakaoPublicKey(keyFactory, publicKey);
             }
         }
-        throw new ExpiredPublicKeyCachedException("Can't Find Public Key, Retry Please");
+        throw new ExpiredPublicKeyCachedException();
     }
 
     private PublicKey generateKakaoPublicKey(KeyFactory keyFactory, KakakoPublicKey publicKey)

@@ -6,11 +6,7 @@ public class DenidedTokenException extends RuntimeException {
         super(message);
     }
 
-    public DenidedTokenException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public DenidedTokenException(Throwable cause) {
-        super(cause);
+    public DenidedTokenException() {
+        super("Not Allowed Token Format Exception");
     }
 }

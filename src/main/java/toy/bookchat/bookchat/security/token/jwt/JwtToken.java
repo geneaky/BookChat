@@ -37,23 +37,17 @@ public class JwtToken {
 
     public Long getUserId(String secret) {
         return Long.valueOf((String) Optional.ofNullable(getBody(secret).get(USER_ID))
-            .orElseThrow(() -> {
-                throw new IllegalStandardTokenException("User id is not existed");
-            }));
+            .orElseThrow(IllegalStandardTokenException::new));
     }
 
     public String getOAuth2MemberNumber(String secret) {
         return (String) Optional.ofNullable(getBody(secret).get(USER_NAME))
-            .orElseThrow(() -> {
-                throw new IllegalStandardTokenException("User name is not existed");
-            });
+            .orElseThrow(IllegalStandardTokenException::new);
     }
 
     public String getEmail(String secret) {
         return (String) Optional.ofNullable(getBody(secret).get(EMAIL))
-            .orElseThrow(() -> {
-                throw new IllegalStandardTokenException("Email is not existed");
-            });
+            .orElseThrow(IllegalStandardTokenException::new);
     }
 
     private Claims getBody(String secret) {
@@ -61,23 +55,19 @@ public class JwtToken {
             return Optional.ofNullable(Jwts.parser()
                 .setSigningKey(secret)
                 .parseClaimsJws(this.token)
-                .getBody()).orElseThrow(() -> {
-                throw new IllegalStandardTokenException("Token body is not existed");
-            });
+                .getBody()).orElseThrow(IllegalStandardTokenException::new);
         } catch (ExpiredJwtException exception) {
-            log.info("Token :: {} :: is expired", this.token);
-            throw new ExpiredTokenException(exception.getMessage(), exception);
+            log.info("Token Is Expired :: {}", this.token);
+            throw new ExpiredTokenException(exception.getMessage());
         } catch (IllegalArgumentException | JwtException exception) {
-            log.info("Token :: {} :: is denied", this.token);
-            throw new DenidedTokenException(exception.getMessage(), exception);
+            log.info("Token Is Denied :: {}", this.token);
+            throw new DenidedTokenException(exception.getMessage());
         }
     }
 
     public OAuth2Provider getOAuth2Provider(String secret) {
         return OAuth2Provider.from((String) Optional.ofNullable(getBody(secret).get(PROVIDER))
-            .orElseThrow(() -> {
-                throw new IllegalStandardTokenException("Provider is not existed");
-            }));
+            .orElseThrow(IllegalStandardTokenException::new));
     }
 
     public boolean hasNotRemainingTime(String secret, long reissuePeriod) {

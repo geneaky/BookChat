@@ -1,6 +1,6 @@
 package toy.bookchat.bookchat.domain.storage.image;
 
-import static toy.bookchat.bookchat.exception.user.SupportedFileExtension.WEBP;
+import static toy.bookchat.bookchat.domain.storage.image.SupportedFileExtension.WEBP;
 
 import com.luciad.imageio.webp.WebPImageReaderSpi;
 import java.io.IOException;
@@ -18,7 +18,7 @@ public class ImageReaderAdapterImpl implements ImageReaderAdapter {
         try {
             this.readerInstance = new WebPImageReaderSpi().createReaderInstance(WEBP.getValue());
         } catch (IOException exception) {
-            throw new ImageInputStreamException(exception.getMessage(), exception.getCause());
+            throw new ImageInputStreamException(exception.getMessage());
         }
     }
 
@@ -32,7 +32,7 @@ public class ImageReaderAdapterImpl implements ImageReaderAdapter {
         try {
             return readerInstance.getWidth(0);
         } catch (IOException exception) {
-            throw new ImageInputStreamException(exception.getMessage(), exception.getCause());
+            throw new ImageInputStreamException(exception.getMessage());
         }
     }
 
@@ -41,7 +41,7 @@ public class ImageReaderAdapterImpl implements ImageReaderAdapter {
         try {
             return readerInstance.getHeight(0);
         } catch (IOException exception) {
-            throw new ImageInputStreamException(exception.getMessage(), exception.getCause());
+            throw new ImageInputStreamException(exception.getMessage());
         }
     }
 }

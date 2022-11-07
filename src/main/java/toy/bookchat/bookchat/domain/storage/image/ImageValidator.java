@@ -33,7 +33,7 @@ public class ImageValidator {
             imageReaderAdapter.setInput(
                 ImageIO.createImageInputStream(multipartFile.getInputStream()));
         } catch (IOException | NullPointerException exception) {
-            throw new ImageInputStreamException(exception.getMessage(), exception.getCause());
+            throw new ImageInputStreamException(exception.getMessage());
         }
 
         return isValidFileSize();

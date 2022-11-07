@@ -54,7 +54,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return bearerToken.substring(BEGIN_INDEX);
         }
         ipBlockManager.increase(request);
-        throw new DenidedTokenException("Not Allowed Format Request Exception");
+        throw new DenidedTokenException();
     }
 
     private void registerUserAuthenticationOnSecurityContext(TokenPayload tokenPayload) {

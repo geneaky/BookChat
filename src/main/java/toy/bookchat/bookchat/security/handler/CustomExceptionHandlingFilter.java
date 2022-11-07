@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.exception.security;
+package toy.bookchat.bookchat.security.handler;
 
 import java.io.IOException;
 import javax.servlet.FilterChain;
