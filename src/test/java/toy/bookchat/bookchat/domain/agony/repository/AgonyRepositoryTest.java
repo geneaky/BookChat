@@ -124,7 +124,7 @@ class AgonyRepositoryTest {
             .hexColorCode("pupple")
             .bookShelf(bookShelf)
             .build();
-        ;
+
         List<Agony> agonyList = List.of(agony1, agony2, agony3);
         agonyRepository.saveAll(agonyList);
 
@@ -134,5 +134,38 @@ class AgonyRepositoryTest {
 
         List<Agony> content = pageOfAgonies.getContent();
         assertThat(content).containsExactly(agony3, agony2);
+    }
+
+    @Test
+    void 고민_여러개_삭제_성공() throws Exception {
+        Book book = getBook();
+        bookRepository.save(book);
+
+        User user = getUser();
+        userRepository.save(user);
+
+        BookShelf bookShelf = getBookShelf(user, book);
+        bookShelfRepository.save(bookShelf);
+
+        Agony agony1 = getAgony(bookShelf);
+        Agony agony2 = Agony.builder()
+            .title("title2")
+            .hexColorCode("red")
+            .bookShelf(bookShelf)
+            .build();
+        Agony agony3 = Agony.builder()
+            .title("title3")
+            .hexColorCode("pupple")
+            .bookShelf(bookShelf)
+            .build();
+
+        List<Agony> agonyList = List.of(agony1, agony2, agony3);
+        agonyRepository.saveAll(agonyList);
+
+        List<Long> agoniesIds = List.of(agony1.getId(), agony2.getId(), agony3.getId());
+        agonyRepository.deleteByAgoniesIds(book.getId(), user.getId(), agoniesIds);
+
+        List<Agony> result = agonyRepository.findAll();
+        assertThat(result).isEmpty();
     }
 }

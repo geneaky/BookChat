@@ -350,7 +350,7 @@ include::{snippets}/delete-bookshelf-books/request-headers.adoc[]
 
 `Request`
 
-include::{snippets}/delete-bookshelf-books/request-fields.adoc[]
+include::{snippets}/delete-bookshelf-books/path-parameters.adoc[]
 include::{snippets}/delete-bookshelf-books/http-request.adoc[]
 
 `Response`

@@ -49,8 +49,7 @@ public class AgonyRecordQueryRepositoryImpl implements AgonyRecordQueryRepositor
                 JPAExpressions.select(subAgonyRecord.id)
                     .from(subAgonyRecord)
                     .join(subAgonyRecord.agony, agony).on(agony.id.eq(agonyId))
-                    .join(agony.bookShelf, bookShelf).on(agony.bookShelf.id.eq(bookShelf.id)
-                        .and(bookShelf.user.id.eq(userId))
+                    .join(agony.bookShelf, bookShelf).on(bookShelf.user.id.eq(userId)
                         .and(bookShelf.book.id.eq(bookId)))
                     .where(subAgonyRecord.id.eq(recordId))
             )).execute();
@@ -66,12 +65,22 @@ public class AgonyRecordQueryRepositoryImpl implements AgonyRecordQueryRepositor
             .where(agony.id.eq(
                 JPAExpressions.select(subAgonyRecord.id)
                     .from(subAgonyRecord)
-                    .join(subAgonyRecord.agony, agony).on(subAgonyRecord.agony.id.eq(agony.id)
-                        .and(agony.id.eq(agonyId)))
-                    .join(agony.bookShelf, bookShelf).on(agony.bookShelf.id.eq(bookShelf.id)
-                        .and(bookShelf.user.id.eq(userId))
+                    .join(subAgonyRecord.agony, agony).on(agony.id.eq(agonyId))
+                    .join(agony.bookShelf, bookShelf).on(bookShelf.user.id.eq(userId)
                         .and(bookShelf.book.id.eq(bookId)))
                     .where(subAgonyRecord.id.eq(recordId))
+            )).execute();
+    }
+
+    @Override
+    public void deleteByAgoniesIds(Long bookId, Long userId, List<Long> agoniesIds) {
+        queryFactory.delete(agonyRecord)
+            .where(agonyRecord.agony.id.in(
+                JPAExpressions.select(agony.id)
+                    .from(agony)
+                    .join(agony.bookShelf, bookShelf)
+                    .on(bookShelf.book.id.eq(bookId).and(bookShelf.user.id.eq(userId)))
+                    .where(agony.id.in(agoniesIds))
             )).execute();
     }
 

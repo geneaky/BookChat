@@ -14,6 +14,7 @@ import toy.bookchat.bookchat.domain.agony.service.AgonyRecordService;
 import toy.bookchat.bookchat.domain.agony.service.AgonyService;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateAgonyRecordRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateBookAgonyRequest;
+import toy.bookchat.bookchat.domain.agony.service.dto.request.DeleteAgoniesRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRecordRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.response.BasePageOfAgoniesResponse;
@@ -68,11 +69,12 @@ public class AgonyController {
             tokenPayload.getUserId(), pageable);
     }
 
-    @DeleteMapping("/{agonyId}")
-    public void deleteAgony(@PathVariable Long bookId, @PathVariable Long agonyId,
+    @DeleteMapping
+    public void deleteAgony(@PathVariable Long bookId,
+        @Valid @RequestBody DeleteAgoniesRequest deleteAgoniesRequest,
         @UserPayload TokenPayload tokenPayload) {
 
-        agonyService.deleteAgony(bookId, agonyId, tokenPayload.getUserId());
+        agonyService.deleteAgony(bookId, deleteAgoniesRequest, tokenPayload.getUserId());
     }
 
     @PutMapping("/{agonyId}")

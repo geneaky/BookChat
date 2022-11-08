@@ -1,5 +1,6 @@
 package toy.bookchat.bookchat.domain.agony.repository.query;
 
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import toy.bookchat.bookchat.domain.agony.AgonyRecord;
@@ -14,4 +15,6 @@ public interface AgonyRecordQueryRepository {
 
     void reviseAgonyRecord(Long userId, Long bookId, Long agonyId, Long recordId,
         String recordTitle, String recordContent);
+
+    void deleteByAgoniesIds(Long bookId, Long userId, List<Long> agoniesIds);
 }
