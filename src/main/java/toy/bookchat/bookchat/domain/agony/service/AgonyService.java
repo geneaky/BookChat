@@ -7,6 +7,7 @@ import toy.bookchat.bookchat.domain.agony.Agony;
 import toy.bookchat.bookchat.domain.agony.repository.AgonyRecordRepository;
 import toy.bookchat.bookchat.domain.agony.repository.AgonyRepository;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateBookAgonyRequest;
+import toy.bookchat.bookchat.domain.agony.service.dto.request.DeleteAgoniesRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.response.BasePageOfAgoniesResponse;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
@@ -48,11 +49,10 @@ public class AgonyService {
     }
 
     @Transactional
-    public void deleteAgony(Long bookId, Long agonyId, Long userId) {
-        Agony agony = agonyRepository.findUserBookShelfAgony(userId, bookId, agonyId)
-            .orElseThrow(AgonyNotFoundException::new);
-        agonyRecordRepository.deleteByAgony(agony);
-        agonyRepository.delete(agony);
+    public void deleteAgony(Long bookId, DeleteAgoniesRequest deleteAgoniesRequest, Long userId) {
+        agonyRecordRepository.deleteByAgoniesIds(bookId, userId,
+            deleteAgoniesRequest.getAgoniesIds());
+        agonyRepository.deleteByAgoniesIds(bookId, userId, deleteAgoniesRequest.getAgoniesIds());
     }
 
     @Transactional

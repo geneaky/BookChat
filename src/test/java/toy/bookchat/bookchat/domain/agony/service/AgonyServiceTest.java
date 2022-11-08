@@ -22,11 +22,11 @@ import toy.bookchat.bookchat.domain.agony.Agony;
 import toy.bookchat.bookchat.domain.agony.repository.AgonyRecordRepository;
 import toy.bookchat.bookchat.domain.agony.repository.AgonyRepository;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateBookAgonyRequest;
+import toy.bookchat.bookchat.domain.agony.service.dto.request.DeleteAgoniesRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.response.BasePageOfAgoniesResponse;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
-import toy.bookchat.bookchat.exception.agony.AgonyNotFoundException;
 import toy.bookchat.bookchat.exception.book.BookNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
@@ -91,20 +91,11 @@ class AgonyServiceTest {
 
     @Test
     void 고민폴더_삭제_성공() throws Exception {
-        when(agonyRepository.findUserBookShelfAgony(any(), any(), any())).thenReturn(
-            Optional.of(mock(Agony.class)));
+        DeleteAgoniesRequest deleteAgoniesRequest = DeleteAgoniesRequest.of(List.of(1L, 2L, 3L));
+        agonyService.deleteAgony(1L, deleteAgoniesRequest, 1L);
 
-        agonyService.deleteAgony(1L, 1L, 1L);
-
-        verify(agonyRecordRepository).deleteByAgony(any(Agony.class));
-        verify(agonyRepository).delete(any(Agony.class));
-    }
-
-    @Test
-    void 등록되지않은_고민폴더_삭제_요청시_예외발생() throws Exception {
-        assertThatThrownBy(() -> {
-            agonyService.deleteAgony(1L, 1L, 1L);
-        }).isInstanceOf(AgonyNotFoundException.class);
+        verify(agonyRecordRepository).deleteByAgoniesIds(any(), any(), any());
+        verify(agonyRepository).deleteByAgoniesIds(any(), any(), any());
     }
 
     @Test
