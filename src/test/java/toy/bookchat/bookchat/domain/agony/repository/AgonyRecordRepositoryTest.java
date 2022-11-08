@@ -96,7 +96,6 @@ class AgonyRecordRepositoryTest {
         agonyRecordRepository.save(agonyRecord);
 
         AgonyRecord findAgonyRecord = agonyRecordRepository.findById(agonyRecord.getId()).get();
-
         assertThat(agonyRecord).isEqualTo(findAgonyRecord);
     }
 
@@ -120,7 +119,6 @@ class AgonyRecordRepositoryTest {
         Pageable pageable = PageRequest.of(0, 1, Sort.by("id").descending());
         List<AgonyRecord> content = agonyRecordRepository.findPageOfUserAgonyRecords(
             book.getId(), agony.getId(), user.getId(), pageable).getContent();
-
         assertThat(content).containsExactly(agonyRecord);
     }
 
