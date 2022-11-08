@@ -1,3 +1,13 @@
+buildscript {
+    repositories {
+        jcenter() // asciidoctor plugin's grolifant dependency move to jcenter from maven
+    }
+
+    dependencies {
+        classpath ("org.ysb33r.gradle:grolifant:0.17.0")
+    }
+}
+
 plugins {
     id 'org.springframework.boot' version '2.6.4'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
