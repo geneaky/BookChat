@@ -172,4 +172,31 @@ class AgonyRecordRepositoryTest {
         String result = agonyRecordRepository.findById(agonyRecord.getId()).get().getTitle();
         assertThat(result).isEqualTo("수정 제목");
     }
+
+    @Test
+    void 고민_기록_여러개_삭제_성공() throws Exception {
+        Book book = getBook();
+        bookRepository.save(book);
+
+        User user = getUser();
+        userRepository.save(user);
+
+        BookShelf bookShelf = getBookShelf(user, book);
+        bookShelfRepository.save(bookShelf);
+
+        Agony agony = getAgony(bookShelf);
+        agonyRepository.save(agony);
+
+        AgonyRecord agonyRecord1 = getAgonyRecord(agony);
+        AgonyRecord agonyRecord2 = getAgonyRecord(agony);
+        AgonyRecord agonyRecord3 = getAgonyRecord(agony);
+        List<AgonyRecord> agonyRecords = List.of(agonyRecord1, agonyRecord2, agonyRecord3);
+        agonyRecordRepository.saveAll(agonyRecords);
+
+        agonyRecordRepository.deleteByAgoniesIds(book.getId(), user.getId(),
+            List.of(agony.getId()));
+
+        List<AgonyRecord> result = agonyRecordRepository.findAll();
+        assertThat(result).isEmpty();
+    }
 }
