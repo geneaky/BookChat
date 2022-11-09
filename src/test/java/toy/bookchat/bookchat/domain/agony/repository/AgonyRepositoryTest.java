@@ -100,7 +100,7 @@ class AgonyRepositoryTest {
     }
 
     @Test
-    void 사용자_책꽂이에_등록한_고민들_paging성공() throws Exception {
+    void 사용자_책꽂이에_등록한_고민들_첫_페이지_조회_성공() throws Exception {
         Book book = getBook();
         bookRepository.save(book);
 
@@ -131,6 +131,59 @@ class AgonyRepositoryTest {
 
         List<Agony> content = pageOfAgonies.getContent();
         assertThat(content).containsExactly(agony3, agony2);
+    }
+
+    @Test
+    void 사용자_책꽂이에_등록한_고민들_두번째_페이지_조회_성공() throws Exception {
+        Book book = getBook();
+        bookRepository.save(book);
+
+        User user = getUser();
+        userRepository.save(user);
+
+        BookShelf bookShelf = getBookShelf(user, book);
+        bookShelfRepository.save(bookShelf);
+
+        Agony agony1 = getAgony(bookShelf);
+        Agony agony2 = getAgony(bookShelf);
+        Agony agony3 = getAgony(bookShelf);
+
+        agonyRepository.save(agony1);
+        agonyRepository.save(agony2);
+        agonyRepository.save(agony3);
+
+        PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("id").descending());
+        Slice<Agony> pageOfAgonies = agonyRepository.findUserBookShelfSliceOfAgonies(
+            book.getId(), user.getId(), pageRequest, Optional.of(3L));
+
+        List<Agony> content = pageOfAgonies.getContent();
+        assertThat(content).containsExactly(agony2, agony1);
+    }
+
+    @Test
+    void 사용자_책꽂이에_등록한_고민들_asc_정렬조건_조회_성공() throws Exception {
+        Book book = getBook();
+        bookRepository.save(book);
+
+        User user = getUser();
+        userRepository.save(user);
+
+        BookShelf bookShelf = getBookShelf(user, book);
+        bookShelfRepository.save(bookShelf);
+
+        Agony agony1 = getAgony(bookShelf);
+        Agony agony2 = getAgony(bookShelf);
+        Agony agony3 = getAgony(bookShelf);
+
+        List<Agony> agonyList = List.of(agony1, agony2, agony3);
+        agonyRepository.saveAllAndFlush(agonyList);
+
+        PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("id").ascending());
+        Slice<Agony> pageOfAgonies = agonyRepository.findUserBookShelfSliceOfAgonies(
+            book.getId(), user.getId(), pageRequest, Optional.of(1L));
+
+        List<Agony> content = pageOfAgonies.getContent();
+        assertThat(content).containsExactly(agony2, agony3);
     }
 
     @Test

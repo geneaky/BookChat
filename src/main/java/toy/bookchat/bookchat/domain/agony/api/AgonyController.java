@@ -46,7 +46,7 @@ public class AgonyController {
     }
 
     @GetMapping
-    public BaseSliceOfAgoniesResponse searchPageOfAgonies(@PathVariable Long bookId,
+    public BaseSliceOfAgoniesResponse searchSliceOfAgonies(@PathVariable Long bookId,
         @RequestParam Optional<Long> postAgonyCursorId,
         Pageable pageable,
         @UserPayload TokenPayload tokenPayload) {

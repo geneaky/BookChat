@@ -5,16 +5,16 @@ import java.util.List;
 import lombok.Getter;
 import org.springframework.data.domain.Slice;
 import toy.bookchat.bookchat.domain.agony.Agony;
-import toy.bookchat.bookchat.domain.common.SliceMeta;
+import toy.bookchat.bookchat.domain.common.CursorMeta;
 
 @Getter
 public class BaseSliceOfAgoniesResponse {
 
     private List<AgonyResponse> agonyResponseList;
-    private SliceMeta sliceMeta;
+    private CursorMeta cursorMeta;
 
     public BaseSliceOfAgoniesResponse(Slice<Agony> slice) {
-        this.sliceMeta = SliceMeta.from(slice);
+        this.cursorMeta = CursorMeta.from(slice);
         this.agonyResponseList = from(slice.getContent());
     }
 

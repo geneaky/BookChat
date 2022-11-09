@@ -195,8 +195,8 @@ class AgonyControllerTest extends ControllerTestExtension {
                 .header("Authorization", "Bearer " + getTestToken())
                 .with(user(getUserPrincipal()))
                 .queryParam("size", "2")
-                .queryParam("page", "0")
-                .queryParam("sort", "id,DESC"))
+                .queryParam("sort", "id,DESC")
+                .queryParam("postAgonyCursorId", "1"))
             .andExpect(status().isOk())
             .andDo(print())
             .andDo(document("get-agonies",
@@ -208,15 +208,16 @@ class AgonyControllerTest extends ControllerTestExtension {
                 ),
                 requestParameters(
                     parameterWithName("size").description("page 당 size"),
-                    parameterWithName("page").description("한번에 조회할 page수"),
-                    parameterWithName("sort").description("[최신순] - id,DESC | [등록순] - id,ASC")
+                    parameterWithName("sort").description("[최신순] - id,DESC | [등록순] - id,ASC"),
+                    parameterWithName("postAgonyCursorId").optional()
+                        .description("다음 Cursor로 지정할 마지막 AgonyId")
                 ),
                 responseFields(
                     fieldWithPath("agonyResponseList[].agonyId").type(NUMBER).description("고민 Id"),
                     fieldWithPath("agonyResponseList[].title").type(STRING).description("고민 제목"),
                     fieldWithPath("agonyResponseList[].hexColorCode").type(STRING)
                         .description("16진수 색상 코드")
-                ).and(getSliceField())
+                ).and(getCursorField())
             ));
     }
 
