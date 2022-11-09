@@ -4,8 +4,11 @@ import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.EntityPathBase;
 import com.querydsl.core.types.dsl.PathBuilder;
+import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
 
 public abstract class RepositorySupport {
@@ -31,5 +34,16 @@ public abstract class RepositorySupport {
             return Order.ASC;
         }
         return Order.DESC;
+    }
+
+    public static <T> Slice<T> toSlice(final List<T> content, final Pageable pageable) {
+        if (hasSameSize(content, pageable)) {
+            return new SliceImpl<>(content, pageable, true);
+        }
+        return new SliceImpl<>(content, pageable, false);
+    }
+
+    private static <T> boolean hasSameSize(List<T> content, Pageable pageable) {
+        return content.size() == pageable.getPageSize();
     }
 }

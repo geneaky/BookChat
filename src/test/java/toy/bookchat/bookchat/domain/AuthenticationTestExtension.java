@@ -2,11 +2,15 @@ package toy.bookchat.bookchat.domain;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
+import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static toy.bookchat.bookchat.domain.user.ROLE.USER;
 
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.restdocs.payload.FieldDescriptor;
 import toy.bookchat.bookchat.config.OpenIdTokenConfig;
 import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.domain.user.User;
@@ -65,5 +69,27 @@ public abstract class AuthenticationTestExtension {
 
     public OpenIdTokenManager getOpenIdTokenManager() {
         return this.openIdTokenManager;
+    }
+
+    public List<FieldDescriptor> getPageField() {
+        return List.of(fieldWithPath("pageMeta.totalElements").type(NUMBER).description("전체 ROW 수"),
+            fieldWithPath("pageMeta.totalPages").type(NUMBER).description("총 페이지 수"),
+            fieldWithPath("pageMeta.pageSize").type(NUMBER).description("요청한 페이지 사이즈"),
+            fieldWithPath("pageMeta.pageNumber").type(NUMBER).description("현재 페이지 번호"),
+            fieldWithPath("pageMeta.offset").type(NUMBER).description("ROW 시작 번호"),
+            fieldWithPath("pageMeta.first").type(BOOLEAN).description("시작 페이지 여부"),
+            fieldWithPath("pageMeta.last").type(BOOLEAN).description("마지막 페이지 여부"),
+            fieldWithPath("pageMeta.empty").type(BOOLEAN).description("content 비어있는지 여부"));
+    }
+
+    public List<FieldDescriptor> getSliceField() {
+        return List.of(fieldWithPath("sliceMeta.sliceSize").type(NUMBER).description("현재 슬라이스 크기"),
+            fieldWithPath("sliceMeta.sliceNumber").type(NUMBER).description("현재 슬라이스 번호"),
+            fieldWithPath("sliceMeta.contentSize").type(NUMBER).description("현재 슬라이스에 담긴 내용물 크기"),
+            fieldWithPath("sliceMeta.hasContent").type(BOOLEAN).description("현재 슬라이스 내용물 유/무"),
+            fieldWithPath("sliceMeta.hasNext").type(BOOLEAN).description("다음 슬라이스 유무"),
+            fieldWithPath("sliceMeta.hasPrevious").type(BOOLEAN).description("이전 슬라이스 유무"),
+            fieldWithPath("sliceMeta.last").type(BOOLEAN).description("마지막 슬라이스 여부"),
+            fieldWithPath("sliceMeta.first").type(BOOLEAN).description("처음 슬라이스 여부"));
     }
 }

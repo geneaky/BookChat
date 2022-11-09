@@ -187,7 +187,7 @@ class AgonyControllerTest extends AuthenticationTestExtension {
         PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("id").descending());
         Page<Agony> page = new PageImpl<>(agonies, pageRequest, 1);
         BasePageOfAgoniesResponse pageOfAgoniesResponse = new BasePageOfAgoniesResponse(page);
-        when(agonyService.searchPageOfAgonies(any(), any(), any())).thenReturn(
+        when(agonyService.searchPageOfAgonies(any(), any(), any(), any())).thenReturn(
             pageOfAgoniesResponse);
         mockMvc.perform(get("/v1/api/bookshelf/books/{bookId}/agonies", 1)
                 .header("Authorization", "Bearer " + getTestToken())
@@ -213,16 +213,8 @@ class AgonyControllerTest extends AuthenticationTestExtension {
                     fieldWithPath("agonyResponseList[].agonyId").type(NUMBER).description("고민 Id"),
                     fieldWithPath("agonyResponseList[].title").type(STRING).description("고민 제목"),
                     fieldWithPath("agonyResponseList[].hexColorCode").type(STRING)
-                        .description("16진수 색상 코드"),
-                    fieldWithPath("pageMeta.totalElements").type(NUMBER).description("전체 ROW 수"),
-                    fieldWithPath("pageMeta.totalPages").type(NUMBER).description("총 페이지 수"),
-                    fieldWithPath("pageMeta.pageSize").type(NUMBER).description("요청한 페이지 사이즈"),
-                    fieldWithPath("pageMeta.pageNumber").type(NUMBER).description("현재 페이지 번호"),
-                    fieldWithPath("pageMeta.offset").type(NUMBER).description("ROW 시작 번호"),
-                    fieldWithPath("pageMeta.first").type(BOOLEAN).description("시작 페이지 여부"),
-                    fieldWithPath("pageMeta.last").type(BOOLEAN).description("마지막 페이지 여부"),
-                    fieldWithPath("pageMeta.empty").type(BOOLEAN).description("content 비어있는지 여부")
-                )
+                        .description("16진수 색상 코드")
+                ).and(getSliceField())
             ));
     }
 

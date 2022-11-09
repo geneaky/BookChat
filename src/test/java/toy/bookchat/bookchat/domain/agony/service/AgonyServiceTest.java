@@ -14,9 +14,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
 import toy.bookchat.bookchat.domain.agony.Agony;
 import toy.bookchat.bookchat.domain.agony.repository.AgonyRecordRepository;
@@ -66,7 +66,7 @@ class AgonyServiceTest {
 
     @Test
     void 사용자_서재에_등록된_고민_조회_성공() throws Exception {
-        PageRequest pageRequest = PageRequest.of(1, 1, Sort.by("id").descending());
+        PageRequest pageRequest = PageRequest.of(0, 1, Sort.by("id").descending());
 
         Agony agony1 = Agony.builder()
             .title("agony1")
@@ -80,10 +80,11 @@ class AgonyServiceTest {
             .build();
 
         List<Agony> contents = List.of(agony1, agony2);
-        Page<Agony> page = new PageImpl<>(contents, pageRequest, 2);
-        when(agonyRepository.findUserBookShelfPageOfAgonies(1L, 1L, pageRequest)).thenReturn(page);
+        Slice<Agony> page = new SliceImpl<>(contents, pageRequest, true);
+        when(agonyRepository.findUserBookShelfPageOfAgonies(1L, 1L, pageRequest,
+            Optional.of(1L))).thenReturn(page);
         BasePageOfAgoniesResponse pageOfAgoniesResponse = agonyService.searchPageOfAgonies(1L, 1L,
-            pageRequest);
+            pageRequest, Optional.of(1L));
 
         String title = pageOfAgoniesResponse.getAgonyResponseList().get(0).getTitle();
         assertThat(title).isEqualTo("agony1");

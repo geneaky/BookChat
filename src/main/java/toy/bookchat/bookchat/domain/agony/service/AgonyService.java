@@ -1,5 +1,6 @@
 package toy.bookchat.bookchat.domain.agony.service;
 
+import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,9 +44,10 @@ public class AgonyService {
 
     @Transactional(readOnly = true)
     public BasePageOfAgoniesResponse searchPageOfAgonies(Long bookId, Long userId,
-        Pageable pageable) {
+        Pageable pageable, Optional<Long> postAgonyCursorId) {
         return new BasePageOfAgoniesResponse(
-            agonyRepository.findUserBookShelfPageOfAgonies(bookId, userId, pageable));
+            agonyRepository.findUserBookShelfPageOfAgonies(bookId, userId, pageable,
+                postAgonyCursorId));
     }
 
     @Transactional

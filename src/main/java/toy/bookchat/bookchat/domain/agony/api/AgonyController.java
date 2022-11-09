@@ -1,5 +1,6 @@
 package toy.bookchat.bookchat.domain.agony.api;
 
+import java.util.Optional;
 import javax.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import toy.bookchat.bookchat.domain.agony.service.AgonyRecordService;
 import toy.bookchat.bookchat.domain.agony.service.AgonyService;
@@ -45,10 +47,12 @@ public class AgonyController {
 
     @GetMapping
     public BasePageOfAgoniesResponse searchPageOfAgonies(@PathVariable Long bookId,
+        @RequestParam Optional<Long> postAgonyCursorId,
         Pageable pageable,
         @UserPayload TokenPayload tokenPayload) {
 
-        return agonyService.searchPageOfAgonies(bookId, tokenPayload.getUserId(), pageable);
+        return agonyService.searchPageOfAgonies(bookId, tokenPayload.getUserId(), pageable,
+            postAgonyCursorId);
     }
 
     @PostMapping("/{agonyId}/records")
