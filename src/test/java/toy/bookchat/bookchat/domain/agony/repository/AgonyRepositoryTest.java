@@ -126,7 +126,7 @@ class AgonyRepositoryTest {
         agonyRepository.saveAll(agonyList);
 
         PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("id").descending());
-        Slice<Agony> pageOfAgonies = agonyRepository.findUserBookShelfPageOfAgonies(
+        Slice<Agony> pageOfAgonies = agonyRepository.findUserBookShelfSliceOfAgonies(
             book.getId(), user.getId(), pageRequest, Optional.empty());
 
         List<Agony> content = pageOfAgonies.getContent();

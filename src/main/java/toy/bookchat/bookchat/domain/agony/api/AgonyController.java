@@ -19,8 +19,8 @@ import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateBookAgonyReq
 import toy.bookchat.bookchat.domain.agony.service.dto.request.DeleteAgoniesRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRecordRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRequest;
-import toy.bookchat.bookchat.domain.agony.service.dto.response.BasePageOfAgoniesResponse;
 import toy.bookchat.bookchat.domain.agony.service.dto.response.BasePageOfAgonyRecordsResponse;
+import toy.bookchat.bookchat.domain.agony.service.dto.response.BaseSliceOfAgoniesResponse;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPayload;
 
@@ -46,12 +46,12 @@ public class AgonyController {
     }
 
     @GetMapping
-    public BasePageOfAgoniesResponse searchPageOfAgonies(@PathVariable Long bookId,
+    public BaseSliceOfAgoniesResponse searchPageOfAgonies(@PathVariable Long bookId,
         @RequestParam Optional<Long> postAgonyCursorId,
         Pageable pageable,
         @UserPayload TokenPayload tokenPayload) {
 
-        return agonyService.searchPageOfAgonies(bookId, tokenPayload.getUserId(), pageable,
+        return agonyService.searchSliceOfAgonies(bookId, tokenPayload.getUserId(), pageable,
             postAgonyCursorId);
     }
 

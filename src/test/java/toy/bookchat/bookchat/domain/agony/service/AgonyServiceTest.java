@@ -24,7 +24,7 @@ import toy.bookchat.bookchat.domain.agony.repository.AgonyRepository;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateBookAgonyRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.DeleteAgoniesRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRequest;
-import toy.bookchat.bookchat.domain.agony.service.dto.response.BasePageOfAgoniesResponse;
+import toy.bookchat.bookchat.domain.agony.service.dto.response.BaseSliceOfAgoniesResponse;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.exception.book.BookNotFoundException;
@@ -81,9 +81,9 @@ class AgonyServiceTest {
 
         List<Agony> contents = List.of(agony1, agony2);
         Slice<Agony> page = new SliceImpl<>(contents, pageRequest, true);
-        when(agonyRepository.findUserBookShelfPageOfAgonies(1L, 1L, pageRequest,
+        when(agonyRepository.findUserBookShelfSliceOfAgonies(1L, 1L, pageRequest,
             Optional.of(1L))).thenReturn(page);
-        BasePageOfAgoniesResponse pageOfAgoniesResponse = agonyService.searchPageOfAgonies(1L, 1L,
+        BaseSliceOfAgoniesResponse pageOfAgoniesResponse = agonyService.searchSliceOfAgonies(1L, 1L,
             pageRequest, Optional.of(1L));
 
         String title = pageOfAgoniesResponse.getAgonyResponseList().get(0).getTitle();

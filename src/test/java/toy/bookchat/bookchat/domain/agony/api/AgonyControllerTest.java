@@ -38,6 +38,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -51,8 +53,8 @@ import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateBookAgonyReq
 import toy.bookchat.bookchat.domain.agony.service.dto.request.DeleteAgoniesRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRecordRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRequest;
-import toy.bookchat.bookchat.domain.agony.service.dto.response.BasePageOfAgoniesResponse;
 import toy.bookchat.bookchat.domain.agony.service.dto.response.BasePageOfAgonyRecordsResponse;
+import toy.bookchat.bookchat.domain.agony.service.dto.response.BaseSliceOfAgoniesResponse;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.domain.user.User;
@@ -185,9 +187,9 @@ class AgonyControllerTest extends ControllerTestExtension {
 
         List<Agony> agonies = getAgonies();
         PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("id").descending());
-        Page<Agony> page = new PageImpl<>(agonies, pageRequest, 1);
-        BasePageOfAgoniesResponse pageOfAgoniesResponse = new BasePageOfAgoniesResponse(page);
-        when(agonyService.searchPageOfAgonies(any(), any(), any(), any())).thenReturn(
+        Slice<Agony> slice = new SliceImpl<>(agonies, pageRequest, true);
+        BaseSliceOfAgoniesResponse pageOfAgoniesResponse = new BaseSliceOfAgoniesResponse(slice);
+        when(agonyService.searchSliceOfAgonies(any(), any(), any(), any())).thenReturn(
             pageOfAgoniesResponse);
         mockMvc.perform(get("/v1/api/bookshelf/books/{bookId}/agonies", 1)
                 .header("Authorization", "Bearer " + getTestToken())

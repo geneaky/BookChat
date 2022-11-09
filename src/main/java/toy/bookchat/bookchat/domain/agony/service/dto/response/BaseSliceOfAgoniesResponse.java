@@ -8,12 +8,12 @@ import toy.bookchat.bookchat.domain.agony.Agony;
 import toy.bookchat.bookchat.domain.common.SliceMeta;
 
 @Getter
-public class BasePageOfAgoniesResponse {
+public class BaseSliceOfAgoniesResponse {
 
     private List<AgonyResponse> agonyResponseList;
     private SliceMeta sliceMeta;
 
-    public BasePageOfAgoniesResponse(Slice<Agony> slice) {
+    public BaseSliceOfAgoniesResponse(Slice<Agony> slice) {
         this.sliceMeta = SliceMeta.from(slice);
         this.agonyResponseList = from(slice.getContent());
     }

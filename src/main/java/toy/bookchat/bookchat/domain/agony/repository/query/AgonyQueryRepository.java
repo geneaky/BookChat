@@ -10,7 +10,7 @@ public interface AgonyQueryRepository {
 
     Optional<Agony> findUserBookShelfAgony(Long userId, Long bookId, Long agonyId);
 
-    Slice<Agony> findUserBookShelfPageOfAgonies(long bookId, long userId, Pageable pageable,
+    Slice<Agony> findUserBookShelfSliceOfAgonies(long bookId, long userId, Pageable pageable,
         Optional<Long> postAgonyCursorId);
 
     void deleteByAgoniesIds(Long bookId, Long userId, List<Long> agoniesIds);

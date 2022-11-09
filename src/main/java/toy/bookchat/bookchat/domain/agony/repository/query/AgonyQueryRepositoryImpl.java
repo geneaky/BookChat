@@ -38,7 +38,7 @@ public class AgonyQueryRepositoryImpl implements AgonyQueryRepository {
     }
 
     @Override
-    public Slice<Agony> findUserBookShelfPageOfAgonies(long bookId, long userId,
+    public Slice<Agony> findUserBookShelfSliceOfAgonies(long bookId, long userId,
         Pageable pageable, Optional<Long> postAgonyCursorId) {
         List<Agony> contents = queryFactory.select(agony)
             .from(agony)

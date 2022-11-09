@@ -11,7 +11,6 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
-import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -480,16 +479,8 @@ class BookShelfControllerTest extends ControllerTestExtension {
                     fieldWithPath("contents[].pages").type(NUMBER).description("현재 읽고 있는 페이지 번호"),
                     fieldWithPath("contents[].star").type(STRING).optional().description("평점"),
                     fieldWithPath("contents[].singleLineAssessment").type(STRING).optional()
-                        .description("한 줄 평"),
-                    fieldWithPath("pageMeta.totalElements").type(NUMBER).description("전체 ROW 수"),
-                    fieldWithPath("pageMeta.totalPages").type(NUMBER).description("총 페이지 수"),
-                    fieldWithPath("pageMeta.pageSize").type(NUMBER).description("요청한 페이지 사이즈"),
-                    fieldWithPath("pageMeta.pageNumber").type(NUMBER).description("현재 페이지 번호"),
-                    fieldWithPath("pageMeta.offset").type(NUMBER).description("ROW 시작 번호"),
-                    fieldWithPath("pageMeta.first").type(BOOLEAN).description("시작 페이지 여부"),
-                    fieldWithPath("pageMeta.last").type(BOOLEAN).description("마지막 페이지 여부"),
-                    fieldWithPath("pageMeta.empty").type(BOOLEAN).description("content 비어있는지 여부")
-                ))
+                        .description("한 줄 평"))
+                    .and(getPageField()))
             );
 
         verify(bookShelfService).takeBooksOutOfBookShelf(any(ReadingStatus.class),
@@ -560,16 +551,8 @@ class BookShelfControllerTest extends ControllerTestExtension {
                     fieldWithPath("contents[].pages").type(NUMBER).description("현재 읽고 있는 페이지 번호"),
                     fieldWithPath("contents[].star").type(STRING).description("평점"),
                     fieldWithPath("contents[].singleLineAssessment").type(STRING)
-                        .description("한 줄 평"),
-                    fieldWithPath("pageMeta.totalElements").type(NUMBER).description("전체 ROW 수"),
-                    fieldWithPath("pageMeta.totalPages").type(NUMBER).description("총 페이지 수"),
-                    fieldWithPath("pageMeta.pageSize").type(NUMBER).description("요청한 페이지 사이즈"),
-                    fieldWithPath("pageMeta.pageNumber").type(NUMBER).description("현재 페이지 번호"),
-                    fieldWithPath("pageMeta.offset").type(NUMBER).description("ROW 시작 번호"),
-                    fieldWithPath("pageMeta.first").type(BOOLEAN).description("시작 페이지 여부"),
-                    fieldWithPath("pageMeta.last").type(BOOLEAN).description("마지막 페이지 여부"),
-                    fieldWithPath("pageMeta.empty").type(BOOLEAN).description("content 비어있는지 여부")
-                ))
+                        .description("한 줄 평"))
+                    .and(getPageField()))
             );
 
         verify(bookShelfService).takeBooksOutOfBookShelf(any(ReadingStatus.class),
@@ -639,16 +622,8 @@ class BookShelfControllerTest extends ControllerTestExtension {
                     fieldWithPath("contents[].pages").type(NUMBER).description("현재 읽고 있는 페이지 번호"),
                     fieldWithPath("contents[].star").type(STRING).optional().description("평점"),
                     fieldWithPath("contents[].singleLineAssessment").type(STRING).optional()
-                        .description("한 줄 평"),
-                    fieldWithPath("pageMeta.totalElements").type(NUMBER).description("전체 ROW 수"),
-                    fieldWithPath("pageMeta.totalPages").type(NUMBER).description("총 페이지 수"),
-                    fieldWithPath("pageMeta.pageSize").type(NUMBER).description("요청한 페이지 사이즈"),
-                    fieldWithPath("pageMeta.pageNumber").type(NUMBER).description("현재 페이지 번호"),
-                    fieldWithPath("pageMeta.offset").type(NUMBER).description("ROW 시작 번호"),
-                    fieldWithPath("pageMeta.first").type(BOOLEAN).description("시작 페이지 여부"),
-                    fieldWithPath("pageMeta.last").type(BOOLEAN).description("마지막 페이지 여부"),
-                    fieldWithPath("pageMeta.empty").type(BOOLEAN).description("content 비어있는지 여부")
-                ))
+                        .description("한 줄 평"))
+                    .and(getPageField()))
             );
 
         verify(bookShelfService).takeBooksOutOfBookShelf(any(ReadingStatus.class),
