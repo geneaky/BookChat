@@ -222,14 +222,14 @@ class AgonyControllerTest extends AuthenticationTestExtension {
                     fieldWithPath("agonyResponseList[].title").type(STRING).description("고민 제목"),
                     fieldWithPath("agonyResponseList[].hexColorCode").type(STRING)
                         .description("16진수 색상 코드"),
-                    fieldWithPath("totalElements").type(NUMBER).description("전체 ROW 수"),
-                    fieldWithPath("totalPages").type(NUMBER).description("총 페이지 수"),
-                    fieldWithPath("pageSize").type(NUMBER).description("요청한 페이지 사이즈"),
-                    fieldWithPath("pageNumber").type(NUMBER).description("현재 페이지 번호"),
-                    fieldWithPath("offset").type(NUMBER).description("ROW 시작 번호"),
-                    fieldWithPath("first").type(BOOLEAN).description("시작 페이지 여부"),
-                    fieldWithPath("last").type(BOOLEAN).description("마지막 페이지 여부"),
-                    fieldWithPath("empty").type(BOOLEAN).description("content 비어있는지 여부")
+                    fieldWithPath("pageMeta.totalElements").type(NUMBER).description("전체 ROW 수"),
+                    fieldWithPath("pageMeta.totalPages").type(NUMBER).description("총 페이지 수"),
+                    fieldWithPath("pageMeta.pageSize").type(NUMBER).description("요청한 페이지 사이즈"),
+                    fieldWithPath("pageMeta.pageNumber").type(NUMBER).description("현재 페이지 번호"),
+                    fieldWithPath("pageMeta.offset").type(NUMBER).description("ROW 시작 번호"),
+                    fieldWithPath("pageMeta.first").type(BOOLEAN).description("시작 페이지 여부"),
+                    fieldWithPath("pageMeta.last").type(BOOLEAN).description("마지막 페이지 여부"),
+                    fieldWithPath("pageMeta.empty").type(BOOLEAN).description("content 비어있는지 여부")
                 )
             ));
     }
@@ -286,14 +286,14 @@ class AgonyControllerTest extends AuthenticationTestExtension {
                         .description("고민 기록 내용"),
                     fieldWithPath("agonyRecordResponseList[].createdAt").type(STRING)
                         .description("고민 가장 최근 수정시간"),
-                    fieldWithPath("totalElements").type(NUMBER).description("전체 ROW 수"),
-                    fieldWithPath("totalPages").type(NUMBER).description("총 페이지 수"),
-                    fieldWithPath("pageSize").type(NUMBER).description("요청한 페이지 사이즈"),
-                    fieldWithPath("pageNumber").type(NUMBER).description("현재 페이지 번호"),
-                    fieldWithPath("offset").type(NUMBER).description("ROW 시작 번호"),
-                    fieldWithPath("first").type(BOOLEAN).description("시작 페이지 여부"),
-                    fieldWithPath("last").type(BOOLEAN).description("마지막 페이지 여부"),
-                    fieldWithPath("empty").type(BOOLEAN).description("content 비어있는지 여부")
+                    fieldWithPath("pageMeta.totalElements").type(NUMBER).description("전체 ROW 수"),
+                    fieldWithPath("pageMeta.totalPages").type(NUMBER).description("총 페이지 수"),
+                    fieldWithPath("pageMeta.pageSize").type(NUMBER).description("요청한 페이지 사이즈"),
+                    fieldWithPath("pageMeta.pageNumber").type(NUMBER).description("현재 페이지 번호"),
+                    fieldWithPath("pageMeta.offset").type(NUMBER).description("ROW 시작 번호"),
+                    fieldWithPath("pageMeta.first").type(BOOLEAN).description("시작 페이지 여부"),
+                    fieldWithPath("pageMeta.last").type(BOOLEAN).description("마지막 페이지 여부"),
+                    fieldWithPath("pageMeta.empty").type(BOOLEAN).description("content 비어있는지 여부")
                 )));
     }
 
