@@ -41,7 +41,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
+import toy.bookchat.bookchat.domain.ControllerTestExtension;
 import toy.bookchat.bookchat.domain.agony.Agony;
 import toy.bookchat.bookchat.domain.agony.AgonyRecord;
 import toy.bookchat.bookchat.domain.agony.service.AgonyRecordService;
@@ -61,7 +61,7 @@ import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @AgonyPresentationTest
-class AgonyControllerTest extends AuthenticationTestExtension {
+class AgonyControllerTest extends ControllerTestExtension {
 
     @MockBean
     AgonyService agonyService;

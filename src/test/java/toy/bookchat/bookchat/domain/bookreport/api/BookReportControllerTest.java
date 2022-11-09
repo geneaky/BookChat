@@ -32,7 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
+import toy.bookchat.bookchat.domain.ControllerTestExtension;
 import toy.bookchat.bookchat.domain.bookreport.BookReport;
 import toy.bookchat.bookchat.domain.bookreport.service.BookReportService;
 import toy.bookchat.bookchat.domain.bookreport.service.dto.request.ReviseBookReportRequest;
@@ -45,7 +45,7 @@ import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @BookReportPresentationTest
-class BookReportControllerTest extends AuthenticationTestExtension {
+class BookReportControllerTest extends ControllerTestExtension {
 
     @Autowired
     ObjectMapper objectMapper;

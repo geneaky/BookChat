@@ -35,7 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
+import toy.bookchat.bookchat.domain.ControllerTestExtension;
 import toy.bookchat.bookchat.domain.book.service.BookSearchService;
 import toy.bookchat.bookchat.domain.book.service.dto.request.BookSearchRequest;
 import toy.bookchat.bookchat.domain.book.service.dto.request.Meta;
@@ -49,7 +49,7 @@ import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @BookPresentationTest
-class BookControllerTest extends AuthenticationTestExtension {
+class BookControllerTest extends ControllerTestExtension {
 
     @MockBean
     BookSearchService bookSearchService;

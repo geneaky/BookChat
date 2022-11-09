@@ -59,7 +59,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.Base64Utils;
 import org.springframework.web.multipart.MultipartFile;
-import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
+import toy.bookchat.bookchat.domain.ControllerTestExtension;
 import toy.bookchat.bookchat.domain.user.ROLE;
 import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.domain.user.User;
@@ -78,7 +78,7 @@ import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @UserPresentationTest
-class UserControllerTest extends AuthenticationTestExtension {
+class UserControllerTest extends ControllerTestExtension {
 
     @MockBean
     UserService userService;

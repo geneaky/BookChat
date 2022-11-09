@@ -29,7 +29,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
+import toy.bookchat.bookchat.domain.ControllerTestExtension;
 import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.api.dto.Token;
@@ -44,7 +44,7 @@ import toy.bookchat.bookchat.security.token.jwt.JwtTokenProvider;
     includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {
         SecurityConfig.class}))
 @AutoConfigureRestDocs(uriScheme = "https", uriHost = "bookchat.link", uriPort = 443)
-class TokenControllerTest extends AuthenticationTestExtension {
+class TokenControllerTest extends ControllerTestExtension {
 
     @MockBean
     TokenService tokenService;

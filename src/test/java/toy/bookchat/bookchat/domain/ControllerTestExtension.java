@@ -22,9 +22,9 @@ import toy.bookchat.bookchat.security.user.TokenPayload;
 
 /*
     controller 테스트는 security까지 포함시켜 테스트하여 restdoc 문서에
-    token, provider_type과 같은 정보가 포함되도록 진행
+    token 정보가 포함되도록 진행
  */
-public abstract class AuthenticationTestExtension {
+public abstract class ControllerTestExtension {
 
     @MockBean
     OpenIdTokenManager openIdTokenManager;
