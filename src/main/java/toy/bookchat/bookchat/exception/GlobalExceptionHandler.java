@@ -1,14 +1,14 @@
 package toy.bookchat.bookchat.exception;
 
-import static toy.bookchat.bookchat.utils.constants.ExceptionResponse.BAD_REQUEST;
-import static toy.bookchat.bookchat.utils.constants.ExceptionResponse.BOOK_NOT_FOUND;
-import static toy.bookchat.bookchat.utils.constants.ExceptionResponse.EXPIRED_PUBLIC_KEY;
-import static toy.bookchat.bookchat.utils.constants.ExceptionResponse.IMAGE_PROCESSING_FAIL;
-import static toy.bookchat.bookchat.utils.constants.ExceptionResponse.IMAGE_UPLOAD_FAIL;
-import static toy.bookchat.bookchat.utils.constants.ExceptionResponse.NOT_VERIFIED_TOKEN;
-import static toy.bookchat.bookchat.utils.constants.ExceptionResponse.USER_ALREADY_EXISTED;
-import static toy.bookchat.bookchat.utils.constants.ExceptionResponse.USER_NOT_FOUND;
-import static toy.bookchat.bookchat.utils.constants.ExceptionResponse.WRONG_KEY_SPEC;
+import static toy.bookchat.bookchat.exception.ExceptionResponse.BAD_REQUEST;
+import static toy.bookchat.bookchat.exception.ExceptionResponse.BOOK_NOT_FOUND;
+import static toy.bookchat.bookchat.exception.ExceptionResponse.EXPIRED_PUBLIC_KEY;
+import static toy.bookchat.bookchat.exception.ExceptionResponse.IMAGE_PROCESSING_FAIL;
+import static toy.bookchat.bookchat.exception.ExceptionResponse.IMAGE_UPLOAD_FAIL;
+import static toy.bookchat.bookchat.exception.ExceptionResponse.NOT_VERIFIED_TOKEN;
+import static toy.bookchat.bookchat.exception.ExceptionResponse.USER_ALREADY_EXISTED;
+import static toy.bookchat.bookchat.exception.ExceptionResponse.USER_NOT_FOUND;
+import static toy.bookchat.bookchat.exception.ExceptionResponse.WRONG_KEY_SPEC;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

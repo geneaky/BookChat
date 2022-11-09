@@ -1,8 +1,8 @@
 package toy.bookchat.bookchat.security.token.jwt;
 
-import static toy.bookchat.bookchat.utils.constants.AuthConstants.AUTHORIZATION;
-import static toy.bookchat.bookchat.utils.constants.AuthConstants.BEARER;
-import static toy.bookchat.bookchat.utils.constants.AuthConstants.BEGIN_INDEX;
+import static toy.bookchat.bookchat.domain.common.AuthConstants.AUTHORIZATION;
+import static toy.bookchat.bookchat.domain.common.AuthConstants.BEARER;
+import static toy.bookchat.bookchat.domain.common.AuthConstants.BEGIN_INDEX;
 
 import java.io.IOException;
 import javax.servlet.FilterChain;
