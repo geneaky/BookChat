@@ -101,6 +101,13 @@ public class GlobalExceptionHandler {
         return BAD_REQUEST.getValue();
     }
 
+    @ExceptionHandler(NotSupportedPagingConditionException.class)
+    public final ResponseEntity<String> handleNotSupportedPagingConditionException(
+        NotSupportedPagingConditionException exception) {
+        log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
+        return BAD_REQUEST.getValue();
+    }
+
     @ExceptionHandler(Exception.class)
     public final ResponseEntity<String> handleUnExpectedException(Exception exception) {
         log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());

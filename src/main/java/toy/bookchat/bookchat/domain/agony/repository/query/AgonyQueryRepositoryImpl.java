@@ -6,8 +6,8 @@ import static toy.bookchat.bookchat.domain.common.RepositorySupport.extractOrder
 import static toy.bookchat.bookchat.domain.common.RepositorySupport.toSlice;
 
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
@@ -17,6 +17,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
 import toy.bookchat.bookchat.domain.agony.Agony;
 import toy.bookchat.bookchat.domain.agony.QAgony;
+import toy.bookchat.bookchat.exception.NotSupportedPagingConditionException;
 
 @Repository
 public class AgonyQueryRepositoryImpl implements AgonyQueryRepository {
@@ -44,7 +45,7 @@ public class AgonyQueryRepositoryImpl implements AgonyQueryRepository {
             .from(agony)
             .join(agony.bookShelf, bookShelf).on(bookShelf.user.id.eq(userId)
                 .and(bookShelf.book.id.eq(bookId)))
-            .where(hasNextCursorId(postAgonyCursorId, pageable))
+            .where(conditionalNextCursorId(postAgonyCursorId, pageable))
             .limit(pageable.getPageSize())
             .orderBy(extractOrderSpecifierFrom(agony, pageable))
             .fetch();
@@ -52,7 +53,7 @@ public class AgonyQueryRepositoryImpl implements AgonyQueryRepository {
         return toSlice(contents, pageable);
     }
 
-    private BooleanExpression hasNextCursorId(Optional<Long> postAgonyCursorId,
+    private BooleanExpression conditionalNextCursorId(Optional<Long> postAgonyCursorId,
         Pageable pageable) {
 
         if (postAgonyCursorId.isPresent()) {
@@ -69,7 +70,8 @@ public class AgonyQueryRepositoryImpl implements AgonyQueryRepository {
                 return getSortedAgonyIdExpression(agonyCursorId, orderSpecifier);
             }
         }
-        return null;
+
+        throw new NotSupportedPagingConditionException();
     }
 
     private BooleanExpression getSortedAgonyIdExpression(Long agonyCursorId,
@@ -80,15 +82,15 @@ public class AgonyQueryRepositoryImpl implements AgonyQueryRepository {
         return agony.id.lt(agonyCursorId);
     }
 
-    private boolean isSameTargetPath(OrderSpecifier orderSpecifier, NumberPath<Long> id) {
-        if (isSamePath(orderSpecifier, id)) {
+    private boolean isSameTargetPath(OrderSpecifier orderSpecifier, Path<?> path) {
+        if (isSamePath(orderSpecifier, path)) {
             return true;
         }
         return false;
     }
 
-    private boolean isSamePath(OrderSpecifier orderSpecifier, NumberPath<Long> id) {
-        return orderSpecifier.getTarget().equals(id);
+    private boolean isSamePath(OrderSpecifier orderSpecifier, Path<?> path) {
+        return orderSpecifier.getTarget().equals(path);
     }
 
 

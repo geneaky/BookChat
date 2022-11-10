@@ -1,6 +1,7 @@
 package toy.bookchat.bookchat.domain.agony.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +18,7 @@ import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
+import toy.bookchat.bookchat.exception.NotSupportedPagingConditionException;
 
 @RepositoryTest
 class AgonyRepositoryTest {
@@ -154,7 +156,7 @@ class AgonyRepositoryTest {
 
         PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("id").descending());
         Slice<Agony> pageOfAgonies = agonyRepository.findUserBookShelfSliceOfAgonies(
-            book.getId(), user.getId(), pageRequest, Optional.of(3L));
+            book.getId(), user.getId(), pageRequest, Optional.of(agony3.getId()));
 
         List<Agony> content = pageOfAgonies.getContent();
         assertThat(content).containsExactly(agony2, agony1);
@@ -180,10 +182,35 @@ class AgonyRepositoryTest {
 
         PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("id").ascending());
         Slice<Agony> pageOfAgonies = agonyRepository.findUserBookShelfSliceOfAgonies(
-            book.getId(), user.getId(), pageRequest, Optional.of(1L));
+            book.getId(), user.getId(), pageRequest, Optional.of(agony1.getId()));
 
         List<Agony> content = pageOfAgonies.getContent();
         assertThat(content).containsExactly(agony2, agony3);
+    }
+
+    @Test
+    void 지원하지않는_정렬조건으로_조회시_예외발생() throws Exception {
+        Book book = getBook();
+        bookRepository.save(book);
+
+        User user = getUser();
+        userRepository.save(user);
+
+        BookShelf bookShelf = getBookShelf(user, book);
+        bookShelfRepository.save(bookShelf);
+
+        Agony agony1 = getAgony(bookShelf);
+        Agony agony2 = getAgony(bookShelf);
+        Agony agony3 = getAgony(bookShelf);
+
+        List<Agony> agonyList = List.of(agony1, agony2, agony3);
+        agonyRepository.saveAllAndFlush(agonyList);
+
+        PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("title").ascending());
+        assertThatThrownBy(() -> {
+            agonyRepository.findUserBookShelfSliceOfAgonies(
+                book.getId(), user.getId(), pageRequest, Optional.of(agony1.getId()));
+        }).isInstanceOf(NotSupportedPagingConditionException.class);
     }
 
     @Test
