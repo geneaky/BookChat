@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.utils.constants;
+package toy.bookchat.bookchat.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

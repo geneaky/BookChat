@@ -1,27 +1,26 @@
 package toy.bookchat.bookchat.domain.agony.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
-import toy.bookchat.bookchat.config.JpaAuditingConfig;
+import toy.bookchat.bookchat.domain.RepositoryTest;
 import toy.bookchat.bookchat.domain.agony.Agony;
 import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.book.repository.BookRepository;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
-import toy.bookchat.bookchat.domain.configuration.TestConfig;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
+import toy.bookchat.bookchat.exception.NotSupportedPagingConditionException;
 
-@DataJpaTest
-@Import({JpaAuditingConfig.class, TestConfig.class})
+@RepositoryTest
 class AgonyRepositoryTest {
 
     @Autowired
@@ -103,7 +102,7 @@ class AgonyRepositoryTest {
     }
 
     @Test
-    void 사용자_책꽂이에_등록한_고민들_paging성공() throws Exception {
+    void 사용자_책꽂이에_등록한_고민들_첫_페이지_조회_성공() throws Exception {
         Book book = getBook();
         bookRepository.save(book);
 
@@ -129,11 +128,89 @@ class AgonyRepositoryTest {
         agonyRepository.saveAll(agonyList);
 
         PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("id").descending());
-        Page<Agony> pageOfAgonies = agonyRepository.findUserBookShelfPageOfAgonies(
-            book.getId(), user.getId(), pageRequest);
+        Slice<Agony> pageOfAgonies = agonyRepository.findUserBookShelfSliceOfAgonies(
+            book.getId(), user.getId(), pageRequest, Optional.empty());
 
         List<Agony> content = pageOfAgonies.getContent();
         assertThat(content).containsExactly(agony3, agony2);
+    }
+
+    @Test
+    void 사용자_책꽂이에_등록한_고민들_두번째_페이지_조회_성공() throws Exception {
+        Book book = getBook();
+        bookRepository.save(book);
+
+        User user = getUser();
+        userRepository.save(user);
+
+        BookShelf bookShelf = getBookShelf(user, book);
+        bookShelfRepository.save(bookShelf);
+
+        Agony agony1 = getAgony(bookShelf);
+        Agony agony2 = getAgony(bookShelf);
+        Agony agony3 = getAgony(bookShelf);
+
+        agonyRepository.save(agony1);
+        agonyRepository.save(agony2);
+        agonyRepository.save(agony3);
+
+        PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("id").descending());
+        Slice<Agony> pageOfAgonies = agonyRepository.findUserBookShelfSliceOfAgonies(
+            book.getId(), user.getId(), pageRequest, Optional.of(agony3.getId()));
+
+        List<Agony> content = pageOfAgonies.getContent();
+        assertThat(content).containsExactly(agony2, agony1);
+    }
+
+    @Test
+    void 사용자_책꽂이에_등록한_고민들_asc_정렬조건_조회_성공() throws Exception {
+        Book book = getBook();
+        bookRepository.save(book);
+
+        User user = getUser();
+        userRepository.save(user);
+
+        BookShelf bookShelf = getBookShelf(user, book);
+        bookShelfRepository.save(bookShelf);
+
+        Agony agony1 = getAgony(bookShelf);
+        Agony agony2 = getAgony(bookShelf);
+        Agony agony3 = getAgony(bookShelf);
+
+        List<Agony> agonyList = List.of(agony1, agony2, agony3);
+        agonyRepository.saveAllAndFlush(agonyList);
+
+        PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("id").ascending());
+        Slice<Agony> pageOfAgonies = agonyRepository.findUserBookShelfSliceOfAgonies(
+            book.getId(), user.getId(), pageRequest, Optional.of(agony1.getId()));
+
+        List<Agony> content = pageOfAgonies.getContent();
+        assertThat(content).containsExactly(agony2, agony3);
+    }
+
+    @Test
+    void 지원하지않는_정렬조건으로_조회시_예외발생() throws Exception {
+        Book book = getBook();
+        bookRepository.save(book);
+
+        User user = getUser();
+        userRepository.save(user);
+
+        BookShelf bookShelf = getBookShelf(user, book);
+        bookShelfRepository.save(bookShelf);
+
+        Agony agony1 = getAgony(bookShelf);
+        Agony agony2 = getAgony(bookShelf);
+        Agony agony3 = getAgony(bookShelf);
+
+        List<Agony> agonyList = List.of(agony1, agony2, agony3);
+        agonyRepository.saveAllAndFlush(agonyList);
+
+        PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("title").ascending());
+        assertThatThrownBy(() -> {
+            agonyRepository.findUserBookShelfSliceOfAgonies(
+                book.getId(), user.getId(), pageRequest, Optional.of(agony1.getId()));
+        }).isInstanceOf(NotSupportedPagingConditionException.class);
     }
 
     @Test

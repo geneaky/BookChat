@@ -3,14 +3,15 @@ package toy.bookchat.bookchat.domain.agony.repository.query;
 import static toy.bookchat.bookchat.domain.agony.QAgony.agony;
 import static toy.bookchat.bookchat.domain.bookshelf.QBookShelf.bookShelf;
 import static toy.bookchat.bookchat.domain.common.RepositorySupport.extractOrderSpecifierFrom;
+import static toy.bookchat.bookchat.domain.common.RepositorySupport.numberBasedPagination;
+import static toy.bookchat.bookchat.domain.common.RepositorySupport.toSlice;
 
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
 import toy.bookchat.bookchat.domain.agony.Agony;
 import toy.bookchat.bookchat.domain.agony.QAgony;
@@ -35,18 +36,20 @@ public class AgonyQueryRepositoryImpl implements AgonyQueryRepository {
     }
 
     @Override
-    public Page<Agony> findUserBookShelfPageOfAgonies(long bookId, long userId, Pageable pageable) {
+    public Slice<Agony> findUserBookShelfSliceOfAgonies(long bookId, long userId,
+        Pageable pageable, Optional<Long> postAgonyCursorId) {
         List<Agony> contents = queryFactory.select(agony)
             .from(agony)
             .join(agony.bookShelf, bookShelf).on(bookShelf.user.id.eq(userId)
                 .and(bookShelf.book.id.eq(bookId)))
-            .offset(pageable.getOffset())
+            .where(numberBasedPagination(agony, agony.id, postAgonyCursorId, pageable))
             .limit(pageable.getPageSize())
             .orderBy(extractOrderSpecifierFrom(agony, pageable))
             .fetch();
 
-        return new PageImpl<Agony>(contents, pageable, contents.size());
+        return toSlice(contents, pageable);
     }
+
 
     @Override
     public void deleteByAgoniesIds(Long bookId, Long userId, List<Long> agoniesIds) {

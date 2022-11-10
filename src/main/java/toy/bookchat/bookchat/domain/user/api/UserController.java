@@ -1,6 +1,6 @@
 package toy.bookchat.bookchat.domain.user.api;
 
-import static toy.bookchat.bookchat.utils.constants.AuthConstants.OIDC;
+import static toy.bookchat.bookchat.domain.common.AuthConstants.OIDC;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;

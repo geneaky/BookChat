@@ -4,13 +4,15 @@ import static toy.bookchat.bookchat.domain.agony.QAgony.agony;
 import static toy.bookchat.bookchat.domain.agony.QAgonyRecord.agonyRecord;
 import static toy.bookchat.bookchat.domain.bookshelf.QBookShelf.bookShelf;
 import static toy.bookchat.bookchat.domain.common.RepositorySupport.extractOrderSpecifierFrom;
+import static toy.bookchat.bookchat.domain.common.RepositorySupport.numberBasedPagination;
+import static toy.bookchat.bookchat.domain.common.RepositorySupport.toSlice;
 
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
+import java.util.Optional;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
 import toy.bookchat.bookchat.domain.agony.AgonyRecord;
 import toy.bookchat.bookchat.domain.agony.QAgonyRecord;
@@ -26,19 +28,19 @@ public class AgonyRecordQueryRepositoryImpl implements AgonyRecordQueryRepositor
 
 
     @Override
-    public Page<AgonyRecord> findPageOfUserAgonyRecords(Long bookId, Long agonyId, Long userId,
-        Pageable pageable) {
+    public Slice<AgonyRecord> findSliceOfUserAgonyRecords(Long bookId, Long agonyId, Long userId,
+        Pageable pageable, Optional<Long> postRecordCursorId) {
         List<AgonyRecord> contents = queryFactory.select(agonyRecord)
             .from(agonyRecord)
             .join(agonyRecord.agony, agony).on(agony.id.eq(agonyId))
             .join(agony.bookShelf, bookShelf).on(bookShelf.book.id.eq(bookId)
                 .and(bookShelf.user.id.eq(userId)))
-            .offset(pageable.getOffset())
+            .where(numberBasedPagination(agonyRecord, agonyRecord.id, postRecordCursorId, pageable))
             .limit(pageable.getPageSize())
             .orderBy(extractOrderSpecifierFrom(agonyRecord, pageable))
             .fetch();
 
-        return new PageImpl<>(contents, pageable, contents.size());
+        return toSlice(contents, pageable);
     }
 
     @Override
@@ -62,7 +64,7 @@ public class AgonyRecordQueryRepositoryImpl implements AgonyRecordQueryRepositor
         queryFactory.update(agonyRecord)
             .set(agonyRecord.title, recordTitle)
             .set(agonyRecord.content, recordContent)
-            .where(agony.id.eq(
+            .where(agonyRecord.id.eq(
                 JPAExpressions.select(subAgonyRecord.id)
                     .from(subAgonyRecord)
                     .join(subAgonyRecord.agony, agony).on(agony.id.eq(agonyId))

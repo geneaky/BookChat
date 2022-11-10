@@ -4,7 +4,7 @@ import lombok.Getter;
 import org.springframework.data.domain.Page;
 
 @Getter
-public abstract class BasePage {
+public final class PageMeta {
 
     private final Long totalElements;
 
@@ -22,7 +22,7 @@ public abstract class BasePage {
 
     private final boolean empty;
 
-    public BasePage(Page<?> page) {
+    private PageMeta(Page<?> page) {
         this.totalElements = page.getTotalElements();
         this.totalPages = page.getTotalPages();
         this.pageSize = page.getPageable().getPageSize();
@@ -31,5 +31,9 @@ public abstract class BasePage {
         this.first = page.isFirst();
         this.last = page.isLast();
         this.empty = page.isEmpty();
+    }
+
+    public static PageMeta from(Page<?> page) {
+        return new PageMeta(page);
     }
 }

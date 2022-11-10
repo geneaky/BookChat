@@ -1,30 +1,29 @@
 package toy.bookchat.bookchat.domain.agony.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
+import java.util.Optional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import toy.bookchat.bookchat.config.JpaAuditingConfig;
+import toy.bookchat.bookchat.domain.RepositoryTest;
 import toy.bookchat.bookchat.domain.agony.Agony;
 import toy.bookchat.bookchat.domain.agony.AgonyRecord;
 import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.book.repository.BookRepository;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
-import toy.bookchat.bookchat.domain.configuration.TestConfig;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
+import toy.bookchat.bookchat.exception.NotSupportedPagingConditionException;
 
-@DataJpaTest
-@Import({JpaAuditingConfig.class, TestConfig.class})
+@RepositoryTest
 class AgonyRecordRepositoryTest {
 
     @Autowired
@@ -117,9 +116,94 @@ class AgonyRecordRepositoryTest {
         agonyRecordRepository.save(agonyRecord);
 
         Pageable pageable = PageRequest.of(0, 1, Sort.by("id").descending());
-        List<AgonyRecord> content = agonyRecordRepository.findPageOfUserAgonyRecords(
-            book.getId(), agony.getId(), user.getId(), pageable).getContent();
+        List<AgonyRecord> content = agonyRecordRepository.findSliceOfUserAgonyRecords(
+            book.getId(), agony.getId(), user.getId(), pageable, Optional.empty()).getContent();
         assertThat(content).containsExactly(agonyRecord);
+    }
+
+    @Test
+    void 고민기록_DESC_커서ID로_조회_성공() throws Exception {
+        Book book = getBook();
+        bookRepository.save(book);
+
+        User user = getUser();
+        userRepository.save(user);
+
+        BookShelf bookShelf = getBookShelf(user, book);
+        bookShelfRepository.save(bookShelf);
+
+        Agony agony = getAgony(bookShelf);
+        agonyRepository.save(agony);
+
+        AgonyRecord agonyRecord1 = getAgonyRecord(agony);
+        AgonyRecord agonyRecord2 = getAgonyRecord(agony);
+        AgonyRecord agonyRecord3 = getAgonyRecord(agony);
+        agonyRecordRepository.save(agonyRecord1);
+        agonyRecordRepository.save(agonyRecord2);
+        agonyRecordRepository.save(agonyRecord3);
+
+        Pageable pageable = PageRequest.of(0, 1, Sort.by("id").descending());
+        List<AgonyRecord> content = agonyRecordRepository.findSliceOfUserAgonyRecords(
+                book.getId(), agony.getId(), user.getId(), pageable, Optional.of(agonyRecord3.getId()))
+            .getContent();
+        assertThat(content).containsExactly(agonyRecord2);
+    }
+
+    @Test
+    void 고민기록_ASC_커서ID로_조회_성공() throws Exception {
+        Book book = getBook();
+        bookRepository.save(book);
+
+        User user = getUser();
+        userRepository.save(user);
+
+        BookShelf bookShelf = getBookShelf(user, book);
+        bookShelfRepository.save(bookShelf);
+
+        Agony agony = getAgony(bookShelf);
+        agonyRepository.save(agony);
+
+        AgonyRecord agonyRecord1 = getAgonyRecord(agony);
+        AgonyRecord agonyRecord2 = getAgonyRecord(agony);
+        AgonyRecord agonyRecord3 = getAgonyRecord(agony);
+        agonyRecordRepository.save(agonyRecord1);
+        agonyRecordRepository.save(agonyRecord2);
+        agonyRecordRepository.save(agonyRecord3);
+
+        Pageable pageable = PageRequest.of(0, 2, Sort.by("id").ascending());
+        List<AgonyRecord> content = agonyRecordRepository.findSliceOfUserAgonyRecords(
+                book.getId(), agony.getId(), user.getId(), pageable, Optional.of(agonyRecord1.getId()))
+            .getContent();
+        assertThat(content).containsExactly(agonyRecord2, agonyRecord3);
+    }
+
+    @Test
+    void 고민기록_지원하지않는_커서ID로_조회시_예외발생() throws Exception {
+        Book book = getBook();
+        bookRepository.save(book);
+
+        User user = getUser();
+        userRepository.save(user);
+
+        BookShelf bookShelf = getBookShelf(user, book);
+        bookShelfRepository.save(bookShelf);
+
+        Agony agony = getAgony(bookShelf);
+        agonyRepository.save(agony);
+
+        AgonyRecord agonyRecord1 = getAgonyRecord(agony);
+        AgonyRecord agonyRecord2 = getAgonyRecord(agony);
+        AgonyRecord agonyRecord3 = getAgonyRecord(agony);
+        agonyRecordRepository.save(agonyRecord1);
+        agonyRecordRepository.save(agonyRecord2);
+        agonyRecordRepository.save(agonyRecord3);
+
+        Pageable pageable = PageRequest.of(0, 2, Sort.by("title").ascending());
+        assertThatThrownBy(() -> {
+            agonyRecordRepository.findSliceOfUserAgonyRecords(
+                book.getId(), agony.getId(), user.getId(), pageable,
+                Optional.of(agonyRecord1.getId()));
+        }).isInstanceOf(NotSupportedPagingConditionException.class);
     }
 
     @Test
@@ -165,6 +249,7 @@ class AgonyRecordRepositoryTest {
 
         agonyRecordRepository.reviseAgonyRecord(user.getId(), book.getId(), agony.getId(),
             agonyRecord.getId(), "수정 제목", "수정 내용");
+
         em.flush();
         em.clear();
         String result = agonyRecordRepository.findById(agonyRecord.getId()).get().getTitle();

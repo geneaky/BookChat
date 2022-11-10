@@ -3,18 +3,19 @@ package toy.bookchat.bookchat.domain.agony.service.dto.response;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Slice;
 import toy.bookchat.bookchat.domain.agony.Agony;
-import toy.bookchat.bookchat.domain.common.BasePage;
+import toy.bookchat.bookchat.domain.common.CursorMeta;
 
 @Getter
-public class BasePageOfAgoniesResponse extends BasePage {
+public class SliceOfAgoniesResponse {
 
     private List<AgonyResponse> agonyResponseList;
+    private CursorMeta cursorMeta;
 
-    public BasePageOfAgoniesResponse(Page<Agony> page) {
-        super(page);
-        this.agonyResponseList = from(page.getContent());
+    public SliceOfAgoniesResponse(Slice<Agony> slice) {
+        this.cursorMeta = CursorMeta.from(slice);
+        this.agonyResponseList = from(slice.getContent());
     }
 
     private List<AgonyResponse> from(List<Agony> content) {

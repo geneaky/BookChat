@@ -1,7 +1,8 @@
 package toy.bookchat.bookchat.domain.agony.service;
 
-import org.springframework.data.domain.Page;
+import java.util.Optional;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import toy.bookchat.bookchat.domain.agony.Agony;
@@ -10,7 +11,7 @@ import toy.bookchat.bookchat.domain.agony.repository.AgonyRecordRepository;
 import toy.bookchat.bookchat.domain.agony.repository.AgonyRepository;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateAgonyRecordRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRecordRequest;
-import toy.bookchat.bookchat.domain.agony.service.dto.response.BasePageOfAgonyRecordsResponse;
+import toy.bookchat.bookchat.domain.agony.service.dto.response.SliceOfAgonyRecordsResponse;
 import toy.bookchat.bookchat.exception.agony.AgonyNotFoundException;
 
 @Service
@@ -35,11 +36,12 @@ public class AgonyRecordService {
     }
 
     @Transactional(readOnly = true)
-    public BasePageOfAgonyRecordsResponse searchPageOfAgonyRecords(Long bookId, Long agonyId,
-        Long userId, Pageable pageable) {
-        Page<AgonyRecord> agonyRecordPage = agonyRecordRepository.findPageOfUserAgonyRecords(bookId,
-            agonyId, userId, pageable);
-        return new BasePageOfAgonyRecordsResponse(agonyRecordPage);
+    public SliceOfAgonyRecordsResponse searchPageOfAgonyRecords(Long bookId, Long agonyId,
+        Long userId, Pageable pageable, Optional<Long> postRecordCursorId) {
+        Slice<AgonyRecord> agonyRecordSlice = agonyRecordRepository.findSliceOfUserAgonyRecords(
+            bookId,
+            agonyId, userId, pageable, postRecordCursorId);
+        return new SliceOfAgonyRecordsResponse(agonyRecordSlice);
     }
 
     @Transactional

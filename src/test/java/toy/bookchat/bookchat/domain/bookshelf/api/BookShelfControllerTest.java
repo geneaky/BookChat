@@ -11,7 +11,6 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
-import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -39,17 +38,13 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.web.servlet.MockMvc;
-import toy.bookchat.bookchat.domain.AuthenticationTestExtension;
+import toy.bookchat.bookchat.domain.ControllerTestExtension;
 import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
@@ -62,16 +57,12 @@ import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ReviseBookShel
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.SearchBookShelfByReadingStatus;
 import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.domain.user.User;
-import toy.bookchat.bookchat.security.SecurityConfig;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
-@WebMvcTest(controllers = BookShelfController.class,
-    includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {
-        SecurityConfig.class}))
-@AutoConfigureRestDocs(uriScheme = "https", uriHost = "bookchat.link", uriPort = 443)
-class BookShelfControllerTest extends AuthenticationTestExtension {
+@BookShelfPresentationTest
+class BookShelfControllerTest extends ControllerTestExtension {
 
     @MockBean
     BookShelfService bookShelfService;
@@ -488,16 +479,8 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
                     fieldWithPath("contents[].pages").type(NUMBER).description("현재 읽고 있는 페이지 번호"),
                     fieldWithPath("contents[].star").type(STRING).optional().description("평점"),
                     fieldWithPath("contents[].singleLineAssessment").type(STRING).optional()
-                        .description("한 줄 평"),
-                    fieldWithPath("totalElements").type(NUMBER).description("전체 ROW 수"),
-                    fieldWithPath("totalPages").type(NUMBER).description("총 페이지 수"),
-                    fieldWithPath("pageSize").type(NUMBER).description("요청한 페이지 사이즈"),
-                    fieldWithPath("pageNumber").type(NUMBER).description("현재 페이지 번호"),
-                    fieldWithPath("offset").type(NUMBER).description("ROW 시작 번호"),
-                    fieldWithPath("first").type(BOOLEAN).description("시작 페이지 여부"),
-                    fieldWithPath("last").type(BOOLEAN).description("마지막 페이지 여부"),
-                    fieldWithPath("empty").type(BOOLEAN).description("content 비어있는지 여부")
-                ))
+                        .description("한 줄 평"))
+                    .and(getPageField()))
             );
 
         verify(bookShelfService).takeBooksOutOfBookShelf(any(ReadingStatus.class),
@@ -568,16 +551,8 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
                     fieldWithPath("contents[].pages").type(NUMBER).description("현재 읽고 있는 페이지 번호"),
                     fieldWithPath("contents[].star").type(STRING).description("평점"),
                     fieldWithPath("contents[].singleLineAssessment").type(STRING)
-                        .description("한 줄 평"),
-                    fieldWithPath("totalElements").type(NUMBER).description("전체 ROW 수"),
-                    fieldWithPath("totalPages").type(NUMBER).description("총 페이지 수"),
-                    fieldWithPath("pageSize").type(NUMBER).description("요청한 페이지 사이즈"),
-                    fieldWithPath("pageNumber").type(NUMBER).description("현재 페이지 번호"),
-                    fieldWithPath("offset").type(NUMBER).description("ROW 시작 번호"),
-                    fieldWithPath("first").type(BOOLEAN).description("시작 페이지 여부"),
-                    fieldWithPath("last").type(BOOLEAN).description("마지막 페이지 여부"),
-                    fieldWithPath("empty").type(BOOLEAN).description("content 비어있는지 여부")
-                ))
+                        .description("한 줄 평"))
+                    .and(getPageField()))
             );
 
         verify(bookShelfService).takeBooksOutOfBookShelf(any(ReadingStatus.class),
@@ -647,16 +622,8 @@ class BookShelfControllerTest extends AuthenticationTestExtension {
                     fieldWithPath("contents[].pages").type(NUMBER).description("현재 읽고 있는 페이지 번호"),
                     fieldWithPath("contents[].star").type(STRING).optional().description("평점"),
                     fieldWithPath("contents[].singleLineAssessment").type(STRING).optional()
-                        .description("한 줄 평"),
-                    fieldWithPath("totalElements").type(NUMBER).description("전체 ROW 수"),
-                    fieldWithPath("totalPages").type(NUMBER).description("총 페이지 수"),
-                    fieldWithPath("pageSize").type(NUMBER).description("요청한 페이지 사이즈"),
-                    fieldWithPath("pageNumber").type(NUMBER).description("현재 페이지 번호"),
-                    fieldWithPath("offset").type(NUMBER).description("ROW 시작 번호"),
-                    fieldWithPath("first").type(BOOLEAN).description("시작 페이지 여부"),
-                    fieldWithPath("last").type(BOOLEAN).description("마지막 페이지 여부"),
-                    fieldWithPath("empty").type(BOOLEAN).description("content 비어있는지 여부")
-                ))
+                        .description("한 줄 평"))
+                    .and(getPageField()))
             );
 
         verify(bookShelfService).takeBooksOutOfBookShelf(any(ReadingStatus.class),

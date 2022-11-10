@@ -5,25 +5,22 @@ import java.util.List;
 import lombok.Getter;
 import org.springframework.data.domain.Page;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
-import toy.bookchat.bookchat.domain.common.BasePage;
+import toy.bookchat.bookchat.domain.common.PageMeta;
 
 @Getter
-public class SearchBookShelfByReadingStatus extends BasePage {
+public class SearchBookShelfByReadingStatus {
 
+    private PageMeta pageMeta;
     private List<BookShelfResponse> contents;
 
     public SearchBookShelfByReadingStatus(Page<BookShelf> pagingBookShelves) {
-        super(pagingBookShelves);
-        getBookShelfSearchResponseDtos(pagingBookShelves.getContent());
+        this.pageMeta = PageMeta.from(pagingBookShelves);
+        this.contents = getBookShelfSearchResponseDtos(pagingBookShelves.getContent());
     }
 
-    private void getBookShelfSearchResponseDtos(
-        List<BookShelf> bookShelves) {
-        this.contents = new ArrayList<>();
-        fillContentsWithBookShelfResponseDto(bookShelves);
-    }
-
-    private void fillContentsWithBookShelfResponseDto(List<BookShelf> bookShelves) {
+    private List<BookShelfResponse> getBookShelfSearchResponseDtos(List<BookShelf> bookShelves) {
+        List<BookShelfResponse> contents = new ArrayList<>();
+        
         for (BookShelf bookShelf : bookShelves) {
             BookShelfResponse bookShelfResponse = BookShelfResponse.builder()
                 .bookId(bookShelf.getBookId())
@@ -37,7 +34,9 @@ public class SearchBookShelfByReadingStatus extends BasePage {
                 .pages(bookShelf.getPages())
                 .build();
 
-            this.contents.add(bookShelfResponse);
+            contents.add(bookShelfResponse);
         }
+
+        return contents;
     }
 }
