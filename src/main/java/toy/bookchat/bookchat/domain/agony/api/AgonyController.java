@@ -19,8 +19,8 @@ import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateBookAgonyReq
 import toy.bookchat.bookchat.domain.agony.service.dto.request.DeleteAgoniesRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRecordRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRequest;
-import toy.bookchat.bookchat.domain.agony.service.dto.response.BasePageOfAgonyRecordsResponse;
-import toy.bookchat.bookchat.domain.agony.service.dto.response.BaseSliceOfAgoniesResponse;
+import toy.bookchat.bookchat.domain.agony.service.dto.response.SliceOfAgoniesResponse;
+import toy.bookchat.bookchat.domain.agony.service.dto.response.SliceOfAgonyRecordsResponse;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPayload;
 
@@ -46,7 +46,7 @@ public class AgonyController {
     }
 
     @GetMapping
-    public BaseSliceOfAgoniesResponse searchSliceOfAgonies(@PathVariable Long bookId,
+    public SliceOfAgoniesResponse searchSliceOfAgonies(@PathVariable Long bookId,
         @RequestParam Optional<Long> postAgonyCursorId,
         Pageable pageable,
         @UserPayload TokenPayload tokenPayload) {
@@ -66,11 +66,12 @@ public class AgonyController {
     }
 
     @GetMapping("/{agonyId}/records")
-    public BasePageOfAgonyRecordsResponse getAgonyRecordsOnBookAgony(@PathVariable Long bookId,
-        @PathVariable Long agonyId, @UserPayload TokenPayload tokenPayload, Pageable pageable) {
+    public SliceOfAgonyRecordsResponse getAgonyRecordsOnBookAgony(@PathVariable Long bookId,
+        @PathVariable Long agonyId, @RequestParam Optional<Long> postRecordCursorId,
+        @UserPayload TokenPayload tokenPayload, Pageable pageable) {
 
         return agonyRecordService.searchPageOfAgonyRecords(bookId, agonyId,
-            tokenPayload.getUserId(), pageable);
+            tokenPayload.getUserId(), pageable, postRecordCursorId);
     }
 
     @DeleteMapping

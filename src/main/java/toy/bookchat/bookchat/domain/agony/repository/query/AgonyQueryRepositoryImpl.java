@@ -56,12 +56,10 @@ public class AgonyQueryRepositoryImpl implements AgonyQueryRepository {
     private BooleanExpression conditionalNextCursorId(Optional<Long> postAgonyCursorId,
         Pageable pageable) {
 
-        if (postAgonyCursorId.isPresent()) {
-            Long agonyCursorId = postAgonyCursorId.get();
-            return getSortedCursorExpression(pageable, agonyCursorId);
-        }
+        return postAgonyCursorId.map(
+                agonyCursorId -> getSortedCursorExpression(pageable, agonyCursorId))
+            .orElse(null);
 
-        return null;
     }
 
     private BooleanExpression getSortedCursorExpression(Pageable pageable, Long agonyCursorId) {

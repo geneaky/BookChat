@@ -8,12 +8,12 @@ import toy.bookchat.bookchat.domain.agony.Agony;
 import toy.bookchat.bookchat.domain.common.CursorMeta;
 
 @Getter
-public class BaseSliceOfAgoniesResponse {
+public class SliceOfAgoniesResponse {
 
     private List<AgonyResponse> agonyResponseList;
     private CursorMeta cursorMeta;
 
-    public BaseSliceOfAgoniesResponse(Slice<Agony> slice) {
+    public SliceOfAgoniesResponse(Slice<Agony> slice) {
         this.cursorMeta = CursorMeta.from(slice);
         this.agonyResponseList = from(slice.getContent());
     }

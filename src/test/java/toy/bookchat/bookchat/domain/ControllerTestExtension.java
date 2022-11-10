@@ -98,7 +98,6 @@ public abstract class ControllerTestExtension {
             fieldWithPath("cursorMeta.contentSize").type(NUMBER).description("현재 슬라이스에 담긴 내용물 크기"),
             fieldWithPath("cursorMeta.hasContent").type(BOOLEAN).description("현재 슬라이스 내용물 유/무"),
             fieldWithPath("cursorMeta.hasNext").type(BOOLEAN).description("다음 슬라이스 유무"),
-            fieldWithPath("cursorMeta.hasPrevious").type(BOOLEAN).description("이전 슬라이스 유무"),
             fieldWithPath("cursorMeta.last").type(BOOLEAN).description("마지막 슬라이스 여부"),
             fieldWithPath("cursorMeta.first").type(BOOLEAN).description("처음 슬라이스 여부"));
     }

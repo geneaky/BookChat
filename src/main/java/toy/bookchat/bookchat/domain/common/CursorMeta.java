@@ -12,8 +12,6 @@ public final class CursorMeta {
     private final boolean isFirst;
     private final boolean isLast;
     private final boolean hasNext;
-    private final boolean hasPrevious;
-
 
     private CursorMeta(Slice<?> slice) {
         this.sliceSize = slice.getPageable().getPageSize();
@@ -22,7 +20,6 @@ public final class CursorMeta {
         this.isFirst = slice.isFirst();
         this.isLast = slice.isLast();
         this.hasNext = slice.hasNext();
-        this.hasPrevious = slice.hasPrevious();
     }
 
     public static CursorMeta from(Slice<?> slice) {

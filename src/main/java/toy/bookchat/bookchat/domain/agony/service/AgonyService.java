@@ -10,7 +10,7 @@ import toy.bookchat.bookchat.domain.agony.repository.AgonyRepository;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateBookAgonyRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.DeleteAgoniesRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRequest;
-import toy.bookchat.bookchat.domain.agony.service.dto.response.BaseSliceOfAgoniesResponse;
+import toy.bookchat.bookchat.domain.agony.service.dto.response.SliceOfAgoniesResponse;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.exception.agony.AgonyNotFoundException;
@@ -43,9 +43,9 @@ public class AgonyService {
     }
 
     @Transactional(readOnly = true)
-    public BaseSliceOfAgoniesResponse searchSliceOfAgonies(Long bookId, Long userId,
+    public SliceOfAgoniesResponse searchSliceOfAgonies(Long bookId, Long userId,
         Pageable pageable, Optional<Long> postAgonyCursorId) {
-        return new BaseSliceOfAgoniesResponse(
+        return new SliceOfAgoniesResponse(
             agonyRepository.findUserBookShelfSliceOfAgonies(bookId, userId, pageable,
                 postAgonyCursorId));
     }
