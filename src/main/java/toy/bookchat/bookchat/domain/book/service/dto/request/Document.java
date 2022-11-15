@@ -25,4 +25,32 @@ public class Document {
     public String getYearMonthDay() {
         return this.datetime.substring(0, 10);
     }
+
+    public boolean hasPerfectDocument() {
+        if (authors == null) {
+            return false;
+        }
+
+        if (datetime == null) {
+            return false;
+        }
+
+        if (isbn == null) {
+            return false;
+        }
+
+        if (publisher == null) {
+            return false;
+        }
+
+        if (title == null) {
+            return false;
+        }
+
+        if (thumbnail == null) {
+            return false;
+        }
+
+        return true;
+    }
 }
