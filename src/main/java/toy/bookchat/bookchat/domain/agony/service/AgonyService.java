@@ -1,5 +1,6 @@
 package toy.bookchat.bookchat.domain.agony.service;
 
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -7,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 import toy.bookchat.bookchat.domain.agony.Agony;
 import toy.bookchat.bookchat.domain.agony.repository.AgonyRepository;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateBookAgonyRequest;
-import toy.bookchat.bookchat.domain.agony.service.dto.request.DeleteAgoniesRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.response.SliceOfAgoniesResponse;
 import toy.bookchat.bookchat.domain.agonyrecord.repository.AgonyRecordRepository;
@@ -51,9 +51,9 @@ public class AgonyService {
     }
 
     @Transactional
-    public void deleteAgony(DeleteAgoniesRequest deleteAgoniesRequest, Long userId) {
-        agonyRecordRepository.deleteByAgoniesIds(userId, deleteAgoniesRequest.getAgoniesIds());
-        agonyRepository.deleteByAgoniesIds(userId, deleteAgoniesRequest.getAgoniesIds());
+    public void deleteAgony(List<Long> agoniesIds, Long userId) {
+        agonyRecordRepository.deleteByAgoniesIds(userId, agoniesIds);
+        agonyRepository.deleteByAgoniesIds(userId, agoniesIds);
     }
 
     @Transactional

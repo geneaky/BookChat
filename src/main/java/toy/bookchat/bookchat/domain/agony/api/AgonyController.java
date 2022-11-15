@@ -1,5 +1,6 @@
 package toy.bookchat.bookchat.domain.agony.api;
 
+import java.util.List;
 import java.util.Optional;
 import javax.validation.Valid;
 import org.springframework.data.domain.Pageable;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import toy.bookchat.bookchat.domain.agony.service.AgonyService;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateBookAgonyRequest;
-import toy.bookchat.bookchat.domain.agony.service.dto.request.DeleteAgoniesRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.response.SliceOfAgoniesResponse;
 import toy.bookchat.bookchat.security.user.TokenPayload;
@@ -45,11 +45,11 @@ public class AgonyController {
             postAgonyCursorId);
     }
 
-    @DeleteMapping("/v1/api/agonies")
-    public void deleteAgony(@Valid @RequestBody DeleteAgoniesRequest deleteAgoniesRequest,
+    @DeleteMapping("/v1/api/agonies/{agoniesIds}")
+    public void deleteAgony(@PathVariable List<Long> agoniesIds,
         @UserPayload TokenPayload tokenPayload) {
 
-        agonyService.deleteAgony(deleteAgoniesRequest, tokenPayload.getUserId());
+        agonyService.deleteAgony(agoniesIds, tokenPayload.getUserId());
     }
 
     @PutMapping("/v1/api/agonies/{agonyId}")

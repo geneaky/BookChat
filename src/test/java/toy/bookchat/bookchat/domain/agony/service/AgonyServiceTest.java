@@ -21,7 +21,6 @@ import org.springframework.data.domain.Sort;
 import toy.bookchat.bookchat.domain.agony.Agony;
 import toy.bookchat.bookchat.domain.agony.repository.AgonyRepository;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateBookAgonyRequest;
-import toy.bookchat.bookchat.domain.agony.service.dto.request.DeleteAgoniesRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.response.SliceOfAgoniesResponse;
 import toy.bookchat.bookchat.domain.agonyrecord.repository.AgonyRecordRepository;
@@ -92,8 +91,7 @@ class AgonyServiceTest {
 
     @Test
     void 고민폴더_삭제_성공() throws Exception {
-        DeleteAgoniesRequest deleteAgoniesRequest = DeleteAgoniesRequest.of(List.of(1L, 2L, 3L));
-        agonyService.deleteAgony(deleteAgoniesRequest, 1L);
+        agonyService.deleteAgony(List.of(1L, 2L, 3L), 1L);
 
         verify(agonyRecordRepository).deleteByAgoniesIds(any(), any());
         verify(agonyRepository).deleteByAgoniesIds(any(), any());

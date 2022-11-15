@@ -11,7 +11,6 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
-import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -44,7 +43,6 @@ import toy.bookchat.bookchat.domain.ControllerTestExtension;
 import toy.bookchat.bookchat.domain.agony.Agony;
 import toy.bookchat.bookchat.domain.agony.service.AgonyService;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateBookAgonyRequest;
-import toy.bookchat.bookchat.domain.agony.service.dto.request.DeleteAgoniesRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.response.SliceOfAgoniesResponse;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
@@ -183,19 +181,16 @@ class AgonyControllerTest extends ControllerTestExtension {
 
     @Test
     void 고민_폴더_삭제_성공() throws Exception {
-        DeleteAgoniesRequest deleteAgoniesRequest = DeleteAgoniesRequest.of(List.of(1L, 2L, 3L));
-        mockMvc.perform(delete("/v1/api/agonies")
+        mockMvc.perform(delete("/v1/api/agonies/{agoniesIds}", "1,2,3")
                 .header("Authorization", "Bearer " + getTestToken())
-                .with(user(getUserPrincipal()))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(deleteAgoniesRequest)))
+                .with(user(getUserPrincipal())))
             .andExpect(status().isOk())
             .andDo(document("delete-agony",
                 requestHeaders(
                     headerWithName("Authorization").description("Bearer [JWT token]")
                 ),
-                requestFields(
-                    fieldWithPath("agoniesIds").type(ARRAY).description("삭제할 고민폴더 ID")
+                pathParameters(
+                    parameterWithName("agoniesIds").description("삭제할 고민폴더 ID")
                 )));
 
         verify(agonyService).deleteAgony(any(), any());
