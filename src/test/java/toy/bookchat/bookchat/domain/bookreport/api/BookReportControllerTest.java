@@ -1,8 +1,11 @@
 package toy.bookchat.bookchat.domain.bookreport.api;
 
+import static io.jsonwebtoken.SignatureAlgorithm.HS256;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -18,11 +21,15 @@ import static org.springframework.restdocs.request.RequestDocumentation.paramete
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static toy.bookchat.bookchat.domain.common.AuthConstants.BEARER;
 import static toy.bookchat.bookchat.domain.user.ROLE.USER;
+import static toy.bookchat.bookchat.domain.user.ReadingTaste.ART;
+import static toy.bookchat.bookchat.domain.user.ReadingTaste.DEVELOPMENT;
+import static toy.bookchat.bookchat.security.oauth.OAuth2Provider.GOOGLE;
+import static toy.bookchat.bookchat.security.oauth.OAuth2Provider.KAKAO;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +37,6 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
 import toy.bookchat.bookchat.domain.bookreport.BookReport;
@@ -38,21 +44,33 @@ import toy.bookchat.bookchat.domain.bookreport.service.BookReportService;
 import toy.bookchat.bookchat.domain.bookreport.service.dto.request.ReviseBookReportRequest;
 import toy.bookchat.bookchat.domain.bookreport.service.dto.request.WriteBookReportRequest;
 import toy.bookchat.bookchat.domain.bookreport.service.dto.response.BookReportResponse;
-import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.domain.user.User;
-import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @BookReportPresentationTest
 class BookReportControllerTest extends ControllerTestExtension {
 
+    public static final String JWT_TOKEN = BEARER + getTestToken();
     @Autowired
     ObjectMapper objectMapper;
     @Autowired
     private MockMvc mockMvc;
     @MockBean
     private BookReportService bookReportService;
+
+    private static String getTestToken() {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("sub", "test");
+        claims.put("name", "google123");
+        claims.put("provider", GOOGLE);
+        claims.put("email", "test@gmail.com");
+
+        return Jwts.builder()
+            .setClaims(claims)
+            .signWith(HS256, "test")
+            .compact();
+    }
 
     private User getUser() {
         return User.builder()
@@ -63,8 +81,8 @@ class BookReportControllerTest extends ControllerTestExtension {
             .name("testUser")
             .profileImageUrl("somethingImageUrl@naver.com")
             .defaultProfileImageType(1)
-            .provider(OAuth2Provider.KAKAO)
-            .readingTastes(List.of(ReadingTaste.DEVELOPMENT, ReadingTaste.ART))
+            .provider(KAKAO)
+            .readingTastes(List.of(DEVELOPMENT, ART))
             .build();
     }
 
@@ -77,21 +95,6 @@ class BookReportControllerTest extends ControllerTestExtension {
         return UserPrincipal.create(tokenPayload);
     }
 
-    private String getTestToken() throws Exception {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("sub", "test");
-        claims.put("name", "google123");
-        claims.put("provider", OAuth2Provider.GOOGLE);
-        claims.put("email", "test@gmail.com");
-
-        String testToken = Jwts.builder()
-            .setClaims(claims)
-            .signWith(SignatureAlgorithm.HS256, "test")
-            .compact();
-
-        return testToken;
-    }
-
     @Test
     void 다_읽은_책_독후감_작성_성공() throws Exception {
 
@@ -101,14 +104,14 @@ class BookReportControllerTest extends ControllerTestExtension {
             .build();
 
         mockMvc.perform(post("/v1/api/books/{bookId}/report", 1L)
-                .header("Authorization", "Bearer " + getTestToken())
+                .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(writeBookReportRequest)))
             .andExpect(status().isOk())
             .andDo(document("post-book-report",
                 requestHeaders(
-                    headerWithName("Authorization").description("Bearer [JWT token]")
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 pathParameters(
                     parameterWithName("bookId").description("Book Id")
@@ -132,12 +135,12 @@ class BookReportControllerTest extends ControllerTestExtension {
         BookReportResponse bookReportResponse = BookReportResponse.from(bookReport);
         when(bookReportService.getBookReportResponse(any(), any())).thenReturn(bookReportResponse);
         mockMvc.perform(get("/v1/api/books/{bookId}/report", 1L)
-                .header("Authorization", "Bearer " + getTestToken())
+                .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isOk())
             .andDo(document("get-book-report",
                 requestHeaders(
-                    headerWithName("Authorization").description("Bearer [JWT token]")
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 pathParameters(
                     parameterWithName("bookId").description("Book Id")
@@ -152,12 +155,12 @@ class BookReportControllerTest extends ControllerTestExtension {
     @Test
     void 독후감_삭제_성공() throws Exception {
         mockMvc.perform(delete("/v1/api/books/{bookId}/report", 1L)
-                .header("Authorization", "Bearer " + getTestToken())
+                .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isOk())
             .andDo(document("delete-book-report",
                 requestHeaders(
-                    headerWithName("Authorization").description("Bearer [JWT token]")
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 pathParameters(
                     parameterWithName("bookId").description("Book Id")
@@ -175,14 +178,14 @@ class BookReportControllerTest extends ControllerTestExtension {
             .build();
 
         mockMvc.perform(put("/v1/api/books/{bookId}/report", 1L)
-                .header("Authorization", "Bearer " + getTestToken())
+                .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(reviseBookReportRequest)))
             .andExpect(status().isOk())
             .andDo(document("put-book-report",
                 requestHeaders(
-                    headerWithName("Authorization").description("Bearer [JWT token]")
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 pathParameters(
                     parameterWithName("bookId").description("Book Id")

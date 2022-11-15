@@ -1,9 +1,11 @@
 package toy.bookchat.bookchat.domain.agonyrecord.api;
 
+import static io.jsonwebtoken.SignatureAlgorithm.HS256;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -21,11 +23,16 @@ import static org.springframework.restdocs.request.RequestDocumentation.pathPara
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static toy.bookchat.bookchat.domain.common.AuthConstants.BEARER;
 import static toy.bookchat.bookchat.domain.user.ROLE.USER;
+import static toy.bookchat.bookchat.domain.user.ReadingTaste.ART;
+import static toy.bookchat.bookchat.domain.user.ReadingTaste.DEVELOPMENT;
+import static toy.bookchat.bookchat.security.oauth.OAuth2Provider.GOOGLE;
+import static toy.bookchat.bookchat.security.oauth.OAuth2Provider.KAKAO;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +43,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateAgonyRecordRequest;
@@ -44,14 +50,14 @@ import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRecordR
 import toy.bookchat.bookchat.domain.agony.service.dto.response.SliceOfAgonyRecordsResponse;
 import toy.bookchat.bookchat.domain.agonyrecord.AgonyRecord;
 import toy.bookchat.bookchat.domain.agonyrecord.service.AgonyRecordService;
-import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.domain.user.User;
-import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @AgonyRecordPresentationTest
 class AgonyRecordControllerTest extends ControllerTestExtension {
+
+    public static final String JWT_TOKEN = BEARER + getTestToken();
 
     @MockBean
     AgonyRecordService agonyRecordService;
@@ -59,6 +65,19 @@ class AgonyRecordControllerTest extends ControllerTestExtension {
     ObjectMapper objectMapper;
     @Autowired
     private MockMvc mockMvc;
+
+    private static String getTestToken() {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("sub", "test");
+        claims.put("name", "google123");
+        claims.put("provider", GOOGLE);
+        claims.put("email", "test@gmail.com");
+
+        return Jwts.builder()
+            .setClaims(claims)
+            .signWith(HS256, "test")
+            .compact();
+    }
 
     private User getUser() {
         return User.builder()
@@ -69,8 +88,8 @@ class AgonyRecordControllerTest extends ControllerTestExtension {
             .name("testUser")
             .profileImageUrl("somethingImageUrl@naver.com")
             .defaultProfileImageType(1)
-            .provider(OAuth2Provider.KAKAO)
-            .readingTastes(List.of(ReadingTaste.DEVELOPMENT, ReadingTaste.ART))
+            .provider(KAKAO)
+            .readingTastes(List.of(DEVELOPMENT, ART))
             .build();
     }
 
@@ -83,35 +102,20 @@ class AgonyRecordControllerTest extends ControllerTestExtension {
         return UserPrincipal.create(tokenPayload);
     }
 
-    private String getTestToken() throws Exception {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("sub", "test");
-        claims.put("name", "google123");
-        claims.put("provider", OAuth2Provider.GOOGLE);
-        claims.put("email", "test@gmail.com");
-
-        String testToken = Jwts.builder()
-            .setClaims(claims)
-            .signWith(SignatureAlgorithm.HS256, "test")
-            .compact();
-
-        return testToken;
-    }
-
     @Test
     void 생성된_고민에_고민기록_추가_성공() throws Exception {
         CreateAgonyRecordRequest createAgonyRecordRequest = new CreateAgonyRecordRequest(
             "title", "blabla");
 
         mockMvc.perform(post("/v1/api/agonies/{agonyId}/records", 1)
-                .header("Authorization", "Bearer " + getTestToken())
+                .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(createAgonyRecordRequest)))
             .andExpect(status().isOk())
             .andDo(document("post-agonyrecord",
                 requestHeaders(
-                    headerWithName("Authorization").description("Bearer [JWT token]")
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 pathParameters(
                     parameterWithName("agonyId").description("Agony Id")
@@ -126,17 +130,18 @@ class AgonyRecordControllerTest extends ControllerTestExtension {
 
     @Test
     void 고민_기록_조회_성공() throws Exception {
-        AgonyRecord agonyRecord1 = mock(AgonyRecord.class);
-        AgonyRecord agonyRecord2 = mock(AgonyRecord.class);
-
-        when(agonyRecord1.getId()).thenReturn(2L);
-        when(agonyRecord1.getTitle()).thenReturn("title1");
-        when(agonyRecord1.getContent()).thenReturn("content1");
-        when(agonyRecord1.getCreateTimeInYearMonthDayFormat()).thenReturn("2022-11-01");
-        when(agonyRecord2.getId()).thenReturn(3L);
-        when(agonyRecord2.getTitle()).thenReturn("title2");
-        when(agonyRecord2.getContent()).thenReturn("content2");
-        when(agonyRecord2.getCreateTimeInYearMonthDayFormat()).thenReturn("2022-11-01");
+        AgonyRecord agonyRecord1 = AgonyRecord.builder()
+            .id(2L)
+            .title("title1")
+            .content("content1")
+            .build();
+        agonyRecord1.setCreatedAt(LocalDateTime.now());
+        AgonyRecord agonyRecord2 = AgonyRecord.builder()
+            .id(3L)
+            .title("title2")
+            .content("content2")
+            .build();
+        agonyRecord2.setCreatedAt(LocalDateTime.now());
 
         List<AgonyRecord> list = List.of(agonyRecord1, agonyRecord2);
         PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("id").ascending());
@@ -148,7 +153,7 @@ class AgonyRecordControllerTest extends ControllerTestExtension {
             any())).thenReturn(
             pageOfAgonyRecordsResponse);
         mockMvc.perform(get("/v1/api/agonies/{agonyId}/records", 1, 1)
-                .header("Authorization", "Bearer " + getTestToken())
+                .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
                 .queryParam("recordCursorId", "1")
                 .queryParam("size", "2")
@@ -156,7 +161,7 @@ class AgonyRecordControllerTest extends ControllerTestExtension {
             .andExpect(status().isOk())
             .andDo(document("get-agonies-records",
                 requestHeaders(
-                    headerWithName("Authorization").description("Bearer [JWT token]")
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 pathParameters(
                     parameterWithName("agonyId").description("Agony Id")
@@ -183,12 +188,12 @@ class AgonyRecordControllerTest extends ControllerTestExtension {
     void 고민기록_삭제_성공() throws Exception {
         mockMvc.perform(
                 delete("/v1/api/agonies/{agonyId}/records/{recordId}", 1L, 1L)
-                    .header("Authorization", "Bearer " + getTestToken())
+                    .header(AUTHORIZATION, JWT_TOKEN)
                     .with(user(getUserPrincipal())))
             .andExpect(status().isOk())
             .andDo(document("delete-agony-record",
                 requestHeaders(
-                    headerWithName("Authorization").description("Bearer [JWT token]")
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 pathParameters(
                     parameterWithName("agonyId").description("Agony Id"),
@@ -207,14 +212,14 @@ class AgonyRecordControllerTest extends ControllerTestExtension {
 
         mockMvc.perform(
                 put("/v1/api/agonies/{agonyId}/records/{recordId}", 1L, 1L)
-                    .header("Authorization", "Bearer " + getTestToken())
+                    .header(AUTHORIZATION, JWT_TOKEN)
                     .with(user(getUserPrincipal()))
-                    .contentType(MediaType.APPLICATION_JSON)
+                    .contentType(APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(reviseAgonyRecordRequest)))
             .andExpect(status().isOk())
             .andDo(document("put-agony-record",
                 requestHeaders(
-                    headerWithName("Authorization").description("Bearer [JWT token]")
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 pathParameters(
                     parameterWithName("agonyId").description("Agony Id"),

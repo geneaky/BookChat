@@ -57,10 +57,7 @@ class JwtTokenManagerTest {
 
     @Test
     void 토큰에서_사용자_이름_추출_성공() throws Exception {
-
-        when(jwtTokenConfig.getSecret()).thenReturn("test");
-        when(jwtTokenConfig.getAccessTokenExpiredTime()).thenReturn(1111111L);
-        when(jwtTokenConfig.getRefreshTokenExpiredTime()).thenReturn(2222222L);
+        generalTokenConfigContext();
 
         User user = getUser();
 
@@ -72,11 +69,15 @@ class JwtTokenManagerTest {
         assertThat(user.getName()).isEqualTo(findUserName);
     }
 
-    @Test
-    void 토큰에서_사용자_이메일_추출_성공() throws Exception {
+    private void generalTokenConfigContext() {
         when(jwtTokenConfig.getSecret()).thenReturn("test");
         when(jwtTokenConfig.getAccessTokenExpiredTime()).thenReturn(1111111L);
         when(jwtTokenConfig.getRefreshTokenExpiredTime()).thenReturn(2222222L);
+    }
+
+    @Test
+    void 토큰에서_사용자_이메일_추출_성공() throws Exception {
+        generalTokenConfigContext();
 
         User user = getUser();
 
@@ -88,9 +89,7 @@ class JwtTokenManagerTest {
 
     @Test
     void 토큰에서_provider_type_추출_성공() throws Exception {
-        when(jwtTokenConfig.getSecret()).thenReturn("test");
-        when(jwtTokenConfig.getAccessTokenExpiredTime()).thenReturn(1111111L);
-        when(jwtTokenConfig.getRefreshTokenExpiredTime()).thenReturn(2222222L);
+        generalTokenConfigContext();
 
         User user = getUser();
 
@@ -127,9 +126,7 @@ class JwtTokenManagerTest {
 
     @Test
     void 토큰에서_사용자_id_추출_성공() throws Exception {
-        when(jwtTokenConfig.getSecret()).thenReturn("test");
-        when(jwtTokenConfig.getAccessTokenExpiredTime()).thenReturn(1111111L);
-        when(jwtTokenConfig.getRefreshTokenExpiredTime()).thenReturn(2222222L);
+        generalTokenConfigContext();
 
         User user = getUser();
 
@@ -142,9 +139,7 @@ class JwtTokenManagerTest {
 
     @Test
     void 토큰에서_TokenPayload_반환_성공() throws Exception {
-        when(jwtTokenConfig.getSecret()).thenReturn("test");
-        when(jwtTokenConfig.getAccessTokenExpiredTime()).thenReturn(1111111L);
-        when(jwtTokenConfig.getRefreshTokenExpiredTime()).thenReturn(2222222L);
+        generalTokenConfigContext();
 
         User user = getUser();
 

@@ -1,13 +1,11 @@
 package toy.bookchat.bookchat.security.token.openid;
 
 import static io.jsonwebtoken.JwsHeader.KEY_ID;
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.KeyFactory;
@@ -20,7 +18,6 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,6 +31,14 @@ import toy.bookchat.bookchat.exception.security.IllegalStandardTokenException;
 class OpenIdTokenTest {
 
     OpenIdTestUtil openIdTestUtil;
+
+    private static Map<String, Object> getClaims() {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("sub", "1234");
+        claims.put("iss", "https://kauth.kakao.com");
+        claims.put("email", "test@naver.com");
+        return claims;
+    }
 
     @BeforeEach
     public void init() throws FileNotFoundException {
@@ -73,10 +78,7 @@ class OpenIdTokenTest {
     }
 
     private String getMockOpenIdToken(PrivateKey privateKey) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("sub", "1234");
-        claims.put("iss", "https://kauth.kakao.com");
-        claims.put("email", "test@naver.com");
+        Map<String, Object> claims = getClaims();
 
         String token = Jwts.builder()
             .setHeaderParam(KEY_ID, "abcdedf")
@@ -143,10 +145,7 @@ class OpenIdTokenTest {
         PrivateKey privateKey = getPrivateKey();
         PublicKey publicKey = getPublicKey();
 
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("sub", "1234");
-        claims.put("iss", "https://kauth.kakao.com");
-        claims.put("email", "test@naver.com");
+        Map<String, Object> claims = getClaims();
 
         String token = Jwts.builder()
             .setHeaderParam(KEY_ID, "abcdedf")
@@ -189,10 +188,7 @@ class OpenIdTokenTest {
         PrivateKey privateKey = getPrivateKey();
         PublicKey publicKey = getPublicKey();
 
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("sub", "1234");
-        claims.put("iss", "https://kauth.kakao.com");
-        claims.put("email", "test@naver.com");
+        Map<String, Object> claims = getClaims();
 
         String token = Jwts.builder()
             .setHeaderParam(KEY_ID, "abcdedf")
@@ -255,10 +251,7 @@ class OpenIdTokenTest {
     void openidtoken에서_keyid_정보_없을시_예외발생() throws Exception {
         PrivateKey privateKey = getPrivateKey();
 
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("sub", "1234");
-        claims.put("iss", "https://kauth.kakao.com");
-        claims.put("email", "test@naver.com");
+        Map<String, Object> claims = getClaims();
 
         String token = Jwts.builder()
             .setClaims(claims)
@@ -276,10 +269,7 @@ class OpenIdTokenTest {
     void openidtoken_만료된토큰으로_keyid조회시_예외발생() throws Exception {
         PrivateKey privateKey = getPrivateKey();
 
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("sub", "1234");
-        claims.put("iss", "https://kauth.kakao.com");
-        claims.put("email", "test@naver.com");
+        Map<String, Object> claims = getClaims();
 
         String token = Jwts.builder()
             .setHeaderParam(KEY_ID, "abcdedf")

@@ -1,9 +1,12 @@
 package toy.bookchat.bookchat.domain.agony.api;
 
+import static io.jsonwebtoken.SignatureAlgorithm.HS256;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -22,11 +25,15 @@ import static org.springframework.restdocs.request.RequestDocumentation.requestP
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static toy.bookchat.bookchat.domain.common.AuthConstants.BEARER;
 import static toy.bookchat.bookchat.domain.user.ROLE.USER;
+import static toy.bookchat.bookchat.domain.user.ReadingTaste.ART;
+import static toy.bookchat.bookchat.domain.user.ReadingTaste.DEVELOPMENT;
+import static toy.bookchat.bookchat.security.oauth.OAuth2Provider.GOOGLE;
+import static toy.bookchat.bookchat.security.oauth.OAuth2Provider.KAKAO;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +44,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
 import toy.bookchat.bookchat.domain.agony.Agony;
@@ -46,14 +52,14 @@ import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateBookAgonyReq
 import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.response.SliceOfAgoniesResponse;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
-import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.domain.user.User;
-import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @AgonyPresentationTest
 class AgonyControllerTest extends ControllerTestExtension {
+
+    public static final String JWT_TOKEN = BEARER + getTestToken();
 
     @MockBean
     AgonyService agonyService;
@@ -61,6 +67,19 @@ class AgonyControllerTest extends ControllerTestExtension {
     ObjectMapper objectMapper;
     @Autowired
     private MockMvc mockMvc;
+
+    private static String getTestToken() {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("sub", "test");
+        claims.put("name", "google123");
+        claims.put("provider", GOOGLE);
+        claims.put("email", "test@gmail.com");
+
+        return Jwts.builder()
+            .setClaims(claims)
+            .signWith(HS256, "test")
+            .compact();
+    }
 
     private User getUser() {
         return User.builder()
@@ -71,8 +90,8 @@ class AgonyControllerTest extends ControllerTestExtension {
             .name("testUser")
             .profileImageUrl("somethingImageUrl@naver.com")
             .defaultProfileImageType(1)
-            .provider(OAuth2Provider.KAKAO)
-            .readingTastes(List.of(ReadingTaste.DEVELOPMENT, ReadingTaste.ART))
+            .provider(KAKAO)
+            .readingTastes(List.of(DEVELOPMENT, ART))
             .build();
     }
 
@@ -83,21 +102,6 @@ class AgonyControllerTest extends ControllerTestExtension {
             user.getEmail(), user.getProfileImageUrl(), user.getDefaultProfileImageType(),
             user.getRole());
         return UserPrincipal.create(tokenPayload);
-    }
-
-    private String getTestToken() throws Exception {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("sub", "test");
-        claims.put("name", "google123");
-        claims.put("provider", OAuth2Provider.GOOGLE);
-        claims.put("email", "test@gmail.com");
-
-        String testToken = Jwts.builder()
-            .setClaims(claims)
-            .signWith(SignatureAlgorithm.HS256, "test")
-            .compact();
-
-        return testToken;
     }
 
     private List<Agony> getAgonies() {
@@ -123,14 +127,14 @@ class AgonyControllerTest extends ControllerTestExtension {
         CreateBookAgonyRequest createBookAgonyRequest = new CreateBookAgonyRequest("title",
             "#062498");
         mockMvc.perform(post("/v1/api/bookshelf/books/{bookId}/agonies", 1)
-                .header("Authorization", "Bearer " + getTestToken())
+                .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(createBookAgonyRequest)))
             .andExpect(status().isOk())
             .andDo(document("post-agony",
                 requestHeaders(
-                    headerWithName("Authorization").description("Bearer [JWT token]")
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 pathParameters(
                     parameterWithName("bookId").description("Book Id")
@@ -153,7 +157,7 @@ class AgonyControllerTest extends ControllerTestExtension {
         when(agonyService.searchSliceOfAgonies(any(), any(), any())).thenReturn(
             pageOfAgoniesResponse);
         mockMvc.perform(get("/v1/api/agonies")
-                .header("Authorization", "Bearer " + getTestToken())
+                .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
                 .queryParam("size", "2")
                 .queryParam("sort", "id,DESC")
@@ -162,7 +166,7 @@ class AgonyControllerTest extends ControllerTestExtension {
             .andDo(print())
             .andDo(document("get-agonies",
                 requestHeaders(
-                    headerWithName("Authorization").description("Bearer [JWT token]")
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 requestParameters(
                     parameterWithName("size").description("page 당 size"),
@@ -182,12 +186,12 @@ class AgonyControllerTest extends ControllerTestExtension {
     @Test
     void 고민_폴더_삭제_성공() throws Exception {
         mockMvc.perform(delete("/v1/api/agonies/{agoniesIds}", "1,2,3")
-                .header("Authorization", "Bearer " + getTestToken())
+                .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isOk())
             .andDo(document("delete-agony",
                 requestHeaders(
-                    headerWithName("Authorization").description("Bearer [JWT token]")
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 pathParameters(
                     parameterWithName("agoniesIds").description("삭제할 고민폴더 ID")
@@ -204,14 +208,14 @@ class AgonyControllerTest extends ControllerTestExtension {
             .build();
 
         mockMvc.perform(put("/v1/api/agonies/{agonyId}", 1L)
-                .header("Authorization", "Bearer " + getTestToken())
+                .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(reviseAgonyRequest)))
             .andExpect(status().isOk())
             .andDo(document("put-agony",
                 requestHeaders(
-                    headerWithName("Authorization").description("Bearer [JWT token]")
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 pathParameters(
                     parameterWithName("agonyId").description("Agony Id")

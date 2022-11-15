@@ -42,6 +42,13 @@ class BookReportServiceTest {
             .build();
     }
 
+    private static BookReport getBookReport() {
+        return BookReport.builder()
+            .title("title")
+            .content("content")
+            .build();
+    }
+
     @Test
     void 독후감_등록_성공() throws Exception {
         WriteBookReportRequest writeBookReportRequest = getWriteBookReportRequest();
@@ -88,10 +95,7 @@ class BookReportServiceTest {
 
     @Test
     void 서재에_등록된_책_독후감_조회_성공() throws Exception {
-        BookReport bookReport = BookReport.builder()
-            .title("title")
-            .content("content")
-            .build();
+        BookReport bookReport = getBookReport();
 
         bookReport.setCreatedAt(LocalDateTime.now());
 
@@ -109,10 +113,7 @@ class BookReportServiceTest {
 
     @Test
     void 서재에_등록된_책_독후감_삭제_성공() throws Exception {
-        BookReport bookReport = BookReport.builder()
-            .title("title")
-            .content("content")
-            .build();
+        BookReport bookReport = getBookReport();
 
         bookReport.setCreatedAt(LocalDateTime.now());
 
@@ -135,10 +136,7 @@ class BookReportServiceTest {
             .reportTitle("title2")
             .reportContent("content2")
             .build();
-        BookReport bookReport = BookReport.builder()
-            .title("title")
-            .content("content")
-            .build();
+        BookReport bookReport = getBookReport();
 
         bookReport.setCreatedAt(LocalDateTime.now());
 

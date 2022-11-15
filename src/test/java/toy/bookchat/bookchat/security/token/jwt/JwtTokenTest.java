@@ -82,9 +82,7 @@ class JwtTokenTest {
 
     @Test
     void 일치하지않은_secretkey로_토큰개방시_예외발생() throws Exception {
-        when(jwtTokenConfig.getSecret()).thenReturn("test");
-        when(jwtTokenConfig.getAccessTokenExpiredTime()).thenReturn(888888888L);
-        when(jwtTokenConfig.getRefreshTokenExpiredTime()).thenReturn(999999999L);
+        generalTokenConfigContext();
 
         Token token = jwtTokenProvider.createToken(getUser());
 
@@ -96,9 +94,7 @@ class JwtTokenTest {
 
     @Test
     void 토큰에서_userId_추출_성공() throws Exception {
-        when(jwtTokenConfig.getSecret()).thenReturn("test");
-        when(jwtTokenConfig.getAccessTokenExpiredTime()).thenReturn(888888888L);
-        when(jwtTokenConfig.getRefreshTokenExpiredTime()).thenReturn(999999999L);
+        generalTokenConfigContext();
 
         Token token = jwtTokenProvider.createToken(getUser());
 
@@ -109,9 +105,7 @@ class JwtTokenTest {
 
     @Test
     void 토큰에서_TokenPayload_추출_성공() throws Exception {
-        when(jwtTokenConfig.getSecret()).thenReturn("test");
-        when(jwtTokenConfig.getAccessTokenExpiredTime()).thenReturn(888888888L);
-        when(jwtTokenConfig.getRefreshTokenExpiredTime()).thenReturn(999999999L);
+        generalTokenConfigContext();
 
         Token token = jwtTokenProvider.createToken(getUser());
 
@@ -119,5 +113,11 @@ class JwtTokenTest {
         TokenPayload expect = getTokenPayload(getUser());
 
         assertThat(result).isEqualTo(expect);
+    }
+
+    private void generalTokenConfigContext() {
+        when(jwtTokenConfig.getSecret()).thenReturn("test");
+        when(jwtTokenConfig.getAccessTokenExpiredTime()).thenReturn(888888888L);
+        when(jwtTokenConfig.getRefreshTokenExpiredTime()).thenReturn(999999999L);
     }
 }

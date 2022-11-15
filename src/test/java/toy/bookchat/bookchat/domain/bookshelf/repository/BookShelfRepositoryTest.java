@@ -71,13 +71,7 @@ class BookShelfRepositoryTest {
     @Test
     void 읽고있는_책을_조회() throws Exception {
         Book book1 = getBook();
-        Book book2 = Book.builder()
-            .isbn("1-4133-0454-0")
-            .title("effective java2")
-            .authors(List.of("Joshua"))
-            .publisher("insight")
-            .bookCoverImageUrl("bookCover@naver.com")
-            .build();
+        Book book2 = getBook();
 
         bookRepository.save(book1);
         bookRepository.save(book2);
@@ -115,13 +109,7 @@ class BookShelfRepositoryTest {
     @Test
     void 읽은_책을_조회() throws Exception {
         Book book1 = getBook();
-        Book book2 = Book.builder()
-            .isbn("1-4133-0454-0")
-            .title("effective java2")
-            .authors(List.of("Joshua"))
-            .publisher("insight")
-            .bookCoverImageUrl("bookCover@naver.com")
-            .build();
+        Book book2 = getBook();
         bookRepository.save(book1);
         bookRepository.save(book2);
 
@@ -158,13 +146,7 @@ class BookShelfRepositoryTest {
     @Test
     void 읽을_책을_조회() throws Exception {
         Book book1 = getBook();
-        Book book2 = Book.builder()
-            .isbn("1-4133-0454-0")
-            .title("effective java2")
-            .authors(List.of("Joshua"))
-            .publisher("insight")
-            .bookCoverImageUrl("bookCover@naver.com")
-            .build();
+        Book book2 = getBook();
 
         bookRepository.save(book1);
         bookRepository.save(book2);
@@ -302,6 +284,8 @@ class BookShelfRepositoryTest {
             .readingStatus(ReadingStatus.READING)
             .build();
 
+        bookShelfRepository.save(bookShelf1);
+        bookShelfRepository.save(bookShelf2);
         bookShelfRepository.deleteAllByUserId(user.getId());
 
         List<BookShelf> result = bookShelfRepository.findAll();

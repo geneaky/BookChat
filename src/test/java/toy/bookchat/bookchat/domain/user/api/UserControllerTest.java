@@ -1,11 +1,17 @@
 package toy.bookchat.bookchat.domain.user.api;
 
+import static io.jsonwebtoken.SignatureAlgorithm.HS256;
+import static io.jsonwebtoken.SignatureAlgorithm.RS256;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -26,18 +32,20 @@ import static org.springframework.restdocs.request.RequestDocumentation.requestP
 import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static toy.bookchat.bookchat.domain.common.AuthConstants.BEARER;
+import static toy.bookchat.bookchat.domain.common.AuthConstants.OIDC;
 import static toy.bookchat.bookchat.domain.user.ROLE.USER;
 import static toy.bookchat.bookchat.domain.user.ReadingTaste.ART;
 import static toy.bookchat.bookchat.domain.user.ReadingTaste.DEVELOPMENT;
 import static toy.bookchat.bookchat.domain.user.ReadingTaste.SCIENCE;
+import static toy.bookchat.bookchat.security.oauth.OAuth2Provider.GOOGLE;
+import static toy.bookchat.bookchat.security.oauth.OAuth2Provider.KAKAO;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -53,15 +61,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.Base64Utils;
 import org.springframework.web.multipart.MultipartFile;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
-import toy.bookchat.bookchat.domain.user.ROLE;
-import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.api.dto.Token;
 import toy.bookchat.bookchat.domain.user.api.dto.UserProfileResponse;
@@ -70,7 +75,6 @@ import toy.bookchat.bookchat.domain.user.service.dto.request.ChangeUserNicknameR
 import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignInRequest;
 import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignUpRequest;
 import toy.bookchat.bookchat.exception.security.ExpiredTokenException;
-import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenProvider;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenRecorder;
 import toy.bookchat.bookchat.security.token.openid.OpenIdTestUtil;
@@ -80,6 +84,7 @@ import toy.bookchat.bookchat.security.user.UserPrincipal;
 @UserPresentationTest
 class UserControllerTest extends ControllerTestExtension {
 
+    public static final String JWT_TOKEN = BEARER + getTestToken();
     @MockBean
     UserService userService;
     @MockBean
@@ -96,14 +101,21 @@ class UserControllerTest extends ControllerTestExtension {
         Map<String, Object> claims = new HashMap<>();
         claims.put("sub", "test");
         claims.put("name", "testkakao");
-        claims.put("provider", OAuth2Provider.GOOGLE);
+        claims.put("provider", GOOGLE);
         claims.put("email", "test@gmail.com");
 
-        String testToken = Jwts.builder()
+        return Jwts.builder()
             .setClaims(claims)
-            .signWith(SignatureAlgorithm.HS256, "test")
+            .signWith(HS256, "test")
             .compact();
-        return testToken;
+    }
+
+    private static Map<String, Object> getClaims() {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("email", "test@gmail.com");
+        claims.put("iss", "https://kauth.kakao.com");
+        claims.put("sub", "test");
+        return claims;
     }
 
     @BeforeEach
@@ -122,8 +134,8 @@ class UserControllerTest extends ControllerTestExtension {
             .name("testUser")
             .profileImageUrl("somethingImageUrl@naver.com")
             .defaultProfileImageType(1)
-            .provider(OAuth2Provider.KAKAO)
-            .readingTastes(List.of(ReadingTaste.DEVELOPMENT, ReadingTaste.ART))
+            .provider(KAKAO)
+            .readingTastes(List.of(DEVELOPMENT, ART))
             .build();
     }
 
@@ -145,7 +157,6 @@ class UserControllerTest extends ControllerTestExtension {
 
     @Test
     void 사용자_프로필_정보_반환() throws Exception {
-        String testToken = getTestToken();
 
         String real = objectMapper.writeValueAsString(UserProfileResponse.builder()
             .userEmail("test@gmail.com")
@@ -156,11 +167,11 @@ class UserControllerTest extends ControllerTestExtension {
 
         MvcResult mvcResult = mockMvc.perform(get("/v1/api/users/profile")
                 .with(user(getUserPrincipal()))
-                .header("Authorization", "Bearer " + testToken))
+                .header(AUTHORIZATION, JWT_TOKEN))
             .andExpect(status().isOk())
             .andDo(document("user",
                 requestHeaders(
-                    headerWithName("Authorization").description("Bearer [JWT token]")
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 responseFields(
                     fieldWithPath("userNickname").type(STRING).description("닉네임"),
@@ -194,7 +205,7 @@ class UserControllerTest extends ControllerTestExtension {
     @Test
     void 사용자_회원가입_요청시_header_인증정보_없을시_400반환() throws Exception {
         mockMvc.perform(post("/v1/api/users/signup")
-                .header("Authorization", " ")
+                .header(AUTHORIZATION, " ")
                 .param("nickname", "nick")
                 .param("userEmail", "kaktus418@gmail.com")
                 .param("oauth2Provider", "kakao")
@@ -206,7 +217,7 @@ class UserControllerTest extends ControllerTestExtension {
     @Test
     void 사용자_회원가입_요청시_header_openid없는_인증정보_400반환() throws Exception {
         mockMvc.perform(post("/v1/api/users/signup")
-                .header("Authorization", "Bearer ")
+                .header(AUTHORIZATION, "Bearer ")
                 .param("nickname", "nick")
                 .param("defaultProfileImageType", "2"))
             .andExpect(status().isBadRequest())
@@ -232,16 +243,14 @@ class UserControllerTest extends ControllerTestExtension {
         throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         X509EncodedKeySpec publicKeySpec = getPublicPkcs8EncodedKeySpec(openIdTestUtil);
-        PublicKey publicKey = keyFactory.generatePublic(publicKeySpec);
-        return publicKey;
+        return keyFactory.generatePublic(publicKeySpec);
     }
 
     private PrivateKey getPrivateKey()
         throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         PKCS8EncodedKeySpec privateKeySpec = getPrivatePkcs8EncodedKeySpec(openIdTestUtil);
-        PrivateKey privateKey = keyFactory.generatePrivate(privateKeySpec);
-        return privateKey;
+        return keyFactory.generatePrivate(privateKeySpec);
     }
 
     @Test
@@ -254,7 +263,7 @@ class UserControllerTest extends ControllerTestExtension {
         UserSignUpRequest userSignUpRequest = UserSignUpRequest.builder()
             .nickname("nick")
             .defaultProfileImageType(1)
-            .oauth2Provider(OAuth2Provider.KAKAO)
+            .oauth2Provider(KAKAO)
             .readingTastes(List.of(DEVELOPMENT, ART, SCIENCE))
             .build();
 
@@ -263,7 +272,7 @@ class UserControllerTest extends ControllerTestExtension {
         String testToken = Jwts.builder()
             .setHeaderParam("kid", "abcdefg")
             .setClaims(claims)
-            .signWith(SignatureAlgorithm.RS256, privateKey).compact();
+            .signWith(RS256, privateKey).compact();
 
         when(getOpenIdTokenConfig().getPublicKey(any(), any())).thenReturn(publicKey);
         doThrow(ExpiredTokenException.class).when(getOpenIdTokenManager())
@@ -273,8 +282,8 @@ class UserControllerTest extends ControllerTestExtension {
                 .file(multipartFile)
                 .file(new MockMultipartFile("userSignUpRequest", "", "application/json",
                     objectMapper.writeValueAsString(userSignUpRequest)
-                        .getBytes(StandardCharsets.UTF_8)))
-                .header("OIDC", "Bearer " + testToken))
+                        .getBytes(UTF_8)))
+                .header(OIDC, BEARER + testToken))
             .andExpect(status().isUnauthorized())
             .andDo(document("user-signup-error4"));
     }
@@ -290,15 +299,10 @@ class UserControllerTest extends ControllerTestExtension {
         when(getOpenIdTokenManager().getUserEmailFromToken(any(), any())).thenReturn(
             "test@gmail.com");
 
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("email", "test@gmail.com");
-        claims.put("iss", "https://kauth.kakao.com");
-        claims.put("sub", "test");
-
         String testToken = Jwts.builder()
             .setHeaderParam("kid", "abcedf")
-            .setClaims(claims)
-            .signWith(SignatureAlgorithm.RS256, privateKey)
+            .setClaims(getClaims())
+            .signWith(RS256, privateKey)
             .compact();
 
         MockMultipartFile multipartFile = new MockMultipartFile("userProfileImage",
@@ -306,7 +310,7 @@ class UserControllerTest extends ControllerTestExtension {
         UserSignUpRequest userSignUpRequest = UserSignUpRequest.builder()
             .nickname("nick")
             .defaultProfileImageType(1)
-            .oauth2Provider(OAuth2Provider.KAKAO)
+            .oauth2Provider(KAKAO)
             .readingTastes(List.of(DEVELOPMENT, ART, SCIENCE))
             .build();
 
@@ -314,11 +318,11 @@ class UserControllerTest extends ControllerTestExtension {
                 .file(multipartFile)
                 .file(new MockMultipartFile("userSignUpRequest", "", "application/json",
                     objectMapper.writeValueAsString(userSignUpRequest)
-                        .getBytes(StandardCharsets.UTF_8)))
-                .header("OIDC", "Bearer " + testToken))
+                        .getBytes(UTF_8)))
+                .header(OIDC, BEARER + testToken))
             .andExpect(status().isOk())
             .andDo(document("user-signup", requestHeaders(
-                    headerWithName("OIDC").description("Bearer [openid token]")
+                    headerWithName(OIDC).description("Bearer [openid token]")
                 ),
                 requestParts(
                     partWithName("userProfileImage").description("프로필 이미지 [200 x 200].webp"),
@@ -342,14 +346,16 @@ class UserControllerTest extends ControllerTestExtension {
         PrivateKey privateKey = getPrivateKey();
 
         String testToken = Jwts.builder().setSubject("test")
-            .signWith(SignatureAlgorithm.RS256, privateKey).compact();
+            .signWith(RS256, privateKey).compact();
 
         String A = "Tearer " + testToken;
 
-        String B = "Bearer " + testToken;
+        String B = BEARER + testToken;
 
-        assertThat(A.matches("^(Bearer)\\s.+")).isFalse();
-        assertThat(B.matches("^(Bearer)\\s.+")).isTrue();
+        assertAll(
+            () -> assertThat(A.matches("^(Bearer)\\s.+")).isFalse(),
+            () -> assertThat(B.matches("^(Bearer)\\s.+")).isTrue()
+        );
 
     }
 
@@ -358,10 +364,10 @@ class UserControllerTest extends ControllerTestExtension {
         PrivateKey privateKey = getPrivateKey();
 
         String testToken = Jwts.builder().setSubject("test")
-            .signWith(SignatureAlgorithm.RS256, privateKey).compact();
+            .signWith(RS256, privateKey).compact();
 
         mockMvc.perform(post("/v1/api/users/signup")
-                .header("Authorization", "Tearer" + testToken)
+                .header(AUTHORIZATION, "Tearer" + testToken)
                 .param("defaultProfileImageType", "1")
                 .param("nickname", "testName"))
             .andExpect(status().isBadRequest())
@@ -373,10 +379,10 @@ class UserControllerTest extends ControllerTestExtension {
         PrivateKey privateKey = getPrivateKey();
 
         String testToken = Jwts.builder().setSubject("test")
-            .signWith(SignatureAlgorithm.RS256, privateKey).compact();
+            .signWith(RS256, privateKey).compact();
 
         mockMvc.perform(post("/v1/api/users/signup")
-                .header("Authorization", "Bearer " + testToken)
+                .header(AUTHORIZATION, BEARER + testToken)
                 .param("nickname", "")
                 .param("userEmail", "abcdefg")
                 .param("oauth2Provider", ""))
@@ -391,15 +397,10 @@ class UserControllerTest extends ControllerTestExtension {
 
         when(getOpenIdTokenConfig().getPublicKey(any(), any())).thenReturn(publicKey);
 
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("email", "test@gmail.com");
-        claims.put("iss", "https://kauth.kakao.com");
-        claims.put("sub", "test");
-
         String testToken = Jwts.builder()
             .setHeaderParam("kid", "abcedf")
-            .setClaims(claims)
-            .signWith(SignatureAlgorithm.RS256, privateKey)
+            .setClaims(getClaims())
+            .signWith(RS256, privateKey)
             .compact();
 
         Token responseToken = Token.builder()
@@ -408,19 +409,19 @@ class UserControllerTest extends ControllerTestExtension {
             .build();
 
         UserSignInRequest userSignInRequest = UserSignInRequest.builder()
-            .oauth2Provider(OAuth2Provider.KAKAO)
+            .oauth2Provider(KAKAO)
             .build();
 
         when(jwtTokenProvider.createToken(any())).thenReturn(responseToken);
         when(userService.findUserByUsername(any())).thenReturn(getUser());
         MvcResult mvcResult = mockMvc.perform(post("/v1/api/users/signin")
-                .header("OIDC", "Bearer " + testToken)
-                .contentType(MediaType.APPLICATION_JSON)
+                .header(OIDC, BEARER + testToken)
+                .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(userSignInRequest)))
             .andExpect(status().isOk())
             .andDo(document("user-signin",
                 requestHeaders(
-                    headerWithName("OIDC").description("Bearer [openid token]")
+                    headerWithName(OIDC).description("Bearer [openid token]")
                 ),
                 requestFields(
                     fieldWithPath("oauth2Provider").type(STRING)
@@ -439,7 +440,6 @@ class UserControllerTest extends ControllerTestExtension {
 
     @Test
     void 로그인_요청시_Header없으면_예외발생() throws Exception {
-
         mockMvc.perform(post("/v1/api/users/signin"))
             .andExpect(status().isBadRequest())
             .andDo(document("user-signin-error1"));
@@ -448,7 +448,7 @@ class UserControllerTest extends ControllerTestExtension {
     @Test
     void 로그인_요청시_Header에_토큰이_없으면_예외발생() throws Exception {
         mockMvc.perform(post("/v1/api/users/signin")
-                .header("OIDC", "Bearer "))
+                .header(OIDC, BEARER))
             .andExpect(status().isBadRequest())
             .andDo(document("user-signin-error2"));
     }
@@ -460,19 +460,14 @@ class UserControllerTest extends ControllerTestExtension {
 
         when(getOpenIdTokenConfig().getPublicKey(any(), any())).thenReturn(publicKey);
 
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("email", "test@gmail.com");
-        claims.put("iss", "https://kauth.kakao.com");
-        claims.put("sub", "test");
-
         String testToken = Jwts.builder()
             .setHeaderParam("kid", "abcedf")
-            .setClaims(claims)
-            .signWith(SignatureAlgorithm.RS256, privateKey)
+            .setClaims(getClaims())
+            .signWith(RS256, privateKey)
             .compact();
 
         mockMvc.perform(post("/v1/api/users/signin")
-                .header("OIDC", "Tearer " + testToken))
+                .header(OIDC, "Tearer " + testToken))
             .andExpect(status().isBadRequest())
             .andDo(document("user-signin-error3"));
     }
@@ -489,34 +484,23 @@ class UserControllerTest extends ControllerTestExtension {
         String testToken = Jwts.builder()
             .setHeaderParam("kid", "abcdefg")
             .setClaims(claims)
-            .signWith(SignatureAlgorithm.RS256, privateKey).compact();
+            .signWith(RS256, privateKey).compact();
 
         mockMvc.perform(post("/v1/api/users/siginin")
-                .header("OIDC", "Bearer " + testToken))
+                .header(OIDC, BEARER + testToken))
             .andExpect(status().isUnauthorized())
             .andDo(document("user-signin-error4"));
     }
 
     @Test
     void 가입된_사용자_회원탈퇴_성공() throws Exception {
-        String testToken = getTestToken();
-
-        User user = User.builder()
-            .email("test@gmail.com")
-            .name("testkakao")
-            .nickname("nickname")
-            .role(ROLE.USER)
-            .profileImageUrl("somethingImageUrl@naver.com")
-            .defaultProfileImageType(1)
-            .build();
-
         mockMvc.perform(delete("/v1/api/users")
                 .with(user(getUserPrincipal()))
-                .header("Authorization", "Bearer " + testToken))
+                .header(AUTHORIZATION, JWT_TOKEN))
             .andExpect(status().isOk())
             .andDo(document("delete-user",
                 requestHeaders(
-                    headerWithName("Authorization").description("Bearer [JWT token]")
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 )));
 
         verify(userService).deleteUser(any());
@@ -524,27 +508,18 @@ class UserControllerTest extends ControllerTestExtension {
 
     @Test
     void 사용자_닉네임_변경성공() throws Exception {
-        User user = User.builder()
-            .email("test@gmail.com")
-            .name("testkakao")
-            .nickname("nickname")
-            .role(ROLE.USER)
-            .profileImageUrl("somethingImageUrl@naver.com")
-            .defaultProfileImageType(1)
-            .build();
-
         ChangeUserNicknameRequest changeUserNicknameRequest = new ChangeUserNicknameRequest(
             "newNickname");
 
         mockMvc.perform(patch("/v1/api/user")
-                .header("Authorization", "Bearer " + getTestToken())
+                .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(changeUserNicknameRequest)))
             .andExpect(status().isOk())
             .andDo(document("patch-user-nickname",
                 requestHeaders(
-                    headerWithName("Authorization").description("Bearer [JWT token]")
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 requestFields(
                     fieldWithPath("nickname").type(STRING).description("변경할 닉네임")

@@ -1,6 +1,5 @@
 package toy.bookchat.bookchat.security.token.jwt;
 
-import static toy.bookchat.bookchat.domain.common.AuthConstants.AUTHORIZATION;
 import static toy.bookchat.bookchat.domain.common.AuthConstants.BEARER;
 import static toy.bookchat.bookchat.domain.common.AuthConstants.BEGIN_INDEX;
 
@@ -9,6 +8,7 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
@@ -49,7 +49,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private String getJwtTokenFromRequest(HttpServletRequest request) {
-        String bearerToken = request.getHeader(AUTHORIZATION);
+        String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER)) {
             return bearerToken.substring(BEGIN_INDEX);
         }
