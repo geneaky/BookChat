@@ -64,4 +64,10 @@ public class AgonyService {
         agony.changeTitle(reviseAgonyRequest.getAgonyTitle());
         agony.changeHexColorCode(reviseAgonyRequest.getAgonyColor());
     }
+
+    @Transactional
+    public void deleteAllUserAgony(Long userId) {
+        agonyRecordRepository.deleteAllByUserId(userId);
+        agonyRepository.deleteAllByUserId(userId);
+    }
 }

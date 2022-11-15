@@ -282,4 +282,29 @@ class AgonyRecordRepositoryTest {
         List<AgonyRecord> result = agonyRecordRepository.findAll();
         assertThat(result).isEmpty();
     }
+
+    @Test
+    void 사용자가_생성한_고민기록_전부_삭제성공() throws Exception {
+        Book book = getBook();
+        bookRepository.save(book);
+
+        User user = getUser();
+        userRepository.save(user);
+
+        BookShelf bookShelf = getBookShelf(user, book);
+        bookShelfRepository.save(bookShelf);
+
+        Agony agony = getAgony(bookShelf);
+        agonyRepository.save(agony);
+
+        AgonyRecord agonyRecord1 = getAgonyRecord(agony);
+        AgonyRecord agonyRecord2 = getAgonyRecord(agony);
+        AgonyRecord agonyRecord3 = getAgonyRecord(agony);
+        List<AgonyRecord> agonyRecords = List.of(agonyRecord1, agonyRecord2, agonyRecord3);
+        agonyRecordRepository.saveAll(agonyRecords);
+
+        agonyRecordRepository.deleteAllByUserId(user.getId());
+        List<AgonyRecord> result = agonyRecordRepository.findAll();
+        assertThat(result).isEmpty();
+    }
 }

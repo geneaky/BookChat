@@ -15,6 +15,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
+import toy.bookchat.bookchat.domain.agony.service.AgonyService;
+import toy.bookchat.bookchat.domain.bookshelf.service.BookShelfService;
 import toy.bookchat.bookchat.domain.storage.StorageService;
 import toy.bookchat.bookchat.domain.storage.image.ImageValidator;
 import toy.bookchat.bookchat.domain.user.User;
@@ -29,6 +31,10 @@ class UserServiceTest {
 
     @Mock
     UserRepository userRepository;
+    @Mock
+    BookShelfService bookShelfService;
+    @Mock
+    AgonyService agonyService;
     @Mock
     StorageService storageService;
     @Mock
@@ -97,6 +103,8 @@ class UserServiceTest {
     void 사용자_회원탈퇴_요청시_삭제_성공() throws Exception {
         userService.deleteUser(any());
 
+        verify(agonyService).deleteAllUserAgony(any());
+        verify(bookShelfService).deleteAllUserBookShelves(any());
         verify(userRepository).deleteById(any());
     }
 

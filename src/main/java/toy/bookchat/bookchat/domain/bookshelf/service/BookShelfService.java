@@ -133,4 +133,9 @@ public class BookShelfService {
 
         bookShelf.changeStar(reviseBookShelfStarRequest.getStar());
     }
+
+    @Transactional
+    public void deleteAllUserBookShelves(Long userId) {
+        bookShelfRepository.deleteAllByUserId(userId);
+    }
 }

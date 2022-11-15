@@ -14,4 +14,6 @@ public interface AgonyQueryRepository {
         Optional<Long> postAgonyCursorId);
 
     void deleteByAgoniesIds(Long userId, List<Long> agoniesIds);
+
+    void deleteAllByUserId(Long userId);
 }

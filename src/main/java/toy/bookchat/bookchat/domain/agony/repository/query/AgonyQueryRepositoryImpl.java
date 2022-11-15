@@ -62,4 +62,10 @@ public class AgonyQueryRepositoryImpl implements AgonyQueryRepository {
                     .where(subAgony.id.in(agoniesIds))
             )).execute();
     }
+
+    @Override
+    public void deleteAllByUserId(Long userId) {
+        queryFactory.delete(agony)
+            .where(agony.user.id.eq(userId)).execute();
+    }
 }

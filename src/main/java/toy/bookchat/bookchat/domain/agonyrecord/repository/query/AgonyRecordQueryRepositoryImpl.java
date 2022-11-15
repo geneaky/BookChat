@@ -83,4 +83,14 @@ public class AgonyRecordQueryRepositoryImpl implements AgonyRecordQueryRepositor
             )).execute();
     }
 
+    @Override
+    public void deleteAllByUserId(Long userId) {
+        queryFactory.delete(agonyRecord)
+            .where(agonyRecord.agony.id.in(
+                JPAExpressions.select(agony.id)
+                    .from(agony)
+                    .where(agony.user.id.eq(userId))
+            )).execute();
+    }
+
 }

@@ -10,11 +10,13 @@ public interface AgonyRecordQueryRepository {
 
     Slice<AgonyRecord> findSliceOfUserAgonyRecords(Long agonyId, Long userId,
         Pageable pageable, Optional<Long> postRecordCursorId);
-    
+
     void deleteAgony(Long userId, Long agonyId, Long recordId);
 
     void reviseAgonyRecord(Long userId, Long agonyId, Long recordId,
         String recordTitle, String recordContent);
 
     void deleteByAgoniesIds(Long userId, List<Long> agoniesIds);
+
+    void deleteAllByUserId(Long userId);
 }

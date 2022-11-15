@@ -279,4 +279,32 @@ class BookShelfRepositoryTest {
             user.getId(), book.getId()).get();
         assertThat(findBookShelf).isEqualTo(bookShelf);
     }
+
+    @Test
+    void 사용자가_생성한_책장_전부_삭제성공() throws Exception {
+        Book book1 = getBook();
+        Book book2 = getBook();
+        bookRepository.save(book1);
+        bookRepository.save(book2);
+
+        User user = User.builder().name("hi").build();
+        userRepository.save(user);
+
+        BookShelf bookShelf1 = BookShelf.builder()
+            .book(book1)
+            .user(user)
+            .readingStatus(ReadingStatus.READING)
+            .build();
+
+        BookShelf bookShelf2 = BookShelf.builder()
+            .book(book2)
+            .user(user)
+            .readingStatus(ReadingStatus.READING)
+            .build();
+
+        bookShelfRepository.deleteAllByUserId(user.getId());
+
+        List<BookShelf> result = bookShelfRepository.findAll();
+        assertThat(result).isEmpty();
+    }
 }
