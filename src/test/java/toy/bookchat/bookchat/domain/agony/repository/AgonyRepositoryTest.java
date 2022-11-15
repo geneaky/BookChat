@@ -58,6 +58,7 @@ class AgonyRepositoryTest {
             .title("title")
             .hexColorCode("blue")
             .bookShelf(bookShelf)
+            .user(bookShelf.getUser())
             .build();
     }
 
@@ -95,8 +96,7 @@ class AgonyRepositoryTest {
         Agony agony = getAgony(bookShelf);
         agonyRepository.save(agony);
 
-        Agony findAgony = agonyRepository.findUserBookShelfAgony(user.getId(), book.getId(),
-            agony.getId()).get();
+        Agony findAgony = agonyRepository.findUserBookShelfAgony(user.getId(), agony.getId()).get();
 
         assertThat(findAgony).isEqualTo(agony);
     }
@@ -113,23 +113,15 @@ class AgonyRepositoryTest {
         bookShelfRepository.save(bookShelf);
 
         Agony agony1 = getAgony(bookShelf);
-        Agony agony2 = Agony.builder()
-            .title("title2")
-            .hexColorCode("red")
-            .bookShelf(bookShelf)
-            .build();
-        Agony agony3 = Agony.builder()
-            .title("title3")
-            .hexColorCode("pupple")
-            .bookShelf(bookShelf)
-            .build();
+        Agony agony2 = getAgony(bookShelf);
+        Agony agony3 = getAgony(bookShelf);
 
         List<Agony> agonyList = List.of(agony1, agony2, agony3);
         agonyRepository.saveAll(agonyList);
 
         PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("id").descending());
-        Slice<Agony> pageOfAgonies = agonyRepository.findUserBookShelfSliceOfAgonies(
-            book.getId(), user.getId(), pageRequest, Optional.empty());
+        Slice<Agony> pageOfAgonies = agonyRepository.findUserBookShelfSliceOfAgonies(user.getId(),
+            pageRequest, Optional.empty());
 
         List<Agony> content = pageOfAgonies.getContent();
         assertThat(content).containsExactly(agony3, agony2);
@@ -155,8 +147,8 @@ class AgonyRepositoryTest {
         agonyRepository.save(agony3);
 
         PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("id").descending());
-        Slice<Agony> pageOfAgonies = agonyRepository.findUserBookShelfSliceOfAgonies(
-            book.getId(), user.getId(), pageRequest, Optional.of(agony3.getId()));
+        Slice<Agony> pageOfAgonies = agonyRepository.findUserBookShelfSliceOfAgonies(user.getId(),
+            pageRequest, Optional.of(agony3.getId()));
 
         List<Agony> content = pageOfAgonies.getContent();
         assertThat(content).containsExactly(agony2, agony1);
@@ -181,8 +173,8 @@ class AgonyRepositoryTest {
         agonyRepository.saveAllAndFlush(agonyList);
 
         PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("id").ascending());
-        Slice<Agony> pageOfAgonies = agonyRepository.findUserBookShelfSliceOfAgonies(
-            book.getId(), user.getId(), pageRequest, Optional.of(agony1.getId()));
+        Slice<Agony> pageOfAgonies = agonyRepository.findUserBookShelfSliceOfAgonies(user.getId(),
+            pageRequest, Optional.of(agony1.getId()));
 
         List<Agony> content = pageOfAgonies.getContent();
         assertThat(content).containsExactly(agony2, agony3);
@@ -208,8 +200,8 @@ class AgonyRepositoryTest {
 
         PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("title").ascending());
         assertThatThrownBy(() -> {
-            agonyRepository.findUserBookShelfSliceOfAgonies(
-                book.getId(), user.getId(), pageRequest, Optional.of(agony1.getId()));
+            agonyRepository.findUserBookShelfSliceOfAgonies(user.getId(), pageRequest,
+                Optional.of(agony1.getId()));
         }).isInstanceOf(NotSupportedPagingConditionException.class);
     }
 
@@ -225,22 +217,14 @@ class AgonyRepositoryTest {
         bookShelfRepository.save(bookShelf);
 
         Agony agony1 = getAgony(bookShelf);
-        Agony agony2 = Agony.builder()
-            .title("title2")
-            .hexColorCode("red")
-            .bookShelf(bookShelf)
-            .build();
-        Agony agony3 = Agony.builder()
-            .title("title3")
-            .hexColorCode("pupple")
-            .bookShelf(bookShelf)
-            .build();
+        Agony agony2 = getAgony(bookShelf);
+        Agony agony3 = getAgony(bookShelf);
 
         List<Agony> agonyList = List.of(agony1, agony2, agony3);
         agonyRepository.saveAll(agonyList);
 
         List<Long> agoniesIds = List.of(agony1.getId(), agony2.getId(), agony3.getId());
-        agonyRepository.deleteByAgoniesIds(book.getId(), user.getId(), agoniesIds);
+        agonyRepository.deleteByAgoniesIds(user.getId(), agoniesIds);
 
         List<Agony> result = agonyRepository.findAll();
         assertThat(result).isEmpty();

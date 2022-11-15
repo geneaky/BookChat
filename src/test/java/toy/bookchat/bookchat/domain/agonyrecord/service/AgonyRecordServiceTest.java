@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.domain.agony.service;
+package toy.bookchat.bookchat.domain.agonyrecord.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -21,12 +21,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import toy.bookchat.bookchat.domain.agony.Agony;
-import toy.bookchat.bookchat.domain.agony.AgonyRecord;
-import toy.bookchat.bookchat.domain.agony.repository.AgonyRecordRepository;
 import toy.bookchat.bookchat.domain.agony.repository.AgonyRepository;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateAgonyRecordRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRecordRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.response.SliceOfAgonyRecordsResponse;
+import toy.bookchat.bookchat.domain.agonyrecord.AgonyRecord;
+import toy.bookchat.bookchat.domain.agonyrecord.repository.AgonyRecordRepository;
 import toy.bookchat.bookchat.exception.agony.AgonyNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
@@ -45,10 +45,10 @@ class AgonyRecordServiceTest {
             CreateAgonyRecordRequest.class);
         Agony agony = mock(Agony.class);
 
-        when(agonyRepository.findUserBookShelfAgony(any(), any(), any())).thenReturn(
+        when(agonyRepository.findUserBookShelfAgony(any(), any())).thenReturn(
             Optional.of(agony));
 
-        agonyRecordService.storeAgonyRecord(createAgonyRecordRequest, 1L, 1L, 1L);
+        agonyRecordService.storeAgonyRecord(createAgonyRecordRequest, 1L, 1L);
 
         verify(agonyRecordRepository).save(any());
     }
@@ -59,7 +59,7 @@ class AgonyRecordServiceTest {
             CreateAgonyRecordRequest.class);
 
         assertThatThrownBy(() -> {
-            agonyRecordService.storeAgonyRecord(createAgonyRecordRequest, 1L, 1L, 1L);
+            agonyRecordService.storeAgonyRecord(createAgonyRecordRequest, 1L, 1L);
         }).isInstanceOf(AgonyNotFoundException.class);
     }
 
@@ -83,11 +83,11 @@ class AgonyRecordServiceTest {
 
         Pageable pageable = PageRequest.of(0, 2, Sort.by("id").descending());
         Page<AgonyRecord> page = new PageImpl<>(list, pageable, list.size());
-        when(agonyRecordRepository.findSliceOfUserAgonyRecords(any(), any(), any(),
+        when(agonyRecordRepository.findSliceOfUserAgonyRecords(any(), any(),
             any(), any())).thenReturn(
             page);
         SliceOfAgonyRecordsResponse pageOfAgonyRecordsResponse = agonyRecordService.searchPageOfAgonyRecords(
-            1L, 1L, 1L, pageable, Optional.empty());
+            1L, 1L, pageable, Optional.empty());
 
         int result = pageOfAgonyRecordsResponse.getAgonyRecordResponseList().size();
         assertThat(result).isEqualTo(2);
@@ -95,9 +95,9 @@ class AgonyRecordServiceTest {
 
     @Test
     void 본인이_생성한_고민_기록_삭제_성공() throws Exception {
-        agonyRecordService.deleteAgonyRecord(1L, 1L, 1L, 1L);
+        agonyRecordService.deleteAgonyRecord(1L, 1L, 1L);
 
-        verify(agonyRecordRepository).deleteAgony(any(), any(), any(), any());
+        verify(agonyRecordRepository).deleteAgony(any(), any(), any());
     }
 
     @Test
@@ -107,8 +107,8 @@ class AgonyRecordServiceTest {
             .recordContent("수정 내용")
             .build();
 
-        agonyRecordService.reviseAgonyRecord(1L, 1L, 1L, 1L, reviseAgonyRecordRequest);
+        agonyRecordService.reviseAgonyRecord(1L, 1L, 1L, reviseAgonyRecordRequest);
 
-        verify(agonyRecordRepository).reviseAgonyRecord(any(), any(), any(), any(), any(), any());
+        verify(agonyRecordRepository).reviseAgonyRecord(any(), any(), any(), any(), any());
     }
 }

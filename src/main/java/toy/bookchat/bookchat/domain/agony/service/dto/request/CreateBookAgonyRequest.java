@@ -18,8 +18,10 @@ public class CreateBookAgonyRequest {
 
     public Agony getAgony(BookShelf bookShelf) {
         return Agony.builder()
+            .title(this.title)
             .hexColorCode(this.hexColorCode)
             .bookShelf(bookShelf)
+            .user(bookShelf.getUser())
             .build();
     }
 

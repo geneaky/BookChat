@@ -19,12 +19,12 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
 import toy.bookchat.bookchat.domain.agony.Agony;
-import toy.bookchat.bookchat.domain.agony.repository.AgonyRecordRepository;
 import toy.bookchat.bookchat.domain.agony.repository.AgonyRepository;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateBookAgonyRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.DeleteAgoniesRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.response.SliceOfAgoniesResponse;
+import toy.bookchat.bookchat.domain.agonyrecord.repository.AgonyRecordRepository;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.exception.book.BookNotFoundException;
@@ -81,9 +81,9 @@ class AgonyServiceTest {
 
         List<Agony> contents = List.of(agony1, agony2);
         Slice<Agony> page = new SliceImpl<>(contents, pageRequest, true);
-        when(agonyRepository.findUserBookShelfSliceOfAgonies(1L, 1L, pageRequest,
+        when(agonyRepository.findUserBookShelfSliceOfAgonies(1L, pageRequest,
             Optional.of(1L))).thenReturn(page);
-        SliceOfAgoniesResponse pageOfAgoniesResponse = agonyService.searchSliceOfAgonies(1L, 1L,
+        SliceOfAgoniesResponse pageOfAgoniesResponse = agonyService.searchSliceOfAgonies(1L,
             pageRequest, Optional.of(1L));
 
         String title = pageOfAgoniesResponse.getAgonyResponseList().get(0).getTitle();
@@ -93,10 +93,10 @@ class AgonyServiceTest {
     @Test
     void 고민폴더_삭제_성공() throws Exception {
         DeleteAgoniesRequest deleteAgoniesRequest = DeleteAgoniesRequest.of(List.of(1L, 2L, 3L));
-        agonyService.deleteAgony(1L, deleteAgoniesRequest, 1L);
+        agonyService.deleteAgony(deleteAgoniesRequest, 1L);
 
-        verify(agonyRecordRepository).deleteByAgoniesIds(any(), any(), any());
-        verify(agonyRepository).deleteByAgoniesIds(any(), any(), any());
+        verify(agonyRecordRepository).deleteByAgoniesIds(any(), any());
+        verify(agonyRepository).deleteByAgoniesIds(any(), any());
     }
 
     @Test
@@ -109,10 +109,10 @@ class AgonyServiceTest {
             .agonyTitle("폴더 이름 바꾸기")
             .agonyColor("보라색")
             .build();
-        when(agonyRepository.findUserBookShelfAgony(any(), any(), any())).thenReturn(
+        when(agonyRepository.findUserBookShelfAgony(any(), any())).thenReturn(
             Optional.of(agony));
 
-        agonyService.reviseAgony(1L, 1L, 1L, reviseAgonyRequest);
+        agonyService.reviseAgony(1L, 1L, reviseAgonyRequest);
 
         String result = agony.getHexColorCode();
         assertThat(result).isEqualTo("보라색");

@@ -5,12 +5,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import toy.bookchat.bookchat.domain.agony.Agony;
-import toy.bookchat.bookchat.domain.agony.repository.AgonyRecordRepository;
 import toy.bookchat.bookchat.domain.agony.repository.AgonyRepository;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateBookAgonyRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.DeleteAgoniesRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.response.SliceOfAgoniesResponse;
+import toy.bookchat.bookchat.domain.agonyrecord.repository.AgonyRecordRepository;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.exception.agony.AgonyNotFoundException;
@@ -43,24 +43,23 @@ public class AgonyService {
     }
 
     @Transactional(readOnly = true)
-    public SliceOfAgoniesResponse searchSliceOfAgonies(Long bookId, Long userId,
+    public SliceOfAgoniesResponse searchSliceOfAgonies(Long userId,
         Pageable pageable, Optional<Long> postAgonyCursorId) {
         return new SliceOfAgoniesResponse(
-            agonyRepository.findUserBookShelfSliceOfAgonies(bookId, userId, pageable,
+            agonyRepository.findUserBookShelfSliceOfAgonies(userId, pageable,
                 postAgonyCursorId));
     }
 
     @Transactional
-    public void deleteAgony(Long bookId, DeleteAgoniesRequest deleteAgoniesRequest, Long userId) {
-        agonyRecordRepository.deleteByAgoniesIds(bookId, userId,
-            deleteAgoniesRequest.getAgoniesIds());
-        agonyRepository.deleteByAgoniesIds(bookId, userId, deleteAgoniesRequest.getAgoniesIds());
+    public void deleteAgony(DeleteAgoniesRequest deleteAgoniesRequest, Long userId) {
+        agonyRecordRepository.deleteByAgoniesIds(userId, deleteAgoniesRequest.getAgoniesIds());
+        agonyRepository.deleteByAgoniesIds(userId, deleteAgoniesRequest.getAgoniesIds());
     }
 
     @Transactional
-    public void reviseAgony(Long bookId, Long agonyId, Long userId,
+    public void reviseAgony(Long agonyId, Long userId,
         ReviseAgonyRequest reviseAgonyRequest) {
-        Agony agony = agonyRepository.findUserBookShelfAgony(userId, bookId, agonyId)
+        Agony agony = agonyRepository.findUserBookShelfAgony(userId, agonyId)
             .orElseThrow(AgonyNotFoundException::new);
         agony.changeTitle(reviseAgonyRequest.getAgonyTitle());
         agony.changeHexColorCode(reviseAgonyRequest.getAgonyColor());

@@ -7,6 +7,10 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import toy.bookchat.bookchat.domain.agony.repository.AgonyRepository;
+import toy.bookchat.bookchat.domain.agonyrecord.repository.AgonyRecordRepository;
+import toy.bookchat.bookchat.domain.bookreport.repository.BookReportRepository;
+import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.domain.storage.StorageService;
 import toy.bookchat.bookchat.domain.storage.image.ImageValidator;
 import toy.bookchat.bookchat.domain.user.User;
@@ -15,17 +19,34 @@ import toy.bookchat.bookchat.domain.user.service.dto.request.ChangeUserNicknameR
 import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignUpRequest;
 import toy.bookchat.bookchat.exception.user.UserAlreadySignUpException;
 import toy.bookchat.bookchat.exception.user.UserNotFoundException;
+import toy.bookchat.bookchat.security.token.jwt.RefreshTokenRepository;
 
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
+    private final BookShelfRepository bookShelfRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final AgonyRepository agonyRepository;
+    private final AgonyRecordRepository agonyRecordRepository;
+    private final BookReportRepository bookReportRepository;
     private final StorageService storageService;
     private final ImageValidator imageValidator;
 
-    public UserService(UserRepository userRepository, StorageService storageService,
+    public UserService(UserRepository userRepository,
+        BookShelfRepository bookShelfRepository,
+        RefreshTokenRepository refreshTokenRepository,
+        AgonyRepository agonyRepository,
+        AgonyRecordRepository agonyRecordRepository,
+        BookReportRepository bookReportRepository,
+        StorageService storageService,
         ImageValidator imageValidator) {
         this.userRepository = userRepository;
+        this.bookShelfRepository = bookShelfRepository;
+        this.refreshTokenRepository = refreshTokenRepository;
+        this.agonyRepository = agonyRepository;
+        this.agonyRecordRepository = agonyRecordRepository;
+        this.bookReportRepository = bookReportRepository;
         this.storageService = storageService;
         this.imageValidator = imageValidator;
     }

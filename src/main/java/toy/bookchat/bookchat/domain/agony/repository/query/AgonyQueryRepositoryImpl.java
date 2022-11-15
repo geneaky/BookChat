@@ -1,10 +1,10 @@
 package toy.bookchat.bookchat.domain.agony.repository.query;
 
 import static toy.bookchat.bookchat.domain.agony.QAgony.agony;
-import static toy.bookchat.bookchat.domain.bookshelf.QBookShelf.bookShelf;
 import static toy.bookchat.bookchat.domain.common.RepositorySupport.extractOrderSpecifierFrom;
 import static toy.bookchat.bookchat.domain.common.RepositorySupport.numberBasedPagination;
 import static toy.bookchat.bookchat.domain.common.RepositorySupport.toSlice;
+import static toy.bookchat.bookchat.domain.user.QUser.user;
 
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -26,22 +26,20 @@ public class AgonyQueryRepositoryImpl implements AgonyQueryRepository {
     }
 
     @Override
-    public Optional<Agony> findUserBookShelfAgony(Long userId, Long bookId, Long agonyId) {
+    public Optional<Agony> findUserBookShelfAgony(Long userId, Long agonyId) {
         return Optional.ofNullable(queryFactory.select(agony)
             .from(agony)
-            .join(agony.bookShelf, bookShelf).on(bookShelf.user.id.eq(userId)
-                .and(bookShelf.book.id.eq(bookId)))
+            .join(agony.user, user).on(user.id.eq(userId))
             .where(agony.id.eq(agonyId))
             .fetchOne());
     }
 
     @Override
-    public Slice<Agony> findUserBookShelfSliceOfAgonies(long bookId, long userId,
-        Pageable pageable, Optional<Long> postAgonyCursorId) {
+    public Slice<Agony> findUserBookShelfSliceOfAgonies(long userId, Pageable pageable,
+        Optional<Long> postAgonyCursorId) {
         List<Agony> contents = queryFactory.select(agony)
             .from(agony)
-            .join(agony.bookShelf, bookShelf).on(bookShelf.user.id.eq(userId)
-                .and(bookShelf.book.id.eq(bookId)))
+            .join(agony.user, user).on(user.id.eq(userId))
             .where(numberBasedPagination(agony, agony.id, postAgonyCursorId, pageable))
             .limit(pageable.getPageSize())
             .orderBy(extractOrderSpecifierFrom(agony, pageable))
@@ -52,15 +50,15 @@ public class AgonyQueryRepositoryImpl implements AgonyQueryRepository {
 
 
     @Override
-    public void deleteByAgoniesIds(Long bookId, Long userId, List<Long> agoniesIds) {
+    public void deleteByAgoniesIds(Long userId, List<Long> agoniesIds) {
         QAgony subAgony = new QAgony("subAgony");
 
         queryFactory.delete(agony)
             .where(agony.id.in(
                 JPAExpressions.select(subAgony.id)
                     .from(subAgony)
-                    .join(subAgony.bookShelf, bookShelf)
-                    .on(bookShelf.book.id.eq(bookId).and(bookShelf.user.id.eq(userId)))
+                    .join(subAgony.user, user)
+                    .on(user.id.eq(userId))
                     .where(subAgony.id.in(agoniesIds))
             )).execute();
     }
