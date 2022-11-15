@@ -99,6 +99,7 @@ include::{snippets}/user-signup/request-parts.adoc[]
 `userSignUpRequest`
 include::{snippets}/user-signup/request-part-userSignUpRequest-fields.adoc[]
 ****
+
 include::{snippets}/user-signup/http-request.adoc[]
 
 `Response`
@@ -474,7 +475,6 @@ include::{snippets}/get-agonies/request-headers.adoc[]
 
 `Request`
 
-include::{snippets}/get-agonies/path-parameters.adoc[]
 include::{snippets}/get-agonies/request-parameters.adoc[]
 include::{snippets}/get-agonies/http-request.adoc[]
 
@@ -493,7 +493,6 @@ include::{snippets}/delete-agony/request-headers.adoc[]
 
 `Request`
 
-include::{snippets}/delete-agony/path-parameters.adoc[]
 include::{snippets}/delete-agony/http-request.adoc[]
 
 `Response`

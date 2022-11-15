@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.domain.agony;
+package toy.bookchat.bookchat.domain.agonyrecord;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -9,6 +9,7 @@ import javax.persistence.ManyToOne;
 import lombok.Builder;
 import lombok.Getter;
 import toy.bookchat.bookchat.domain.BaseEntity;
+import toy.bookchat.bookchat.domain.agony.Agony;
 
 @Getter
 @Entity

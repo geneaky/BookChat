@@ -1,9 +1,11 @@
 package toy.bookchat.bookchat.domain.bookshelf.api;
 
+import static io.jsonwebtoken.SignatureAlgorithm.HS256;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
@@ -24,14 +26,20 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static toy.bookchat.bookchat.domain.bookshelf.ReadingStatus.COMPLETE;
+import static toy.bookchat.bookchat.domain.bookshelf.ReadingStatus.READING;
+import static toy.bookchat.bookchat.domain.bookshelf.ReadingStatus.WISH;
+import static toy.bookchat.bookchat.domain.bookshelf.Star.FOUR;
+import static toy.bookchat.bookchat.domain.bookshelf.Star.FOUR_HALF;
+import static toy.bookchat.bookchat.domain.common.AuthConstants.BEARER;
 import static toy.bookchat.bookchat.domain.user.ROLE.USER;
+import static toy.bookchat.bookchat.domain.user.ReadingTaste.ART;
+import static toy.bookchat.bookchat.domain.user.ReadingTaste.DEVELOPMENT;
+import static toy.bookchat.bookchat.security.oauth.OAuth2Provider.GOOGLE;
+import static toy.bookchat.bookchat.security.oauth.OAuth2Provider.KAKAO;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,21 +56,20 @@ import toy.bookchat.bookchat.domain.ControllerTestExtension;
 import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
-import toy.bookchat.bookchat.domain.bookshelf.Star;
 import toy.bookchat.bookchat.domain.bookshelf.service.BookShelfService;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookShelfRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeBookStatusRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeReadingBookPageRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ReviseBookShelfStarRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.SearchBookShelfByReadingStatus;
-import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.domain.user.User;
-import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @BookShelfPresentationTest
 class BookShelfControllerTest extends ControllerTestExtension {
+
+    public static final String JWT_TOKEN = BEARER + getTestToken();
 
     @MockBean
     BookShelfService bookShelfService;
@@ -70,6 +77,19 @@ class BookShelfControllerTest extends ControllerTestExtension {
     ObjectMapper objectMapper;
     @Autowired
     private MockMvc mockMvc;
+
+    private static String getTestToken() {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("sub", "test");
+        claims.put("name", "google123");
+        claims.put("provider", GOOGLE);
+        claims.put("email", "test@gmail.com");
+
+        return Jwts.builder()
+            .setClaims(claims)
+            .signWith(HS256, "test")
+            .compact();
+    }
 
     private User getUser() {
         return User.builder()
@@ -80,8 +100,8 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .name("testUser")
             .profileImageUrl("somethingImageUrl@naver.com")
             .defaultProfileImageType(1)
-            .provider(OAuth2Provider.KAKAO)
-            .readingTastes(List.of(ReadingTaste.DEVELOPMENT, ReadingTaste.ART))
+            .provider(KAKAO)
+            .readingTastes(List.of(DEVELOPMENT, ART))
             .build();
     }
 
@@ -95,7 +115,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
     }
 
     private BookShelfRequest getBookShelfRequest(ReadingStatus readingStatus) {
-        if (readingStatus == ReadingStatus.COMPLETE) {
+        if (readingStatus == COMPLETE) {
             return BookShelfRequest.builder()
                 .isbn("124151214")
                 .title("effectiveJava")
@@ -103,7 +123,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
                 .publisher("oreilly")
                 .bookCoverImageUrl("bookCoverImage.com")
                 .readingStatus(readingStatus)
-                .star(Star.FOUR)
+                .star(FOUR)
                 .singleLineAssessment("very good")
                 .build();
         }
@@ -117,26 +137,10 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .build();
     }
 
-    private String getTestToken()
-        throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("sub", "test");
-        claims.put("name", "google123");
-        claims.put("provider", OAuth2Provider.GOOGLE);
-        claims.put("email", "test@gmail.com");
-
-        String testToken = Jwts.builder()
-            .setClaims(claims)
-            .signWith(SignatureAlgorithm.HS256, "test")
-            .compact();
-
-        return testToken;
-    }
-
     @Test
     void 로그인하지_않은_사용자_요청_401() throws Exception {
         mockMvc.perform(post("/v1/api/bookshelf/books")
-                .content(objectMapper.writeValueAsString(getBookShelfRequest(ReadingStatus.READING)))
+                .content(objectMapper.writeValueAsString(getBookShelfRequest(READING)))
                 .contentType(APPLICATION_JSON))
             .andExpect(status().isUnauthorized());
     }
@@ -144,14 +148,14 @@ class BookShelfControllerTest extends ControllerTestExtension {
     @Test
     void 읽고_있는_책_등록_성공() throws Exception {
         mockMvc.perform(post("/v1/api/bookshelf/books")
-                .header("Authorization", "Bearer " + getTestToken())
-                .content(objectMapper.writeValueAsString(getBookShelfRequest(ReadingStatus.READING)))
+                .header(AUTHORIZATION, JWT_TOKEN)
+                .content(objectMapper.writeValueAsString(getBookShelfRequest(READING)))
                 .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isOk())
             .andDo(document("bookshelf-reading",
                 requestHeaders(
-                    headerWithName("Authorization").description("Bearer [JWT token]")),
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")),
                 requestFields(fieldWithPath("isbn").description("ISBN"),
                     fieldWithPath("title").type(STRING).description("제목"),
                     fieldWithPath("authors[]").type(ARRAY).description("저자"),
@@ -168,15 +172,15 @@ class BookShelfControllerTest extends ControllerTestExtension {
     @Test
     void 읽은_책_등록_성공() throws Exception {
         mockMvc.perform(post("/v1/api/bookshelf/books")
-                .header("Authorization", "Bearer " + getTestToken())
+                .header(AUTHORIZATION, JWT_TOKEN)
                 .content(
-                    objectMapper.writeValueAsString(getBookShelfRequest(ReadingStatus.COMPLETE)))
+                    objectMapper.writeValueAsString(getBookShelfRequest(COMPLETE)))
                 .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isOk())
             .andDo(document("bookshelf-complete",
                 requestHeaders(
-                    headerWithName("Authorization").description("Bearer [JWT token]")
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 requestFields(fieldWithPath("isbn").type(STRING).description("ISBN"),
                     fieldWithPath("title").type(STRING).description("제목"),
@@ -203,11 +207,11 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .authors(List.of("Joshua"))
             .publisher("oreilly")
             .bookCoverImageUrl("bookCoverImage.com")
-            .readingStatus(ReadingStatus.COMPLETE)
+            .readingStatus(COMPLETE)
             .build();
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
-                .header("Authorization", "Bearer " + getTestToken())
+                .header(AUTHORIZATION, JWT_TOKEN)
                 .content(
                     objectMapper.writeValueAsString(bookShelfRequest))
                 .contentType(APPLICATION_JSON)
@@ -219,14 +223,14 @@ class BookShelfControllerTest extends ControllerTestExtension {
     @Test
     void 읽을_책_등록_성공() throws Exception {
         mockMvc.perform(post("/v1/api/bookshelf/books")
-                .header("Authorization", "Bearer " + getTestToken())
-                .content(objectMapper.writeValueAsString(getBookShelfRequest(ReadingStatus.WISH)))
+                .header(AUTHORIZATION, JWT_TOKEN)
+                .content(objectMapper.writeValueAsString(getBookShelfRequest(WISH)))
                 .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isOk())
             .andDo(document("bookshelf-wish",
                 requestHeaders(
-                    headerWithName("Authorization").description("Bearer [openid token]")
+                    headerWithName(AUTHORIZATION).description("Bearer [openid token]")
                 ),
                 requestFields(fieldWithPath("isbn").type(STRING).description("ISBN"),
                     fieldWithPath("title").type(STRING).description("제목"),
@@ -245,7 +249,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
     @Test
     void null로_요청_실패() throws Exception {
         mockMvc.perform(post("/v1/api/bookshelf/books")
-                .header("Authorization", "Bearer " + getTestToken())
+                .header(AUTHORIZATION, JWT_TOKEN)
                 .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isBadRequest());
@@ -262,7 +266,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .build();
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
-                .header("Authorization", "Bearer " + getTestToken())
+                .header(AUTHORIZATION, JWT_TOKEN)
                 .content(objectMapper.writeValueAsString(bookShelfRequest))
                 .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
@@ -277,11 +281,11 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .authors(List.of("Joshua"))
             .publisher("oreilly")
             .bookCoverImageUrl("bookCoverImage.com")
-            .readingStatus(ReadingStatus.WISH)
+            .readingStatus(WISH)
             .build();
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
-                .header("Authorization", "Bearer " + getTestToken())
+                .header(AUTHORIZATION, JWT_TOKEN)
                 .content(objectMapper.writeValueAsString(bookShelfRequest))
                 .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
@@ -296,11 +300,11 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .authors(List.of("Joshua"))
             .publisher("oreilly")
             .bookCoverImageUrl("bookCoverImage.com")
-            .readingStatus(ReadingStatus.WISH)
+            .readingStatus(WISH)
             .build();
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
-                .header("Authorization", "Bearer " + getTestToken())
+                .header(AUTHORIZATION, JWT_TOKEN)
                 .content(objectMapper.writeValueAsString(bookShelfRequest))
                 .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
@@ -314,11 +318,11 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .authors(List.of("Joshua"))
             .publisher("oreilly")
             .bookCoverImageUrl("bookCoverImage.com")
-            .readingStatus(ReadingStatus.WISH)
+            .readingStatus(WISH)
             .build();
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
-                .header("Authorization", "Bearer " + getTestToken())
+                .header(AUTHORIZATION, JWT_TOKEN)
                 .content(objectMapper.writeValueAsString(bookShelfRequest))
                 .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
@@ -333,11 +337,11 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .authors(List.of("Joshua"))
             .publisher("oreilly")
             .bookCoverImageUrl("bookCoverImage.com")
-            .readingStatus(ReadingStatus.WISH)
+            .readingStatus(WISH)
             .build();
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
-                .header("Authorization", "Bearer " + getTestToken())
+                .header(AUTHORIZATION, JWT_TOKEN)
                 .content(objectMapper.writeValueAsString(bookShelfRequest))
                 .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
@@ -351,11 +355,11 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .title("effectiveJava")
             .publisher("oreilly")
             .bookCoverImageUrl("bookCoverImage.com")
-            .readingStatus(ReadingStatus.WISH)
+            .readingStatus(WISH)
             .build();
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
-                .header("Authorization", "Bearer " + getTestToken())
+                .header(AUTHORIZATION, JWT_TOKEN)
                 .content(objectMapper.writeValueAsString(bookShelfRequest))
                 .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
@@ -370,11 +374,11 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .authors(List.of(""))
             .publisher("oreilly")
             .bookCoverImageUrl("bookCoverImage.com")
-            .readingStatus(ReadingStatus.WISH)
+            .readingStatus(WISH)
             .build();
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
-                .header("Authorization", "Bearer " + getTestToken())
+                .header(AUTHORIZATION, JWT_TOKEN)
                 .content(objectMapper.writeValueAsString(bookShelfRequest))
                 .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
@@ -388,11 +392,11 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .title("effectiveJava")
             .authors(List.of("Joshua"))
             .bookCoverImageUrl("bookCoverImage.com")
-            .readingStatus(ReadingStatus.WISH)
+            .readingStatus(WISH)
             .build();
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
-                .header("Authorization", "Bearer " + getTestToken())
+                .header(AUTHORIZATION, JWT_TOKEN)
                 .content(objectMapper.writeValueAsString(bookShelfRequest))
                 .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
@@ -407,11 +411,11 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .authors(List.of("Joshua"))
             .publisher("")
             .bookCoverImageUrl("bookCoverImage.com")
-            .readingStatus(ReadingStatus.WISH)
+            .readingStatus(WISH)
             .build();
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
-                .header("Authorization", "Bearer " + getTestToken())
+                .header(AUTHORIZATION, JWT_TOKEN)
                 .content(objectMapper.writeValueAsString(bookShelfRequest))
                 .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
@@ -436,7 +440,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .book(book)
             .user(user)
             .pages(152)
-            .readingStatus(ReadingStatus.READING)
+            .readingStatus(READING)
             .build();
 
         result.add(bookShelf);
@@ -450,7 +454,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
             any())).thenReturn(searchBookShelfByReadingStatus);
 
         mockMvc.perform(get("/v1/api/bookshelf/books")
-                .header("Authorization", "Bearer " + getTestToken())
+                .header(AUTHORIZATION, JWT_TOKEN)
                 .queryParam("readingStatus", "READING")
                 .queryParam("size", "5")
                 .queryParam("page", "1")
@@ -460,7 +464,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .andDo(print())
             .andDo(document("get-bookshelf-reading",
                 requestHeaders(
-                    headerWithName("Authorization").description("Bearer [JWT token]")
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 requestParameters(
                     parameterWithName("readingStatus").description("READING"),
@@ -506,8 +510,8 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .book(book)
             .user(user)
             .pages(0)
-            .readingStatus(ReadingStatus.READING)
-            .star(Star.FOUR_HALF)
+            .readingStatus(READING)
+            .star(FOUR_HALF)
             .singleLineAssessment("it's is best")
             .build();
 
@@ -522,7 +526,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
             any())).thenReturn(searchBookShelfByReadingStatus);
 
         mockMvc.perform(get("/v1/api/bookshelf/books")
-                .header("Authorization", "Bearer " + getTestToken())
+                .header(AUTHORIZATION, JWT_TOKEN)
                 .queryParam("readingStatus", "COMPLETE")
                 .queryParam("size", "5")
                 .queryParam("page", "1")
@@ -532,7 +536,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .andDo(print())
             .andDo(document("get-bookshelf-complete",
                 requestHeaders(
-                    headerWithName("Authorization").description("Bearer [JWT token]")
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 requestParameters(
                     parameterWithName("readingStatus").description("COMPLETE"),
@@ -577,7 +581,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .book(book)
             .user(user)
             .pages(0)
-            .readingStatus(ReadingStatus.WISH)
+            .readingStatus(WISH)
             .star(null)
             .singleLineAssessment(null)
             .build();
@@ -593,7 +597,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
             any())).thenReturn(searchBookShelfByReadingStatus);
 
         mockMvc.perform(get("/v1/api/bookshelf/books")
-                .header("Authorization", "Bearer " + getTestToken())
+                .header(AUTHORIZATION, JWT_TOKEN)
                 .queryParam("readingStatus", "WISH")
                 .queryParam("size", "5")
                 .queryParam("page", "1")
@@ -603,7 +607,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .andDo(print())
             .andDo(document("get-bookshelf-wish",
                 requestHeaders(
-                    headerWithName("Authorization").description("Bearer [JWT token]")
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 requestParameters(
                     parameterWithName("readingStatus").description("WISH"),
@@ -635,14 +639,14 @@ class BookShelfControllerTest extends ControllerTestExtension {
         ChangeReadingBookPageRequest requestDto = new ChangeReadingBookPageRequest(137);
 
         mockMvc.perform(patch("/v1/api/bookshelf/books/{bookId}/pages", 1L)
-                .header("Authorization", "Bearer " + getTestToken())
+                .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDto)))
             .andExpect(status().isOk())
             .andDo(document("patch-bookshelf-pages",
                 requestHeaders(
-                    headerWithName("Authorization").description("Bearer [JWT token]")
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 pathParameters(
                     parameterWithName("bookId").description("Book Id")
@@ -657,12 +661,12 @@ class BookShelfControllerTest extends ControllerTestExtension {
     @Test
     void 서재에_넣어둔_책_삭제_성공() throws Exception {
         mockMvc.perform(delete("/v1/api/bookshelf/books/{bookId}", 1)
-                .header("Authorization", "Bearer " + getTestToken())
+                .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isOk())
             .andDo(document("delete-bookshelf-books",
                 requestHeaders(
-                    headerWithName("Authorization").description("Bearer [JWT token]")
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 pathParameters(
                     parameterWithName("bookId").description("Book Id")
@@ -675,16 +679,16 @@ class BookShelfControllerTest extends ControllerTestExtension {
     @Test
     void 독서예정_책_독서중으로_변경_성공() throws Exception {
         ChangeBookStatusRequest changeBookStatusRequest = new ChangeBookStatusRequest(
-            ReadingStatus.READING);
+            READING);
         mockMvc.perform(patch("/v1/api/bookshelf/books/{bookId}/status", 1)
-                .header("Authorization", "Bearer " + getTestToken())
+                .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(changeBookStatusRequest)))
             .andExpect(status().isOk())
             .andDo(document("patch-bookshelf-book-status",
                 requestHeaders(
-                    headerWithName("Authorization").description("Bearer [JWT token]")
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 requestFields(
                     fieldWithPath("readingStatus").type(STRING).description("변경할 상태")
@@ -699,16 +703,16 @@ class BookShelfControllerTest extends ControllerTestExtension {
     @Test
     void 독서완료_책_별점_수정_성공() throws Exception {
         ReviseBookShelfStarRequest reviseBookShelfStarRequest = ReviseBookShelfStarRequest.of(
-            Star.FOUR);
+            FOUR);
         mockMvc.perform(patch("/v1/api/bookshelf/books/{bookId}/star", 1L, 1L)
-                .header("Authorization", "Bearer " + getTestToken())
+                .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(reviseBookShelfStarRequest)))
             .andExpect(status().isOk())
             .andDo(document("patch-bookshelf-book-star",
                 requestHeaders(
-                    headerWithName("Authorization").description("Bearer [JWT token]")
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 pathParameters(
                     parameterWithName("bookId").description("Book Id")

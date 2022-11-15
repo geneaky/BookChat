@@ -7,6 +7,8 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import toy.bookchat.bookchat.domain.agony.service.AgonyService;
+import toy.bookchat.bookchat.domain.bookshelf.service.BookShelfService;
 import toy.bookchat.bookchat.domain.storage.StorageService;
 import toy.bookchat.bookchat.domain.storage.image.ImageValidator;
 import toy.bookchat.bookchat.domain.user.User;
@@ -20,12 +22,19 @@ import toy.bookchat.bookchat.exception.user.UserNotFoundException;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final BookShelfService bookShelfService;
+    private final AgonyService agonyService;
     private final StorageService storageService;
     private final ImageValidator imageValidator;
 
-    public UserService(UserRepository userRepository, StorageService storageService,
+    public UserService(UserRepository userRepository,
+        BookShelfService bookShelfService,
+        AgonyService agonyService,
+        StorageService storageService,
         ImageValidator imageValidator) {
         this.userRepository = userRepository;
+        this.bookShelfService = bookShelfService;
+        this.agonyService = agonyService;
         this.storageService = storageService;
         this.imageValidator = imageValidator;
     }
@@ -70,6 +79,8 @@ public class UserService {
 
     @Transactional
     public void deleteUser(Long userId) {
+        agonyService.deleteAllUserAgony(userId);
+        bookShelfService.deleteAllUserBookShelves(userId);
         userRepository.deleteById(userId);
     }
 

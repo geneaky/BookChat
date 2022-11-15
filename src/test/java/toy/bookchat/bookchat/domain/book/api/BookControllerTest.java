@@ -1,9 +1,11 @@
 package toy.bookchat.bookchat.domain.book.api;
 
+import static io.jsonwebtoken.SignatureAlgorithm.HS256;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -18,14 +20,15 @@ import static org.springframework.restdocs.request.RequestDocumentation.requestP
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static toy.bookchat.bookchat.domain.common.AuthConstants.BEARER;
 import static toy.bookchat.bookchat.domain.user.ROLE.USER;
+import static toy.bookchat.bookchat.domain.user.ReadingTaste.ART;
+import static toy.bookchat.bookchat.domain.user.ReadingTaste.DEVELOPMENT;
+import static toy.bookchat.bookchat.security.oauth.OAuth2Provider.GOOGLE;
+import static toy.bookchat.bookchat.security.oauth.OAuth2Provider.KAKAO;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,15 +44,15 @@ import toy.bookchat.bookchat.domain.book.service.dto.request.BookSearchRequest;
 import toy.bookchat.bookchat.domain.book.service.dto.request.Meta;
 import toy.bookchat.bookchat.domain.book.service.dto.response.BookResponse;
 import toy.bookchat.bookchat.domain.book.service.dto.response.BookSearchResponse;
-import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.exception.book.BookNotFoundException;
-import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @BookPresentationTest
 class BookControllerTest extends ControllerTestExtension {
+
+    public static final String JWT_TOKEN = BEARER + getTestToken();
 
     @MockBean
     BookSearchService bookSearchService;
@@ -57,6 +60,19 @@ class BookControllerTest extends ControllerTestExtension {
     ObjectMapper objectMapper;
     @Autowired
     private MockMvc mockMvc;
+
+    private static String getTestToken() {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("sub", "test");
+        claims.put("name", "google123");
+        claims.put("provider", GOOGLE);
+        claims.put("email", "test@gmail.com");
+
+        return Jwts.builder()
+            .setClaims(claims)
+            .signWith(HS256, "test")
+            .compact();
+    }
 
     private User getUser() {
         return User.builder()
@@ -67,8 +83,8 @@ class BookControllerTest extends ControllerTestExtension {
             .name("testUser")
             .profileImageUrl("somethingImageUrl@naver.com")
             .defaultProfileImageType(1)
-            .provider(OAuth2Provider.KAKAO)
-            .readingTastes(List.of(ReadingTaste.DEVELOPMENT, ReadingTaste.ART))
+            .provider(KAKAO)
+            .readingTastes(List.of(DEVELOPMENT, ART))
             .build();
     }
 
@@ -83,7 +99,7 @@ class BookControllerTest extends ControllerTestExtension {
 
     private BookResponse getBookResponse(String isbn, String title, String datetime,
         List<String> author) {
-        BookResponse bookResponse = BookResponse.builder()
+        return BookResponse.builder()
             .isbn(isbn)
             .title(title)
             .datetime(datetime.substring(0, 10))
@@ -91,25 +107,7 @@ class BookControllerTest extends ControllerTestExtension {
             .publisher("testPublisher")
             .bookCoverImageUrl("bookCoverImageUrl")
             .build();
-        return bookResponse;
     }
-
-    private String getTestToken()
-        throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("sub", "test");
-        claims.put("name", "google123");
-        claims.put("provider", OAuth2Provider.GOOGLE);
-        claims.put("email", "test@gmail.com");
-
-        String testToken = Jwts.builder()
-            .setClaims(claims)
-            .signWith(SignatureAlgorithm.HS256, "test")
-            .compact();
-
-        return testToken;
-    }
-
 
     @Test
     void 로그인하지_않은_사용자_요청_401() throws Exception {
@@ -124,7 +122,7 @@ class BookControllerTest extends ControllerTestExtension {
             BookNotFoundException.class);
 
         mockMvc.perform(get("/v1/api/books")
-                .header("Authorization", "Bearer " + getTestToken())
+                .header(AUTHORIZATION, JWT_TOKEN)
                 .param("query", "effectiveJava")
                 .with(user(getUserPrincipal())))
             .andExpect(status().isNotFound());
@@ -133,7 +131,7 @@ class BookControllerTest extends ControllerTestExtension {
     @Test
     void 올바르지않은_요청으로_외부api_검색_요청시_400() throws Exception {
         mockMvc.perform(get("/v1/api/books")
-                .header("Authorization", "Bearer " + getTestToken())
+                .header(AUTHORIZATION, JWT_TOKEN)
                 .param("query", " ")
                 .with(user(getUserPrincipal())))
             .andExpect(status().isBadRequest());
@@ -163,7 +161,7 @@ class BookControllerTest extends ControllerTestExtension {
         String result = objectMapper.writeValueAsString(bookSearchResponse);
 
         MvcResult mvcResult = mockMvc.perform(get("/v1/api/books")
-                .header("Authorization", "Bearer " + getTestToken())
+                .header(AUTHORIZATION, JWT_TOKEN)
                 .param("query", "1231513")
                 .param("size", "5")
                 .param("page", "1")
@@ -172,7 +170,7 @@ class BookControllerTest extends ControllerTestExtension {
             .andExpect(status().isOk())
             .andDo(document("book-search-paging",
                 requestHeaders(
-                    headerWithName("Authorization").description("Bearer [JWT token]")),
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")),
                 requestParameters(parameterWithName("query").description("검색 키워드 [ISBN, 도서명, 저자명]"),
                     parameterWithName("size").description("한 번에 조회할 책의 수 - page 당 size"),
                     parameterWithName("page").description("한 번에 조회할 page 수"),

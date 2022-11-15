@@ -71,13 +71,7 @@ class BookShelfRepositoryTest {
     @Test
     void 읽고있는_책을_조회() throws Exception {
         Book book1 = getBook();
-        Book book2 = Book.builder()
-            .isbn("1-4133-0454-0")
-            .title("effective java2")
-            .authors(List.of("Joshua"))
-            .publisher("insight")
-            .bookCoverImageUrl("bookCover@naver.com")
-            .build();
+        Book book2 = getBook();
 
         bookRepository.save(book1);
         bookRepository.save(book2);
@@ -115,13 +109,7 @@ class BookShelfRepositoryTest {
     @Test
     void 읽은_책을_조회() throws Exception {
         Book book1 = getBook();
-        Book book2 = Book.builder()
-            .isbn("1-4133-0454-0")
-            .title("effective java2")
-            .authors(List.of("Joshua"))
-            .publisher("insight")
-            .bookCoverImageUrl("bookCover@naver.com")
-            .build();
+        Book book2 = getBook();
         bookRepository.save(book1);
         bookRepository.save(book2);
 
@@ -158,13 +146,7 @@ class BookShelfRepositoryTest {
     @Test
     void 읽을_책을_조회() throws Exception {
         Book book1 = getBook();
-        Book book2 = Book.builder()
-            .isbn("1-4133-0454-0")
-            .title("effective java2")
-            .authors(List.of("Joshua"))
-            .publisher("insight")
-            .bookCoverImageUrl("bookCover@naver.com")
-            .build();
+        Book book2 = getBook();
 
         bookRepository.save(book1);
         bookRepository.save(book2);
@@ -278,5 +260,35 @@ class BookShelfRepositoryTest {
         BookShelf findBookShelf = bookShelfRepository.findByUserIdAndBookId(
             user.getId(), book.getId()).get();
         assertThat(findBookShelf).isEqualTo(bookShelf);
+    }
+
+    @Test
+    void 사용자가_생성한_책장_전부_삭제성공() throws Exception {
+        Book book1 = getBook();
+        Book book2 = getBook();
+        bookRepository.save(book1);
+        bookRepository.save(book2);
+
+        User user = User.builder().name("hi").build();
+        userRepository.save(user);
+
+        BookShelf bookShelf1 = BookShelf.builder()
+            .book(book1)
+            .user(user)
+            .readingStatus(ReadingStatus.READING)
+            .build();
+
+        BookShelf bookShelf2 = BookShelf.builder()
+            .book(book2)
+            .user(user)
+            .readingStatus(ReadingStatus.READING)
+            .build();
+
+        bookShelfRepository.save(bookShelf1);
+        bookShelfRepository.save(bookShelf2);
+        bookShelfRepository.deleteAllByUserId(user.getId());
+
+        List<BookShelf> result = bookShelfRepository.findAll();
+        assertThat(result).isEmpty();
     }
 }

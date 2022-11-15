@@ -74,4 +74,10 @@ public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
                 .and(bookShelf.book.id.eq(bookId)))
             .fetchOne());
     }
+
+    @Override
+    public void deleteAllByUserId(Long userId) {
+        queryFactory.delete(bookShelf)
+            .where(bookShelf.user.id.eq(userId)).execute();
+    }
 }
