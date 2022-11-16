@@ -40,6 +40,7 @@ import static toy.bookchat.bookchat.security.oauth.OAuth2Provider.KAKAO;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -122,6 +123,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
                 .authors(List.of("Joshua"))
                 .publisher("oreilly")
                 .bookCoverImageUrl("bookCoverImage.com")
+                .publishAt(LocalDate.now())
                 .readingStatus(readingStatus)
                 .star(FOUR)
                 .singleLineAssessment("very good")
@@ -133,6 +135,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .authors(List.of("Joshua"))
             .publisher("oreilly")
             .bookCoverImageUrl("bookCoverImage.com")
+            .publishAt(LocalDate.now())
             .readingStatus(readingStatus)
             .build();
     }
@@ -162,6 +165,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
                     fieldWithPath("publisher").type(STRING).description("출판사"),
                     fieldWithPath("bookCoverImageUrl").type(STRING).optional()
                         .description("책 커버 이미지 URI"),
+                    fieldWithPath("publishAt").type(STRING).description("출판일"),
                     fieldWithPath("readingStatus").type(STRING).description("READING"),
                     fieldWithPath("star").ignored(),
                     fieldWithPath("singleLineAssessment").ignored())));
@@ -188,6 +192,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
                     fieldWithPath("publisher").type(STRING).description("출판사"),
                     fieldWithPath("bookCoverImageUrl").type(STRING).optional()
                         .description("책 커버 이미지 URI"),
+                    fieldWithPath("publishAt").type(STRING).description("출판일"),
                     fieldWithPath("readingStatus").type(STRING).description("COMPLETE"),
                     fieldWithPath("star").type(STRING).description("평점"),
                     fieldWithPath("singleLineAssessment").type(STRING).description("한 줄 평"))));
@@ -238,6 +243,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
                     fieldWithPath("publisher").type(STRING).description("출판사"),
                     fieldWithPath("bookCoverImageUrl").type(STRING).optional()
                         .description("책 커버 이미지 URI"),
+                    fieldWithPath("publishAt").type(STRING).description("출판일"),
                     fieldWithPath("readingStatus").type(STRING).description("WISH"),
                     fieldWithPath("star").ignored(),
                     fieldWithPath("singleLineAssessment").ignored())));
@@ -434,6 +440,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .authors(List.of("joshua"))
             .publisher("jpub")
             .bookCoverImageUrl("testBookCoverImageUrl")
+            .publishAt(LocalDate.now())
             .build();
 
         BookShelf bookShelf = BookShelf.builder()
@@ -480,6 +487,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
                         .description("책 커버 이미지 URI"),
                     fieldWithPath("contents[].authors[]").type(ARRAY).description("저자"),
                     fieldWithPath("contents[].publisher").type(STRING).description("출판사"),
+                    fieldWithPath("contents[].publishAt").type(STRING).description("출판일자"),
                     fieldWithPath("contents[].pages").type(NUMBER).description("현재 읽고 있는 페이지 번호"),
                     fieldWithPath("contents[].star").type(STRING).optional().description("평점"),
                     fieldWithPath("contents[].singleLineAssessment").type(STRING).optional()
@@ -504,6 +512,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .authors(List.of("joshua"))
             .publisher("jpub")
             .bookCoverImageUrl("testBookCoverImageUrl")
+            .publishAt(LocalDate.now())
             .build();
 
         BookShelf bookShelf = BookShelf.builder()
@@ -552,6 +561,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
                         .description("책 커버 이미지 URI"),
                     fieldWithPath("contents[].authors[]").type(ARRAY).description("저자"),
                     fieldWithPath("contents[].publisher").type(STRING).description("출판사"),
+                    fieldWithPath("contents[].publishAt").type(STRING).description("출판일자"),
                     fieldWithPath("contents[].pages").type(NUMBER).description("현재 읽고 있는 페이지 번호"),
                     fieldWithPath("contents[].star").type(STRING).description("평점"),
                     fieldWithPath("contents[].singleLineAssessment").type(STRING)
@@ -575,6 +585,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .authors(List.of("joshua"))
             .publisher("jpub")
             .bookCoverImageUrl("testBookCoverImageUrl")
+            .publishAt(LocalDate.now())
             .build();
 
         BookShelf bookShelf = BookShelf.builder()
@@ -623,6 +634,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
                         .description("책 커버 이미지 URI"),
                     fieldWithPath("contents[].authors[]").type(ARRAY).description("저자"),
                     fieldWithPath("contents[].publisher").type(STRING).description("출판사"),
+                    fieldWithPath("contents[].publishAt").type(STRING).description("출판일자"),
                     fieldWithPath("contents[].pages").type(NUMBER).description("현재 읽고 있는 페이지 번호"),
                     fieldWithPath("contents[].star").type(STRING).optional().description("평점"),
                     fieldWithPath("contents[].singleLineAssessment").type(STRING).optional()

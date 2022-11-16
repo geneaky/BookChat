@@ -97,7 +97,6 @@ class BookShelfServiceTest {
         verify(bookShelfRepository).save(any(BookShelf.class));
     }
 
-
     @Test
     void 내부에_등록되지_않은_책을_책장에_저장() throws Exception {
         BookShelfRequest bookShelfRequest = getBookShelfRequest(ReadingStatus.READING);

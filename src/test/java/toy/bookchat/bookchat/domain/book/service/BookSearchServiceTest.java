@@ -1,6 +1,7 @@
 package toy.bookchat.bookchat.domain.book.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
@@ -59,15 +60,21 @@ class BookSearchServiceTest {
         BookSearchResponse bookSearchResponse = bookSearchService.searchByQuery(
             bookSearchRequest);
 
-        assertThat(bookSearchResponse.getBookResponses().get(0).getIsbn()).isEqualTo(isbn);
-        assertThat(bookSearchResponse.getBookResponses().get(0).getTitle()).isEqualTo(title);
-        assertThat(bookSearchResponse.getBookResponses().get(0).getDatetime()).isEqualTo(datetime);
-        assertThat(bookSearchResponse.getBookResponses().get(0).getPublisher()).isEqualTo(
-            publisher);
-        assertThat(bookSearchResponse.getBookResponses().get(0).getAuthor()).isEqualTo(
-            List.of(authors));
-        assertThat(bookSearchResponse.getBookResponses().get(0).getBookCoverImageUrl()).isEqualTo(
-            bookCoverImageUrl);
+        assertAll(
+            () -> assertThat(bookSearchResponse.getBookResponses().get(0).getIsbn()).isEqualTo(
+                isbn),
+            () -> assertThat(bookSearchResponse.getBookResponses().get(0).getTitle()).isEqualTo(
+                title),
+            () -> assertThat(bookSearchResponse.getBookResponses().get(0).getDatetime()).isEqualTo(
+                datetime),
+            () -> assertThat(bookSearchResponse.getBookResponses().get(0).getPublisher()).isEqualTo(
+                publisher),
+            () -> assertThat(bookSearchResponse.getBookResponses().get(0).getAuthor()).isEqualTo(
+                List.of(authors)),
+            () -> assertThat(
+                bookSearchResponse.getBookResponses().get(0).getBookCoverImageUrl()).isEqualTo(
+                bookCoverImageUrl)
+        );
     }
 
     @Test
@@ -86,15 +93,21 @@ class BookSearchServiceTest {
         BookSearchResponse bookSearchResponse = bookSearchService.searchByQuery(
             bookSearchRequest);
 
-        assertThat(bookSearchResponse.getBookResponses().get(0).getIsbn()).isEqualTo(isbn);
-        assertThat(bookSearchResponse.getBookResponses().get(0).getTitle()).isEqualTo(title);
-        assertThat(bookSearchResponse.getBookResponses().get(0).getDatetime()).isEqualTo(datetime);
-        assertThat(bookSearchResponse.getBookResponses().get(0).getPublisher()).isEqualTo(
-            publisher);
-        assertThat(bookSearchResponse.getBookResponses().get(0).getAuthor()).isEqualTo(
-            List.of(authors));
-        assertThat(bookSearchResponse.getBookResponses().get(0).getBookCoverImageUrl()).isEqualTo(
-            bookCoverImageUrl);
+        assertAll(
+            () -> assertThat(bookSearchResponse.getBookResponses().get(0).getIsbn()).isEqualTo(
+                isbn),
+            () -> assertThat(bookSearchResponse.getBookResponses().get(0).getTitle()).isEqualTo(
+                title),
+            () -> assertThat(bookSearchResponse.getBookResponses().get(0).getDatetime()).isEqualTo(
+                datetime),
+            () -> assertThat(bookSearchResponse.getBookResponses().get(0).getPublisher()).isEqualTo(
+                publisher),
+            () -> assertThat(bookSearchResponse.getBookResponses().get(0).getAuthor()).isEqualTo(
+                List.of(authors)),
+            () -> assertThat(
+                bookSearchResponse.getBookResponses().get(0).getBookCoverImageUrl()).isEqualTo(
+                bookCoverImageUrl)
+        );
     }
 
     @Test
@@ -113,15 +126,21 @@ class BookSearchServiceTest {
         BookSearchResponse bookSearchResponse = bookSearchService.searchByQuery(
             bookSearchRequest);
 
-        assertThat(bookSearchResponse.getBookResponses().get(0).getIsbn()).isEqualTo(isbn);
-        assertThat(bookSearchResponse.getBookResponses().get(0).getTitle()).isEqualTo(title);
-        assertThat(bookSearchResponse.getBookResponses().get(0).getDatetime()).isEqualTo(datetime);
-        assertThat(bookSearchResponse.getBookResponses().get(0).getPublisher()).isEqualTo(
-            publisher);
-        assertThat(bookSearchResponse.getBookResponses().get(0).getAuthor()).isEqualTo(
-            List.of(authors));
-        assertThat(bookSearchResponse.getBookResponses().get(0).getBookCoverImageUrl()).isEqualTo(
-            bookCoverImageUrl);
+        assertAll(
+            () -> assertThat(bookSearchResponse.getBookResponses().get(0).getIsbn()).isEqualTo(
+                isbn),
+            () -> assertThat(bookSearchResponse.getBookResponses().get(0).getTitle()).isEqualTo(
+                title),
+            () -> assertThat(bookSearchResponse.getBookResponses().get(0).getDatetime()).isEqualTo(
+                datetime),
+            () -> assertThat(bookSearchResponse.getBookResponses().get(0).getPublisher()).isEqualTo(
+                publisher),
+            () -> assertThat(bookSearchResponse.getBookResponses().get(0).getAuthor()).isEqualTo(
+                List.of(authors)),
+            () -> assertThat(
+                bookSearchResponse.getBookResponses().get(0).getBookCoverImageUrl()).isEqualTo(
+                bookCoverImageUrl)
+        );
     }
 
     @Test

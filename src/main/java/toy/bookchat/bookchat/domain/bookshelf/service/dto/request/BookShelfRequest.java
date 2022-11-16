@@ -1,5 +1,6 @@
 package toy.bookchat.bookchat.domain.bookshelf.service.dto.request;
 
+import java.time.LocalDate;
 import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -26,11 +27,29 @@ public class BookShelfRequest {
     private List<@NotBlank String> authors;
     @NotBlank
     private String publisher;
+    @NotBlank
     private String bookCoverImageUrl;
+    @NotNull
+    private LocalDate publishAt;
     @NotNull
     private ReadingStatus readingStatus;
     private Star star;
     private String singleLineAssessment;
+
+    @Builder
+    private BookShelfRequest(String isbn, String title,
+        List<@NotBlank String> authors, String publisher, String bookCoverImageUrl,
+        ReadingStatus readingStatus, Star star, String singleLineAssessment, LocalDate publishAt) {
+        this.isbn = isbn;
+        this.title = title;
+        this.authors = authors;
+        this.publisher = publisher;
+        this.bookCoverImageUrl = bookCoverImageUrl;
+        this.publishAt = publishAt;
+        this.readingStatus = readingStatus;
+        this.star = star;
+        this.singleLineAssessment = singleLineAssessment;
+    }
 
     public Book extractBookEntity() {
         return Book.builder()
@@ -39,21 +58,8 @@ public class BookShelfRequest {
             .authors(this.authors)
             .publisher(this.publisher)
             .bookCoverImageUrl(this.bookCoverImageUrl)
+            .publishAt(this.publishAt)
             .build();
-    }
-
-    @Builder
-    private BookShelfRequest(String isbn, String title,
-        List<@NotBlank String> authors, String publisher, String bookCoverImageUrl,
-        ReadingStatus readingStatus, Star star, String singleLineAssessment) {
-        this.isbn = isbn;
-        this.title = title;
-        this.authors = authors;
-        this.publisher = publisher;
-        this.bookCoverImageUrl = bookCoverImageUrl;
-        this.readingStatus = readingStatus;
-        this.star = star;
-        this.singleLineAssessment = singleLineAssessment;
     }
 
     public void checkCompleteStateField() {

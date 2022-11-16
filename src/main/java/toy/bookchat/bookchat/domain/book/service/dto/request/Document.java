@@ -1,5 +1,7 @@
 package toy.bookchat.bookchat.domain.book.service.dto.request;
 
+import static org.springframework.util.StringUtils.hasText;
+
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -27,30 +29,34 @@ public class Document {
     }
 
     public boolean hasPerfectDocument() {
-        if (authors == null) {
+        if (!hasText(thumbnail)) {
             return false;
         }
 
-        if (datetime == null) {
+        if (!hasText(datetime)) {
             return false;
         }
 
-        if (isbn == null) {
+        if (!hasText(publisher)) {
             return false;
         }
 
-        if (publisher == null) {
+        if (!hasText(isbn)) {
             return false;
         }
 
-        if (title == null) {
+        if (!hasText(title)) {
             return false;
         }
 
-        if (thumbnail == null) {
+        if (hasNotAuthor()) {
             return false;
         }
 
         return true;
+    }
+
+    private boolean hasNotAuthor() {
+        return authors == null || authors.isEmpty();
     }
 }
