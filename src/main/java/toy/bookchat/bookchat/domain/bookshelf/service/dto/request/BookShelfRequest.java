@@ -1,5 +1,6 @@
 package toy.bookchat.bookchat.domain.bookshelf.service.dto.request;
 
+import java.time.LocalDate;
 import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -26,21 +27,14 @@ public class BookShelfRequest {
     private List<@NotBlank String> authors;
     @NotBlank
     private String publisher;
+    @NotBlank
     private String bookCoverImageUrl;
+    @NotNull
+    private LocalDate publishAt;
     @NotNull
     private ReadingStatus readingStatus;
     private Star star;
     private String singleLineAssessment;
-
-    public Book extractBookEntity() {
-        return Book.builder()
-            .isbn(this.isbn)
-            .title(this.title)
-            .authors(this.authors)
-            .publisher(this.publisher)
-            .bookCoverImageUrl(this.bookCoverImageUrl)
-            .build();
-    }
 
     @Builder
     private BookShelfRequest(String isbn, String title,
@@ -54,6 +48,17 @@ public class BookShelfRequest {
         this.readingStatus = readingStatus;
         this.star = star;
         this.singleLineAssessment = singleLineAssessment;
+    }
+
+    public Book extractBookEntity() {
+        return Book.builder()
+            .isbn(this.isbn)
+            .title(this.title)
+            .authors(this.authors)
+            .publisher(this.publisher)
+            .bookCoverImageUrl(this.bookCoverImageUrl)
+            .publishAt(this.publishAt)
+            .build();
     }
 
     public void checkCompleteStateField() {

@@ -1,5 +1,6 @@
 package toy.bookchat.bookchat.domain.book;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.ElementCollection;
@@ -22,18 +23,20 @@ public class Book extends BaseEntity {
     private String title;
     private String publisher;
     private String bookCoverImageUrl;
+    private LocalDate publishAt;
     @ElementCollection
     private List<String> authors = new ArrayList<>();
 
     @Builder
     private Book(Long id, String isbn, String title, List<String> authors, String publisher,
-        String bookCoverImageUrl) {
+        String bookCoverImageUrl, LocalDate publishAt) {
         this.id = id;
         this.isbn = isbn;
         this.title = title;
         this.authors = authors;
         this.publisher = publisher;
         this.bookCoverImageUrl = bookCoverImageUrl;
+        this.publishAt = publishAt;
     }
 
     protected Book() {
