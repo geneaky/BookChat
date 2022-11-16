@@ -26,8 +26,8 @@ public class KakaoBook {
     }
 
     private void fillBookResponsesWithDocuments(List<BookResponse> bookResponses) {
-        for (Document document : documents) {
-            bookResponses.add(
+        documents.stream().filter(Document::hasPerfectDocument)
+            .forEach(document -> bookResponses.add(
                 BookResponse.builder()
                     .isbn(document.getIsbn())
                     .title(document.getTitle())
@@ -36,7 +36,6 @@ public class KakaoBook {
                     .publisher(document.getPublisher())
                     .bookCoverImageUrl(document.getThumbnail())
                     .build()
-            );
-        }
+            ));
     }
 }

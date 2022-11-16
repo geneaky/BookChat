@@ -194,4 +194,26 @@ class BookSearchServiceTest {
 
         assertThat(bookSearchResponse.getBookResponses().size()).isEqualTo(5);
     }
+
+    @Test
+    void 응답도서_특정필드에_null값이_있을_경우_제외처리후_반환() throws Exception {
+        UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder
+            .fromUri(URI.create(apiUri))
+            .queryParam("query", "자바")
+            .queryParam("page", 1)
+            .queryParam("size", 3)
+            .queryParam("sort", "LATEST");
+
+        BookSearchRequest bookSearchRequest = getBookSearchRequest("자바", 3, 1,
+            BookSearchSort.LATEST);
+        String result = "{\n  \"documents\": [\n    {\n      \"authors\": null,\n      \"contents\": \"야후의 선임 자바스크립트 아키텍트 더글라스 크락포드의 『자바스크립트 핵심 가이드』. 자바스크립트를 우연히 접했거나 호기심이 생겨 탐험하고 싶어하는 프로그래머를 위해 저술된 것이다.  이 책은 놀라울 정도로 강력한 언어인 자바스크립트에 대한 핵심적인 안내서다. 자바스크립트가 제공하는 여러 가지 기능을 보여준 다음, 그것을 조합하여 사용하는 방법을 찾을 수 있도록 인도한다.  자바스크립트를 우수한 객체지향 언어로 만들 수 있는 장점에 대해서도 다루는 것\",\n      \"datetime\": \"2008-09-30T00:00:00.000+09:00\",\n      \"isbn\": null,\n      \"price\": 22000,\n      \"publisher\": \"한빛미디어\",\n      \"sale_price\": 19800,\n      \"status\": \"정상판매\",\n      \"thumbnail\": \"https://search1.kakaocdn.net/thumb/R120x174.q85/?fname=http%3A%2F%2Ft1.daumcdn.net%2Flbook%2Fimage%2F1103216%3Ftimestamp%3D20221011091039\",\n      \"title\": \"자바스크립트 핵심 가이드(더글라스 크락포드의)\",\n      \"translators\": [\n        \"김명신\"\n      ],\n      \"url\": \"https://search.daum.net/search?w=bookpage&bookId=1103216&q=%EC%9E%90%EB%B0%94%EC%8A%A4%ED%81%AC%EB%A6%BD%ED%8A%B8+%ED%95%B5%EC%8B%AC+%EA%B0%80%EC%9D%B4%EB%93%9C%28%EB%8D%94%EA%B8%80%EB%9D%BC%EC%8A%A4+%ED%81%AC%EB%9D%BD%ED%8F%AC%EB%93%9C%EC%9D%98%29\"\n    },\n    {\n      \"authors\": [\n        \"신용권\"\n      ],\n      \"contents\": \"『이것이 자바다』은 15년 이상 자바 언어를 교육해온 자바 전문강사의 노하우를 아낌 없이 담아낸 자바 입문서이다. 자바 입문자를 배려한 친절한 설명과 배려로 1장에 풀인원 설치 방법을 제공하여 쉽게 학습환경을 구축할 수 있다. 또한 중급 개발자로 나아가기 위한 람다식(14장), JavaFX(17장), NIO(18~19장) 수록되어 있으며 각 챕터마다 확인문제 제공. 풀이와 답은 인터넷 강의에서 친절한 해설을 통해 알려준다.\",\n      \"datetime\": \"2015-01-05T00:00:00.000+09:00\",\n      \"isbn\": \"8968481474 9788968481475\",\n      \"price\": 30000,\n      \"publisher\": \"한빛미디어\",\n      \"sale_price\": 27000,\n      \"status\": \"정상판매\",\n      \"thumbnail\": \"https://search1.kakaocdn.net/thumb/R120x174.q85/?fname=http%3A%2F%2Ft1.daumcdn.net%2Flbook%2Fimage%2F945967%3Ftimestamp%3D20221011172516\",\n      \"title\": \"이것이 자바다\",\n      \"translators\": [],\n      \"url\": \"https://search.daum.net/search?w=bookpage&bookId=945967&q=%EC%9D%B4%EA%B2%83%EC%9D%B4+%EC%9E%90%EB%B0%94%EB%8B%A4\"\n    },\n    {\n      \"authors\": [\n        \"김병부\"\n      ],\n      \"contents\": \"『자바를 다루는 기술』은 자바 언어의 기초 문법을 친절하고 자세하게 설명한다. 객체 지향 프로그래밍 개념은 물론, 자바의 자료구조, 제네릭(generics), 리플렉션(reflection) 등 고급 응용 기법들을 다양한 예제를 통해 익힐 수 있도록 구성하였다. 또한 저자의 실무 경험 속에서 얻은 노하우와 팁들을 제시하고, 오픈 소스 라이브러리 응용법 등을 통해 실무 적응력을 높여 독자들이 다양한 개발 현장에서 자바 프로젝트를 어려움 없이 수행할 수 있도록\",\n      \"datetime\": null,\n      \"isbn\": \"8966185525 9788966185528\",\n      \"price\": 29000,\n      \"publisher\": null,\n      \"sale_price\": 26100,\n      \"status\": \"정상판매\",\n      \"thumbnail\": \"https://search1.kakaocdn.net/thumb/R120x174.q85/?fname=http%3A%2F%2Ft1.daumcdn.net%2Flbook%2Fimage%2F923727%3Ftimestamp%3D20220103152724\",\n      \"title\": \"자바를 다루는 기술\",\n      \"translators\": [],\n      \"url\": \"https://search.daum.net/search?w=bookpage&bookId=923727&q=%EC%9E%90%EB%B0%94%EB%A5%BC+%EB%8B%A4%EB%A3%A8%EB%8A%94+%EA%B8%B0%EC%88%A0\"\n    }\n  ],\n  \"meta\": {\n    \"is_end\": false,\n    \"pageable_count\": 1000,\n    \"total_count\": 4759\n  }\n}";
+
+        mockServer.expect(
+                requestTo(uriComponentsBuilder.build().encode(StandardCharsets.UTF_8).toUri()))
+            .andRespond(withSuccess(result, MediaType.APPLICATION_JSON));
+
+        BookSearchResponse bookSearchResponse = bookSearchService.searchByQuery(bookSearchRequest);
+
+        assertThat(bookSearchResponse.getBookResponses().size()).isOne();
+    }
 }
