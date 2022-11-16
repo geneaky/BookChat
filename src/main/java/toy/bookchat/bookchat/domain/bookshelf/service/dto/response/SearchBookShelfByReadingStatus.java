@@ -15,12 +15,12 @@ public class SearchBookShelfByReadingStatus {
 
     public SearchBookShelfByReadingStatus(Page<BookShelf> pagingBookShelves) {
         this.pageMeta = PageMeta.from(pagingBookShelves);
-        this.contents = getBookShelfSearchResponseDtos(pagingBookShelves.getContent());
+        getBookShelfSearchResponseDtos(pagingBookShelves.getContent());
     }
 
-    private List<BookShelfResponse> getBookShelfSearchResponseDtos(List<BookShelf> bookShelves) {
-        List<BookShelfResponse> contents = new ArrayList<>();
-        
+    private void getBookShelfSearchResponseDtos(List<BookShelf> bookShelves) {
+        this.contents = new ArrayList<>();
+
         for (BookShelf bookShelf : bookShelves) {
             BookShelfResponse bookShelfResponse = BookShelfResponse.builder()
                 .bookId(bookShelf.getBookId())
@@ -29,6 +29,7 @@ public class SearchBookShelfByReadingStatus {
                 .authors(bookShelf.getBookAuthors())
                 .publisher(bookShelf.getBookPublisher())
                 .bookCoverImageUrl(bookShelf.getBookCoverImageUrl())
+                .publishAt(bookShelf.getBook().getPublishAt())
                 .star(bookShelf.getStar())
                 .singleLineAssessment(bookShelf.getSingleLineAssessment())
                 .pages(bookShelf.getPages())
@@ -36,7 +37,5 @@ public class SearchBookShelfByReadingStatus {
 
             contents.add(bookShelfResponse);
         }
-
-        return contents;
     }
 }

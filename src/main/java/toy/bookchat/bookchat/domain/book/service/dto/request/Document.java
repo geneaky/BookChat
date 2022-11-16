@@ -29,23 +29,23 @@ public class Document {
     }
 
     public boolean hasPerfectDocument() {
-        if (hasText(thumbnail)) {
+        if (!hasText(thumbnail)) {
             return false;
         }
 
-        if (hasText(datetime)) {
+        if (!hasText(datetime)) {
             return false;
         }
 
-        if (hasText(publisher)) {
+        if (!hasText(publisher)) {
             return false;
         }
 
-        if (hasText(isbn)) {
+        if (!hasText(isbn)) {
             return false;
         }
 
-        if (hasText(title)) {
+        if (!hasText(title)) {
             return false;
         }
 

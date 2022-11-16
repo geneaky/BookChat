@@ -39,12 +39,13 @@ public class BookShelfRequest {
     @Builder
     private BookShelfRequest(String isbn, String title,
         List<@NotBlank String> authors, String publisher, String bookCoverImageUrl,
-        ReadingStatus readingStatus, Star star, String singleLineAssessment) {
+        ReadingStatus readingStatus, Star star, String singleLineAssessment, LocalDate publishAt) {
         this.isbn = isbn;
         this.title = title;
         this.authors = authors;
         this.publisher = publisher;
         this.bookCoverImageUrl = bookCoverImageUrl;
+        this.publishAt = publishAt;
         this.readingStatus = readingStatus;
         this.star = star;
         this.singleLineAssessment = singleLineAssessment;
