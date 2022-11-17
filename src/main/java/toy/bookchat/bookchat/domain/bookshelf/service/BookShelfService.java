@@ -141,6 +141,9 @@ public class BookShelfService {
     }
 
     public ExistenceBookOnBookShelfResponse getBookIfExisted(String isbn, Long userId) {
-        return null;
+        BookShelf bookShelf = bookShelfRepository.findByUserIdAndIsbn(userId, isbn)
+            .orElseThrow(BookNotFoundException::new);
+
+        return ExistenceBookOnBookShelfResponse.from(bookShelf);
     }
 }
