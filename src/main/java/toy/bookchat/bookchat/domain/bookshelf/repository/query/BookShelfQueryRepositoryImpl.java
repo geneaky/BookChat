@@ -84,6 +84,10 @@ public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
 
     @Override
     public Optional<BookShelf> findByUserIdAndIsbn(Long userId, String isbn) {
-        return Optional.empty();
+        return Optional.ofNullable(queryFactory.select(bookShelf)
+            .from(bookShelf).join(bookShelf.book, book).fetchJoin()
+            .where(bookShelf.user.id.eq(userId)
+                .and(bookShelf.book.isbn.eq(isbn)))
+            .fetchOne());
     }
 }
