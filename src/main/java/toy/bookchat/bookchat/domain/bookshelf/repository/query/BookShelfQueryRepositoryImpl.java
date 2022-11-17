@@ -1,5 +1,6 @@
 package toy.bookchat.bookchat.domain.bookshelf.repository.query;
 
+import static toy.bookchat.bookchat.domain.book.QBook.book;
 import static toy.bookchat.bookchat.domain.bookshelf.QBookShelf.bookShelf;
 
 import com.querydsl.jpa.impl.JPAQuery;
@@ -29,7 +30,7 @@ public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
         ReadingStatus readingStatus, Pageable pageable, Long userId) {
 
         JPAQuery<BookShelf> jpaQuery = queryFactory.select(bookShelf)
-            .from(bookShelf)
+            .from(bookShelf).join(bookShelf.book, book).fetchJoin()
             .where(bookShelf.readingStatus.eq(readingStatus)
                 .and(bookShelf.user.id.eq(userId)));
 
@@ -50,7 +51,7 @@ public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
     public BookShelf findOneOnConditionByUserIdAndBookId(Long userId, Long bookId,
         ReadingStatus readingStatus) {
         return Optional.ofNullable(queryFactory.select(bookShelf)
-            .from(bookShelf)
+            .from(bookShelf).join(bookShelf.book, book).fetchJoin()
             .where(bookShelf.readingStatus.eq(readingStatus)
                 .and(bookShelf.user.id.eq(userId))
                 .and(bookShelf.book.id.eq(bookId)))
@@ -69,7 +70,7 @@ public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
     @Override
     public Optional<BookShelf> findByUserIdAndBookId(Long userId, Long bookId) {
         return Optional.ofNullable(queryFactory.select(bookShelf)
-            .from(bookShelf)
+            .from(bookShelf).join(bookShelf.book, book).fetchJoin()
             .where(bookShelf.user.id.eq(userId)
                 .and(bookShelf.book.id.eq(bookId)))
             .fetchOne());
