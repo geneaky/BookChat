@@ -30,9 +30,9 @@ class BookShelfRepositoryTest {
     @Autowired
     private BookShelfRepository bookShelfRepository;
 
-    private Book getBook() {
+    private Book getBook(String isbn) {
         return Book.builder()
-            .isbn("1-4133-0454-0")
+            .isbn(isbn)
             .title("effective java")
             .authors(List.of("Joshua"))
             .publisher("insight")
@@ -42,7 +42,7 @@ class BookShelfRepositoryTest {
 
     @Test
     void 책_저장() throws Exception {
-        Book book = getBook();
+        Book book = getBook("1-4133-0454-0");
 
         Book savedBook = bookRepository.save(book);
         assertThat(book).isEqualTo(savedBook);
@@ -51,7 +51,7 @@ class BookShelfRepositoryTest {
     @Test
     void 책장에_책을_저장() throws Exception {
 
-        Book book = getBook();
+        Book book = getBook("1-4133-0454-0");
         bookRepository.save(book);
 
         User user = User.builder().build();
@@ -70,8 +70,8 @@ class BookShelfRepositoryTest {
 
     @Test
     void 읽고있는_책을_조회() throws Exception {
-        Book book1 = getBook();
-        Book book2 = getBook();
+        Book book1 = getBook("1-4133-0454-0");
+        Book book2 = getBook("1-4133-0454-1");
 
         bookRepository.save(book1);
         bookRepository.save(book2);
@@ -108,8 +108,8 @@ class BookShelfRepositoryTest {
 
     @Test
     void 읽은_책을_조회() throws Exception {
-        Book book1 = getBook();
-        Book book2 = getBook();
+        Book book1 = getBook("1-4133-0454-0");
+        Book book2 = getBook("1-4133-0454-1");
         bookRepository.save(book1);
         bookRepository.save(book2);
 
@@ -145,8 +145,8 @@ class BookShelfRepositoryTest {
 
     @Test
     void 읽을_책을_조회() throws Exception {
-        Book book1 = getBook();
-        Book book2 = getBook();
+        Book book1 = getBook("1-4133-0454-0");
+        Book book2 = getBook("1-4133-0454-1");
 
         bookRepository.save(book1);
         bookRepository.save(book2);
@@ -187,7 +187,7 @@ class BookShelfRepositoryTest {
 
     @Test
     void 읽고있는_책_book_id로_조회성공() throws Exception {
-        Book book = getBook();
+        Book book = getBook("1-4133-0454-0");
 
         bookRepository.save(book);
 
@@ -219,7 +219,7 @@ class BookShelfRepositoryTest {
 
     @Test
     void 책장에있는_책_book_id로_삭제_성공() throws Exception {
-        Book book = getBook();
+        Book book = getBook("1-4133-0454-0");
 
         bookRepository.save(book);
 
@@ -242,7 +242,7 @@ class BookShelfRepositoryTest {
 
     @Test
     void user_id_book_id로_서재_조회성공() throws Exception {
-        Book book = getBook();
+        Book book = getBook("1-4133-0454-0");
 
         bookRepository.save(book);
 
@@ -264,8 +264,8 @@ class BookShelfRepositoryTest {
 
     @Test
     void 사용자가_생성한_책장_전부_삭제성공() throws Exception {
-        Book book1 = getBook();
-        Book book2 = getBook();
+        Book book1 = getBook("1-4133-0454-0");
+        Book book2 = getBook("1-4133-0454-1");
         bookRepository.save(book1);
         bookRepository.save(book2);
 
