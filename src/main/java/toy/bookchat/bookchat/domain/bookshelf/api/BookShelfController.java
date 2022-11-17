@@ -16,6 +16,7 @@ import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookShelfReque
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeBookStatusRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeReadingBookPageRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ReviseBookShelfStarRequest;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.ExistenceBookOnBookShelfResponse;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.SearchBookShelfByReadingStatus;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPayload;
@@ -71,9 +72,17 @@ public class BookShelfController {
 
     @PatchMapping("/bookshelf/books/{bookId}/star")
     public void changeBookStarOnBookShelf(@PathVariable Long bookId, @Valid @RequestBody
-    ReviseBookShelfStarRequest reviseBookShelfStarRequest, @UserPayload TokenPayload tokenPayload) {
+        ReviseBookShelfStarRequest reviseBookShelfStarRequest,
+        @UserPayload TokenPayload tokenPayload) {
 
         bookShelfService.reviseBookStar(bookId, tokenPayload.getUserId(),
             reviseBookShelfStarRequest);
+    }
+
+    @GetMapping("/bookshelf/books/existence")
+    public ExistenceBookOnBookShelfResponse findBookIfExistedOnBookShelf(String isbn,
+        @UserPayload TokenPayload tokenPayload) {
+
+        return bookShelfService.getBookIfExisted(isbn, tokenPayload.getUserId());
     }
 }

@@ -15,6 +15,7 @@ import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookShelfReque
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeBookStatusRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeReadingBookPageRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ReviseBookShelfStarRequest;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.ExistenceBookOnBookShelfResponse;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.SearchBookShelfByReadingStatus;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
@@ -137,5 +138,12 @@ public class BookShelfService {
     @Transactional
     public void deleteAllUserBookShelves(Long userId) {
         bookShelfRepository.deleteAllByUserId(userId);
+    }
+
+    public ExistenceBookOnBookShelfResponse getBookIfExisted(String isbn, Long userId) {
+        BookShelf bookShelf = bookShelfRepository.findByUserIdAndIsbn(userId, isbn)
+            .orElseThrow(BookNotFoundException::new);
+
+        return ExistenceBookOnBookShelfResponse.from(bookShelf);
     }
 }

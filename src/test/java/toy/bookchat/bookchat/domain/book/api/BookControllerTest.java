@@ -1,7 +1,6 @@
 package toy.bookchat.bookchat.domain.book.api;
 
 import static io.jsonwebtoken.SignatureAlgorithm.HS256;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -37,7 +36,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
 import toy.bookchat.bookchat.domain.book.service.BookSearchService;
 import toy.bookchat.bookchat.domain.book.service.dto.request.BookSearchRequest;
@@ -158,9 +156,7 @@ class BookControllerTest extends ControllerTestExtension {
         when(bookSearchService.searchByQuery(any(BookSearchRequest.class))).thenReturn(
             bookSearchResponse);
 
-        String result = objectMapper.writeValueAsString(bookSearchResponse);
-
-        MvcResult mvcResult = mockMvc.perform(get("/v1/api/books")
+        mockMvc.perform(get("/v1/api/books")
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .param("query", "1231513")
                 .param("size", "5")
@@ -189,7 +185,5 @@ class BookControllerTest extends ControllerTestExtension {
                 ))).andReturn();
 
         verify(bookSearchService).searchByQuery(any(BookSearchRequest.class));
-        assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo(result);
-
     }
 }

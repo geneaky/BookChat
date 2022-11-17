@@ -62,6 +62,7 @@ import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookShelfReque
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeBookStatusRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeReadingBookPageRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ReviseBookShelfStarRequest;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.ExistenceBookOnBookShelfResponse;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.SearchBookShelfByReadingStatus;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.security.user.TokenPayload;
@@ -734,5 +735,36 @@ class BookShelfControllerTest extends ControllerTestExtension {
                 )));
 
         verify(bookShelfService).reviseBookStar(any(), any(), any());
+    }
+
+    @Test
+    void isbn으로_서재에_책이_등록되었는지_조회_성공() throws Exception {
+
+        ExistenceBookOnBookShelfResponse existenceBookOnBookShelfResponse = ExistenceBookOnBookShelfResponse.builder()
+            .bookShelfId(1L)
+            .bookId(1L)
+            .readingStatus(WISH)
+            .build();
+
+        when(bookShelfService.getBookIfExisted(any(), any())).thenReturn(
+            existenceBookOnBookShelfResponse);
+        mockMvc.perform(get("/v1/api/bookshelf/books/existence")
+                .header(AUTHORIZATION, JWT_TOKEN)
+                .param("isbn", "1234567891011 0123456789"))
+            .andExpect(status().isOk())
+            .andDo(document("get-bookshelf-book-existence-isbn",
+                requestHeaders(
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
+                ),
+                requestParameters(
+                    parameterWithName("isbn").description("ISBN 번호")
+                ),
+                responseFields(
+                    fieldWithPath("bookShelfId").type(NUMBER).description("책이 등록된 서재 ID"),
+                    fieldWithPath("bookId").type(NUMBER).description("책 ID"),
+                    fieldWithPath("readingStatus").type(STRING).description("서재에 등록된 책의 현재 상태")
+                )));
+
+        verify(bookShelfService).getBookIfExisted(any(), any());
     }
 }

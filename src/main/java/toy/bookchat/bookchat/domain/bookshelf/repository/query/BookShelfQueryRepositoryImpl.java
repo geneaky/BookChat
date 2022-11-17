@@ -81,4 +81,13 @@ public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
         queryFactory.delete(bookShelf)
             .where(bookShelf.user.id.eq(userId)).execute();
     }
+
+    @Override
+    public Optional<BookShelf> findByUserIdAndIsbn(Long userId, String isbn) {
+        return Optional.ofNullable(queryFactory.select(bookShelf)
+            .from(bookShelf).join(bookShelf.book, book).fetchJoin()
+            .where(bookShelf.user.id.eq(userId)
+                .and(bookShelf.book.isbn.eq(isbn)))
+            .fetchOne());
+    }
 }

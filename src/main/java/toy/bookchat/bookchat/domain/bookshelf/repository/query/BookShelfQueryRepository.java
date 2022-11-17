@@ -19,4 +19,6 @@ public interface BookShelfQueryRepository {
     Optional<BookShelf> findByUserIdAndBookId(Long userId, Long bookId);
 
     void deleteAllByUserId(Long userId);
+
+    Optional<BookShelf> findByUserIdAndIsbn(Long userId, String isbn);
 }

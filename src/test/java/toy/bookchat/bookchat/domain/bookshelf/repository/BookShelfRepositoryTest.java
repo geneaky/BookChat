@@ -291,4 +291,26 @@ class BookShelfRepositoryTest {
         List<BookShelf> result = bookShelfRepository.findAll();
         assertThat(result).isEmpty();
     }
+
+    @Test
+    void isbn으로_사용자_서재에_등록된_책_조회성공() throws Exception {
+        Book book1 = getBook("1-4133-0454-0");
+        bookRepository.save(book1);
+
+        User user = User.builder().name("hi").build();
+        userRepository.save(user);
+
+        BookShelf bookShelf1 = BookShelf.builder()
+            .book(book1)
+            .user(user)
+            .readingStatus(ReadingStatus.READING)
+            .build();
+
+        bookShelfRepository.save(bookShelf1);
+
+        BookShelf findBookShelf = bookShelfRepository.findByUserIdAndIsbn(user.getId(),
+            book1.getIsbn()).get();
+        
+        assertThat(findBookShelf).isEqualTo(bookShelf1);
+    }
 }
