@@ -15,6 +15,7 @@ endif::[]
 |     400     | Bad Request |요청이 부적절한 경우
 |     401     | UnAuthorized|인증되지 않은 사용자
 |     403     |  Forbidden  |권한이 없거나 차단된 사용자
+|     404     |  NotFound   |조회결과가 없는 경우
 |===
 
 == 토큰
@@ -375,6 +376,24 @@ include::{snippets}/patch-bookshelf-book-star/http-request.adoc[]
 `Response`
 
 include::{snippets}/patch-bookshelf-book-star/http-response.adoc[]
+
+---
+
+=== 서재에 등록된 책 여부 조회
+
+`Request Header`
+
+include::{snippets}/get-bookshelf-book-existence-isbn/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/get-bookshelf-book-existence-isbn/request-parameters.adoc[]
+include::{snippets}/get-bookshelf-book-existence-isbn/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/get-bookshelf-book-existence-isbn/response-fields.adoc[]
+include::{snippets}/get-bookshelf-book-existence-isbn/http-response.adoc[]
 
 == 독후감
 
