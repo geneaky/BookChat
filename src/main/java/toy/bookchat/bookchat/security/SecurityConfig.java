@@ -2,7 +2,6 @@ package toy.bookchat.bookchat.security;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -46,7 +45,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             UsernamePasswordAuthenticationFilter.class);
 
         http.csrf().disable();
-        http.anonymous().disable();
         http.formLogin().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
@@ -54,14 +52,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .authenticationEntryPoint(new RestAuthenticationEntryPoint())
             .and()
             .authorizeRequests()
+            .antMatchers("/v1/api/users/profile/nickname", "/v1/api/users/signup",
+                "/v1/api/users/signin", "/v1/api/auth/token", "/v2/api/test/users/token")
+            .permitAll()
             .anyRequest().authenticated();
-    }
-
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring()
-            .antMatchers("/v1/api/users/profile/nickname")
-            .antMatchers("/v1/api/users/signup", "/v1/api/users/signin",
-                "/v1/api/auth/token");
     }
 }
