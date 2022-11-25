@@ -31,6 +31,7 @@ public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
 
         JPAQuery<BookShelf> jpaQuery = queryFactory.select(bookShelf)
             .from(bookShelf).join(bookShelf.book, book).fetchJoin()
+            .join(book.authors).fetchJoin()
             .where(bookShelf.readingStatus.eq(readingStatus)
                 .and(bookShelf.user.id.eq(userId)));
 

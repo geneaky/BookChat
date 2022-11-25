@@ -522,7 +522,6 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .pages(0)
             .readingStatus(READING)
             .star(FOUR_HALF)
-            .singleLineAssessment("it's is best")
             .build();
 
         result.add(bookShelf);
@@ -564,9 +563,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
                     fieldWithPath("contents[].publisher").type(STRING).description("출판사"),
                     fieldWithPath("contents[].publishAt").type(STRING).description("출판일자"),
                     fieldWithPath("contents[].pages").type(NUMBER).description("현재 읽고 있는 페이지 번호"),
-                    fieldWithPath("contents[].star").type(STRING).description("평점"),
-                    fieldWithPath("contents[].singleLineAssessment").type(STRING)
-                        .description("한 줄 평"))
+                    fieldWithPath("contents[].star").type(STRING).description("평점"))
                     .and(getPageField()))
             );
 
@@ -595,7 +592,6 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .pages(0)
             .readingStatus(WISH)
             .star(null)
-            .singleLineAssessment(null)
             .build();
 
         result.add(bookShelf);

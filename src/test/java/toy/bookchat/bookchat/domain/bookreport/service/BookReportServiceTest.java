@@ -133,8 +133,8 @@ class BookReportServiceTest {
     @Test
     void 서재에_등록된_책_독후감_수정_성공() throws Exception {
         ReviseBookReportRequest reviseBookReportRequest = ReviseBookReportRequest.builder()
-            .reportTitle("title2")
-            .reportContent("content2")
+            .title("title2")
+            .content("content2")
             .build();
         BookReport bookReport = getBookReport();
 

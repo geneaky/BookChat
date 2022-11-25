@@ -84,7 +84,6 @@ class BookShelfRepositoryTest {
             .user(user)
             .readingStatus(ReadingStatus.READING)
             .star(Star.ZERO)
-            .singleLineAssessment(null)
             .build();
 
         BookShelf bookShelf2 = BookShelf.builder()
@@ -92,7 +91,6 @@ class BookShelfRepositoryTest {
             .user(user)
             .readingStatus(ReadingStatus.READING)
             .star(Star.ZERO)
-            .singleLineAssessment(null)
             .build();
 
         bookShelfRepository.save(bookShelf1);
@@ -121,7 +119,6 @@ class BookShelfRepositoryTest {
             .user(user)
             .readingStatus(ReadingStatus.COMPLETE)
             .star(Star.THREE_HALF)
-            .singleLineAssessment("재밌네요 허허")
             .build();
 
         BookShelf bookShelf2 = BookShelf.builder()
@@ -129,7 +126,6 @@ class BookShelfRepositoryTest {
             .user(user)
             .readingStatus(ReadingStatus.COMPLETE)
             .star(Star.FIVE)
-            .singleLineAssessment("이시대 최고의 도서")
             .build();
 
         bookShelfRepository.save(bookShelf1);
@@ -159,7 +155,6 @@ class BookShelfRepositoryTest {
             .user(user)
             .readingStatus(ReadingStatus.WISH)
             .star(Star.ZERO)
-            .singleLineAssessment(null)
             .build();
 
         BookShelf bookShelf2 = BookShelf.builder()
@@ -167,7 +162,6 @@ class BookShelfRepositoryTest {
             .user(user)
             .readingStatus(ReadingStatus.WISH)
             .star(Star.ZERO)
-            .singleLineAssessment(null)
             .build();
 
         bookShelfRepository.save(bookShelf1);
@@ -199,7 +193,6 @@ class BookShelfRepositoryTest {
             .user(user)
             .readingStatus(ReadingStatus.READING)
             .star(null)
-            .singleLineAssessment(null)
             .build();
 
         bookShelfRepository.save(bookShelf);
@@ -310,7 +303,7 @@ class BookShelfRepositoryTest {
 
         BookShelf findBookShelf = bookShelfRepository.findByUserIdAndIsbn(user.getId(),
             book1.getIsbn()).get();
-        
+
         assertThat(findBookShelf).isEqualTo(bookShelf1);
     }
 }

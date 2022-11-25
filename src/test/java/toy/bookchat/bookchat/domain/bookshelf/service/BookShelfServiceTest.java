@@ -169,7 +169,6 @@ class BookShelfServiceTest {
             .readingStatus(READING)
             .pages(252)
             .star(null)
-            .singleLineAssessment(null)
             .build();
 
         Page<BookShelf> bookShelves = new PageImpl<>(List.of(bookShelf), pageable, 1);
@@ -203,7 +202,6 @@ class BookShelfServiceTest {
             .readingStatus(COMPLETE)
             .pages(0)
             .star(FIVE)
-            .singleLineAssessment("최고")
             .build();
 
         Page<BookShelf> bookShelves = new PageImpl<>(List.of(bookShelf), pageable, 1);
@@ -238,7 +236,6 @@ class BookShelfServiceTest {
             .readingStatus(WISH)
             .pages(0)
             .star(null)
-            .singleLineAssessment(null)
             .build();
 
         Page<BookShelf> bookShelves = new PageImpl<>(List.of(bookShelf), pageable, 1);
@@ -276,7 +273,6 @@ class BookShelfServiceTest {
             .readingStatus(READING)
             .pages(0)
             .star(null)
-            .singleLineAssessment(null)
             .build();
 
         when(bookShelfRepository.findOneOnConditionByUserIdAndBookId(any(), any(),

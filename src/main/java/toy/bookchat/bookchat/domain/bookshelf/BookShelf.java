@@ -36,7 +36,6 @@ public class BookShelf extends BaseEntity {
     private ReadingStatus readingStatus;
     @Enumerated(EnumType.STRING)
     private Star star;
-    private String singleLineAssessment;
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
     @ManyToOne(fetch = FetchType.LAZY)
@@ -45,13 +44,12 @@ public class BookShelf extends BaseEntity {
     private BookReport bookReport;
 
     @Builder
-    private BookShelf(Long id, Integer pages, ReadingStatus readingStatus, Star star,
-        String singleLineAssessment, User user, Book book, BookReport bookReport) {
+    private BookShelf(Long id, Integer pages, ReadingStatus readingStatus, Star star, User user,
+        Book book, BookReport bookReport) {
         this.id = id;
         this.pages = pages;
         this.readingStatus = readingStatus;
         this.star = star;
-        this.singleLineAssessment = singleLineAssessment;
         this.user = user;
         this.book = book;
         this.bookReport = bookReport;
@@ -88,10 +86,6 @@ public class BookShelf extends BaseEntity {
         return this.book.getBookCoverImageUrl();
     }
 
-    public boolean isNotReadingStatus() {
-        return this.readingStatus != ReadingStatus.READING;
-    }
-
     public void updatePage(Integer pages) {
         this.pages = pages;
     }
@@ -102,10 +96,6 @@ public class BookShelf extends BaseEntity {
 
     public void updateReadingStatus(ReadingStatus readingStatus) {
         this.readingStatus = readingStatus;
-    }
-
-    public void setBookReport(BookReport bookReport) {
-        this.bookReport = bookReport;
     }
 
     public void changeToCompleteReading() {

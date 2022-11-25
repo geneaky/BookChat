@@ -57,7 +57,7 @@ public class BookReportService {
             .orElseThrow(BookNotFoundException::new);
         BookReport bookReport = bookShelf.getBookReport();
 
-        bookReport.reviseTitle(reviseBookReportRequest.getReportTitle());
-        bookReport.reviseContent(reviseBookReportRequest.getReportContent());
+        bookReport.reviseTitle(reviseBookReportRequest.getTitle());
+        bookReport.reviseContent(reviseBookReportRequest.getContent());
     }
 }
