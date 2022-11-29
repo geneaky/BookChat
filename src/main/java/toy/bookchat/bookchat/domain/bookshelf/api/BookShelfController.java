@@ -45,6 +45,8 @@ public class BookShelfController {
             tokenPayload.getUserId());
     }
 
+    // TODO: 2022/11/26 책쪽수 변경, 독서상태변경, 별점변경 api를 put 하나로 묶기
+    // TODO: 2022/11/26 서재에는 책이 1권씩만 있는데 이거에 맞춰 url을 바꾸기
     @PatchMapping("/bookshelf/books/{bookId}/pages")
     public void changeReadingBookPagesOnBookShelf(@PathVariable Long bookId,
         @Valid @RequestBody ChangeReadingBookPageRequest changeReadingBookPageRequest,
@@ -72,7 +74,7 @@ public class BookShelfController {
 
     @PatchMapping("/bookshelf/books/{bookId}/star")
     public void changeBookStarOnBookShelf(@PathVariable Long bookId, @Valid @RequestBody
-        ReviseBookShelfStarRequest reviseBookShelfStarRequest,
+    ReviseBookShelfStarRequest reviseBookShelfStarRequest,
         @UserPayload TokenPayload tokenPayload) {
 
         bookShelfService.reviseBookStar(bookId, tokenPayload.getUserId(),

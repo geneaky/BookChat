@@ -1,7 +1,9 @@
 package toy.bookchat.bookchat.domain.bookshelf.repository.query;
 
 import static toy.bookchat.bookchat.domain.book.QBook.book;
+import static toy.bookchat.bookchat.domain.bookreport.QBookReport.bookReport;
 import static toy.bookchat.bookchat.domain.bookshelf.QBookShelf.bookShelf;
+import static toy.bookchat.bookchat.domain.common.RepositorySupport.extractOrderSpecifierFrom;
 
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -37,6 +39,7 @@ public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
 
         List<BookShelf> bookShelves = jpaQuery.offset(pageable.getOffset())
             .limit(pageable.getPageSize())
+            .orderBy(extractOrderSpecifierFrom(bookShelf, pageable))
             .fetch();
 
         Long size = queryFactory.select(bookShelf.count())
@@ -72,6 +75,7 @@ public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
     public Optional<BookShelf> findByUserIdAndBookId(Long userId, Long bookId) {
         return Optional.ofNullable(queryFactory.select(bookShelf)
             .from(bookShelf).join(bookShelf.book, book).fetchJoin()
+            .leftJoin(bookShelf.bookReport, bookReport).fetchJoin()
             .where(bookShelf.user.id.eq(userId)
                 .and(bookShelf.book.id.eq(bookId)))
             .fetchOne());
