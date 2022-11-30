@@ -11,13 +11,13 @@ import lombok.NoArgsConstructor;
 public class ReviseBookReportRequest {
 
     @NotBlank
-    private String reportTitle;
+    private String title;
     @NotBlank
-    private String reportContent;
+    private String content;
 
     @Builder
-    private ReviseBookReportRequest(String reportTitle, String reportContent) {
-        this.reportTitle = reportTitle;
-        this.reportContent = reportContent;
+    private ReviseBookReportRequest(String title, String content) {
+        this.title = title;
+        this.content = content;
     }
 }

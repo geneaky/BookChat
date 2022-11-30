@@ -172,8 +172,8 @@ class BookReportControllerTest extends ControllerTestExtension {
     @Test
     void 독후감_수정_성공() throws Exception {
         ReviseBookReportRequest reviseBookReportRequest = ReviseBookReportRequest.builder()
-            .reportTitle("제목 바꿔버리기")
-            .reportContent(
+            .title("제목 바꿔버리기")
+            .content(
                 "내용은 바꿀수도 아닐수도 있기 때문에 이전 상태 값을 완전히 가지고있기 때문에 똑같이 보내주거나 바꿔서 보내주세요 put으로 멱등성을 보장해줍시다.")
             .build();
 
@@ -191,8 +191,8 @@ class BookReportControllerTest extends ControllerTestExtension {
                     parameterWithName("bookId").description("Book Id")
                 ),
                 requestFields(
-                    fieldWithPath("reportTitle").type(STRING).description("독후감 제목"),
-                    fieldWithPath("reportContent").type(STRING).description("독후감 내용")
+                    fieldWithPath("title").type(STRING).description("독후감 제목"),
+                    fieldWithPath("content").type(STRING).description("독후감 내용")
                 )));
 
         verify(bookReportService).reviseBookReport(any(), any(), any());

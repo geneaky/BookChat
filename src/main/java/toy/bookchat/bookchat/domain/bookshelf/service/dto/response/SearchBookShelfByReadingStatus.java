@@ -31,7 +31,6 @@ public class SearchBookShelfByReadingStatus {
                 .bookCoverImageUrl(bookShelf.getBookCoverImageUrl())
                 .publishAt(bookShelf.getBook().getPublishAt())
                 .star(bookShelf.getStar())
-                .singleLineAssessment(bookShelf.getSingleLineAssessment())
                 .pages(bookShelf.getPages())
                 .build();
 

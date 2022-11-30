@@ -30,8 +30,8 @@ public class BookReportService {
         BookShelf bookShelf = bookShelfRepository.findByUserIdAndBookId(userId, bookId)
             .orElseThrow(BookNotFoundException::new);
 
-        bookShelf.changeToCompleteReading();
         BookReport bookReport = writeBookReportRequest.getBookReport(bookShelf);
+        bookShelf.writeReportInStateOfCompleteReading(bookReport);
         bookReportRepository.save(bookReport);
     }
 
@@ -57,7 +57,7 @@ public class BookReportService {
             .orElseThrow(BookNotFoundException::new);
         BookReport bookReport = bookShelf.getBookReport();
 
-        bookReport.reviseTitle(reviseBookReportRequest.getReportTitle());
-        bookReport.reviseContent(reviseBookReportRequest.getReportContent());
+        bookReport.reviseTitle(reviseBookReportRequest.getTitle());
+        bookReport.reviseContent(reviseBookReportRequest.getContent());
     }
 }

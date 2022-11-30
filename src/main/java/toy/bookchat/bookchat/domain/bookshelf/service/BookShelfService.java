@@ -73,7 +73,6 @@ public class BookShelfService {
                 .readingStatus(bookShelfRequest.getReadingStatus())
                 .user(user)
                 .star(bookShelfRequest.getStar())
-                .singleLineAssessment(bookShelfRequest.getSingleLineAssessment())
                 .build();
         }
 

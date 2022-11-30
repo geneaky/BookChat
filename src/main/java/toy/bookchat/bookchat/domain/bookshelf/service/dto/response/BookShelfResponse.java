@@ -17,13 +17,12 @@ public class BookShelfResponse {
     private List<String> authors;
     private String publisher;
     private Star star;
-    private String singleLineAssessment;
     private Integer pages;
 
     @Builder
     private BookShelfResponse(Long bookId, String title, String isbn,
         String bookCoverImageUrl, LocalDate publishAt, List<String> authors, String publisher,
-        Star star, String singleLineAssessment, Integer pages) {
+        Star star, Integer pages) {
         this.bookId = bookId;
         this.title = title;
         this.isbn = isbn;
@@ -32,7 +31,6 @@ public class BookShelfResponse {
         this.authors = authors;
         this.publisher = publisher;
         this.star = star;
-        this.singleLineAssessment = singleLineAssessment;
         this.pages = pages;
     }
 }
