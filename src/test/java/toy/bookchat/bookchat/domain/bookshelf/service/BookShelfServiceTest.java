@@ -96,7 +96,7 @@ class BookShelfServiceTest {
         BookShelfRequest bookShelfRequest = getBookShelfRequest(READING);
         Book book = getBook();
 
-        when(bookRepository.findByIsbn(bookShelfRequest.getIsbn())).thenReturn(
+        when(bookRepository.findByIsbnAndPublishAt(any(), any())).thenReturn(
             Optional.of(book));
         when(userRepository.findById(any())).thenReturn(Optional.of(mock(User.class)));
 
@@ -109,7 +109,7 @@ class BookShelfServiceTest {
     void 내부에_등록되지_않은_책을_책장에_저장() throws Exception {
         BookShelfRequest bookShelfRequest = getBookShelfRequest(READING);
 
-        when(bookRepository.findByIsbn(bookShelfRequest.getIsbn())).thenReturn(Optional.empty());
+        when(bookRepository.findByIsbnAndPublishAt(any(), any())).thenReturn(Optional.empty());
         when(userRepository.findById(any())).thenReturn(Optional.of(mock(User.class)));
         bookShelfService.putBookOnBookShelf(bookShelfRequest, 1L);
 
@@ -122,7 +122,7 @@ class BookShelfServiceTest {
         BookShelfRequest bookShelfRequest = getBookShelfRequest(COMPLETE);
         Book book = getBook();
 
-        when(bookRepository.findByIsbn(any())).thenReturn(
+        when(bookRepository.findByIsbnAndPublishAt(any(), any())).thenReturn(
             Optional.of(book));
         when(userRepository.findById(any())).thenReturn(Optional.of(mock(User.class)));
 
@@ -142,7 +142,7 @@ class BookShelfServiceTest {
             .readingStatus(COMPLETE)
             .build();
 
-        when(bookRepository.findByIsbn(bookShelfRequest.getIsbn())).thenReturn(Optional.empty());
+        when(bookRepository.findByIsbnAndPublishAt(any(), any())).thenReturn(Optional.empty());
         when(userRepository.findById(any())).thenReturn(Optional.of(mock(User.class)));
 
         User user = getUser();

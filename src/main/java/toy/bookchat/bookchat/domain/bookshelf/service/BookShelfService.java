@@ -39,7 +39,8 @@ public class BookShelfService {
 
     @Transactional
     public void putBookOnBookShelf(BookShelfRequest bookShelfRequest, Long userId) {
-        Optional<Book> optionalBook = bookRepository.findByIsbn(bookShelfRequest.getIsbn());
+        Optional<Book> optionalBook = bookRepository.findByIsbnAndPublishAt(
+            bookShelfRequest.getIsbn(), bookShelfRequest.getPublishAt());
         optionalBook.ifPresentOrElse(putBook(bookShelfRequest, userId),
             saveBookBeforePuttingBookOnBookShelf(bookShelfRequest, userId));
     }

@@ -2,6 +2,7 @@ package toy.bookchat.bookchat.domain.book.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
@@ -68,6 +69,22 @@ class BookRepositoryTest {
                 errorHandler.handleError(e);
             }
         }
+    }
+
+    @Test
+    void ISBN_출판일로_도서_조회_성공() throws Exception {
+        String isbn = "1234567890";
+        LocalDate publishAt = LocalDate.now();
+        Book book = Book.builder()
+            .isbn(isbn)
+            .publishAt(publishAt)
+            .build();
+
+        bookRepository.save(book);
+
+        Book findBook = bookRepository.findByIsbnAndPublishAt(isbn, publishAt).get();
+
+        assertThat(findBook).isEqualTo(book);
     }
 
 }

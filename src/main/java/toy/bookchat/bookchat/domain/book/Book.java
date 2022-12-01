@@ -9,11 +9,18 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import lombok.Builder;
 import lombok.Getter;
 import toy.bookchat.bookchat.domain.BaseEntity;
 
 @Entity
+@Table(uniqueConstraints = {
+    @UniqueConstraint(
+        columnNames = {"isbn", "publishAt"}
+    )
+})
 @Getter
 public class Book extends BaseEntity {
 
