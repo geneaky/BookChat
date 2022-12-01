@@ -24,6 +24,7 @@ import static toy.bookchat.bookchat.security.oauth.OAuth2Provider.KAKAO;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -91,7 +92,8 @@ class ChatRoomControllerTest extends ControllerTestExtension {
         CreateChatRoomRequest createChatRoomRequest = CreateChatRoomRequest.builder()
             .roomName("effective java 부수는 방")
             .roomSize(5)
-            .bookId(1L)
+            .isbn("124151214")
+            .publishAt(LocalDate.now())
             .build();
 
         mockMvc.perform(post("/v1/api/chatrooms")
@@ -107,7 +109,8 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                 requestFields(
                     fieldWithPath("roomName").type(STRING).description("채팅 방 이름"),
                     fieldWithPath("roomSize").type(NUMBER).description("채팅 방 인원 수"),
-                    fieldWithPath("bookId").type(NUMBER).description("Book Id")
+                    fieldWithPath("isbn").type(STRING).description("ISBN 번호"),
+                    fieldWithPath("publishAt").type(STRING).description("출판일")
                 )));
 
         verify(chatRoomService).createChatRoom(any(), any());

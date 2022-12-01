@@ -1,5 +1,6 @@
 package toy.bookchat.bookchat.domain.chatroom.service.dto.request;
 
+import java.time.LocalDate;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -16,13 +17,17 @@ public class CreateChatRoomRequest {
     private String roomName;
     @Min(2)
     private Integer roomSize;
+    @NotBlank
+    private String isbn;
     @NotNull
-    private Long bookId;
+    private LocalDate publishAt;
 
     @Builder
-    private CreateChatRoomRequest(String roomName, Integer roomSize, Long bookId) {
+    private CreateChatRoomRequest(String roomName, Integer roomSize, String isbn,
+        LocalDate publishAt) {
         this.roomName = roomName;
         this.roomSize = roomSize;
-        this.bookId = bookId;
+        this.isbn = isbn;
+        this.publishAt = publishAt;
     }
 }
