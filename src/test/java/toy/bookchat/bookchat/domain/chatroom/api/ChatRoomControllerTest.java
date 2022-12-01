@@ -9,6 +9,7 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.headerWit
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -93,6 +94,10 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .roomName("effective java 부수는 방")
             .roomSize(5)
             .isbn("124151214")
+            .title("effective java")
+            .publisher("insight")
+            .bookCoverImageUrl("testImageUrl")
+            .authors(List.of("joshua"))
             .publishAt(LocalDate.now())
             .build();
 
@@ -110,6 +115,10 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                     fieldWithPath("roomName").type(STRING).description("채팅 방 이름"),
                     fieldWithPath("roomSize").type(NUMBER).description("채팅 방 인원 수"),
                     fieldWithPath("isbn").type(STRING).description("ISBN 번호"),
+                    fieldWithPath("title").type(STRING).description("책 제목"),
+                    fieldWithPath("publisher").type(STRING).description("출판사"),
+                    fieldWithPath("bookCoverImageUrl").type(STRING).description("책 표지 이미지 url"),
+                    fieldWithPath("authors").type(ARRAY).description("저자 목록"),
                     fieldWithPath("publishAt").type(STRING).description("출판일")
                 )));
 
