@@ -11,7 +11,6 @@ import toy.bookchat.bookchat.domain.chatroomhost.ChatRoomHost;
 import toy.bookchat.bookchat.domain.chatroomhost.repository.ChatRoomHostRepository;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
-import toy.bookchat.bookchat.exception.book.BookNotFoundException;
 import toy.bookchat.bookchat.exception.user.UserNotFoundException;
 
 @Service
@@ -36,7 +35,8 @@ public class ChatRoomService {
     @Transactional
     public void createChatRoom(CreateChatRoomRequest createChatRoomRequest, Long userId) {
         Book book = bookRepository.findByIsbnAndPublishAt(createChatRoomRequest.getIsbn(),
-            createChatRoomRequest.getPublishAt()).orElseThrow(BookNotFoundException::new);
+                createChatRoomRequest.getPublishAt())
+            .orElseGet(() -> bookRepository.save(createChatRoomRequest.createBook()));
 
         User mainHost = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 

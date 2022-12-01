@@ -61,4 +61,15 @@ public class CreateChatRoomRequest {
             .chatRoomHost(chatRoomHost)
             .build();
     }
+
+    public Book createBook() {
+        return Book.builder()
+            .isbn(this.isbn)
+            .title(this.title)
+            .publishAt(this.publishAt)
+            .publisher(this.publisher)
+            .authors(this.authors)
+            .bookCoverImageUrl(this.bookCoverImageUrl)
+            .build();
+    }
 }

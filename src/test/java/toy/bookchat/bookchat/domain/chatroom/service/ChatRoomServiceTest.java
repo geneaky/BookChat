@@ -45,4 +45,15 @@ class ChatRoomServiceTest {
         verify(chatRoomRepository).save(any());
         verify(chatRoomHostRepository).save(any());
     }
+
+    @Test
+    void 등록되지_않은_책으로_채팅방_생성시_책을_등록_후_생성한다() throws Exception {
+        when(userRepository.findById(any())).thenReturn(Optional.of(mock(User.class)));
+
+        chatRoomService.createChatRoom(mock(CreateChatRoomRequest.class), 1L);
+
+        verify(bookRepository).save(any());
+        verify(chatRoomRepository).save(any());
+        verify(chatRoomHostRepository).save(any());
+    }
 }
