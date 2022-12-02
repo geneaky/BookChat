@@ -6,14 +6,14 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
-src/main/resources/*
-!src/main/resources/.gitkeep
-src/main/java/toy/bookchat/bookchat/localtest/
+temp/src/main/resources/*
+!temp/src/main/resources/.gitkeep
+temp/src/main/java/toy/bookchat/bookchat/localtest/
 logs/
-!src/main/resources/log4j2-spring-production.xml
+!temp/src/main/resources/log4j2-spring-production.xml
 
 logs/
-!src/main/resources/log4j2-spring-local.xml
+!temp/src/main/resources/log4j2-spring-local.xml
 
 
 ### STS ###
