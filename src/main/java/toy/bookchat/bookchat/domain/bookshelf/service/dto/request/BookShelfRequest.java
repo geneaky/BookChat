@@ -1,5 +1,7 @@
 package toy.bookchat.bookchat.domain.bookshelf.service.dto.request;
 
+import static toy.bookchat.bookchat.domain.bookshelf.ReadingStatus.COMPLETE;
+
 import java.time.LocalDate;
 import java.util.List;
 import javax.validation.Valid;
@@ -9,7 +11,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.util.StringUtils;
 import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.Star;
@@ -34,12 +35,11 @@ public class BookShelfRequest {
     @NotNull
     private ReadingStatus readingStatus;
     private Star star;
-    private String singleLineAssessment;
 
     @Builder
     private BookShelfRequest(String isbn, String title,
         List<@NotBlank String> authors, String publisher, String bookCoverImageUrl,
-        ReadingStatus readingStatus, Star star, String singleLineAssessment, LocalDate publishAt) {
+        ReadingStatus readingStatus, Star star, LocalDate publishAt) {
         this.isbn = isbn;
         this.title = title;
         this.authors = authors;
@@ -48,7 +48,6 @@ public class BookShelfRequest {
         this.publishAt = publishAt;
         this.readingStatus = readingStatus;
         this.star = star;
-        this.singleLineAssessment = singleLineAssessment;
     }
 
     public Book extractBookEntity() {
@@ -62,9 +61,18 @@ public class BookShelfRequest {
             .build();
     }
 
-    public void checkCompleteStateField() {
-        if (!StringUtils.hasText(this.singleLineAssessment) || this.star == null) {
-            throw new IllegalArgumentException();
+    public boolean isFinishedReadingiriri() {
+        if (this.readingStatus == COMPLETE) {
+            return isEvaluated();
         }
+        return false;
+    }
+
+    private boolean isEvaluated() {
+        if (this.star == null) {
+            throw new IllegalStateException(
+                "Star is required to change bookshelf complete reading status");
+        }
+        return true;
     }
 }

@@ -2,7 +2,6 @@ package toy.bookchat.bookchat.domain.bookshelf.api;
 
 import static io.jsonwebtoken.SignatureAlgorithm.HS256;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -127,7 +126,6 @@ class BookShelfControllerTest extends ControllerTestExtension {
                 .publishAt(LocalDate.now())
                 .readingStatus(readingStatus)
                 .star(FOUR)
-                .singleLineAssessment("very good")
                 .build();
         }
         return BookShelfRequest.builder()
@@ -168,8 +166,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
                         .description("책 커버 이미지 URI"),
                     fieldWithPath("publishAt").type(STRING).description("출판일"),
                     fieldWithPath("readingStatus").type(STRING).description("READING"),
-                    fieldWithPath("star").ignored(),
-                    fieldWithPath("singleLineAssessment").ignored())));
+                    fieldWithPath("star").ignored())));
 
         verify(bookShelfService).putBookOnBookShelf(any(BookShelfRequest.class), any());
     }
@@ -195,35 +192,10 @@ class BookShelfControllerTest extends ControllerTestExtension {
                         .description("책 커버 이미지 URI"),
                     fieldWithPath("publishAt").type(STRING).description("출판일"),
                     fieldWithPath("readingStatus").type(STRING).description("COMPLETE"),
-                    fieldWithPath("star").type(STRING).description("평점"),
-                    fieldWithPath("singleLineAssessment").type(STRING).description("한 줄 평"))));
+                    fieldWithPath("star").type(STRING).description("평점"))));
 
         verify(bookShelfService).putBookOnBookShelf(any(BookShelfRequest.class),
             any());
-    }
-
-    @Test
-    void 읽은_책_등록시_평점_한줄평_없으면_400반환() throws Exception {
-        doThrow(IllegalArgumentException.class).when(bookShelfService)
-            .putBookOnBookShelf(any(), any());
-
-        BookShelfRequest bookShelfRequest = BookShelfRequest.builder()
-            .isbn("124151214")
-            .title("effectiveJava")
-            .authors(List.of("Joshua"))
-            .publisher("oreilly")
-            .bookCoverImageUrl("bookCoverImage.com")
-            .readingStatus(COMPLETE)
-            .build();
-
-        mockMvc.perform(post("/v1/api/bookshelf/books")
-                .header(AUTHORIZATION, JWT_TOKEN)
-                .content(
-                    objectMapper.writeValueAsString(bookShelfRequest))
-                .contentType(APPLICATION_JSON)
-                .with(user(getUserPrincipal())))
-            .andExpect(status().isBadRequest());
-
     }
 
     @Test
@@ -246,8 +218,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
                         .description("책 커버 이미지 URI"),
                     fieldWithPath("publishAt").type(STRING).description("출판일"),
                     fieldWithPath("readingStatus").type(STRING).description("WISH"),
-                    fieldWithPath("star").ignored(),
-                    fieldWithPath("singleLineAssessment").ignored())));
+                    fieldWithPath("star").ignored())));
 
         verify(bookShelfService).putBookOnBookShelf(any(BookShelfRequest.class),
             any());

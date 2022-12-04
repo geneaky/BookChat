@@ -78,7 +78,6 @@ class BookShelfServiceTest {
                 .bookCoverImageUrl("test@naver.com")
                 .readingStatus(COMPLETE)
                 .star(THREE)
-                .singleLineAssessment("very good")
                 .build();
         }
         return BookShelfRequest.builder()
@@ -148,7 +147,7 @@ class BookShelfServiceTest {
         User user = getUser();
         Assertions.assertThatThrownBy(() -> {
             bookShelfService.putBookOnBookShelf(bookShelfRequest, user.getId());
-        }).isInstanceOf(IllegalArgumentException.class);
+        }).isInstanceOf(IllegalStateException.class);
     }
 
     @Test
