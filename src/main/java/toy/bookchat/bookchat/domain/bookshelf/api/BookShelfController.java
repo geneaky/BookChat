@@ -1,7 +1,9 @@
 package toy.bookchat.bookchat.domain.bookshelf.api;
 
+import java.time.LocalDate;
 import javax.validation.Valid;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,9 +47,10 @@ public class BookShelfController {
 
     @GetMapping("/bookshelf/books/existence")
     public ExistenceBookOnBookShelfResponse findBookIfExistedOnBookShelf(String isbn,
+        @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate publishAt,
         @UserPayload TokenPayload tokenPayload) {
 
-        return bookShelfService.getBookIfExisted(isbn, tokenPayload.getUserId());
+        return bookShelfService.getBookIfExisted(isbn, publishAt, tokenPayload.getUserId());
     }
 
     @PutMapping("/bookshelf/books/{bookId}")

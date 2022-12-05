@@ -1,5 +1,6 @@
 package toy.bookchat.bookchat.domain.bookshelf.service;
 
+import java.time.LocalDate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -71,11 +72,11 @@ public class BookShelfService {
         return new SearchBookShelfByReadingStatus(pagingBookShelves);
     }
 
-    /* TODO: 2022-12-05 isbn+publishAt 조건으로 수정해야함
-     */
     @Transactional(readOnly = true)
-    public ExistenceBookOnBookShelfResponse getBookIfExisted(String isbn, Long userId) {
-        BookShelf bookShelf = bookShelfRepository.findByUserIdAndIsbn(userId, isbn)
+    public ExistenceBookOnBookShelfResponse getBookIfExisted(String isbn,
+        LocalDate publishAt, Long userId) {
+        BookShelf bookShelf = bookShelfRepository.findByUserIdAndIsbnAndPublishAt(userId, isbn,
+                publishAt)
             .orElseThrow(BookNotFoundException::new);
 
         return ExistenceBookOnBookShelfResponse.from(bookShelf);

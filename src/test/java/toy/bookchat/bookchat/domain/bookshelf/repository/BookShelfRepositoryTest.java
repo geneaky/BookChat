@@ -2,6 +2,7 @@ package toy.bookchat.bookchat.domain.bookshelf.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,7 @@ class BookShelfRepositoryTest {
             .title("effective java")
             .authors(List.of("Joshua"))
             .publisher("insight")
+            .publishAt(LocalDate.now())
             .bookCoverImageUrl("bookCover@naver.com")
             .build();
     }
@@ -254,22 +256,22 @@ class BookShelfRepositoryTest {
 
     @Test
     void isbn으로_사용자_서재에_등록된_책_조회성공() throws Exception {
-        Book book1 = getBook("1-4133-0454-0");
-        bookRepository.save(book1);
+        Book book = getBook("1-4133-0454-0");
+        bookRepository.save(book);
 
         User user = User.builder().name("hi").build();
         userRepository.save(user);
 
         BookShelf bookShelf1 = BookShelf.builder()
-            .book(book1)
+            .book(book)
             .user(user)
             .readingStatus(ReadingStatus.READING)
             .build();
 
         bookShelfRepository.save(bookShelf1);
 
-        BookShelf findBookShelf = bookShelfRepository.findByUserIdAndIsbn(user.getId(),
-            book1.getIsbn()).get();
+        BookShelf findBookShelf = bookShelfRepository.findByUserIdAndIsbnAndPublishAt(user.getId(),
+            book.getIsbn(), book.getPublishAt()).get();
 
         assertThat(findBookShelf).isEqualTo(bookShelf1);
     }

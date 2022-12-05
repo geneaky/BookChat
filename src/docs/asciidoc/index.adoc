@@ -310,6 +310,24 @@ include::{snippets}/get-bookshelf-complete/response-body.adoc[]
 
 ---
 
+=== 서재에 등록된 책 여부 조회
+
+`Request Header`
+
+include::{snippets}/get-bookshelf-book-existence/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/get-bookshelf-book-existence/request-parameters.adoc[]
+include::{snippets}/get-bookshelf-book-existence/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/get-bookshelf-book-existence/response-fields.adoc[]
+include::{snippets}/get-bookshelf-book-existence/http-response.adoc[]
+
+---
+
 === 읽고 있는 도서 페이지번호 저장
 
 `Request Header`
@@ -395,24 +413,6 @@ include::{snippets}/delete-bookshelf-books/http-request.adoc[]
 `Response`
 
 include::{snippets}/delete-bookshelf-books/http-response.adoc[]
-
----
-
-=== 서재에 등록된 책 여부 조회
-
-`Request Header`
-
-include::{snippets}/get-bookshelf-book-existence-isbn/request-headers.adoc[]
-
-`Request`
-
-include::{snippets}/get-bookshelf-book-existence-isbn/request-parameters.adoc[]
-include::{snippets}/get-bookshelf-book-existence-isbn/http-request.adoc[]
-
-`Response`
-
-include::{snippets}/get-bookshelf-book-existence-isbn/response-fields.adoc[]
-include::{snippets}/get-bookshelf-book-existence-isbn/http-response.adoc[]
 
 == 독후감
 

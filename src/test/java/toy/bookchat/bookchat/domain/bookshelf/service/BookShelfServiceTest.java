@@ -13,6 +13,7 @@ import static toy.bookchat.bookchat.domain.bookshelf.Star.FIVE;
 import static toy.bookchat.bookchat.domain.bookshelf.Star.HALF;
 import static toy.bookchat.bookchat.domain.bookshelf.Star.THREE;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -56,6 +57,7 @@ class BookShelfServiceTest {
             .isbn("12345")
             .title("testBook")
             .authors(List.of("test Author"))
+            .publishAt(LocalDate.now())
             .publisher("test publisher")
             .bookCoverImageUrl("test@naver.com")
             .build();
@@ -340,11 +342,11 @@ class BookShelfServiceTest {
             .readingStatus(WISH)
             .build();
 
-        when(bookShelfRepository.findByUserIdAndIsbn(any(), any())).thenReturn(
+        when(bookShelfRepository.findByUserIdAndIsbnAndPublishAt(any(), any(), any())).thenReturn(
             Optional.of(bookShelf));
 
         ExistenceBookOnBookShelfResponse result = bookShelfService.getBookIfExisted(
-            book.getIsbn(), book.getId());
+            book.getIsbn(), book.getPublishAt(), book.getId());
 
         ExistenceBookOnBookShelfResponse expect = ExistenceBookOnBookShelfResponse.from(bookShelf);
 
@@ -357,7 +359,7 @@ class BookShelfServiceTest {
 
         assertThatThrownBy(() -> {
             ExistenceBookOnBookShelfResponse result = bookShelfService.getBookIfExisted(
-                book.getIsbn(), book.getId());
+                book.getIsbn(), book.getPublishAt(), book.getId());
         }).isInstanceOf(BookNotFoundException.class);
     }
 }
