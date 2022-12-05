@@ -5,7 +5,6 @@ import static toy.bookchat.bookchat.domain.bookshelf.ReadingStatus.READING;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Optional;
-import java.util.stream.Stream;
 import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -39,13 +38,17 @@ public class ReviseBookShelfRequest {
         }
         if (bookShelf.isReading()) { //독서중 상태에서만 페이지 쪽수 지정
             this.pages.ifPresent(bookShelf::updatePage);
-            if (this.readingStatus == COMPLETE && this.star.isPresent()) { //독서중에서 독서 완료로 변경시 별점이 필수
-                bookShelf.updateReadingStatus(this.readingStatus);
-                this.star.ifPresent(bookShelf::updateStar);
-            }
+            changeReadingStatusToComplete(bookShelf);
         }
         if (bookShelf.isWish() && this.readingStatus == READING) { // 독서예정 상태에서 독서중으로 변경
             bookShelf.updateReadingStatus(this.readingStatus);
+        }
+    }
+
+    private void changeReadingStatusToComplete(BookShelf bookShelf) {
+        if (this.readingStatus == COMPLETE && this.star.isPresent()) { //독서중에서 독서 완료로 변경시 별점이 필수
+            bookShelf.updateReadingStatus(this.readingStatus);
+            this.star.ifPresent(bookShelf::updateStar);
         }
     }
 }
