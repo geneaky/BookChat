@@ -1,7 +1,5 @@
 package toy.bookchat.bookchat.domain.bookshelf.service;
 
-import java.util.Optional;
-import java.util.function.Consumer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -39,35 +37,16 @@ public class BookShelfService {
 
     @Transactional
     public void putBookOnBookShelf(BookShelfRequest bookShelfRequest, Long userId) {
-        Optional<Book> optionalBook = bookRepository.findByIsbn(bookShelfRequest.getIsbn());
-        optionalBook.ifPresentOrElse(putBook(bookShelfRequest, userId),
-            saveBookBeforePuttingBookOnBookShelf(bookShelfRequest, userId));
-    }
-
-    private Runnable saveBookBeforePuttingBookOnBookShelf(BookShelfRequest bookShelfRequest,
-        Long userId) {
-        return () -> {
-            Book book = bookRepository.save(bookShelfRequest.extractBookEntity());
-            putBookOnBookShelf(bookShelfRequest, book, userId);
-        };
-    }
-
-    private Consumer<Book> putBook(BookShelfRequest bookShelfRequest, Long userId) {
-        return book -> putBookOnBookShelf(bookShelfRequest, book, userId);
-    }
-
-    private void putBookOnBookShelf(BookShelfRequest bookShelfRequest, Book book,
-        Long userId) {
-        BookShelf bookShelf = createBookShelfByReadingStatus(bookShelfRequest, book, userId);
-        bookShelfRepository.save(bookShelf);
+        Book book = bookRepository.findByIsbnAndPublishAt(bookShelfRequest.getIsbn(),
+                bookShelfRequest.getPublishAt())
+            .orElseGet(() -> bookRepository.save(bookShelfRequest.extractBookEntity()));
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        bookShelfRepository.save(createBookShelfByReadingStatus(bookShelfRequest, book, user));
     }
 
     private BookShelf createBookShelfByReadingStatus(BookShelfRequest bookShelfRequest,
-        Book book, Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        if (isFinishedReading(bookShelfRequest)) {
-            bookShelfRequest.checkCompleteStateField();
-
+        Book book, User user) {
+        if (bookShelfRequest.isCompleteReading()) {
             return BookShelf.builder()
                 .book(book)
                 .readingStatus(bookShelfRequest.getReadingStatus())
@@ -81,10 +60,6 @@ public class BookShelfService {
             .readingStatus(bookShelfRequest.getReadingStatus())
             .user(user)
             .build();
-    }
-
-    private boolean isFinishedReading(BookShelfRequest bookShelfRequest) {
-        return bookShelfRequest.getReadingStatus() == ReadingStatus.COMPLETE;
     }
 
     @Transactional(readOnly = true)

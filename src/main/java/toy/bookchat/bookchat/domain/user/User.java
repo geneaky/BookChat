@@ -6,14 +6,17 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import lombok.Builder;
 import lombok.Getter;
 import toy.bookchat.bookchat.domain.BaseEntity;
+import toy.bookchat.bookchat.domain.chatroomhost.ChatRoomHost;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
 @Entity
@@ -41,6 +44,12 @@ public class User extends BaseEntity {
     private OAuth2Provider provider;
     @ElementCollection
     private List<ReadingTaste> readingTastes = new ArrayList<>();
+
+    @OneToOne(mappedBy = "mainHost", fetch = FetchType.LAZY)
+    private ChatRoomHost mainHost;
+
+    @OneToOne(mappedBy = "subHost", fetch = FetchType.LAZY)
+    private ChatRoomHost subHost;
 
     @Builder
     private User(Long id, String name, String nickname, String email, String profileImageUrl,

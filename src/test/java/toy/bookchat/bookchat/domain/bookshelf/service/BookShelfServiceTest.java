@@ -30,6 +30,7 @@ import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.Star;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookShelfRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeBookStatusRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeReadingBookPageRequest;
@@ -68,25 +69,26 @@ class BookShelfServiceTest {
             .build();
     }
 
-    private BookShelfRequest getBookShelfRequest(ReadingStatus readingStatus) {
-        if (readingStatus == COMPLETE) {
-            return BookShelfRequest.builder()
-                .isbn("12345")
-                .title("testBook")
-                .authors(List.of("test Author"))
-                .publisher("test publisher")
-                .bookCoverImageUrl("test@naver.com")
-                .readingStatus(COMPLETE)
-                .star(THREE)
-                .singleLineAssessment("very good")
-                .build();
-        }
-        return BookShelfRequest.builder()
+    private BookRequest getBookRequest() {
+        return BookRequest.builder()
             .isbn("12345")
             .title("testBook")
             .authors(List.of("test Author"))
             .publisher("test publisher")
             .bookCoverImageUrl("test@naver.com")
+            .build();
+    }
+
+    private BookShelfRequest getBookShelfRequest(ReadingStatus readingStatus) {
+        if (readingStatus == COMPLETE) {
+            return BookShelfRequest.builder()
+                .bookRequest(getBookRequest())
+                .readingStatus(COMPLETE)
+                .star(THREE)
+                .build();
+        }
+        return BookShelfRequest.builder()
+            .bookRequest(getBookRequest())
             .readingStatus(READING)
             .build();
     }
@@ -96,7 +98,7 @@ class BookShelfServiceTest {
         BookShelfRequest bookShelfRequest = getBookShelfRequest(READING);
         Book book = getBook();
 
-        when(bookRepository.findByIsbn(bookShelfRequest.getIsbn())).thenReturn(
+        when(bookRepository.findByIsbnAndPublishAt(any(), any())).thenReturn(
             Optional.of(book));
         when(userRepository.findById(any())).thenReturn(Optional.of(mock(User.class)));
 
@@ -109,7 +111,7 @@ class BookShelfServiceTest {
     void 내부에_등록되지_않은_책을_책장에_저장() throws Exception {
         BookShelfRequest bookShelfRequest = getBookShelfRequest(READING);
 
-        when(bookRepository.findByIsbn(bookShelfRequest.getIsbn())).thenReturn(Optional.empty());
+        when(bookRepository.findByIsbnAndPublishAt(any(), any())).thenReturn(Optional.empty());
         when(userRepository.findById(any())).thenReturn(Optional.of(mock(User.class)));
         bookShelfService.putBookOnBookShelf(bookShelfRequest, 1L);
 
@@ -122,7 +124,7 @@ class BookShelfServiceTest {
         BookShelfRequest bookShelfRequest = getBookShelfRequest(COMPLETE);
         Book book = getBook();
 
-        when(bookRepository.findByIsbn(any())).thenReturn(
+        when(bookRepository.findByIsbnAndPublishAt(any(), any())).thenReturn(
             Optional.of(book));
         when(userRepository.findById(any())).thenReturn(Optional.of(mock(User.class)));
 
@@ -132,23 +134,19 @@ class BookShelfServiceTest {
     }
 
     @Test
-    void 읽은_책_저장시_평점과_한줄평이_없으면_예외발생() throws Exception {
+    void 읽은_책_저장시_평점_없으면_예외발생() throws Exception {
         BookShelfRequest bookShelfRequest = BookShelfRequest.builder()
-            .isbn("12345")
-            .title("testBook")
-            .authors(List.of("test Author"))
-            .publisher("test publisher")
-            .bookCoverImageUrl("test@naver.com")
+            .bookRequest(getBookRequest())
             .readingStatus(COMPLETE)
             .build();
 
-        when(bookRepository.findByIsbn(bookShelfRequest.getIsbn())).thenReturn(Optional.empty());
+        when(bookRepository.findByIsbnAndPublishAt(any(), any())).thenReturn(Optional.empty());
         when(userRepository.findById(any())).thenReturn(Optional.of(mock(User.class)));
 
         User user = getUser();
         Assertions.assertThatThrownBy(() -> {
             bookShelfService.putBookOnBookShelf(bookShelfRequest, user.getId());
-        }).isInstanceOf(IllegalArgumentException.class);
+        }).isInstanceOf(IllegalStateException.class);
     }
 
     @Test

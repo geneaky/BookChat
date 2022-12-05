@@ -605,3 +605,20 @@ include::{snippets}/put-agony-record/http-request.adoc[]
 `Response`
 
 include::{snippets}/put-agony-record/http-response.adoc[]
+
+== 채팅방
+
+=== 채팅방 생성
+
+`Request Header`
+
+include::{snippets}/post-chatroom/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/post-chatroom/request-fields.adoc[]
+include::{snippets}/post-chatroom/http-request.adoc[]
+
+`Resposne`
+
+include::{snippets}/post-chatroom/http-response.adoc[]
