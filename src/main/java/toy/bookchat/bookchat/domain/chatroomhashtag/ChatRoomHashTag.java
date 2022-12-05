@@ -14,7 +14,7 @@ import toy.bookchat.bookchat.domain.hashtag.HashTag;
 @Entity
 @Table(uniqueConstraints = {
     @UniqueConstraint(
-        columnNames = {"chatRoom_id", "hashTag_id"}
+        columnNames = {"chat_room_id", "hash_tag_id"}
     )
 })
 public class ChatRoomHashTag extends BaseEntity {
@@ -28,4 +28,16 @@ public class ChatRoomHashTag extends BaseEntity {
 
     @ManyToOne
     private HashTag hashTag;
+
+    protected ChatRoomHashTag() {
+    }
+
+    private ChatRoomHashTag(ChatRoom chatRoom, HashTag hashTag) {
+        this.chatRoom = chatRoom;
+        this.hashTag = hashTag;
+    }
+
+    public static ChatRoomHashTag of(ChatRoom chatRoom, HashTag hashTag) {
+        return new ChatRoomHashTag(chatRoom, hashTag);
+    }
 }
