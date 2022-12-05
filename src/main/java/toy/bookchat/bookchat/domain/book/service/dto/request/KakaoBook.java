@@ -18,11 +18,16 @@ public class KakaoBook {
     public BookSearchResponse getBookSearchResponse() {
         List<BookResponse> bookResponses = new ArrayList<>();
         fillBookResponsesWithDocuments(bookResponses);
+        adjustMetaCount(bookResponses);
 
         return BookSearchResponse.builder()
             .bookResponses(bookResponses)
             .meta(meta)
             .build();
+    }
+
+    private void adjustMetaCount(List<BookResponse> bookResponses) {
+        meta.changeTotalCount(bookResponses.size());
     }
 
     private void fillBookResponsesWithDocuments(List<BookResponse> bookResponses) {

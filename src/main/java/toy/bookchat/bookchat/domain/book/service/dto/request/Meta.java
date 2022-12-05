@@ -19,4 +19,8 @@ public class Meta {
         this.pageable_count = pageable_count;
         this.total_count = total_count;
     }
+
+    public void changeTotalCount(int resultDocumentTotalSize) {
+        this.total_count = resultDocumentTotalSize;
+    }
 }

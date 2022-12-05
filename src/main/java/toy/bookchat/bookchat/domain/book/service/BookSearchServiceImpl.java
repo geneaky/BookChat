@@ -60,7 +60,7 @@ public class BookSearchServiceImpl implements BookSearchService {
                 StandardCharsets.UTF_8).toUri(),
             HttpMethod.GET,
             httpEntity, KakaoBook.class).getBody();
-
+        
         if (Optional.ofNullable(kakaoBook).isPresent()) {
             return kakaoBook.getBookSearchResponse();
         }
