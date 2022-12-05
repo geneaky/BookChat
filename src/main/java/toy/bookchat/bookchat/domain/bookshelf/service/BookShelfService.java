@@ -10,9 +10,7 @@ import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookShelfRequest;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeBookStatusRequest;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeReadingBookPageRequest;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ReviseBookShelfStarRequest;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ReviseBookShelfRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.ExistenceBookOnBookShelfResponse;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.SearchBookShelfByReadingStatus;
 import toy.bookchat.bookchat.domain.user.User;
@@ -73,14 +71,23 @@ public class BookShelfService {
         return new SearchBookShelfByReadingStatus(pagingBookShelves);
     }
 
+    /* TODO: 2022-12-05 isbn+publishAt 조건으로 수정해야함
+     */
+    @Transactional(readOnly = true)
+    public ExistenceBookOnBookShelfResponse getBookIfExisted(String isbn, Long userId) {
+        BookShelf bookShelf = bookShelfRepository.findByUserIdAndIsbn(userId, isbn)
+            .orElseThrow(BookNotFoundException::new);
+
+        return ExistenceBookOnBookShelfResponse.from(bookShelf);
+    }
+
     @Transactional
-    public void changeReadingBookPage(
-        ChangeReadingBookPageRequest changeReadingBookPageRequest, Long userId, Long bookId) {
+    public void reviseBookShelf(Long bookId, ReviseBookShelfRequest reviseBookShelfRequest,
+        Long userId) {
+        BookShelf bookShelf = bookShelfRepository.findByUserIdAndBookId(userId, bookId)
+            .orElseThrow(BookNotFoundException::new);
 
-        BookShelf bookShelf = bookShelfRepository.findOneOnConditionByUserIdAndBookId(userId,
-            bookId, ReadingStatus.READING);
-
-        bookShelf.updatePage(changeReadingBookPageRequest.getPages());
+        reviseBookShelfRequest.applyChanges(bookShelf);
     }
 
     @Transactional
@@ -91,33 +98,8 @@ public class BookShelfService {
     }
 
     @Transactional
-    public void changeBookStatusOnBookShelf(ChangeBookStatusRequest changeBookStatusRequest,
-        Long userId, Long bookId) {
-
-        BookShelf bookShelf = bookShelfRepository.findByUserIdAndBookId(
-            userId, bookId).orElseThrow(BookNotFoundException::new);
-
-        bookShelf.updateReadingStatus(changeBookStatusRequest.getReadingStatus());
-    }
-
-    @Transactional
-    public void reviseBookStar(Long bookId, Long userId,
-        ReviseBookShelfStarRequest reviseBookShelfStarRequest) {
-        BookShelf bookShelf = bookShelfRepository.findOneOnConditionByUserIdAndBookId(
-            userId, bookId, ReadingStatus.COMPLETE);
-
-        bookShelf.changeStar(reviseBookShelfStarRequest.getStar());
-    }
-
-    @Transactional
     public void deleteAllUserBookShelves(Long userId) {
         bookShelfRepository.deleteAllByUserId(userId);
     }
 
-    public ExistenceBookOnBookShelfResponse getBookIfExisted(String isbn, Long userId) {
-        BookShelf bookShelf = bookShelfRepository.findByUserIdAndIsbn(userId, isbn)
-            .orElseThrow(BookNotFoundException::new);
-
-        return ExistenceBookOnBookShelfResponse.from(bookShelf);
-    }
 }

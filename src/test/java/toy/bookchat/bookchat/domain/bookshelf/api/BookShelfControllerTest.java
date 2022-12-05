@@ -10,7 +10,7 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.headerWit
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -59,9 +60,7 @@ import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.service.BookShelfService;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookShelfRequest;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeBookStatusRequest;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeReadingBookPageRequest;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ReviseBookShelfStarRequest;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ReviseBookShelfRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.ExistenceBookOnBookShelfResponse;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.SearchBookShelfByReadingStatus;
 import toy.bookchat.bookchat.domain.user.User;
@@ -643,15 +642,19 @@ class BookShelfControllerTest extends ControllerTestExtension {
 
     @Test
     void 현재_읽고있는_페이지_등록() throws Exception {
-        ChangeReadingBookPageRequest requestDto = new ChangeReadingBookPageRequest(137);
+        ReviseBookShelfRequest reviseBookShelfRequest = ReviseBookShelfRequest.builder()
+            .pages(Optional.of(137))
+            .star(null)
+            .readingStatus(READING)
+            .build();
 
-        mockMvc.perform(patch("/v1/api/bookshelf/books/{bookId}/pages", 1L)
+        mockMvc.perform(put("/v1/api/bookshelf/books/{bookId}", 1L)
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
                 .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(requestDto)))
+                .content(objectMapper.writeValueAsString(reviseBookShelfRequest)))
             .andExpect(status().isOk())
-            .andDo(document("patch-bookshelf-pages",
+            .andDo(document("put-bookshelf-pages",
                 requestHeaders(
                     headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
@@ -659,10 +662,12 @@ class BookShelfControllerTest extends ControllerTestExtension {
                     parameterWithName("bookId").description("Book Id")
                 ),
                 requestFields(
-                    fieldWithPath("pages").type(NUMBER).description("현재 읽고 있는 페이지 번호")
+                    fieldWithPath("pages").type(NUMBER).optional().description("현재 읽고 있는 페이지 번호"),
+                    fieldWithPath("star").type(STRING).optional().description("현재 책의 별점"),
+                    fieldWithPath("readingStatus").type(STRING).description("현재 책의 독서상태")
                 )));
 
-        verify(bookShelfService).changeReadingBookPage(any(), any(), any());
+        verify(bookShelfService).reviseBookShelf(any(), any(), any());
     }
 
     @Test
@@ -685,39 +690,79 @@ class BookShelfControllerTest extends ControllerTestExtension {
 
     @Test
     void 독서예정_책_독서중으로_변경_성공() throws Exception {
-        ChangeBookStatusRequest changeBookStatusRequest = new ChangeBookStatusRequest(
-            READING);
-        mockMvc.perform(patch("/v1/api/bookshelf/books/{bookId}/status", 1)
+        ReviseBookShelfRequest reviseBookShelfRequest = ReviseBookShelfRequest.builder()
+            .pages(null)
+            .star(null)
+            .readingStatus(READING)
+            .build();
+
+        mockMvc.perform(put("/v1/api/bookshelf/books/{bookId}", 1)
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
                 .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(changeBookStatusRequest)))
+                .content(objectMapper.writeValueAsString(reviseBookShelfRequest)))
             .andExpect(status().isOk())
-            .andDo(document("patch-bookshelf-book-status",
+            .andDo(document("put-bookshelf-status1",
                 requestHeaders(
                     headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
+                pathParameters(
+                    parameterWithName("bookId").description("Book Id")
+                ),
                 requestFields(
-                    fieldWithPath("readingStatus").type(STRING).description("변경할 상태")
+                    fieldWithPath("pages").type(NUMBER).optional().description("현재 읽고 있는 페이지 번호"),
+                    fieldWithPath("star").type(STRING).optional().description("현재 책의 별점"),
+                    fieldWithPath("readingStatus").type(STRING).description("변경할 독서상태")
+                )));
+
+        verify(bookShelfService).reviseBookShelf(any(), any(), any());
+    }
+
+    @Test
+    void 독서중_책_독서완료로_변경_성공() throws Exception {
+        ReviseBookShelfRequest reviseBookShelfRequest = ReviseBookShelfRequest.builder()
+            .pages(null)
+            .star(Optional.of(FOUR_HALF))
+            .readingStatus(COMPLETE)
+            .build();
+
+        mockMvc.perform(put("/v1/api/bookshelf/books/{bookId}", 1L)
+                .header(AUTHORIZATION, JWT_TOKEN)
+                .with(user(getUserPrincipal()))
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(reviseBookShelfRequest)))
+            .andExpect(status().isOk())
+            .andDo(document("put-bookshelf-status2",
+                requestHeaders(
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 pathParameters(
                     parameterWithName("bookId").description("Book Id")
+                ),
+                requestFields(
+                    fieldWithPath("pages").optional().description("현재 읽고 있는 페이지 번호"),
+                    fieldWithPath("star").optional().description("변경할 별점"),
+                    fieldWithPath("readingStatus").description("변경할 독서상태")
                 )));
 
-        verify(bookShelfService).changeBookStatusOnBookShelf(any(), any(), any());
+        verify(bookShelfService).reviseBookShelf(any(), any(), any());
     }
 
     @Test
     void 독서완료_책_별점_수정_성공() throws Exception {
-        ReviseBookShelfStarRequest reviseBookShelfStarRequest = ReviseBookShelfStarRequest.of(
-            FOUR);
-        mockMvc.perform(patch("/v1/api/bookshelf/books/{bookId}/star", 1L, 1L)
+        ReviseBookShelfRequest reviseBookShelfRequest = ReviseBookShelfRequest.builder()
+            .pages(null)
+            .star(Optional.of(FOUR_HALF))
+            .readingStatus(COMPLETE)
+            .build();
+
+        mockMvc.perform(put("/v1/api/bookshelf/books/{bookId}", 1L)
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
                 .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(reviseBookShelfStarRequest)))
+                .content(objectMapper.writeValueAsString(reviseBookShelfRequest)))
             .andExpect(status().isOk())
-            .andDo(document("patch-bookshelf-book-star",
+            .andDo(document("put-bookshelf-star",
                 requestHeaders(
                     headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
@@ -725,10 +770,12 @@ class BookShelfControllerTest extends ControllerTestExtension {
                     parameterWithName("bookId").description("Book Id")
                 ),
                 requestFields(
-                    fieldWithPath("star").description("별점")
+                    fieldWithPath("pages").optional().description("현재 읽고 있는 페이지 번호"),
+                    fieldWithPath("star").optional().description("변경할 별점"),
+                    fieldWithPath("readingStatus").description("현재 책의 독서상태")
                 )));
 
-        verify(bookShelfService).reviseBookStar(any(), any(), any());
+        verify(bookShelfService).reviseBookShelf(any(), any(), any());
     }
 
     @Test
