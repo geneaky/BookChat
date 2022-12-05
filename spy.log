@@ -94,3 +94,15 @@
 1670204631308|0|statement|connection 55|url jdbc:h2:mem:cc5ef593-8ec0-4b0f-96fe-c0b38a475e90|drop table if exists refresh_token CASCADE |drop table if exists refresh_token CASCADE 
 1670204631308|0|statement|connection 55|url jdbc:h2:mem:cc5ef593-8ec0-4b0f-96fe-c0b38a475e90|drop table if exists user CASCADE |drop table if exists user CASCADE 
 1670204631308|0|statement|connection 55|url jdbc:h2:mem:cc5ef593-8ec0-4b0f-96fe-c0b38a475e90|drop table if exists user_reading_tastes CASCADE |drop table if exists user_reading_tastes CASCADE 
+1670206480103|0|statement|connection 55|url jdbc:h2:mem:25e70b5c-4a65-4dc2-98a7-b1072a6d6415|drop table if exists access_ip CASCADE |drop table if exists access_ip CASCADE 
+1670206480104|0|statement|connection 55|url jdbc:h2:mem:25e70b5c-4a65-4dc2-98a7-b1072a6d6415|drop table if exists agony CASCADE |drop table if exists agony CASCADE 
+1670206480105|0|statement|connection 55|url jdbc:h2:mem:25e70b5c-4a65-4dc2-98a7-b1072a6d6415|drop table if exists agony_record CASCADE |drop table if exists agony_record CASCADE 
+1670206480105|0|statement|connection 55|url jdbc:h2:mem:25e70b5c-4a65-4dc2-98a7-b1072a6d6415|drop table if exists book CASCADE |drop table if exists book CASCADE 
+1670206480106|0|statement|connection 55|url jdbc:h2:mem:25e70b5c-4a65-4dc2-98a7-b1072a6d6415|drop table if exists book_authors CASCADE |drop table if exists book_authors CASCADE 
+1670206480106|0|statement|connection 55|url jdbc:h2:mem:25e70b5c-4a65-4dc2-98a7-b1072a6d6415|drop table if exists book_report CASCADE |drop table if exists book_report CASCADE 
+1670206480106|0|statement|connection 55|url jdbc:h2:mem:25e70b5c-4a65-4dc2-98a7-b1072a6d6415|drop table if exists book_shelf CASCADE |drop table if exists book_shelf CASCADE 
+1670206480107|0|statement|connection 55|url jdbc:h2:mem:25e70b5c-4a65-4dc2-98a7-b1072a6d6415|drop table if exists chat_room CASCADE |drop table if exists chat_room CASCADE 
+1670206480107|0|statement|connection 55|url jdbc:h2:mem:25e70b5c-4a65-4dc2-98a7-b1072a6d6415|drop table if exists chat_room_host CASCADE |drop table if exists chat_room_host CASCADE 
+1670206480107|0|statement|connection 55|url jdbc:h2:mem:25e70b5c-4a65-4dc2-98a7-b1072a6d6415|drop table if exists refresh_token CASCADE |drop table if exists refresh_token CASCADE 
+1670206480108|0|statement|connection 55|url jdbc:h2:mem:25e70b5c-4a65-4dc2-98a7-b1072a6d6415|drop table if exists user CASCADE |drop table if exists user CASCADE 
+1670206480108|0|statement|connection 55|url jdbc:h2:mem:25e70b5c-4a65-4dc2-98a7-b1072a6d6415|drop table if exists user_reading_tastes CASCADE |drop table if exists user_reading_tastes CASCADE 

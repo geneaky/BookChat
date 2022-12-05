@@ -233,6 +233,9 @@ class BookSearchServiceTest {
 
         BookSearchResponse bookSearchResponse = bookSearchService.searchByQuery(bookSearchRequest);
 
-        assertThat(bookSearchResponse.getBookResponses().size()).isOne();
+        assertAll(
+            () -> assertThat(bookSearchResponse.getBookResponses().size()).isOne(),
+            () -> assertThat(bookSearchResponse.getMeta().getTotal_count()).isOne()
+        );
     }
 }
