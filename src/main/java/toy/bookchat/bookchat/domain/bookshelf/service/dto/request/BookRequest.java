@@ -18,7 +18,7 @@ public class BookRequest {
     @NotBlank String isbn;
     @NotBlank String title;
     @Valid
-    @NotNull List<String> authors;
+    @NotNull List<@NotBlank String> authors;
     @NotBlank String publisher;
     @NotBlank String bookCoverImageUrl;
     @NotNull LocalDate publishAt;

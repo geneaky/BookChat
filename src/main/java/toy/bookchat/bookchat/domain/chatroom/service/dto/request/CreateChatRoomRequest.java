@@ -1,5 +1,6 @@
 package toy.bookchat.bookchat.domain.chatroom.service.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -12,6 +13,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import toy.bookchat.bookchat.domain.book.Book;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookRequest;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
 import toy.bookchat.bookchat.domain.chatroomhost.ChatRoomHost;
 
@@ -23,32 +25,18 @@ public class CreateChatRoomRequest {
     private String roomName;
     @Min(2)
     private Integer roomSize;
-    @NotBlank
-    private String isbn;
-    @NotBlank
-    private String title;
+    private List<String> hashTags;
     @Valid
     @NotNull
-    private List<@NotBlank String> authors;
-    @NotBlank
-    private String publisher;
-    @NotBlank
-    private String bookCoverImageUrl;
-    @NotNull
-    private LocalDate publishAt;
+    private BookRequest bookRequest;
 
     @Builder
-    public CreateChatRoomRequest(String roomName, Integer roomSize, String isbn, String title,
-        List<@NotBlank String> authors, String publisher, String bookCoverImageUrl,
-        LocalDate publishAt) {
+    public CreateChatRoomRequest(String roomName, Integer roomSize, List<String> hashTags,
+        BookRequest bookRequest) {
         this.roomName = roomName;
         this.roomSize = roomSize;
-        this.isbn = isbn;
-        this.title = title;
-        this.authors = authors;
-        this.publisher = publisher;
-        this.bookCoverImageUrl = bookCoverImageUrl;
-        this.publishAt = publishAt;
+        this.hashTags = hashTags;
+        this.bookRequest = bookRequest;
     }
 
     public ChatRoom makeChatRoom(Book book,
@@ -63,13 +51,16 @@ public class CreateChatRoomRequest {
     }
 
     public Book createBook() {
-        return Book.builder()
-            .isbn(this.isbn)
-            .title(this.title)
-            .publishAt(this.publishAt)
-            .publisher(this.publisher)
-            .authors(this.authors)
-            .bookCoverImageUrl(this.bookCoverImageUrl)
-            .build();
+        return this.bookRequest.extractBookEntity();
+    }
+
+    @JsonIgnore
+    public String getIsbn() {
+        return this.bookRequest.getIsbn();
+    }
+
+    @JsonIgnore
+    public LocalDate getPublishAt() {
+        return this.bookRequest.getPublishAt();
     }
 }

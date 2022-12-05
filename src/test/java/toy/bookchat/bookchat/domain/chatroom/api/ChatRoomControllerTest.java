@@ -34,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookRequest;
 import toy.bookchat.bookchat.domain.chatroom.service.ChatRoomService;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.CreateChatRoomRequest;
 import toy.bookchat.bookchat.domain.user.User;
@@ -90,15 +91,20 @@ class ChatRoomControllerTest extends ControllerTestExtension {
 
     @Test
     void 채팅방_생성_성공() throws Exception {
-        CreateChatRoomRequest createChatRoomRequest = CreateChatRoomRequest.builder()
-            .roomName("effective java 부수는 방")
-            .roomSize(5)
+        BookRequest bookRequest = BookRequest.builder()
             .isbn("124151214")
             .title("effective java")
             .publisher("insight")
             .bookCoverImageUrl("testImageUrl")
             .authors(List.of("joshua"))
             .publishAt(LocalDate.now())
+            .build();
+
+        CreateChatRoomRequest createChatRoomRequest = CreateChatRoomRequest.builder()
+            .roomName("effective java 부수는 방")
+            .roomSize(5)
+            .hashTags(List.of("Java", "스터디"))
+            .bookRequest(bookRequest)
             .build();
 
         mockMvc.perform(post("/v1/api/chatrooms")
@@ -114,12 +120,14 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                 requestFields(
                     fieldWithPath("roomName").type(STRING).description("채팅 방 이름"),
                     fieldWithPath("roomSize").type(NUMBER).description("채팅 방 인원 수"),
-                    fieldWithPath("isbn").type(STRING).description("ISBN 번호"),
-                    fieldWithPath("title").type(STRING).description("책 제목"),
-                    fieldWithPath("publisher").type(STRING).description("출판사"),
-                    fieldWithPath("bookCoverImageUrl").type(STRING).description("책 표지 이미지 url"),
-                    fieldWithPath("authors").type(ARRAY).description("저자 목록"),
-                    fieldWithPath("publishAt").type(STRING).description("출판일")
+                    fieldWithPath("hashTags").type(ARRAY).optional().description("해시 태그"),
+                    fieldWithPath("bookRequest.isbn").type(STRING).description("ISBN 번호"),
+                    fieldWithPath("bookRequest.title").type(STRING).description("책 제목"),
+                    fieldWithPath("bookRequest.publisher").type(STRING).description("출판사"),
+                    fieldWithPath("bookRequest.bookCoverImageUrl").type(STRING)
+                        .description("책 표지 이미지 url"),
+                    fieldWithPath("bookRequest.authors").type(ARRAY).description("저자 목록"),
+                    fieldWithPath("bookRequest.publishAt").type(STRING).description("출판일")
                 )));
 
         verify(chatRoomService).createChatRoom(any(), any());
