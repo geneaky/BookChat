@@ -7,6 +7,7 @@ import static toy.bookchat.bookchat.domain.common.RepositorySupport.extractOrder
 
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -15,7 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
-import toy.bookchat.bookchat.exception.book.BookNotFoundException;
 
 @Repository
 public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
@@ -25,7 +25,6 @@ public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
     public BookShelfQueryRepositoryImpl(JPAQueryFactory queryFactory) {
         this.queryFactory = queryFactory;
     }
-
 
     @Override
     public Page<BookShelf> findSpecificStatusBookByUserId(
@@ -49,18 +48,6 @@ public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
             .fetchOne();
 
         return new PageImpl<>(bookShelves, pageable, size);
-    }
-
-    @Override
-    public BookShelf findOneOnConditionByUserIdAndBookId(Long userId, Long bookId,
-        ReadingStatus readingStatus) {
-        return Optional.ofNullable(queryFactory.select(bookShelf)
-            .from(bookShelf).join(bookShelf.book, book).fetchJoin()
-            .where(bookShelf.readingStatus.eq(readingStatus)
-                .and(bookShelf.user.id.eq(userId))
-                .and(bookShelf.book.id.eq(bookId)))
-            .fetchOne()).orElseThrow(BookNotFoundException::new);
-
     }
 
     @Override
@@ -88,11 +75,13 @@ public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
     }
 
     @Override
-    public Optional<BookShelf> findByUserIdAndIsbn(Long userId, String isbn) {
+    public Optional<BookShelf> findByUserIdAndIsbnAndPublishAt(Long userId, String isbn,
+        LocalDate publishAt) {
         return Optional.ofNullable(queryFactory.select(bookShelf)
             .from(bookShelf).join(bookShelf.book, book).fetchJoin()
             .where(bookShelf.user.id.eq(userId)
-                .and(bookShelf.book.isbn.eq(isbn)))
+                .and(bookShelf.book.isbn.eq(isbn))
+                .and(bookShelf.book.publishAt.eq(publishAt)))
             .fetchOne());
     }
 }

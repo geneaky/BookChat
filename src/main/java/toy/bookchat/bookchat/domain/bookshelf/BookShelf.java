@@ -1,5 +1,9 @@
 package toy.bookchat.bookchat.domain.bookshelf;
 
+import static toy.bookchat.bookchat.domain.bookshelf.ReadingStatus.COMPLETE;
+import static toy.bookchat.bookchat.domain.bookshelf.ReadingStatus.READING;
+import static toy.bookchat.bookchat.domain.bookshelf.ReadingStatus.WISH;
+
 import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -99,7 +103,7 @@ public class BookShelf extends BaseEntity {
     }
 
     public void writeReportInStateOfCompleteReading(BookReport bookReport) {
-        this.readingStatus = ReadingStatus.COMPLETE;
+        this.readingStatus = COMPLETE;
         this.bookReport = bookReport;
     }
 
@@ -107,7 +111,19 @@ public class BookShelf extends BaseEntity {
         this.bookReport = null;
     }
 
-    public void changeStar(Star star) {
+    public void updateStar(Star star) {
         this.star = star;
+    }
+
+    public boolean isCompleteReading() {
+        return this.readingStatus == COMPLETE;
+    }
+
+    public boolean isReading() {
+        return this.readingStatus == READING;
+    }
+
+    public boolean isWish() {
+        return this.readingStatus == WISH;
     }
 }

@@ -1,21 +1,21 @@
 package toy.bookchat.bookchat.domain.bookshelf.api;
 
+import java.time.LocalDate;
 import javax.validation.Valid;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.service.BookShelfService;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookShelfRequest;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeBookStatusRequest;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeReadingBookPageRequest;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ReviseBookShelfStarRequest;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ReviseBookShelfRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.ExistenceBookOnBookShelfResponse;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.SearchBookShelfByReadingStatus;
 import toy.bookchat.bookchat.security.user.TokenPayload;
@@ -45,24 +45,21 @@ public class BookShelfController {
             tokenPayload.getUserId());
     }
 
-    // TODO: 2022/11/26 책쪽수 변경, 독서상태변경, 별점변경 api를 put 하나로 묶기
-    // TODO: 2022/11/26 서재에는 책이 1권씩만 있는데 이거에 맞춰 url을 바꾸기
-    @PatchMapping("/bookshelf/books/{bookId}/pages")
-    public void changeReadingBookPagesOnBookShelf(@PathVariable Long bookId,
-        @Valid @RequestBody ChangeReadingBookPageRequest changeReadingBookPageRequest,
+    @GetMapping("/bookshelf/books/existence")
+    public ExistenceBookOnBookShelfResponse findBookIfExistedOnBookShelf(String isbn,
+        @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate publishAt,
         @UserPayload TokenPayload tokenPayload) {
 
-        bookShelfService.changeReadingBookPage(changeReadingBookPageRequest,
-            tokenPayload.getUserId(), bookId);
+        return bookShelfService.getBookIfExisted(isbn, publishAt, tokenPayload.getUserId());
     }
 
-    @PatchMapping("/bookshelf/books/{bookId}/status")
-    public void changeBookStatusOnBookShelf(@PathVariable Long bookId,
-        @Valid @RequestBody ChangeBookStatusRequest changeBookStatusRequest,
+    @PutMapping("/bookshelf/books/{bookId}")
+    public void reviseBookOnBookShelf(@PathVariable Long bookId,
+        @Valid @RequestBody ReviseBookShelfRequest reviseBookShelfStarRequest,
         @UserPayload TokenPayload tokenPayload) {
 
-        bookShelfService.changeBookStatusOnBookShelf(changeBookStatusRequest,
-            tokenPayload.getUserId(), bookId);
+        bookShelfService.reviseBookShelf(bookId, reviseBookShelfStarRequest,
+            tokenPayload.getUserId());
     }
 
     @DeleteMapping("/bookshelf/books/{bookId}")
@@ -72,19 +69,4 @@ public class BookShelfController {
         bookShelfService.deleteBookOnBookShelf(bookId, tokenPayload.getUserId());
     }
 
-    @PatchMapping("/bookshelf/books/{bookId}/star")
-    public void changeBookStarOnBookShelf(@PathVariable Long bookId, @Valid @RequestBody
-    ReviseBookShelfStarRequest reviseBookShelfStarRequest,
-        @UserPayload TokenPayload tokenPayload) {
-
-        bookShelfService.reviseBookStar(bookId, tokenPayload.getUserId(),
-            reviseBookShelfStarRequest);
-    }
-
-    @GetMapping("/bookshelf/books/existence")
-    public ExistenceBookOnBookShelfResponse findBookIfExistedOnBookShelf(String isbn,
-        @UserPayload TokenPayload tokenPayload) {
-
-        return bookShelfService.getBookIfExisted(isbn, tokenPayload.getUserId());
-    }
 }
