@@ -15,7 +15,9 @@ import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.book.repository.BookRepository;
 import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomRepository;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.CreateChatRoomRequest;
+import toy.bookchat.bookchat.domain.chatroomhashtag.repository.ChatRoomHashTagRepository;
 import toy.bookchat.bookchat.domain.chatroomhost.repository.ChatRoomHostRepository;
+import toy.bookchat.bookchat.domain.hashtag.repository.HashTagRepository;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 
@@ -26,6 +28,10 @@ class ChatRoomServiceTest {
     ChatRoomRepository chatRoomRepository;
     @Mock
     ChatRoomHostRepository chatRoomHostRepository;
+    @Mock
+    HashTagRepository hashTagRepository;
+    @Mock
+    ChatRoomHashTagRepository chatRoomHashTagRepository;
     @Mock
     BookRepository bookRepository;
     @Mock
@@ -44,6 +50,8 @@ class ChatRoomServiceTest {
 
         verify(chatRoomRepository).save(any());
         verify(chatRoomHostRepository).save(any());
+        verify(hashTagRepository).save(any());
+        verify(chatRoomHashTagRepository).save(any());
     }
 
     @Test
@@ -55,5 +63,7 @@ class ChatRoomServiceTest {
         verify(bookRepository).save(any());
         verify(chatRoomRepository).save(any());
         verify(chatRoomHostRepository).save(any());
+        verify(hashTagRepository).save(any());
+        verify(chatRoomHashTagRepository).save(any());
     }
 }
