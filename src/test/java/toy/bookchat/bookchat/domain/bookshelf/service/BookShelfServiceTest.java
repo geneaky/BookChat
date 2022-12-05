@@ -30,6 +30,7 @@ import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.Star;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookShelfRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeBookStatusRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeReadingBookPageRequest;
@@ -68,24 +69,26 @@ class BookShelfServiceTest {
             .build();
     }
 
-    private BookShelfRequest getBookShelfRequest(ReadingStatus readingStatus) {
-        if (readingStatus == COMPLETE) {
-            return BookShelfRequest.builder()
-                .isbn("12345")
-                .title("testBook")
-                .authors(List.of("test Author"))
-                .publisher("test publisher")
-                .bookCoverImageUrl("test@naver.com")
-                .readingStatus(COMPLETE)
-                .star(THREE)
-                .build();
-        }
-        return BookShelfRequest.builder()
+    private BookRequest getBookRequest() {
+        return BookRequest.builder()
             .isbn("12345")
             .title("testBook")
             .authors(List.of("test Author"))
             .publisher("test publisher")
             .bookCoverImageUrl("test@naver.com")
+            .build();
+    }
+
+    private BookShelfRequest getBookShelfRequest(ReadingStatus readingStatus) {
+        if (readingStatus == COMPLETE) {
+            return BookShelfRequest.builder()
+                .bookRequest(getBookRequest())
+                .readingStatus(COMPLETE)
+                .star(THREE)
+                .build();
+        }
+        return BookShelfRequest.builder()
+            .bookRequest(getBookRequest())
             .readingStatus(READING)
             .build();
     }
@@ -131,13 +134,9 @@ class BookShelfServiceTest {
     }
 
     @Test
-    void 읽은_책_저장시_평점과_한줄평이_없으면_예외발생() throws Exception {
+    void 읽은_책_저장시_평점_없으면_예외발생() throws Exception {
         BookShelfRequest bookShelfRequest = BookShelfRequest.builder()
-            .isbn("12345")
-            .title("testBook")
-            .authors(List.of("test Author"))
-            .publisher("test publisher")
-            .bookCoverImageUrl("test@naver.com")
+            .bookRequest(getBookRequest())
             .readingStatus(COMPLETE)
             .build();
 

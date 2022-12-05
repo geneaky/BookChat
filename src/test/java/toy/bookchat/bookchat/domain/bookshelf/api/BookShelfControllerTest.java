@@ -57,6 +57,7 @@ import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.service.BookShelfService;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookShelfRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeBookStatusRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ChangeReadingBookPageRequest;
@@ -115,26 +116,27 @@ class BookShelfControllerTest extends ControllerTestExtension {
         return UserPrincipal.create(tokenPayload);
     }
 
-    private BookShelfRequest getBookShelfRequest(ReadingStatus readingStatus) {
-        if (readingStatus == COMPLETE) {
-            return BookShelfRequest.builder()
-                .isbn("124151214")
-                .title("effectiveJava")
-                .authors(List.of("Joshua"))
-                .publisher("oreilly")
-                .bookCoverImageUrl("bookCoverImage.com")
-                .publishAt(LocalDate.now())
-                .readingStatus(readingStatus)
-                .star(FOUR)
-                .build();
-        }
-        return BookShelfRequest.builder()
+    private BookRequest getBookRequest() {
+        return BookRequest.builder()
             .isbn("124151214")
             .title("effectiveJava")
             .authors(List.of("Joshua"))
             .publisher("oreilly")
             .bookCoverImageUrl("bookCoverImage.com")
             .publishAt(LocalDate.now())
+            .build();
+    }
+
+    private BookShelfRequest getBookShelfRequest(ReadingStatus readingStatus) {
+        if (readingStatus == COMPLETE) {
+            return BookShelfRequest.builder()
+                .bookRequest(getBookRequest())
+                .readingStatus(readingStatus)
+                .star(FOUR)
+                .build();
+        }
+        return BookShelfRequest.builder()
+            .bookRequest(getBookRequest())
             .readingStatus(readingStatus)
             .build();
     }
@@ -158,13 +160,13 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .andDo(document("bookshelf-reading",
                 requestHeaders(
                     headerWithName(AUTHORIZATION).description("Bearer [JWT token]")),
-                requestFields(fieldWithPath("isbn").description("ISBN"),
-                    fieldWithPath("title").type(STRING).description("제목"),
-                    fieldWithPath("authors[]").type(ARRAY).description("저자"),
-                    fieldWithPath("publisher").type(STRING).description("출판사"),
-                    fieldWithPath("bookCoverImageUrl").type(STRING).optional()
+                requestFields(fieldWithPath("bookRequest.isbn").description("ISBN"),
+                    fieldWithPath("bookRequest.title").type(STRING).description("제목"),
+                    fieldWithPath("bookRequest.authors[]").type(ARRAY).description("저자"),
+                    fieldWithPath("bookRequest.publisher").type(STRING).description("출판사"),
+                    fieldWithPath("bookRequest.bookCoverImageUrl").type(STRING).optional()
                         .description("책 커버 이미지 URI"),
-                    fieldWithPath("publishAt").type(STRING).description("출판일"),
+                    fieldWithPath("bookRequest.publishAt").type(STRING).description("출판일"),
                     fieldWithPath("readingStatus").type(STRING).description("READING"),
                     fieldWithPath("star").ignored())));
 
@@ -184,13 +186,13 @@ class BookShelfControllerTest extends ControllerTestExtension {
                 requestHeaders(
                     headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
-                requestFields(fieldWithPath("isbn").type(STRING).description("ISBN"),
-                    fieldWithPath("title").type(STRING).description("제목"),
-                    fieldWithPath("authors[]").type(ARRAY).description("저자"),
-                    fieldWithPath("publisher").type(STRING).description("출판사"),
-                    fieldWithPath("bookCoverImageUrl").type(STRING).optional()
+                requestFields(fieldWithPath("bookRequest.isbn").type(STRING).description("ISBN"),
+                    fieldWithPath("bookRequest.title").type(STRING).description("제목"),
+                    fieldWithPath("bookRequest.authors[]").type(ARRAY).description("저자"),
+                    fieldWithPath("bookRequest.publisher").type(STRING).description("출판사"),
+                    fieldWithPath("bookRequest.bookCoverImageUrl").type(STRING).optional()
                         .description("책 커버 이미지 URI"),
-                    fieldWithPath("publishAt").type(STRING).description("출판일"),
+                    fieldWithPath("bookRequest.publishAt").type(STRING).description("출판일"),
                     fieldWithPath("readingStatus").type(STRING).description("COMPLETE"),
                     fieldWithPath("star").type(STRING).description("평점"))));
 
@@ -210,13 +212,13 @@ class BookShelfControllerTest extends ControllerTestExtension {
                 requestHeaders(
                     headerWithName(AUTHORIZATION).description("Bearer [openid token]")
                 ),
-                requestFields(fieldWithPath("isbn").type(STRING).description("ISBN"),
-                    fieldWithPath("title").type(STRING).description("제목"),
-                    fieldWithPath("authors[]").type(ARRAY).description("저자"),
-                    fieldWithPath("publisher").type(STRING).description("출판사"),
-                    fieldWithPath("bookCoverImageUrl").type(STRING).optional()
+                requestFields(fieldWithPath("bookRequest.isbn").type(STRING).description("ISBN"),
+                    fieldWithPath("bookRequest.title").type(STRING).description("제목"),
+                    fieldWithPath("bookRequest.authors[]").type(ARRAY).description("저자"),
+                    fieldWithPath("bookRequest.publisher").type(STRING).description("출판사"),
+                    fieldWithPath("bookRequest.bookCoverImageUrl").type(STRING).optional()
                         .description("책 커버 이미지 URI"),
-                    fieldWithPath("publishAt").type(STRING).description("출판일"),
+                    fieldWithPath("bookRequest.publishAt").type(STRING).description("출판일"),
                     fieldWithPath("readingStatus").type(STRING).description("WISH"),
                     fieldWithPath("star").ignored())));
 
@@ -236,11 +238,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
     @Test
     void readingStatus_없이_요청_실패() throws Exception {
         BookShelfRequest bookShelfRequest = BookShelfRequest.builder()
-            .isbn("135135414")
-            .title("effectiveJava")
-            .authors(List.of("Joshua"))
-            .publisher("oreilly")
-            .bookCoverImageUrl("bookCoverImage.com")
+            .bookRequest(getBookRequest())
             .build();
 
         mockMvc.perform(post("/v1/api/bookshelf/books")
@@ -254,11 +252,14 @@ class BookShelfControllerTest extends ControllerTestExtension {
 
     @Test
     void isbn_없이_책_등록_요청_실패() throws Exception {
-        BookShelfRequest bookShelfRequest = BookShelfRequest.builder()
+        BookRequest bookRequest = BookRequest.builder()
             .title("effectiveJava")
             .authors(List.of("Joshua"))
             .publisher("oreilly")
             .bookCoverImageUrl("bookCoverImage.com")
+            .build();
+        BookShelfRequest bookShelfRequest = BookShelfRequest.builder()
+            .bookRequest(bookRequest)
             .readingStatus(WISH)
             .build();
 
@@ -272,12 +273,15 @@ class BookShelfControllerTest extends ControllerTestExtension {
 
     @Test
     void isbn_빈_문자열_요청_실패() throws Exception {
-        BookShelfRequest bookShelfRequest = BookShelfRequest.builder()
+        BookRequest bookRequest = BookRequest.builder()
             .isbn("")
             .title("effectiveJava")
             .authors(List.of("Joshua"))
             .publisher("oreilly")
             .bookCoverImageUrl("bookCoverImage.com")
+            .build();
+        BookShelfRequest bookShelfRequest = BookShelfRequest.builder()
+            .bookRequest(bookRequest)
             .readingStatus(WISH)
             .build();
 
@@ -291,11 +295,14 @@ class BookShelfControllerTest extends ControllerTestExtension {
 
     @Test
     void 제목_없이_요청_실패() throws Exception {
-        BookShelfRequest bookShelfRequest = BookShelfRequest.builder()
+        BookRequest bookRequest = BookRequest.builder()
             .isbn("124151214")
             .authors(List.of("Joshua"))
             .publisher("oreilly")
             .bookCoverImageUrl("bookCoverImage.com")
+            .build();
+        BookShelfRequest bookShelfRequest = BookShelfRequest.builder()
+            .bookRequest(bookRequest)
             .readingStatus(WISH)
             .build();
 
@@ -309,12 +316,16 @@ class BookShelfControllerTest extends ControllerTestExtension {
 
     @Test
     void 제목_빈_문자열_요청_실패() throws Exception {
-        BookShelfRequest bookShelfRequest = BookShelfRequest.builder()
+        BookRequest bookRequest = BookRequest.builder()
             .isbn("124151214")
             .title("")
             .authors(List.of("Joshua"))
             .publisher("oreilly")
             .bookCoverImageUrl("bookCoverImage.com")
+            .build();
+
+        BookShelfRequest bookShelfRequest = BookShelfRequest.builder()
+            .bookRequest(bookRequest)
             .readingStatus(WISH)
             .build();
 
@@ -328,11 +339,15 @@ class BookShelfControllerTest extends ControllerTestExtension {
 
     @Test
     void 작가명_없이_요청_실패() throws Exception {
-        BookShelfRequest bookShelfRequest = BookShelfRequest.builder()
+        BookRequest bookRequest = BookRequest.builder()
             .isbn("124151214")
             .title("effectiveJava")
             .publisher("oreilly")
             .bookCoverImageUrl("bookCoverImage.com")
+            .build();
+
+        BookShelfRequest bookShelfRequest = BookShelfRequest.builder()
+            .bookRequest(bookRequest)
             .readingStatus(WISH)
             .build();
 
@@ -346,12 +361,16 @@ class BookShelfControllerTest extends ControllerTestExtension {
 
     @Test
     void 작가명_빈_문자열_요청_실패() throws Exception {
-        BookShelfRequest bookShelfRequest = BookShelfRequest.builder()
+        BookRequest bookRequest = BookRequest.builder()
             .isbn("124151214")
             .title("effectiveJava")
             .authors(List.of(""))
             .publisher("oreilly")
             .bookCoverImageUrl("bookCoverImage.com")
+            .build();
+
+        BookShelfRequest bookShelfRequest = BookShelfRequest.builder()
+            .bookRequest(bookRequest)
             .readingStatus(WISH)
             .build();
 
@@ -365,11 +384,15 @@ class BookShelfControllerTest extends ControllerTestExtension {
 
     @Test
     void 출판사_없이_요청_실패() throws Exception {
-        BookShelfRequest bookShelfRequest = BookShelfRequest.builder()
+        BookRequest bookRequest = BookRequest.builder()
             .isbn("124151214")
             .title("effectiveJava")
             .authors(List.of("Joshua"))
             .bookCoverImageUrl("bookCoverImage.com")
+            .build();
+
+        BookShelfRequest bookShelfRequest = BookShelfRequest.builder()
+            .bookRequest(bookRequest)
             .readingStatus(WISH)
             .build();
 
@@ -383,12 +406,16 @@ class BookShelfControllerTest extends ControllerTestExtension {
 
     @Test
     void 출판사_빈_문자열_요청_실패() throws Exception {
-        BookShelfRequest bookShelfRequest = BookShelfRequest.builder()
+        BookRequest bookRequest = BookRequest.builder()
             .isbn("124151214")
             .title("effectiveJava")
             .authors(List.of("Joshua"))
             .publisher("")
             .bookCoverImageUrl("bookCoverImage.com")
+            .build();
+
+        BookShelfRequest bookShelfRequest = BookShelfRequest.builder()
+            .bookRequest(bookRequest)
             .readingStatus(WISH)
             .build();
 

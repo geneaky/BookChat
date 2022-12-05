@@ -46,7 +46,7 @@ public class BookShelfService {
 
     private BookShelf createBookShelfByReadingStatus(BookShelfRequest bookShelfRequest,
         Book book, User user) {
-        if (bookShelfRequest.isFinishedReadingiriri()) {
+        if (bookShelfRequest.isCompleteReading()) {
             return BookShelf.builder()
                 .book(book)
                 .readingStatus(bookShelfRequest.getReadingStatus())
