@@ -15,7 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
-import toy.bookchat.bookchat.exception.book.BookNotFoundException;
 
 @Repository
 public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
@@ -25,7 +24,6 @@ public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
     public BookShelfQueryRepositoryImpl(JPAQueryFactory queryFactory) {
         this.queryFactory = queryFactory;
     }
-
 
     @Override
     public Page<BookShelf> findSpecificStatusBookByUserId(
@@ -49,18 +47,6 @@ public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
             .fetchOne();
 
         return new PageImpl<>(bookShelves, pageable, size);
-    }
-
-    @Override
-    public BookShelf findOneOnConditionByUserIdAndBookId(Long userId, Long bookId,
-        ReadingStatus readingStatus) {
-        return Optional.ofNullable(queryFactory.select(bookShelf)
-            .from(bookShelf).join(bookShelf.book, book).fetchJoin()
-            .where(bookShelf.readingStatus.eq(readingStatus)
-                .and(bookShelf.user.id.eq(userId))
-                .and(bookShelf.book.id.eq(bookId)))
-            .fetchOne()).orElseThrow(BookNotFoundException::new);
-
     }
 
     @Override

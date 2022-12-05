@@ -39,6 +39,7 @@ public class BookShelfService {
                 bookShelfRequest.getPublishAt())
             .orElseGet(() -> bookRepository.save(bookShelfRequest.extractBookEntity()));
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+
         bookShelfRepository.save(createBookShelfByReadingStatus(bookShelfRequest, book, user));
     }
 
@@ -52,7 +53,6 @@ public class BookShelfService {
                 .star(bookShelfRequest.getStar())
                 .build();
         }
-
         return BookShelf.builder()
             .book(book)
             .readingStatus(bookShelfRequest.getReadingStatus())
@@ -92,7 +92,6 @@ public class BookShelfService {
 
     @Transactional
     public void deleteBookOnBookShelf(Long bookId, Long userId) {
-
         bookShelfRepository.deleteBookByUserIdAndBookId(userId,
             bookId);
     }

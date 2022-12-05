@@ -1,7 +1,6 @@
 package toy.bookchat.bookchat.domain.bookshelf.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -18,7 +17,6 @@ import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.Star;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
-import toy.bookchat.bookchat.exception.book.BookNotFoundException;
 
 @RepositoryTest
 class BookShelfRepositoryTest {
@@ -177,37 +175,6 @@ class BookShelfRepositoryTest {
         List<BookShelf> bookShelves = pagingBookShelves.getContent();
         int result = bookShelves.size();
         assertThat(result).isEqualTo(2);
-    }
-
-    @Test
-    void 읽고있는_책_book_id로_조회성공() throws Exception {
-        Book book = getBook("1-4133-0454-0");
-
-        bookRepository.save(book);
-
-        User user = User.builder().name("hi").build();
-        userRepository.save(user);
-
-        BookShelf bookShelf = BookShelf.builder()
-            .book(book)
-            .user(user)
-            .readingStatus(ReadingStatus.READING)
-            .star(null)
-            .build();
-
-        bookShelfRepository.save(bookShelf);
-
-        BookShelf readingBook = bookShelfRepository.findOneOnConditionByUserIdAndBookId(
-            user.getId(), book.getId(), ReadingStatus.READING);
-
-        assertThat(readingBook).isNotNull();
-    }
-
-    @Test
-    void 읽고있는_책_book_id로_조회시_없으면_예외발생() throws Exception {
-        assertThatThrownBy(() -> {
-            bookShelfRepository.findOneOnConditionByUserIdAndBookId(1L, 1L, ReadingStatus.READING);
-        }).isInstanceOf(BookNotFoundException.class);
     }
 
     @Test
