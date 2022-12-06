@@ -1,10 +1,12 @@
 package toy.bookchat.bookchat.domain.chatroom.api;
 
+import java.util.Optional;
 import javax.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import toy.bookchat.bookchat.domain.chatroom.service.ChatRoomService;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.CreateChatRoomRequest;
 import toy.bookchat.bookchat.security.user.TokenPayload;
@@ -22,8 +24,10 @@ public class ChatRoomController {
     }
 
     @PostMapping("/chatrooms")
-    public void createChatRoom(@Valid @RequestBody CreateChatRoomRequest createChatRoomRequest,
+    public void createChatRoom(@Valid @RequestPart CreateChatRoomRequest createChatRoomRequest,
+        @RequestPart Optional<MultipartFile> chatRoomImage,
         @UserPayload TokenPayload tokenPayload) {
-        chatRoomService.createChatRoom(createChatRoomRequest, tokenPayload.getUserId());
+        chatRoomService.createChatRoom(createChatRoomRequest, chatRoomImage,
+            tokenPayload.getUserId());
     }
 }

@@ -1,7 +1,9 @@
 package toy.bookchat.bookchat.domain.chatroom.service;
 
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.book.repository.BookRepository;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
@@ -13,6 +15,7 @@ import toy.bookchat.bookchat.domain.chatroomhost.ChatRoomHost;
 import toy.bookchat.bookchat.domain.chatroomhost.repository.ChatRoomHostRepository;
 import toy.bookchat.bookchat.domain.hashtag.HashTag;
 import toy.bookchat.bookchat.domain.hashtag.repository.HashTagRepository;
+import toy.bookchat.bookchat.domain.storage.StorageService;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.exception.user.UserNotFoundException;
@@ -21,6 +24,7 @@ import toy.bookchat.bookchat.exception.user.UserNotFoundException;
 public class ChatRoomService {
 
     private final ChatRoomRepository chatRoomRepository;
+    private final StorageService storageService;
     private final ChatRoomHostRepository chatRoomHostRepository;
     private final HashTagRepository hashTagRepository;
     private final ChatRoomHashTagRepository chatRoomHashTagRepository;
@@ -29,12 +33,14 @@ public class ChatRoomService {
 
     public ChatRoomService(
         ChatRoomRepository chatRoomRepository,
+        StorageService storageService,
         ChatRoomHostRepository chatRoomHostRepository,
         HashTagRepository hashTagRepository,
         ChatRoomHashTagRepository chatRoomHashTagRepository,
         BookRepository bookRepository,
         UserRepository userRepository) {
         this.chatRoomRepository = chatRoomRepository;
+        this.storageService = storageService;
         this.chatRoomHostRepository = chatRoomHostRepository;
         this.hashTagRepository = hashTagRepository;
         this.chatRoomHashTagRepository = chatRoomHashTagRepository;
@@ -43,7 +49,8 @@ public class ChatRoomService {
     }
 
     @Transactional
-    public void createChatRoom(CreateChatRoomRequest createChatRoomRequest, Long userId) {
+    public void createChatRoom(CreateChatRoomRequest createChatRoomRequest,
+        Optional<MultipartFile> chatRoomImage, Long userId) {
         Book book = bookRepository.findByIsbnAndPublishAt(createChatRoomRequest.getIsbn(),
                 createChatRoomRequest.getPublishAt())
             .orElseGet(() -> bookRepository.save(createChatRoomRequest.createBook()));

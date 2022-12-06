@@ -1,19 +1,26 @@
 package toy.bookchat.bookchat.domain.chatroom.api;
 
 import static io.jsonwebtoken.SignatureAlgorithm.HS256;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.multipart;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestPartFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static toy.bookchat.bookchat.domain.common.AuthConstants.BEARER;
@@ -32,6 +39,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookRequest;
@@ -103,23 +111,35 @@ class ChatRoomControllerTest extends ControllerTestExtension {
         CreateChatRoomRequest createChatRoomRequest = CreateChatRoomRequest.builder()
             .roomName("effective java 부수는 방")
             .roomSize(5)
+            .defaultRoomImageType(1)
             .hashTags(List.of("Java", "스터디"))
             .bookRequest(bookRequest)
             .build();
 
-        mockMvc.perform(post("/v1/api/chatrooms")
+        MockMultipartFile chatRoomImagePart = new MockMultipartFile("chatRoomImage", "",
+            "image/webp", "test".getBytes());
+        MockMultipartFile createChatRoomRequestPart = new MockMultipartFile("createChatRoomRequest",
+            "", APPLICATION_JSON_VALUE,
+            objectMapper.writeValueAsString(createChatRoomRequest).getBytes(UTF_8));
+
+        mockMvc.perform(multipart("/v1/api/chatrooms")
+                .file(chatRoomImagePart)
+                .file(createChatRoomRequestPart)
                 .header(AUTHORIZATION, JWT_TOKEN)
-                .with(user(getUserPrincipal()))
-                .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(createChatRoomRequest)))
+                .with(user(getUserPrincipal())))
             .andExpect(status().isOk())
             .andDo(document("post-chatroom",
                 requestHeaders(
                     headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
-                requestFields(
+                requestParts(
+                    partWithName("createChatRoomRequest").description("채팅방 생성 폼"),
+                    partWithName("chatRoomImage").optional().description("채팅방 이미지 [200x200].webp")
+                ),
+                requestPartFields("createChatRoomRequest",
                     fieldWithPath("roomName").type(STRING).description("채팅 방 이름"),
                     fieldWithPath("roomSize").type(NUMBER).description("채팅 방 인원 수"),
+                    fieldWithPath("defaultRoomImageType").type(NUMBER).description("기본 이미지 타입 번호"),
                     fieldWithPath("hashTags").type(ARRAY).optional().description("해시 태그"),
                     fieldWithPath("bookRequest.isbn").type(STRING).description("ISBN 번호"),
                     fieldWithPath("bookRequest.title").type(STRING).description("책 제목"),
@@ -130,6 +150,36 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                     fieldWithPath("bookRequest.publishAt").type(STRING).description("출판일")
                 )));
 
-        verify(chatRoomService).createChatRoom(any(), any());
+        verify(chatRoomService).createChatRoom(any(), any(), any());
+    }
+
+    @Test
+    void 사용자의_채팅방_목록_조회_성공() throws Exception {
+        mockMvc.perform(get("/v1/api/users/chatrooms")
+                .header(AUTHORIZATION, JWT_TOKEN)
+                .with(user(getUserPrincipal()))
+                .param("postChatRoomCursorId", "0")
+                .param("page", "0")
+                .param("size", "3")
+                .param("sort", "id,DESC"))
+            .andExpect(status().isOk())
+            .andDo(document("get-user-chatrooms",
+                requestHeaders(
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
+                ),
+                requestParameters(
+                    parameterWithName("page").optional().description("페이지 번호"),
+                    parameterWithName("size").optional().description("페이지 사이즈"),
+                    parameterWithName("sort").optional().description("정렬 기준 id [ASC,DESC]")
+                ),
+                responseFields(
+                    fieldWithPath("userChatRooms[].roomName").type(STRING).description("채팅방 이름"),
+                    fieldWithPath("userChatRooms[].roomImage").type(STRING).description("채팅방 이미지"),
+                    fieldWithPath("userChatRooms[].lastActiveTime").type(STRING)
+                        .description("마지막 채팅 활성 시간"),
+                    fieldWithPath("userChatRooms[].lastChatContent").type(STRING)
+                        .description("마지막 채팅 내용")
+                ),
+                responseFields(getCursorField())));
     }
 }

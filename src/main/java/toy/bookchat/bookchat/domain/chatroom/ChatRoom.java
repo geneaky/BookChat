@@ -21,6 +21,8 @@ public class ChatRoom extends BaseEntity {
     private String roomName;
     private String roomSID;
     private Integer roomSize;
+    private Integer defaultRoomImageType;
+    private String roomImageUri;
     @ManyToOne(fetch = FetchType.LAZY)
     private Book book;
     @OneToOne(fetch = FetchType.LAZY)
@@ -31,11 +33,14 @@ public class ChatRoom extends BaseEntity {
 
     @Builder
     private ChatRoom(Long id, String roomName, String roomSID, Integer roomSize,
-        Book book, ChatRoomHost chatRoomHost) {
+        Integer defaultRoomImageType, String roomImageUri, Book book,
+        ChatRoomHost chatRoomHost) {
         this.id = id;
         this.roomName = roomName;
         this.roomSID = roomSID;
         this.roomSize = roomSize;
+        this.defaultRoomImageType = defaultRoomImageType;
+        this.roomImageUri = roomImageUri;
         this.book = book;
         this.chatRoomHost = chatRoomHost;
     }

@@ -635,7 +635,12 @@ include::{snippets}/post-chatroom/request-headers.adoc[]
 
 `Request`
 
-include::{snippets}/post-chatroom/request-fields.adoc[]
+****
+include::{snippets}/post-chatroom/request-parts.adoc[]
+`createChatRoomRequest`
+include::{snippets}/post-chatroom/request-part-createChatRoomRequest-fields.adoc[]
+****
+
 include::{snippets}/post-chatroom/http-request.adoc[]
 
 `Resposne`

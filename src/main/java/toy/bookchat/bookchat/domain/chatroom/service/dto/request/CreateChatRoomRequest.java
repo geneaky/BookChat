@@ -25,16 +25,20 @@ public class CreateChatRoomRequest {
     private String roomName;
     @Min(2)
     private Integer roomSize;
+    @NotNull
+    private Integer defaultRoomImageType;
     private List<String> hashTags;
     @Valid
     @NotNull
     private BookRequest bookRequest;
 
     @Builder
-    public CreateChatRoomRequest(String roomName, Integer roomSize, List<String> hashTags,
+    public CreateChatRoomRequest(String roomName, Integer roomSize, Integer defaultRoomImageType,
+        List<String> hashTags,
         BookRequest bookRequest) {
         this.roomName = roomName;
         this.roomSize = roomSize;
+        this.defaultRoomImageType = defaultRoomImageType;
         this.hashTags = hashTags;
         this.bookRequest = bookRequest;
     }
@@ -46,6 +50,7 @@ public class CreateChatRoomRequest {
             .roomSID(UUID.randomUUID().toString())
             .roomName(this.roomName)
             .roomSize(this.roomSize)
+            .defaultRoomImageType(this.defaultRoomImageType)
             .chatRoomHost(chatRoomHost)
             .build();
     }
