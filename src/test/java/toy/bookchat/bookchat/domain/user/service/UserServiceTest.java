@@ -67,7 +67,7 @@ class UserServiceTest {
         when(imageValidator.hasValidImage(any())).thenReturn(true);
         when(userSignUpRequest.getUser(any(), any(), any())).thenReturn(mockUser);
 
-        userService.registerNewUser(userSignUpRequest, multipartFile, "memberNumber",
+        userService.registerNewUser(userSignUpRequest, Optional.of(multipartFile), "memberNumber",
             "test@gmail.com");
 
         verify(userRepository).save(any(User.class));
@@ -83,7 +83,8 @@ class UserServiceTest {
         when(userRepository.findByName(any())).thenReturn(Optional.of(mockUser));
 
         assertThatThrownBy(() -> {
-            userService.registerNewUser(userSignUpRequest, multipartFile, "testMemberNumber",
+            userService.registerNewUser(userSignUpRequest, Optional.empty(),
+                "testMemberNumber",
                 "test@gmail.com"
             );
         }).isInstanceOf(UserAlreadySignUpException.class);

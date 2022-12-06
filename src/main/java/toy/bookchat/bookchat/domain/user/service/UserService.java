@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Consumer;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -46,18 +47,26 @@ public class UserService {
 
     @Transactional
     public void registerNewUser(UserSignUpRequest userSignUpRequest,
-        MultipartFile userProfileImage, String userName, String userEmail) {
-        if (imageValidator.hasValidImage(userProfileImage)) {
-            String prefixedUUIDFileName = createFileName(userProfileImage);
-            String prefixedUUIDFileUrl = createFileUrl(prefixedUUIDFileName);
+        Optional<MultipartFile> userProfileImage, String userName, String userEmail) {
+        userProfileImage.ifPresentOrElse(uploadWithImage(userSignUpRequest, userName, userEmail),
+            uploadWithoutImage(userSignUpRequest, userName, userEmail));
+    }
 
-            saveUser(userSignUpRequest, userName, userEmail, prefixedUUIDFileUrl);
+    private Runnable uploadWithoutImage(UserSignUpRequest userSignUpRequest, String userName,
+        String userEmail) {
+        return () -> saveUser(userSignUpRequest, userName, userEmail, null);
+    }
 
-            storageService.upload(userProfileImage, prefixedUUIDFileName);
-            return;
-        }
-
-        saveUser(userSignUpRequest, userName, userEmail, null);
+    private Consumer<MultipartFile> uploadWithImage(UserSignUpRequest userSignUpRequest,
+        String userName, String userEmail) {
+        return (image) -> {
+            if (imageValidator.hasValidImage(image)) {
+                String prefixedUUIDFileName = createFileName(image);
+                String prefixedUUIDFileUrl = createFileUrl(prefixedUUIDFileName);
+                saveUser(userSignUpRequest, userName, userEmail, prefixedUUIDFileUrl);
+                storageService.upload(image, prefixedUUIDFileName);
+            }
+        };
     }
 
     private String createFileUrl(String prefixedUUIDFileName) {
@@ -93,8 +102,7 @@ public class UserService {
 
     private void saveUser(UserSignUpRequest userSignUpRequest, String userName,
         String email, String profileImageUrl) {
-        Optional<User> optionalUser = userRepository.findByName(userName);
-        optionalUser.ifPresentOrElse(user -> {
+        userRepository.findByName(userName).ifPresentOrElse(user -> {
             throw new UserAlreadySignUpException();
         }, () -> {
             User user = userSignUpRequest.getUser(userName, email, profileImageUrl);
