@@ -11,7 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import toy.bookchat.bookchat.config.JwtTokenConfig;
+import toy.bookchat.bookchat.config.JwtTokenProperties;
 import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.api.dto.Token;
@@ -24,7 +24,7 @@ import toy.bookchat.bookchat.security.user.TokenPayload;
 class JwtTokenTest {
 
     @Mock
-    JwtTokenConfig jwtTokenConfig;
+    JwtTokenProperties jwtTokenProperties;
 
     @InjectMocks
     JwtTokenProvider jwtTokenProvider;
@@ -52,9 +52,9 @@ class JwtTokenTest {
 
     @Test
     void 만료된_토큰에서_사용자이름_추출시_예외발생() throws Exception {
-        when(jwtTokenConfig.getSecret()).thenReturn("test");
-        when(jwtTokenConfig.getAccessTokenExpiredTime()).thenReturn(0L);
-        when(jwtTokenConfig.getRefreshTokenExpiredTime()).thenReturn(0L);
+        when(jwtTokenProperties.getSecret()).thenReturn("test");
+        when(jwtTokenProperties.getAccessTokenExpiredTime()).thenReturn(0L);
+        when(jwtTokenProperties.getRefreshTokenExpiredTime()).thenReturn(0L);
 
         User user = getUser();
 
@@ -62,21 +62,21 @@ class JwtTokenTest {
 
         assertThatThrownBy(() -> {
             JwtToken jwtToken = JwtToken.of(token.getAccessToken());
-            jwtToken.getOAuth2MemberNumber(jwtTokenConfig.getSecret());
+            jwtToken.getOAuth2MemberNumber(jwtTokenProperties.getSecret());
         }).isInstanceOf(ExpiredTokenException.class);
     }
 
     @Test
     void 유효하지않은_토큰에서_사용자이름_추출시_예외발생() throws Exception {
-        when(jwtTokenConfig.getSecret()).thenReturn("test");
-        when(jwtTokenConfig.getAccessTokenExpiredTime()).thenReturn(8888888L);
-        when(jwtTokenConfig.getRefreshTokenExpiredTime()).thenReturn(999999999L);
+        when(jwtTokenProperties.getSecret()).thenReturn("test");
+        when(jwtTokenProperties.getAccessTokenExpiredTime()).thenReturn(8888888L);
+        when(jwtTokenProperties.getRefreshTokenExpiredTime()).thenReturn(999999999L);
 
         Token token = jwtTokenProvider.createToken(getUser());
 
         assertThatThrownBy(() -> {
             JwtToken jwtToken = JwtToken.of(token.getAccessToken() + "bug");
-            jwtToken.getOAuth2MemberNumber(jwtTokenConfig.getSecret());
+            jwtToken.getOAuth2MemberNumber(jwtTokenProperties.getSecret());
         }).isInstanceOf(DenidedTokenException.class);
     }
 
@@ -116,8 +116,8 @@ class JwtTokenTest {
     }
 
     private void generalTokenConfigContext() {
-        when(jwtTokenConfig.getSecret()).thenReturn("test");
-        when(jwtTokenConfig.getAccessTokenExpiredTime()).thenReturn(888888888L);
-        when(jwtTokenConfig.getRefreshTokenExpiredTime()).thenReturn(999999999L);
+        when(jwtTokenProperties.getSecret()).thenReturn("test");
+        when(jwtTokenProperties.getAccessTokenExpiredTime()).thenReturn(888888888L);
+        when(jwtTokenProperties.getRefreshTokenExpiredTime()).thenReturn(999999999L);
     }
 }

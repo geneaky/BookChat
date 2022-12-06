@@ -1,6 +1,7 @@
 package toy.bookchat.bookchat.domain.chatroom.service;
 
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,7 +16,7 @@ import toy.bookchat.bookchat.domain.chatroomhost.ChatRoomHost;
 import toy.bookchat.bookchat.domain.chatroomhost.repository.ChatRoomHostRepository;
 import toy.bookchat.bookchat.domain.hashtag.HashTag;
 import toy.bookchat.bookchat.domain.hashtag.repository.HashTagRepository;
-import toy.bookchat.bookchat.domain.storage.ChatRoomStorageService;
+import toy.bookchat.bookchat.domain.storage.StorageService;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.exception.user.UserNotFoundException;
@@ -27,7 +28,7 @@ public class ChatRoomService {
     private final ChatRoomHostRepository chatRoomHostRepository;
     private final HashTagRepository hashTagRepository;
     private final ChatRoomHashTagRepository chatRoomHashTagRepository;
-    private final ChatRoomStorageService chatRoomStorageService;
+    private final StorageService storageService;
     private final BookRepository bookRepository;
     private final UserRepository userRepository;
 
@@ -36,14 +37,14 @@ public class ChatRoomService {
         ChatRoomHostRepository chatRoomHostRepository,
         HashTagRepository hashTagRepository,
         ChatRoomHashTagRepository chatRoomHashTagRepository,
-        ChatRoomStorageService chatRoomStorageService,
+        @Qualifier("chatRoomStorageService") StorageService storageService,
         BookRepository bookRepository,
         UserRepository userRepository) {
         this.chatRoomRepository = chatRoomRepository;
         this.chatRoomHostRepository = chatRoomHostRepository;
         this.hashTagRepository = hashTagRepository;
         this.chatRoomHashTagRepository = chatRoomHashTagRepository;
-        this.chatRoomStorageService = chatRoomStorageService;
+        this.storageService = storageService;
         this.bookRepository = bookRepository;
         this.userRepository = userRepository;
     }

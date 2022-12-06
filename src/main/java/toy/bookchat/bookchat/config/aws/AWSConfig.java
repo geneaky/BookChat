@@ -10,19 +10,20 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class AWSConfig {
 
-    private final S3Config s3Config;
+    private final StorageProperties storageProperties;
 
-    public AWSConfig(S3Config s3Config) {
-        this.s3Config = s3Config;
+    public AWSConfig(StorageProperties storageProperties) {
+        this.storageProperties = storageProperties;
     }
 
     @Bean
     public AmazonS3Client amazonS3Client() {
-        BasicAWSCredentials basicAWSCredentials = new BasicAWSCredentials(s3Config.getAccessKey(),
-            s3Config.getSecretKey());
+        BasicAWSCredentials basicAWSCredentials = new BasicAWSCredentials(
+            storageProperties.getAccessKey(),
+            storageProperties.getSecretKey());
         return (AmazonS3Client) AmazonS3ClientBuilder
             .standard()
-            .withRegion(s3Config.getRegion())
+            .withRegion(storageProperties.getRegion())
             .withCredentials(new AWSStaticCredentialsProvider(basicAWSCredentials))
             .build();
     }

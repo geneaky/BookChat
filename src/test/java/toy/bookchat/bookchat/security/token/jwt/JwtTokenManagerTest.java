@@ -15,7 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import toy.bookchat.bookchat.config.JwtTokenConfig;
+import toy.bookchat.bookchat.config.JwtTokenProperties;
 import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.api.dto.Token;
@@ -26,7 +26,7 @@ import toy.bookchat.bookchat.security.user.TokenPayload;
 class JwtTokenManagerTest {
 
     @Mock
-    JwtTokenConfig jwtTokenConfig;
+    JwtTokenProperties jwtTokenProperties;
 
     @InjectMocks
     JwtTokenProvider jwtTokenProvider;
@@ -70,9 +70,9 @@ class JwtTokenManagerTest {
     }
 
     private void generalTokenConfigContext() {
-        when(jwtTokenConfig.getSecret()).thenReturn("test");
-        when(jwtTokenConfig.getAccessTokenExpiredTime()).thenReturn(1111111L);
-        when(jwtTokenConfig.getRefreshTokenExpiredTime()).thenReturn(2222222L);
+        when(jwtTokenProperties.getSecret()).thenReturn("test");
+        when(jwtTokenProperties.getAccessTokenExpiredTime()).thenReturn(1111111L);
+        when(jwtTokenProperties.getRefreshTokenExpiredTime()).thenReturn(2222222L);
     }
 
     @Test
@@ -102,8 +102,8 @@ class JwtTokenManagerTest {
 
     @Test
     void 리프레시토큰_재발급_가능여부_판단_성공() throws Exception {
-        when(jwtTokenConfig.getSecret()).thenReturn("test");
-        when(jwtTokenConfig.getReissuePeriod()).thenReturn(259200000L);
+        when(jwtTokenProperties.getSecret()).thenReturn("test");
+        when(jwtTokenProperties.getReissuePeriod()).thenReturn(259200000L);
 
         String userName = "wRPN";
         String userEmail = "C1Rk6A9";

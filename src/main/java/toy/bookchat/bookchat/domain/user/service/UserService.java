@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,7 +32,7 @@ public class UserService {
     public UserService(UserRepository userRepository,
         BookShelfService bookShelfService,
         AgonyService agonyService,
-        StorageService storageService,
+        @Qualifier("userProfileStorageService") StorageService storageService,
         ImageValidator imageValidator) {
         this.userRepository = userRepository;
         this.bookShelfService = bookShelfService;
