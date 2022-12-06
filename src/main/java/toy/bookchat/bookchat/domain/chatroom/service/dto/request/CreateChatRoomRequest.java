@@ -47,7 +47,7 @@ public class CreateChatRoomRequest {
         ChatRoomHost chatRoomHost, String fileUrl) {
         return ChatRoom.builder()
             .book(book)
-            .roomSID(UUID.randomUUID().toString())
+            .roomSid(UUID.randomUUID().toString())
             .roomName(this.roomName)
             .roomSize(this.roomSize)
             .defaultRoomImageType(this.defaultRoomImageType)

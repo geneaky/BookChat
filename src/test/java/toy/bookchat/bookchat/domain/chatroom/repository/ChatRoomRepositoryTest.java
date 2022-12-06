@@ -18,7 +18,7 @@ class ChatRoomRepositoryTest {
         ChatRoom chatRoom = ChatRoom.builder()
             .roomName("test room")
             .roomSize(5)
-            .roomSID("test sid")
+            .roomSid("test sid")
             .build();
 
         ChatRoom findChatRoom = chatRoomRepository.save(chatRoom);

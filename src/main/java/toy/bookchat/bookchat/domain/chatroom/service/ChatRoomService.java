@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,6 +15,7 @@ import toy.bookchat.bookchat.domain.book.repository.BookRepository;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
 import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomRepository;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.CreateChatRoomRequest;
+import toy.bookchat.bookchat.domain.chatroom.service.dto.response.SliceOfChatRoomsResponse;
 import toy.bookchat.bookchat.domain.chatroomhashtag.ChatRoomHashTag;
 import toy.bookchat.bookchat.domain.chatroomhashtag.repository.ChatRoomHashTagRepository;
 import toy.bookchat.bookchat.domain.chatroomhost.ChatRoomHost;
@@ -108,5 +110,10 @@ public class ChatRoomService {
                 .orElseGet(() -> hashTagRepository.save(HashTag.of(tagName))))
             .forEach(
                 hashTag -> chatRoomHashTagRepository.save(ChatRoomHashTag.of(chatRoom, hashTag)));
+    }
+
+    public SliceOfChatRoomsResponse getUserChatRooms(Optional<Long> postChatRoomCursorId,
+        Pageable pageable, Long userId) {
+        return null;
     }
 }
