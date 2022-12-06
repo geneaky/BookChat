@@ -5,10 +5,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import toy.bookchat.bookchat.config.JwtTokenConfig;
 import toy.bookchat.bookchat.config.OAuth2Config;
+import toy.bookchat.bookchat.config.aws.ChatRoomStorageProperties;
 import toy.bookchat.bookchat.config.aws.S3Config;
 
 @SpringBootApplication
-@EnableConfigurationProperties({JwtTokenConfig.class, OAuth2Config.class, S3Config.class})
+@EnableConfigurationProperties({JwtTokenConfig.class, OAuth2Config.class, S3Config.class,
+    ChatRoomStorageProperties.class})
 public class BookChatApplication {
 
     public static void main(String[] args) {

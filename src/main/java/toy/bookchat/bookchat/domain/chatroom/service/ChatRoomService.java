@@ -15,7 +15,7 @@ import toy.bookchat.bookchat.domain.chatroomhost.ChatRoomHost;
 import toy.bookchat.bookchat.domain.chatroomhost.repository.ChatRoomHostRepository;
 import toy.bookchat.bookchat.domain.hashtag.HashTag;
 import toy.bookchat.bookchat.domain.hashtag.repository.HashTagRepository;
-import toy.bookchat.bookchat.domain.storage.StorageService;
+import toy.bookchat.bookchat.domain.storage.ChatRoomStorageService;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.exception.user.UserNotFoundException;
@@ -24,26 +24,26 @@ import toy.bookchat.bookchat.exception.user.UserNotFoundException;
 public class ChatRoomService {
 
     private final ChatRoomRepository chatRoomRepository;
-    private final StorageService storageService;
     private final ChatRoomHostRepository chatRoomHostRepository;
     private final HashTagRepository hashTagRepository;
     private final ChatRoomHashTagRepository chatRoomHashTagRepository;
+    private final ChatRoomStorageService chatRoomStorageService;
     private final BookRepository bookRepository;
     private final UserRepository userRepository;
 
     public ChatRoomService(
         ChatRoomRepository chatRoomRepository,
-        StorageService storageService,
         ChatRoomHostRepository chatRoomHostRepository,
         HashTagRepository hashTagRepository,
         ChatRoomHashTagRepository chatRoomHashTagRepository,
+        ChatRoomStorageService chatRoomStorageService,
         BookRepository bookRepository,
         UserRepository userRepository) {
         this.chatRoomRepository = chatRoomRepository;
-        this.storageService = storageService;
         this.chatRoomHostRepository = chatRoomHostRepository;
         this.hashTagRepository = hashTagRepository;
         this.chatRoomHashTagRepository = chatRoomHashTagRepository;
+        this.chatRoomStorageService = chatRoomStorageService;
         this.bookRepository = bookRepository;
         this.userRepository = userRepository;
     }

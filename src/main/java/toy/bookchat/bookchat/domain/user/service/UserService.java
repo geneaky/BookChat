@@ -60,12 +60,11 @@ public class UserService {
     private Consumer<MultipartFile> uploadWithImage(UserSignUpRequest userSignUpRequest,
         String userName, String userEmail) {
         return (image) -> {
-            if (imageValidator.hasValidImage(image)) {
-                String prefixedUUIDFileName = createFileName(image);
-                String prefixedUUIDFileUrl = createFileUrl(prefixedUUIDFileName);
-                saveUser(userSignUpRequest, userName, userEmail, prefixedUUIDFileUrl);
-                storageService.upload(image, prefixedUUIDFileName);
-            }
+            imageValidator.hasValidImage(image);
+            String prefixedUUIDFileName = createFileName(image);
+            String prefixedUUIDFileUrl = createFileUrl(prefixedUUIDFileName);
+            saveUser(userSignUpRequest, userName, userEmail, prefixedUUIDFileUrl);
+            storageService.upload(image, prefixedUUIDFileName);
         };
     }
 

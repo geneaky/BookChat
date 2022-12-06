@@ -23,12 +23,19 @@ public class ImageValidator {
             .substring(multipartFile.getOriginalFilename().lastIndexOf(".") + 1);
     }
 
-    public boolean hasValidImage(MultipartFile multipartFile) {
+    public void hasValidImage(MultipartFile multipartFile) {
+        isNotEmptyFile(multipartFile);
+        SupportedFileExtension.isSupport(getFileExtension(multipartFile));
+        isValidFileSize(multipartFile);
+    }
 
+    private void isNotEmptyFile(MultipartFile multipartFile) {
         if (multipartFile == null || multipartFile.isEmpty()) {
-            return false;
+            throw new IllegalArgumentException("Can't Handle Empty File");
         }
+    }
 
+    private void isValidFileSize(MultipartFile multipartFile) {
         try {
             imageReaderAdapter.setInput(
                 ImageIO.createImageInputStream(multipartFile.getInputStream()));
@@ -36,15 +43,10 @@ public class ImageValidator {
             throw new ImageInputStreamException(exception.getMessage());
         }
 
-        return isValidFileSize();
-    }
-
-    private boolean isValidFileSize() {
-        if (imageReaderAdapter.getWidth() <= WIDTH_LIMIT
-            && imageReaderAdapter.getHeight() <= HEIGHT_LIMIT) {
-            return true;
+        if (imageReaderAdapter.getWidth() > WIDTH_LIMIT
+            || imageReaderAdapter.getHeight() > HEIGHT_LIMIT) {
+            throw new IllegalArgumentException("Not Supplied File Size");
         }
-
-        throw new IllegalArgumentException("Not Supplied File Size");
     }
+
 }

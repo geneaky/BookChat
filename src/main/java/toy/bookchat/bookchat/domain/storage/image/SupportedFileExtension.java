@@ -9,13 +9,13 @@ public enum SupportedFileExtension {
         this.fileExtension = fileExtension;
     }
 
-    public static boolean isSupport(String fileExtension) {
+    public static void isSupport(String fileExtension) {
         for (SupportedFileExtension supportedFileExtension : SupportedFileExtension.values()) {
             if (supportedFileExtension.fileExtension.equals(fileExtension)) {
-                return true;
+                return;
             }
         }
-        return false;
+        throw new IllegalArgumentException("Not Supported File Extension");
     }
 
     public String getValue() {

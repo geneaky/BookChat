@@ -64,7 +64,6 @@ class UserServiceTest {
         MultipartFile multipartFile = mock(MultipartFile.class);
 
         when(storageService.getFileUrl(any())).thenReturn("testBucketUrl");
-        when(imageValidator.hasValidImage(any())).thenReturn(true);
         when(userSignUpRequest.getUser(any(), any(), any())).thenReturn(mockUser);
 
         userService.registerNewUser(userSignUpRequest, Optional.of(multipartFile), "memberNumber",
