@@ -69,7 +69,7 @@ class BookSearchServiceTest {
                 datetime),
             () -> assertThat(bookSearchResponse.getBookResponses().get(0).getPublisher()).isEqualTo(
                 publisher),
-            () -> assertThat(bookSearchResponse.getBookResponses().get(0).getAuthor()).isEqualTo(
+            () -> assertThat(bookSearchResponse.getBookResponses().get(0).getAuthors()).isEqualTo(
                 List.of(authors)),
             () -> assertThat(
                 bookSearchResponse.getBookResponses().get(0).getBookCoverImageUrl()).isEqualTo(
@@ -102,7 +102,7 @@ class BookSearchServiceTest {
                 datetime),
             () -> assertThat(bookSearchResponse.getBookResponses().get(0).getPublisher()).isEqualTo(
                 publisher),
-            () -> assertThat(bookSearchResponse.getBookResponses().get(0).getAuthor()).isEqualTo(
+            () -> assertThat(bookSearchResponse.getBookResponses().get(0).getAuthors()).isEqualTo(
                 List.of(authors)),
             () -> assertThat(
                 bookSearchResponse.getBookResponses().get(0).getBookCoverImageUrl()).isEqualTo(
@@ -135,7 +135,7 @@ class BookSearchServiceTest {
                 datetime),
             () -> assertThat(bookSearchResponse.getBookResponses().get(0).getPublisher()).isEqualTo(
                 publisher),
-            () -> assertThat(bookSearchResponse.getBookResponses().get(0).getAuthor()).isEqualTo(
+            () -> assertThat(bookSearchResponse.getBookResponses().get(0).getAuthors()).isEqualTo(
                 List.of(authors)),
             () -> assertThat(
                 bookSearchResponse.getBookResponses().get(0).getBookCoverImageUrl()).isEqualTo(

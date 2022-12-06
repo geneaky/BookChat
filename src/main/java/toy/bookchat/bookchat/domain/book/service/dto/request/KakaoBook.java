@@ -37,7 +37,7 @@ public class KakaoBook {
                     .isbn(document.getIsbn())
                     .title(document.getTitle())
                     .publishAt(document.getYearMonthDay())
-                    .author(document.getAuthors())
+                    .authors(document.getAuthors())
                     .publisher(document.getPublisher())
                     .bookCoverImageUrl(document.getThumbnail())
                     .build()

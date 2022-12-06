@@ -3,6 +3,7 @@ package toy.bookchat.bookchat.domain.storage.image;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import toy.bookchat.bookchat.exception.user.ImageInputStreamException;
 
@@ -18,13 +19,20 @@ public class ImageValidator {
         this.imageReaderAdapter = imageReaderAdapter;
     }
 
-    public String getFileExtension(MultipartFile multipartFile) {
+    private static void hasFileName(MultipartFile multipartFile) {
+        if (!StringUtils.hasText(multipartFile.getOriginalFilename())) {
+            throw new IllegalArgumentException("Can't Handle Blank Name File");
+        }
+    }
+
+    private String getFileExtension(MultipartFile multipartFile) {
         return multipartFile.getOriginalFilename()
             .substring(multipartFile.getOriginalFilename().lastIndexOf(".") + 1);
     }
 
     public void hasValidImage(MultipartFile multipartFile) {
         isNotEmptyFile(multipartFile);
+        hasFileName(multipartFile);
         SupportedFileExtension.isSupport(getFileExtension(multipartFile));
         isValidFileSize(multipartFile);
     }

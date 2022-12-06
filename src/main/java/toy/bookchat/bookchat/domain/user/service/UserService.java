@@ -12,7 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 import toy.bookchat.bookchat.domain.agony.service.AgonyService;
 import toy.bookchat.bookchat.domain.bookshelf.service.BookShelfService;
 import toy.bookchat.bookchat.domain.storage.StorageService;
-import toy.bookchat.bookchat.domain.storage.image.ImageValidator;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.domain.user.service.dto.request.ChangeUserNicknameRequest;
@@ -27,18 +26,15 @@ public class UserService {
     private final BookShelfService bookShelfService;
     private final AgonyService agonyService;
     private final StorageService storageService;
-    private final ImageValidator imageValidator;
 
     public UserService(UserRepository userRepository,
         BookShelfService bookShelfService,
         AgonyService agonyService,
-        @Qualifier("userProfileStorageService") StorageService storageService,
-        ImageValidator imageValidator) {
+        @Qualifier("userProfileStorageService") StorageService storageService) {
         this.userRepository = userRepository;
         this.bookShelfService = bookShelfService;
         this.agonyService = agonyService;
         this.storageService = storageService;
-        this.imageValidator = imageValidator;
     }
 
     @Transactional(readOnly = true)
@@ -60,24 +56,14 @@ public class UserService {
 
     private Consumer<MultipartFile> uploadWithImage(UserSignUpRequest userSignUpRequest,
         String userName, String userEmail) {
-        return (image) -> {
-            imageValidator.hasValidImage(image);
-            String prefixedUUIDFileName = createFileName(image);
-            String prefixedUUIDFileUrl = createFileUrl(prefixedUUIDFileName);
+        return image -> {
+            String prefixedUUIDFileName = storageService.createFileName(
+                image, UUID.randomUUID().toString(),
+                new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+            String prefixedUUIDFileUrl = storageService.getFileUrl(prefixedUUIDFileName);
             saveUser(userSignUpRequest, userName, userEmail, prefixedUUIDFileUrl);
             storageService.upload(image, prefixedUUIDFileName);
         };
-    }
-
-    private String createFileUrl(String prefixedUUIDFileName) {
-        return storageService.getFileUrl(prefixedUUIDFileName);
-    }
-
-    private String createFileName(MultipartFile userProfileImage) {
-        return storageService.createFileName(
-            imageValidator.getFileExtension(userProfileImage),
-            UUID.randomUUID().toString(),
-            new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
     }
 
     @Transactional(readOnly = true)

@@ -8,5 +8,5 @@ public interface StorageService {
 
     String getFileUrl(String fileName);
 
-    String createFileName(String fileExtension, String uuidFileName, String currentTime);
+    String createFileName(MultipartFile file, String uuidFileName, String currentTime);
 }

@@ -17,8 +17,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 import toy.bookchat.bookchat.config.aws.StorageProperties;
+import toy.bookchat.bookchat.domain.storage.image.ImageValidator;
 import toy.bookchat.bookchat.exception.storage.ImageUploadToStorageException;
 
 @ExtendWith(MockitoExtension.class)
@@ -28,6 +30,8 @@ class StorageServiceTest {
     StorageProperties storageProperties;
     @Mock
     AmazonS3Client amazonS3Client;
+    @Mock
+    ImageValidator imageValidator;
     @InjectMocks
     UserProfileStorageService storageService;
 
@@ -72,9 +76,11 @@ class StorageServiceTest {
 
     @Test
     void S3_오브젝트_파일이름_생성() throws Exception {
+        MockMultipartFile multipartFile = new MockMultipartFile("file", "file.webp", "image/webp",
+            "test".getBytes());
         when(storageProperties.getUserProfileImageFolder()).thenReturn("test/");
 
-        String fileName = storageService.createFileName("webp", "1234", "2022-10-12");
+        String fileName = storageService.createFileName(multipartFile, "1234", "2022-10-12");
 
         assertThat(fileName).isEqualTo("test/21-01-22021234.webp");
     }

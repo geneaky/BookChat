@@ -1,6 +1,5 @@
 package toy.bookchat.bookchat.utils;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
@@ -24,17 +23,6 @@ class ImageValidatorTest {
     ImageReaderAdapter imageReaderAdapter;
     @InjectMocks
     ImageValidator imageValidator;
-
-    @Test
-    void 이미지_파일_확장자_요청시_반환() throws Exception {
-        MultipartFile multipartFile = mock(MultipartFile.class);
-
-        when(multipartFile.getOriginalFilename()).thenReturn("test.webp");
-
-        String fileExtension = imageValidator.getFileExtension(multipartFile);
-
-        assertThat(fileExtension).isEqualTo("webp");
-    }
 
     @Test
     void 이미지_검증시_이미지가_없다면_예외발생() throws Exception {
