@@ -100,7 +100,7 @@ class BookControllerTest extends ControllerTestExtension {
         return BookResponse.builder()
             .isbn(isbn)
             .title(title)
-            .datetime(datetime.substring(0, 10))
+            .publishAt(datetime.substring(0, 10))
             .author(author)
             .publisher("testPublisher")
             .bookCoverImageUrl("bookCoverImageUrl")
@@ -174,7 +174,7 @@ class BookControllerTest extends ControllerTestExtension {
                 responseFields(
                     fieldWithPath("bookResponses[].isbn").type(STRING).description("ISBN"),
                     fieldWithPath("bookResponses[].title").type(STRING).description("제목"),
-                    fieldWithPath("bookResponses[].datetime").type(STRING).description("출간일"),
+                    fieldWithPath("bookResponses[].publishAt").type(STRING).description("출간일"),
                     fieldWithPath("bookResponses[].author[]").type(ARRAY).description("저자"),
                     fieldWithPath("bookResponses[].publisher").type(STRING).description("출판사"),
                     fieldWithPath("bookResponses[].bookCoverImageUrl").type(STRING)

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.18">
+<meta name="generator" content="Asciidoctor 2.0.17">
 <title>BookChat API Documentation</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -84,10 +84,10 @@ code{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-weight:400;
 ul,ol,dl{line-height:1.6;margin-bottom:1.25em;list-style-position:outside;font-family:inherit}
 ul,ol{margin-left:1.5em}
 ul li ul,ul li ol{margin-left:1.25em;margin-bottom:0}
+ul.square li ul,ul.circle li ul,ul.disc li ul{list-style:inherit}
+ul.square{list-style-type:square}
 ul.circle{list-style-type:circle}
 ul.disc{list-style-type:disc}
-ul.square{list-style-type:square}
-ul.circle ul:not([class]),ul.disc ul:not([class]),ul.square ul:not([class]){list-style:inherit}
 ol li ul,ol li ol{margin-left:1.25em;margin-bottom:0}
 dl dt{margin-bottom:.3125em;font-weight:bold}
 dl dd{margin-bottom:1.25em}
@@ -594,7 +594,7 @@ Content-Type: application/json;charset=UTF-8
 Content-Length: 395
 Host: bookchat.link
 
-{"refreshToken":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJCb29rQ2hhdCIsImRlZmF1bHRQcm9maWxlSW1hZ2VUeXBlIjoxLCJwcm92aWRlciI6Imdvb2dsZSIsInVzZXJOaWNrbmFtZSI6Im5pY2tuYW1lIiwidXNlck5hbWUiOiJ0ZXN0R09PR0xFIiwidXNlclByb2ZpbGVJbWFnZVVyaSI6InRlc3RAZ2FtaWwuY29tIiwidXNlclJvbGUiOiJST0xFX1VTRVIiLCJleHAiOjE2NzAzMDU4OTMsInVzZXJJZCI6IjEiLCJlbWFpbCI6InRlc3RAZ21haWwuY29tIn0.7ecXKFPXNnUE9Ohjl17utKEdD6V3dEP25eKUC3ZHgyE"}</code></pre>
+{"refreshToken":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJCb29rQ2hhdCIsImRlZmF1bHRQcm9maWxlSW1hZ2VUeXBlIjoxLCJwcm92aWRlciI6Imdvb2dsZSIsInVzZXJOaWNrbmFtZSI6Im5pY2tuYW1lIiwidXNlck5hbWUiOiJ0ZXN0R09PR0xFIiwidXNlclByb2ZpbGVJbWFnZVVyaSI6InRlc3RAZ2FtaWwuY29tIiwidXNlclJvbGUiOiJST0xFX1VTRVIiLCJleHAiOjE2NzE1NDAxNDEsInVzZXJJZCI6IjEiLCJlbWFpbCI6InRlc3RAZ21haWwuY29tIn0.liy6I6ROQn7bttxti8ZUPUeRKrGizTgNkWhf7ugWtsk"}</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -639,7 +639,7 @@ Strict-Transport-Security: max-age=31536000 ; includeSubDomains
 X-Frame-Options: DENY
 Content-Length: 788
 
-{"accessToken":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJCb29rQ2hhdCIsImRlZmF1bHRQcm9maWxlSW1hZ2VUeXBlIjoxLCJwcm92aWRlciI6Imdvb2dsZSIsInVzZXJOaWNrbmFtZSI6Im5pY2tuYW1lIiwidXNlck5hbWUiOiJ0ZXN0R09PR0xFIiwidXNlclByb2ZpbGVJbWFnZVVyaSI6InRlc3RAZ2FtaWwuY29tIiwidXNlclJvbGUiOiJST0xFX1VTRVIiLCJleHAiOjE2NzAzMDU4OTMsInVzZXJJZCI6IjEiLCJlbWFpbCI6InRlc3RAZ21haWwuY29tIn0.7ecXKFPXNnUE9Ohjl17utKEdD6V3dEP25eKUC3ZHgyE","refreshToken":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJCb29rQ2hhdCIsImRlZmF1bHRQcm9maWxlSW1hZ2VUeXBlIjoxLCJwcm92aWRlciI6Imdvb2dsZSIsInVzZXJOaWNrbmFtZSI6Im5pY2tuYW1lIiwidXNlck5hbWUiOiJ0ZXN0R09PR0xFIiwidXNlclByb2ZpbGVJbWFnZVVyaSI6InRlc3RAZ2FtaWwuY29tIiwidXNlclJvbGUiOiJST0xFX1VTRVIiLCJleHAiOjE2NzAzMDU4OTMsInVzZXJJZCI6IjEiLCJlbWFpbCI6InRlc3RAZ21haWwuY29tIn0.7ecXKFPXNnUE9Ohjl17utKEdD6V3dEP25eKUC3ZHgyE"}</code></pre>
+{"accessToken":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJCb29rQ2hhdCIsImRlZmF1bHRQcm9maWxlSW1hZ2VUeXBlIjoxLCJwcm92aWRlciI6Imdvb2dsZSIsInVzZXJOaWNrbmFtZSI6Im5pY2tuYW1lIiwidXNlck5hbWUiOiJ0ZXN0R09PR0xFIiwidXNlclByb2ZpbGVJbWFnZVVyaSI6InRlc3RAZ2FtaWwuY29tIiwidXNlclJvbGUiOiJST0xFX1VTRVIiLCJleHAiOjE2NzAzMzE5NDEsInVzZXJJZCI6IjEiLCJlbWFpbCI6InRlc3RAZ21haWwuY29tIn0.R0XfkNwjSkToVtizF7Aqdyg8cvGZRXtL3tDmm53G_Sw","refreshToken":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJCb29rQ2hhdCIsImRlZmF1bHRQcm9maWxlSW1hZ2VUeXBlIjoxLCJwcm92aWRlciI6Imdvb2dsZSIsInVzZXJOaWNrbmFtZSI6Im5pY2tuYW1lIiwidXNlck5hbWUiOiJ0ZXN0R09PR0xFIiwidXNlclByb2ZpbGVJbWFnZVVyaSI6InRlc3RAZ2FtaWwuY29tIiwidXNlclJvbGUiOiJST0xFX1VTRVIiLCJleHAiOjE2NzE1NDAxNDEsInVzZXJJZCI6IjEiLCJlbWFpbCI6InRlc3RAZ21haWwuY29tIn0.liy6I6ROQn7bttxti8ZUPUeRKrGizTgNkWhf7ugWtsk"}</code></pre>
 </div>
 </div>
 </div>
@@ -1503,7 +1503,7 @@ Host: bookchat.link</code></pre>
 <td class="tableblock halign-left valign-top"><p class="tableblock">제목</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bookResponses[].datetime</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bookResponses[].publishAt</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">출간일</p></td>
 </tr>
@@ -1550,9 +1550,9 @@ Pragma: no-cache
 Expires: 0
 Strict-Transport-Security: max-age=31536000 ; includeSubDomains
 X-Frame-Options: DENY
-Content-Length: 232
+Content-Length: 233
 
-{"bookResponses":[{"isbn":"213123","title":"effectiveJava","datetime":"2014-11-17","author":["Joshua"],"publisher":"testPublisher","bookCoverImageUrl":"bookCoverImageUrl"}],"meta":{"is_end":false,"pageable_count":5,"total_count":5}}</code></pre>
+{"bookResponses":[{"isbn":"213123","title":"effectiveJava","publishAt":"2014-11-17","author":["Joshua"],"publisher":"testPublisher","bookCoverImageUrl":"bookCoverImageUrl"}],"meta":{"is_end":false,"pageable_count":5,"total_count":5}}</code></pre>
 </div>
 </div>
 </div>
@@ -4429,14 +4429,14 @@ X-Frame-Options: DENY</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-12-06 14:45:54 +0900
+Last updated 2022-12-06 20:35:04 +0900
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>
 <script>
 if (!hljs.initHighlighting.called) {
   hljs.initHighlighting.called = true
-  ;[].slice.call(document.querySelectorAll('pre.highlight > code[data-lang]')).forEach(function (el) { hljs.highlightBlock(el) })
+  ;[].slice.call(document.querySelectorAll('pre.highlight > code')).forEach(function (el) { hljs.highlightBlock(el) })
 }
 </script>
 </body>
