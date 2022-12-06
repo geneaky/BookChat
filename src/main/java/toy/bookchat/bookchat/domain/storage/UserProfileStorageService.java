@@ -13,6 +13,9 @@ import toy.bookchat.bookchat.exception.storage.ImageUploadToStorageException;
 @Service
 public class UserProfileStorageService implements StorageService {
 
+    public static final int WIDTH_LIMIT = 200;
+    public static final int HEIGHT_LIMIT = 200;
+
     private final AmazonS3Client amazonS3Client;
     private final StorageProperties storageProperties;
     private final ImageValidator imageValidator;
@@ -55,7 +58,7 @@ public class UserProfileStorageService implements StorageService {
     @Override
     public String createFileName(MultipartFile file, String uuidFileName,
         String currentTime) {
-        imageValidator.hasValidImage(file);
+        imageValidator.hasValidImage(file, WIDTH_LIMIT, HEIGHT_LIMIT);
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(currentTime).reverse();
         stringBuilder.append(uuidFileName);

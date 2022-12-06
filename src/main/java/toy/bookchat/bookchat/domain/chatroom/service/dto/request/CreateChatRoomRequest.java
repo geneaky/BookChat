@@ -44,13 +44,14 @@ public class CreateChatRoomRequest {
     }
 
     public ChatRoom makeChatRoom(Book book,
-        ChatRoomHost chatRoomHost) {
+        ChatRoomHost chatRoomHost, String fileUrl) {
         return ChatRoom.builder()
             .book(book)
             .roomSID(UUID.randomUUID().toString())
             .roomName(this.roomName)
             .roomSize(this.roomSize)
             .defaultRoomImageType(this.defaultRoomImageType)
+            .roomImageUri(fileUrl)
             .chatRoomHost(chatRoomHost)
             .build();
     }

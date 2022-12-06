@@ -1,6 +1,10 @@
 package toy.bookchat.bookchat.domain.chatroom.service;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Consumer;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,20 +59,36 @@ public class ChatRoomService {
         Book book = bookRepository.findByIsbnAndPublishAt(createChatRoomRequest.getIsbn(),
                 createChatRoomRequest.getPublishAt())
             .orElseGet(() -> bookRepository.save(createChatRoomRequest.createBook()));
-
         User mainHost = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-
         ChatRoomHost chatRoomHost = saveChatRoomHost(mainHost);
+        chatRoomImage.ifPresentOrElse(
+            saveChatRoomAndHashTagWithImage(createChatRoomRequest, book, chatRoomHost),
+            saveChatRoomAndHashTagWithoutImage(createChatRoomRequest, book, chatRoomHost));
+    }
 
-        ChatRoom chatRoom = saveChatRoom(createChatRoomRequest, book,
-            chatRoomHost);
+    private Runnable saveChatRoomAndHashTagWithoutImage(CreateChatRoomRequest createChatRoomRequest,
+        Book book, ChatRoomHost chatRoomHost) {
+        return () -> registerHashTagOnChatRoom(createChatRoomRequest,
+            saveChatRoom(createChatRoomRequest, book, chatRoomHost, null));
+    }
 
-        registerHashTagOnChatRoom(createChatRoomRequest, chatRoom);
+    private Consumer<MultipartFile> saveChatRoomAndHashTagWithImage(
+        CreateChatRoomRequest createChatRoomRequest, Book book, ChatRoomHost chatRoomHost) {
+        return image -> {
+            String prefixedUUIDFileName = storageService.createFileName(
+                image, UUID.randomUUID().toString(),
+                new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+            String prefixedUUIDFileUrl = storageService.getFileUrl(prefixedUUIDFileName);
+            ChatRoom chatRoom = saveChatRoom(createChatRoomRequest, book, chatRoomHost,
+                prefixedUUIDFileUrl);
+            storageService.upload(image, prefixedUUIDFileName);
+            registerHashTagOnChatRoom(createChatRoomRequest, chatRoom);
+        };
     }
 
     private ChatRoom saveChatRoom(CreateChatRoomRequest createChatRoomRequest, Book book,
-        ChatRoomHost chatRoomHost) {
-        ChatRoom chatRoom = createChatRoomRequest.makeChatRoom(book, chatRoomHost);
+        ChatRoomHost chatRoomHost, String fileUrl) {
+        ChatRoom chatRoom = createChatRoomRequest.makeChatRoom(book, chatRoomHost, fileUrl);
         chatRoomRepository.save(chatRoom);
         return chatRoom;
     }

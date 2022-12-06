@@ -71,7 +71,7 @@ class ChatRoomServiceTest {
             Optional.ofNullable(mock(Book.class)));
         when(userRepository.findById(any())).thenReturn(Optional.of(mock(User.class)));
 
-        chatRoomService.createChatRoom(createChatRoomRequest, null, 1L);
+        chatRoomService.createChatRoom(createChatRoomRequest, Optional.empty(), 1L);
 
         verify(chatRoomRepository).save(any());
         verify(chatRoomHostRepository).save(any());
@@ -86,7 +86,7 @@ class ChatRoomServiceTest {
 
         when(userRepository.findById(any())).thenReturn(Optional.of(mock(User.class)));
 
-        chatRoomService.createChatRoom(createChatRoomRequest, null, 1L);
+        chatRoomService.createChatRoom(createChatRoomRequest, Optional.empty(), 1L);
 
         verify(bookRepository).save(any());
         verify(chatRoomRepository).save(any());

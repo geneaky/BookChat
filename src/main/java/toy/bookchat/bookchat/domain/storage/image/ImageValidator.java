@@ -10,9 +10,6 @@ import toy.bookchat.bookchat.exception.user.ImageInputStreamException;
 @Component
 public class ImageValidator {
 
-    public static final int WIDTH_LIMIT = 200;
-    public static final int HEIGHT_LIMIT = 200;
-
     private final ImageReaderAdapter imageReaderAdapter;
 
     public ImageValidator(ImageReaderAdapter imageReaderAdapter) {
@@ -30,11 +27,11 @@ public class ImageValidator {
             .substring(multipartFile.getOriginalFilename().lastIndexOf(".") + 1);
     }
 
-    public void hasValidImage(MultipartFile multipartFile) {
+    public void hasValidImage(MultipartFile multipartFile, int widthLimit, int hegithLimit) {
         isNotEmptyFile(multipartFile);
         hasFileName(multipartFile);
         SupportedFileExtension.isSupport(getFileExtension(multipartFile));
-        isValidFileSize(multipartFile);
+        isValidFileSize(multipartFile, widthLimit, hegithLimit);
     }
 
     private void isNotEmptyFile(MultipartFile multipartFile) {
@@ -43,7 +40,7 @@ public class ImageValidator {
         }
     }
 
-    private void isValidFileSize(MultipartFile multipartFile) {
+    private void isValidFileSize(MultipartFile multipartFile, int widthLimit, int heightLimit) {
         try {
             imageReaderAdapter.setInput(
                 ImageIO.createImageInputStream(multipartFile.getInputStream()));
@@ -51,8 +48,8 @@ public class ImageValidator {
             throw new ImageInputStreamException(exception.getMessage());
         }
 
-        if (imageReaderAdapter.getWidth() > WIDTH_LIMIT
-            || imageReaderAdapter.getHeight() > HEIGHT_LIMIT) {
+        if (imageReaderAdapter.getWidth() > widthLimit
+            || imageReaderAdapter.getHeight() > heightLimit) {
             throw new IllegalArgumentException("Not Supplied File Size");
         }
     }

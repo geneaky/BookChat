@@ -27,7 +27,7 @@ class ImageValidatorTest {
     @Test
     void 이미지_검증시_이미지가_없다면_예외발생() throws Exception {
         assertThatThrownBy(() -> {
-            imageValidator.hasValidImage(null);
+            imageValidator.hasValidImage(null, 200, 200);
         }).isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -36,7 +36,7 @@ class ImageValidatorTest {
         byte[] content = {};
         MockMultipartFile multipartFile = new MockMultipartFile("test", content);
         assertThatThrownBy(() -> {
-            imageValidator.hasValidImage(multipartFile);
+            imageValidator.hasValidImage(multipartFile, 200, 200);
         }).isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -46,7 +46,7 @@ class ImageValidatorTest {
             "TEST".getBytes());
 
         assertThatThrownBy(() -> {
-            imageValidator.hasValidImage(multipartFile);
+            imageValidator.hasValidImage(multipartFile, 200, 200);
         }).isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -58,7 +58,7 @@ class ImageValidatorTest {
         when(imageReaderAdapter.getWidth()).thenReturn(5000);
 
         assertThatThrownBy(() -> {
-            imageValidator.hasValidImage(multipartFile);
+            imageValidator.hasValidImage(multipartFile, 200, 200);
         }).isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -69,7 +69,7 @@ class ImageValidatorTest {
         when(multipartFile.getOriginalFilename()).thenReturn("test.webp");
         when(imageReaderAdapter.getHeight()).thenReturn(200);
         when(imageReaderAdapter.getWidth()).thenReturn(200);
-        imageValidator.hasValidImage(multipartFile);
+        imageValidator.hasValidImage(multipartFile, 200, 200);
         assertThatNoException();
     }
 }
