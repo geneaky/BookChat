@@ -7,6 +7,6 @@ import toy.bookchat.bookchat.domain.chat.Chat;
 
 public interface ChatQueryRepository {
 
-    Slice<Chat> findUserChatRoomsWithLastChat(Optional<Long> postChatRoomCursorId,
+    Slice<Chat> findUserChatRoomsWithLastChat(Optional<Long> postCursorId,
         Pageable pageable, Long userId);
 }

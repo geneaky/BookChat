@@ -3,6 +3,7 @@ package toy.bookchat.bookchat.domain.chat.repository.query;
 import static toy.bookchat.bookchat.domain.chat.QChat.chat;
 import static toy.bookchat.bookchat.domain.chatroom.QChatRoom.chatRoom;
 import static toy.bookchat.bookchat.domain.common.RepositorySupport.extractOrderSpecifierFrom;
+import static toy.bookchat.bookchat.domain.common.RepositorySupport.numberBasedPagination;
 import static toy.bookchat.bookchat.domain.common.RepositorySupport.toSlice;
 import static toy.bookchat.bookchat.domain.participant.QParticipant.participant;
 
@@ -26,20 +27,22 @@ public class ChatQueryRepositoryImpl implements ChatQueryRepository {
     }
 
     @Override
-    public Slice<Chat> findUserChatRoomsWithLastChat(Optional<Long> postChatRoomCursorId,
+    public Slice<Chat> findUserChatRoomsWithLastChat(Optional<Long> postCursorId,
         Pageable pageable, Long userId) {
         QChat subChat = new QChat("subChat");
 
         List<Chat> contents = queryFactory.select(chat)
             .from(chat)
             .join(chat.chatRoom, chatRoom).fetchJoin()
-            .where(chat.id.in(
-                JPAExpressions.select(subChat.id)
+            .where(numberBasedPagination(chat, chat.id, postCursorId, pageable), chat.id.in(
+                JPAExpressions.select(subChat.id.max())
                     .from(subChat)
-                    .join(participant).on(subChat.chatRoom.eq(participant.chatRoom)
+                    .join(participant)
+                    .on(participant.chatRoom.eq(subChat.chatRoom)
                         .and(participant.user.id.eq(userId)))
                     .groupBy(subChat.chatRoom)
-                    .limit(1)))
+            ))
+            .limit(pageable.getPageSize())
             .orderBy(extractOrderSpecifierFrom(chat, pageable))
             .fetch();
 
