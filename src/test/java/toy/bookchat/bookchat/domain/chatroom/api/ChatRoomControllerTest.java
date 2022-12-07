@@ -209,7 +209,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
         List<Chat> result = List.of(chat1, chat2, chat3);
         PageRequest pageRequest = PageRequest.of(0, 3, Sort.by("id").descending());
         Slice<Chat> slice = new SliceImpl<>(result, pageRequest, true);
-        SliceOfChatRoomsResponse response = new SliceOfChatRoomsResponse(slice);
+        SliceOfChatRoomsResponse response = SliceOfChatRoomsResponse.of(slice);
         when(chatRoomService.getUserChatRooms(any(), any(), any())).thenReturn(response);
         mockMvc.perform(get("/v1/api/chatrooms")
                 .header(AUTHORIZATION, JWT_TOKEN)

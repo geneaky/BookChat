@@ -13,9 +13,13 @@ public class SliceOfChatRoomsResponse {
     private List<ChatRoomResponse> chatRoomResponseList;
     private CursorMeta cursorMeta;
 
-    public SliceOfChatRoomsResponse(Slice<Chat> slice) {
+    private SliceOfChatRoomsResponse(Slice<Chat> slice) {
         this.cursorMeta = CursorMeta.from(slice);
         this.chatRoomResponseList = from(slice.getContent());
+    }
+
+    public static SliceOfChatRoomsResponse of(Slice<Chat> slice) {
+        return new SliceOfChatRoomsResponse(slice);
     }
 
     private List<ChatRoomResponse> from(List<Chat> content) {

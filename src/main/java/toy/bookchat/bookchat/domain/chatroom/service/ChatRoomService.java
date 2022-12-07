@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.book.repository.BookRepository;
+import toy.bookchat.bookchat.domain.chat.repository.ChatRepository;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
 import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomRepository;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.CreateChatRoomRequest;
@@ -22,6 +23,8 @@ import toy.bookchat.bookchat.domain.chatroomhost.ChatRoomHost;
 import toy.bookchat.bookchat.domain.chatroomhost.repository.ChatRoomHostRepository;
 import toy.bookchat.bookchat.domain.hashtag.HashTag;
 import toy.bookchat.bookchat.domain.hashtag.repository.HashTagRepository;
+import toy.bookchat.bookchat.domain.participant.Participant;
+import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
 import toy.bookchat.bookchat.domain.storage.StorageService;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
@@ -31,7 +34,9 @@ import toy.bookchat.bookchat.exception.user.UserNotFoundException;
 public class ChatRoomService {
 
     private final ChatRoomRepository chatRoomRepository;
+    private final ChatRepository chatRepository;
     private final ChatRoomHostRepository chatRoomHostRepository;
+    private final ParticipantRepository participantRepository;
     private final HashTagRepository hashTagRepository;
     private final ChatRoomHashTagRepository chatRoomHashTagRepository;
     private final StorageService storageService;
@@ -40,14 +45,18 @@ public class ChatRoomService {
 
     public ChatRoomService(
         ChatRoomRepository chatRoomRepository,
+        ChatRepository chatRepository,
         ChatRoomHostRepository chatRoomHostRepository,
+        ParticipantRepository participantRepository,
         HashTagRepository hashTagRepository,
         ChatRoomHashTagRepository chatRoomHashTagRepository,
         @Qualifier("chatRoomStorageService") StorageService storageService,
         BookRepository bookRepository,
         UserRepository userRepository) {
         this.chatRoomRepository = chatRoomRepository;
+        this.chatRepository = chatRepository;
         this.chatRoomHostRepository = chatRoomHostRepository;
+        this.participantRepository = participantRepository;
         this.hashTagRepository = hashTagRepository;
         this.chatRoomHashTagRepository = chatRoomHashTagRepository;
         this.storageService = storageService;
@@ -92,7 +101,16 @@ public class ChatRoomService {
         ChatRoomHost chatRoomHost, String fileUrl) {
         ChatRoom chatRoom = createChatRoomRequest.makeChatRoom(book, chatRoomHost, fileUrl);
         chatRoomRepository.save(chatRoom);
+        saveParticipantWithRoomHostAndRoom(chatRoomHost, chatRoom);
         return chatRoom;
+    }
+
+    private void saveParticipantWithRoomHostAndRoom(ChatRoomHost chatRoomHost, ChatRoom chatRoom) {
+        Participant participant = Participant.builder()
+            .chatRoom(chatRoom)
+            .user(chatRoomHost.getMainHost())
+            .build();
+        participantRepository.save(participant);
     }
 
     private ChatRoomHost saveChatRoomHost(User mainHost) {
@@ -112,8 +130,10 @@ public class ChatRoomService {
                 hashTag -> chatRoomHashTagRepository.save(ChatRoomHashTag.of(chatRoom, hashTag)));
     }
 
+    @Transactional(readOnly = true)
     public SliceOfChatRoomsResponse getUserChatRooms(Optional<Long> postChatRoomCursorId,
         Pageable pageable, Long userId) {
-        return null;
+        return SliceOfChatRoomsResponse.of(
+            chatRepository.findUserChatRoomsWithLastChat(postChatRoomCursorId, pageable, userId));
     }
 }
