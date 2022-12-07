@@ -35,9 +35,9 @@ public class ChatRoomController {
     }
 
     @GetMapping("/chatrooms")
-    public SliceOfChatRoomsResponse getUserChatRooms(Optional<Long> postChatRoomCursorId,
+    public SliceOfChatRoomsResponse getUserChatRooms(Optional<Long> postCursorId,
         Pageable pageable, @UserPayload TokenPayload tokenPayload) {
-        return chatRoomService.getUserChatRooms(postChatRoomCursorId, pageable,
+        return chatRoomService.getUserChatRooms(postCursorId, pageable,
             tokenPayload.getUserId());
     }
 }

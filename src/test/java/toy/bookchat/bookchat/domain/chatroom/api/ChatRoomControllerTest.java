@@ -214,7 +214,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
         mockMvc.perform(get("/v1/api/chatrooms")
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
-                .param("postChatRoomCursorId", "0")
+                .param("postCursorId", "0")
                 .param("page", "0")
                 .param("size", "3")
                 .param("sort", "id,DESC"))
@@ -224,8 +224,8 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                     headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 requestParameters(
-                    parameterWithName("postChatRoomCursorId").optional()
-                        .description("마지막 채팅방 커서 ID"),
+                    parameterWithName("postCursorId").optional()
+                        .description("마지막 커서 ID"),
                     parameterWithName("page").optional().description("페이지 번호"),
                     parameterWithName("size").optional().description("페이지 사이즈"),
                     parameterWithName("sort").optional().description("정렬 기준 id [ASC,DESC]")

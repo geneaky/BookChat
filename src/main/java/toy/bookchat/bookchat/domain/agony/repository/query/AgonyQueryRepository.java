@@ -11,7 +11,7 @@ public interface AgonyQueryRepository {
     Optional<Agony> findUserBookShelfAgony(Long userId, Long agonyId);
 
     Slice<Agony> findUserBookShelfSliceOfAgonies(long userId, Pageable pageable,
-        Optional<Long> postAgonyCursorId);
+        Optional<Long> postCursorId);
 
     void deleteByAgoniesIds(Long userId, List<Long> agoniesIds);
 

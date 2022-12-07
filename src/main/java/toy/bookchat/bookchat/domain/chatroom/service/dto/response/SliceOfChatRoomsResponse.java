@@ -2,6 +2,7 @@ package toy.bookchat.bookchat.domain.chatroom.service.dto.response;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.Getter;
 import org.springframework.data.domain.Slice;
 import toy.bookchat.bookchat.domain.chat.Chat;
@@ -11,11 +12,15 @@ import toy.bookchat.bookchat.domain.common.CursorMeta;
 public class SliceOfChatRoomsResponse {
 
     private List<ChatRoomResponse> chatRoomResponseList;
-    private CursorMeta cursorMeta;
+    private CursorMeta<Long> cursorMeta;
 
     private SliceOfChatRoomsResponse(Slice<Chat> slice) {
-        this.cursorMeta = CursorMeta.from(slice);
+        this.cursorMeta = CursorMeta.from(slice, getNextCursorId(slice.getContent()));
         this.chatRoomResponseList = from(slice.getContent());
+    }
+
+    private Long getNextCursorId(List<Chat> content) {
+        return Optional.ofNullable(content.get(content.size() - 1)).map(Chat::getId).orElse(null);
     }
 
     public static SliceOfChatRoomsResponse of(Slice<Chat> slice) {

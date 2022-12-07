@@ -36,11 +36,11 @@ public class AgonyQueryRepositoryImpl implements AgonyQueryRepository {
 
     @Override
     public Slice<Agony> findUserBookShelfSliceOfAgonies(long userId, Pageable pageable,
-        Optional<Long> postAgonyCursorId) {
+        Optional<Long> postCursorId) {
         List<Agony> contents = queryFactory.select(agony)
             .from(agony)
             .join(agony.user, user).on(user.id.eq(userId))
-            .where(numberBasedPagination(agony, agony.id, postAgonyCursorId, pageable))
+            .where(numberBasedPagination(agony, agony.id, postCursorId, pageable))
             .limit(pageable.getPageSize())
             .orderBy(extractOrderSpecifierFrom(agony, pageable))
             .fetch();

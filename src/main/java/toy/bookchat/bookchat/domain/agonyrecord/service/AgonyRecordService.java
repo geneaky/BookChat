@@ -36,9 +36,9 @@ public class AgonyRecordService {
 
     @Transactional(readOnly = true)
     public SliceOfAgonyRecordsResponse searchPageOfAgonyRecords(Long agonyId,
-        Long userId, Pageable pageable, Optional<Long> postRecordCursorId) {
+        Long userId, Pageable pageable, Optional<Long> postCursorId) {
         Slice<AgonyRecord> agonyRecordSlice = agonyRecordRepository.findSliceOfUserAgonyRecords(
-            agonyId, userId, pageable, postRecordCursorId);
+            agonyId, userId, pageable, postCursorId);
         return new SliceOfAgonyRecordsResponse(agonyRecordSlice);
     }
 

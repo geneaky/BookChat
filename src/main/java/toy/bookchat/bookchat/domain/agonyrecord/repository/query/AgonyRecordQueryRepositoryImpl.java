@@ -29,12 +29,12 @@ public class AgonyRecordQueryRepositoryImpl implements AgonyRecordQueryRepositor
 
     @Override
     public Slice<AgonyRecord> findSliceOfUserAgonyRecords(Long agonyId, Long userId,
-        Pageable pageable, Optional<Long> postRecordCursorId) {
+        Pageable pageable, Optional<Long> postCursorId) {
         List<AgonyRecord> contents = queryFactory.select(agonyRecord)
             .from(agonyRecord)
             .join(agonyRecord.agony, agony).on(agony.id.eq(agonyId))
             .join(agony.user, user).on(user.id.eq(userId))
-            .where(numberBasedPagination(agonyRecord, agonyRecord.id, postRecordCursorId, pageable))
+            .where(numberBasedPagination(agonyRecord, agonyRecord.id, postCursorId, pageable))
             .limit(pageable.getPageSize())
             .orderBy(extractOrderSpecifierFrom(agonyRecord, pageable))
             .fetch();

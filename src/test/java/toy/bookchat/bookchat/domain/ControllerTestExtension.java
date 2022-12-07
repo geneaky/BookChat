@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
+import static org.springframework.restdocs.payload.JsonFieldType.VARIES;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static toy.bookchat.bookchat.domain.user.ROLE.USER;
 
@@ -99,6 +100,7 @@ public abstract class ControllerTestExtension {
             fieldWithPath("cursorMeta.hasContent").type(BOOLEAN).description("현재 슬라이스 내용물 유/무"),
             fieldWithPath("cursorMeta.hasNext").type(BOOLEAN).description("다음 슬라이스 유무"),
             fieldWithPath("cursorMeta.last").type(BOOLEAN).description("마지막 슬라이스 여부"),
-            fieldWithPath("cursorMeta.first").type(BOOLEAN).description("처음 슬라이스 여부"));
+            fieldWithPath("cursorMeta.first").type(BOOLEAN).description("처음 슬라이스 여부"),
+            fieldWithPath("cursorMeta.nextCursorId").type(VARIES).description("다음 커서 ID"));
     }
 }
