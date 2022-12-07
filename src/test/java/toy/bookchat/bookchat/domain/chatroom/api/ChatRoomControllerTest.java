@@ -34,16 +34,23 @@ import static toy.bookchat.bookchat.security.oauth.OAuth2Provider.KAKAO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
+import org.springframework.data.domain.Sort;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookRequest;
+import toy.bookchat.bookchat.domain.chat.Chat;
+import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
 import toy.bookchat.bookchat.domain.chatroom.service.ChatRoomService;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.CreateChatRoomRequest;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.response.SliceOfChatRoomsResponse;
@@ -157,8 +164,52 @@ class ChatRoomControllerTest extends ControllerTestExtension {
 
     @Test
     void 사용자의_채팅방_목록_조회_성공() throws Exception {
-
-        SliceOfChatRoomsResponse response = null;
+        ChatRoom chatRoom1 = ChatRoom.builder()
+            .id(1L)
+            .roomName("이펙티브 자바 부수는 방")
+            .roomSid("secret1")
+            .roomSize(100)
+            .defaultRoomImageType(1)
+            .roomImageUri(null)
+            .build();
+        chatRoom1.setCreatedAt(LocalDateTime.now());
+        Chat chat1 = Chat.builder()
+            .message("안녕")
+            .chatRoom(chatRoom1)
+            .build();
+        chat1.setCreatedAt(LocalDateTime.now());
+        ChatRoom chatRoom2 = ChatRoom.builder()
+            .id(2L)
+            .roomName("이펙티브 코틀린 부수는 방")
+            .roomSid("secret2")
+            .roomSize(10)
+            .defaultRoomImageType(4)
+            .roomImageUri("testRoomImageUri")
+            .build();
+        chatRoom2.setCreatedAt(LocalDateTime.now());
+        Chat chat2 = Chat.builder()
+            .message("잘가")
+            .chatRoom(chatRoom2)
+            .build();
+        chat2.setCreatedAt(LocalDateTime.now());
+        ChatRoom chatRoom3 = ChatRoom.builder()
+            .id(3L)
+            .roomName("토비의 스프링 부수는 방")
+            .roomSid("secret3")
+            .roomSize(5)
+            .defaultRoomImageType(3)
+            .roomImageUri(null)
+            .build();
+        chatRoom3.setCreatedAt(LocalDateTime.now());
+        Chat chat3 = Chat.builder()
+            .message("이거 모르겠음")
+            .chatRoom(chatRoom3)
+            .build();
+        chat3.setCreatedAt(LocalDateTime.now());
+        List<Chat> result = List.of(chat1, chat2, chat3);
+        PageRequest pageRequest = PageRequest.of(0, 3, Sort.by("id").descending());
+        Slice<Chat> slice = new SliceImpl<>(result, pageRequest, true);
+        SliceOfChatRoomsResponse response = new SliceOfChatRoomsResponse(slice);
         when(chatRoomService.getUserChatRooms(any(), any(), any())).thenReturn(response);
         mockMvc.perform(get("/v1/api/chatrooms")
                 .header(AUTHORIZATION, JWT_TOKEN)
@@ -188,13 +239,12 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                         .description("채팅방 SID"),
                     fieldWithPath("chatRoomResponseList[].defaultRoomImageType").type(NUMBER)
                         .description("기본 이미지 타입 번호"),
-                    fieldWithPath("chatRoomResponseList[].roomImageUri").type(STRING)
+                    fieldWithPath("chatRoomResponseList[].roomImageUri").optional().type(STRING)
                         .description("채팅방 이미지 URI"),
                     fieldWithPath("chatRoomResponseList[].lastActiveTime").type(STRING)
                         .description("마지막 채팅 활성 시간"),
                     fieldWithPath("chatRoomResponseList[].lastChatContent").type(STRING)
                         .description("마지막 채팅 내용")
-                ),
-                responseFields(getCursorField())));
+                ).and(getCursorField())));
     }
 }
