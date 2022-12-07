@@ -2,7 +2,6 @@ package toy.bookchat.bookchat.domain.agony.service.dto.response;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import lombok.Getter;
 import org.springframework.data.domain.Slice;
 import toy.bookchat.bookchat.domain.agonyrecord.AgonyRecord;
@@ -20,8 +19,10 @@ public class SliceOfAgonyRecordsResponse {
     }
 
     private Long getNextCursorId(List<AgonyRecord> content) {
-        return Optional.ofNullable(content.get(content.size() - 1)).map(AgonyRecord::getId)
-            .orElse(null);
+        if (content.isEmpty()) {
+            return null;
+        }
+        return content.get(content.size() - 1).getId();
     }
 
     private List<AgonyRecordResponse> from(List<AgonyRecord> content) {
