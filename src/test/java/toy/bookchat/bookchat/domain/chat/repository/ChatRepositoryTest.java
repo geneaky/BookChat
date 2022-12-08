@@ -71,7 +71,6 @@ class ChatRepositoryTest {
         PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("id").descending());
         Slice<Chat> slice = chatRepository.findUserChatRoomsWithLastChat(
             Optional.empty(), pageRequest, user1.getId());
-
         assertThat(slice.getContent()).containsExactly(chat4, chat2);
     }
 

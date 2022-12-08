@@ -15,8 +15,8 @@ import toy.bookchat.bookchat.domain.book.repository.BookRepository;
 import toy.bookchat.bookchat.domain.chat.repository.ChatRepository;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
 import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomRepository;
+import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomsResponseSlice;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.CreateChatRoomRequest;
-import toy.bookchat.bookchat.domain.chatroom.service.dto.response.SliceOfChatRoomsResponse;
 import toy.bookchat.bookchat.domain.chatroomhashtag.ChatRoomHashTag;
 import toy.bookchat.bookchat.domain.chatroomhashtag.repository.ChatRoomHashTagRepository;
 import toy.bookchat.bookchat.domain.chatroomhost.ChatRoomHost;
@@ -131,9 +131,9 @@ public class ChatRoomService {
     }
 
     @Transactional(readOnly = true)
-    public SliceOfChatRoomsResponse getUserChatRooms(Optional<Long> postCursorId,
+    public ChatRoomsResponseSlice getUserChatRooms(Optional<Long> postCursorId,
         Pageable pageable, Long userId) {
-        return SliceOfChatRoomsResponse.of(
+        return ChatRoomsResponseSlice.of(
             chatRepository.findUserChatRoomsWithLastChat(postCursorId, pageable, userId));
     }
 }

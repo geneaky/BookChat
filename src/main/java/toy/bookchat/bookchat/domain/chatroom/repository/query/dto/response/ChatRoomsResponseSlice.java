@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.domain.chatroom.service.dto.response;
+package toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,12 +9,12 @@ import toy.bookchat.bookchat.domain.chat.Chat;
 import toy.bookchat.bookchat.domain.common.CursorMeta;
 
 @Getter
-public class SliceOfChatRoomsResponse {
+public class ChatRoomsResponseSlice {
 
     private List<ChatRoomResponse> chatRoomResponseList;
     private CursorMeta<Long> cursorMeta;
 
-    private SliceOfChatRoomsResponse(Slice<Chat> slice) {
+    private ChatRoomsResponseSlice(Slice<Chat> slice) {
         this.cursorMeta = CursorMeta.from(slice, getNextCursorId(slice.getContent()));
         this.chatRoomResponseList = from(slice.getContent());
     }
@@ -23,8 +23,8 @@ public class SliceOfChatRoomsResponse {
         return Optional.ofNullable(content.get(content.size() - 1)).map(Chat::getId).orElse(null);
     }
 
-    public static SliceOfChatRoomsResponse of(Slice<Chat> slice) {
-        return new SliceOfChatRoomsResponse(slice);
+    public static ChatRoomsResponseSlice of(Slice<Chat> slice) {
+        return new ChatRoomsResponseSlice(slice);
     }
 
     private List<ChatRoomResponse> from(List<Chat> content) {

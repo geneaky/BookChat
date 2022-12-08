@@ -51,9 +51,9 @@ import toy.bookchat.bookchat.domain.ControllerTestExtension;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookRequest;
 import toy.bookchat.bookchat.domain.chat.Chat;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
+import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomsResponseSlice;
 import toy.bookchat.bookchat.domain.chatroom.service.ChatRoomService;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.CreateChatRoomRequest;
-import toy.bookchat.bookchat.domain.chatroom.service.dto.response.SliceOfChatRoomsResponse;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
@@ -209,7 +209,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
         List<Chat> result = List.of(chat1, chat2, chat3);
         PageRequest pageRequest = PageRequest.of(0, 3, Sort.by("id").descending());
         Slice<Chat> slice = new SliceImpl<>(result, pageRequest, true);
-        SliceOfChatRoomsResponse response = SliceOfChatRoomsResponse.of(slice);
+        ChatRoomsResponseSlice response = ChatRoomsResponseSlice.of(slice);
         when(chatRoomService.getUserChatRooms(any(), any(), any())).thenReturn(response);
         mockMvc.perform(get("/v1/api/chatrooms")
                 .header(AUTHORIZATION, JWT_TOKEN)
