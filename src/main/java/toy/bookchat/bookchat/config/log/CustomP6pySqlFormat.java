@@ -11,7 +11,8 @@ public class CustomP6pySqlFormat implements MessageFormattingStrategy {
         if (isDDL(tmpsql)) {
             return FormatStyle.DDL.getFormatter().format(sql);
         }
-        return FormatStyle.BASIC.getFormatter().format(sql);
+        return FormatStyle.HIGHLIGHT.getFormatter()
+            .format(FormatStyle.BASIC.getFormatter().format(sql));
     }
 
     private static boolean isDDL(String tmpsql) {
