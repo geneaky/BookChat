@@ -3,10 +3,13 @@ package toy.bookchat.bookchat.domain.chatroom.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+import java.util.Optional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import toy.bookchat.bookchat.domain.RepositoryTest;
 import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.book.repository.BookRepository;
@@ -65,7 +68,7 @@ class ChatRoomRepositoryTest {
         chatRoomRepository.save(chatRoom2);
         chatRoomRepository.save(chatRoom3);
 
-        Chat chat1 = Chat.builder().user(user1).message("a").chatRoom(chatRoom1).build();
+        Chat chat1 = Chat.builder().user(user1).chatRoom(chatRoom1).build();
         Chat chat2 = Chat.builder().user(user1).message("b").chatRoom(chatRoom2).build();
         Chat chat3 = Chat.builder().user(user1).message("c").chatRoom(chatRoom3).build();
         Chat chat4 = Chat.builder().user(user2).message("d").chatRoom(chatRoom3).build();
@@ -84,7 +87,9 @@ class ChatRoomRepositoryTest {
         participantRepository.save(participant4);
         em.flush();
         em.clear();
-        List<ChatRoomResponse> result = chatRoomRepository.test(user1.getId());
+        Pageable pageable = PageRequest.of(0, 1);
+        List<ChatRoomResponse> result = chatRoomRepository.test(pageable, Optional.of(1L),
+            user1.getId());
         System.out.println(result);
     }
 }
