@@ -14,17 +14,18 @@ public class ChatRoomsResponseSlice {
     private List<ChatRoomResponse> chatRoomResponseList;
     private CursorMeta<Long> cursorMeta;
 
-    private ChatRoomsResponseSlice(Slice<Chat> slice) {
+    private ChatRoomsResponseSlice(Slice<ChatRoomResponse> slice) {
         this.cursorMeta = CursorMeta.from(slice, getNextCursorId(slice.getContent()));
-        this.chatRoomResponseList = from(slice.getContent());
+        this.chatRoomResponseList = slice.getContent();
     }
 
-    private Long getNextCursorId(List<Chat> content) {
-        return Optional.ofNullable(content.get(content.size() - 1)).map(Chat::getId).orElse(null);
-    }
-
-    public static ChatRoomsResponseSlice of(Slice<Chat> slice) {
+    public static ChatRoomsResponseSlice of(Slice<ChatRoomResponse> slice) {
         return new ChatRoomsResponseSlice(slice);
+    }
+
+    private Long getNextCursorId(List<ChatRoomResponse> content) {
+        return Optional.ofNullable(content.get(content.size() - 1)).map(ChatRoomResponse::getRoomId)
+            .orElse(null);
     }
 
     private List<ChatRoomResponse> from(List<Chat> content) {

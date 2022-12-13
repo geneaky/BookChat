@@ -51,6 +51,7 @@ import toy.bookchat.bookchat.domain.ControllerTestExtension;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookRequest;
 import toy.bookchat.bookchat.domain.chat.Chat;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
+import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomResponse;
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomsResponseSlice;
 import toy.bookchat.bookchat.domain.chatroom.service.ChatRoomService;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.CreateChatRoomRequest;
@@ -206,9 +207,13 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .chatRoom(chatRoom3)
             .build();
         chat3.setCreatedAt(LocalDateTime.now());
-        List<Chat> result = List.of(chat1, chat2, chat3);
+        ChatRoomResponse chatRoomResponse1 = getChatRoomResponse(chatRoom1, chat1);
+        ChatRoomResponse chatRoomResponse2 = getChatRoomResponse(chatRoom2, chat2);
+        ChatRoomResponse chatRoomResponse3 = getChatRoomResponse(chatRoom3, chat3);
+        List<ChatRoomResponse> result = List.of(chatRoomResponse1, chatRoomResponse2,
+            chatRoomResponse3);
         PageRequest pageRequest = PageRequest.of(0, 3, Sort.by("id").descending());
-        Slice<Chat> slice = new SliceImpl<>(result, pageRequest, true);
+        Slice<ChatRoomResponse> slice = new SliceImpl<>(result, pageRequest, true);
         ChatRoomsResponseSlice response = ChatRoomsResponseSlice.of(slice);
         when(chatRoomService.getUserChatRooms(any(), any(), any())).thenReturn(response);
         mockMvc.perform(get("/v1/api/chatrooms")
@@ -237,6 +242,8 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                         .description("채팅방 이름"),
                     fieldWithPath("chatRoomResponseList[].roomSid").type(STRING)
                         .description("채팅방 SID"),
+                    fieldWithPath("chatRoomResponseList[].roomMemberCount").type(NUMBER)
+                        .description("채팅방 현재 인원수"),
                     fieldWithPath("chatRoomResponseList[].defaultRoomImageType").type(NUMBER)
                         .description("기본 이미지 타입 번호"),
                     fieldWithPath("chatRoomResponseList[].roomImageUri").optional().type(STRING)
@@ -246,5 +253,17 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                     fieldWithPath("chatRoomResponseList[].lastChatContent").type(STRING)
                         .description("마지막 채팅 내용")
                 ).and(getCursorField())));
+    }
+
+    private ChatRoomResponse getChatRoomResponse(ChatRoom chatRoom, Chat chat) {
+        return ChatRoomResponse.builder()
+            .roomId(chatRoom.getId())
+            .roomSid(chatRoom.getRoomSid())
+            .roomName(chatRoom.getRoomName())
+            .roomMemberCount(2L)
+            .defaultRoomImageType(1)
+            .lastActiveTime(chat.getCreatedAt())
+            .lastChatContent(chat.getMessage())
+            .build();
     }
 }

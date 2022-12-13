@@ -2,7 +2,6 @@ package toy.bookchat.bookchat.domain.chatroom.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -10,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import toy.bookchat.bookchat.domain.RepositoryTest;
 import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.book.repository.BookRepository;
@@ -88,8 +88,8 @@ class ChatRoomRepositoryTest {
         em.flush();
         em.clear();
         Pageable pageable = PageRequest.of(0, 1);
-        List<ChatRoomResponse> result = chatRoomRepository.test(pageable, Optional.of(1L),
-            user1.getId());
-        System.out.println(result);
+        Slice<ChatRoomResponse> chatRoomResponseSlice = chatRoomRepository.test2(pageable,
+            Optional.of(chatRoom3.getId()), user1.getId());
+        System.out.println(chatRoomResponseSlice);
     }
 }

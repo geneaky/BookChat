@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.book.repository.BookRepository;
-import toy.bookchat.bookchat.domain.chat.repository.ChatRepository;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
 import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomRepository;
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomsResponseSlice;
@@ -34,7 +33,6 @@ import toy.bookchat.bookchat.exception.user.UserNotFoundException;
 public class ChatRoomService {
 
     private final ChatRoomRepository chatRoomRepository;
-    private final ChatRepository chatRepository;
     private final ChatRoomHostRepository chatRoomHostRepository;
     private final ParticipantRepository participantRepository;
     private final HashTagRepository hashTagRepository;
@@ -45,7 +43,6 @@ public class ChatRoomService {
 
     public ChatRoomService(
         ChatRoomRepository chatRoomRepository,
-        ChatRepository chatRepository,
         ChatRoomHostRepository chatRoomHostRepository,
         ParticipantRepository participantRepository,
         HashTagRepository hashTagRepository,
@@ -54,7 +51,6 @@ public class ChatRoomService {
         BookRepository bookRepository,
         UserRepository userRepository) {
         this.chatRoomRepository = chatRoomRepository;
-        this.chatRepository = chatRepository;
         this.chatRoomHostRepository = chatRoomHostRepository;
         this.participantRepository = participantRepository;
         this.hashTagRepository = hashTagRepository;
@@ -133,7 +129,6 @@ public class ChatRoomService {
     @Transactional(readOnly = true)
     public ChatRoomsResponseSlice getUserChatRooms(Optional<Long> postCursorId,
         Pageable pageable, Long userId) {
-        return ChatRoomsResponseSlice.of(
-            chatRepository.findUserChatRoomsWithLastChat(postCursorId, pageable, userId));
+        return ChatRoomsResponseSlice.of(chatRoomRepository.test2(pageable, postCursorId, userId));
     }
 }
