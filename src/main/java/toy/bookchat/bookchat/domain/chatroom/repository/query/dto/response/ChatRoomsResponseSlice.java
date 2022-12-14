@@ -24,7 +24,8 @@ public class ChatRoomsResponseSlice {
     }
 
     private Long getNextCursorId(List<ChatRoomResponse> content) {
-        return Optional.ofNullable(content.get(content.size() - 1)).map(ChatRoomResponse::getRoomId)
+        return Optional.ofNullable(content.get(content.size() - 1))
+            .map(ChatRoomResponse::getLastChatId)
             .orElse(null);
     }
 

@@ -8,5 +8,6 @@ import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatR
 public interface ChatRoomQueryRepository {
 
 
-    Slice<ChatRoomResponse> test2(Pageable pageable, Optional<Long> postCursorId, Long userId);
+    Slice<ChatRoomResponse> findUserChatRoomsWithLastChat(Pageable pageable,
+        Optional<Long> postCursorId, Long userId);
 }

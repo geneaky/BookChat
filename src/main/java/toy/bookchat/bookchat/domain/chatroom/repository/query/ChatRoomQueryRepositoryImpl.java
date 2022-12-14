@@ -27,7 +27,8 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
         this.queryFactory = queryFactory;
     }
 
-    public Slice<ChatRoomResponse> test2(Pageable pageable, Optional<Long> postCursorId,
+    public Slice<ChatRoomResponse> findUserChatRoomsWithLastChat(Pageable pageable,
+        Optional<Long> postCursorId,
         Long userId) {
         QChat subChat = new QChat("subChat");
         QParticipant subParticipant1 = new QParticipant("subParticipant1");
@@ -41,6 +42,7 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
                     subParticipant1.count(),
                     chatRoom.defaultRoomImageType,
                     chatRoom.roomImageUri,
+                    chat.id,
                     chat.createdAt,
                     chat.message
                 ))
@@ -58,13 +60,13 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
             .groupBy(chatRoom.id)
             .where(afterPostCursorId(postCursorId))
             .limit(pageable.getPageSize())
-            .orderBy(chatRoom.id.desc())
+            .orderBy(chat.id.desc(), chatRoom.id.desc())
             .fetch();
 
         return toSlice(contents, pageable);
     }
 
     private BooleanExpression afterPostCursorId(Optional<Long> postCursorId) {
-        return postCursorId.map(chatRoom.id::lt).orElse(null);
+        return postCursorId.map(chat.id::lt).orElse(null);
     }
 }

@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,6 +27,7 @@ import toy.bookchat.bookchat.domain.chat.Chat;
 import toy.bookchat.bookchat.domain.chat.repository.ChatRepository;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
 import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomRepository;
+import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomResponse;
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomsResponseSlice;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.CreateChatRoomRequest;
 import toy.bookchat.bookchat.domain.chatroomhashtag.repository.ChatRoomHashTagRepository;
@@ -125,12 +127,25 @@ class ChatRoomServiceTest {
             .chatRoom(chatRoom1)
             .build();
         chat1.setCreatedAt(LocalDateTime.now());
-        List<Chat> result = List.of(chat1);
+        ChatRoomResponse chatRoomResponse = ChatRoomResponse.builder()
+            .roomId(chatRoom1.getId())
+            .roomSid(chatRoom1.getRoomSid())
+            .roomName(chatRoom1.getRoomName())
+            .roomMemberCount(1L)
+            .defaultRoomImageType(1)
+            .lastActiveTime(chat1.getCreatedAt())
+            .lastChatContent(chat1.getMessage())
+            .build();
+        List<ChatRoomResponse> result = List.of(chatRoomResponse);
         PageRequest pageRequest = PageRequest.of(0, 1, Sort.by("id").descending());
-        Slice<Chat> slice = new SliceImpl<>(result, pageRequest, true);
-        when(chatRepository.findUserChatRoomsWithLastChat(any(), any(), any())).thenReturn(slice);
+        Slice<ChatRoomResponse> slice = new SliceImpl<>(result, pageRequest, true);
+        when(chatRoomRepository.findUserChatRoomsWithLastChat(any(), any(), any())).thenReturn(
+            slice);
         ChatRoomsResponseSlice chatRoomsResponseSlice = chatRoomService.getUserChatRooms(any(),
-            any(), any());
-        verify(chatRepository).findUserChatRoomsWithLastChat(any(), any(), any());
+            any(),
+            any());
+
+        Assertions.assertThat(chatRoomsResponseSlice).usingRecursiveComparison()
+            .isEqualTo(ChatRoomsResponseSlice.of(slice));
     }
 }

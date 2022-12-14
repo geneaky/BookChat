@@ -175,6 +175,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .build();
         chatRoom1.setCreatedAt(LocalDateTime.now());
         Chat chat1 = Chat.builder()
+            .id(1L)
             .message("안녕")
             .chatRoom(chatRoom1)
             .build();
@@ -189,6 +190,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .build();
         chatRoom2.setCreatedAt(LocalDateTime.now());
         Chat chat2 = Chat.builder()
+            .id(2L)
             .message("잘가")
             .chatRoom(chatRoom2)
             .build();
@@ -203,6 +205,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .build();
         chatRoom3.setCreatedAt(LocalDateTime.now());
         Chat chat3 = Chat.builder()
+            .id(3L)
             .message("이거 모르겠음")
             .chatRoom(chatRoom3)
             .build();
@@ -220,9 +223,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
                 .param("postCursorId", "0")
-                .param("page", "0")
-                .param("size", "3")
-                .param("sort", "id,DESC"))
+                .param("size", "3"))
             .andExpect(status().isOk())
             .andDo(document("get-user-chatrooms",
                 requestHeaders(
@@ -231,9 +232,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                 requestParameters(
                     parameterWithName("postCursorId").optional()
                         .description("마지막 커서 ID"),
-                    parameterWithName("page").optional().description("페이지 번호"),
-                    parameterWithName("size").optional().description("페이지 사이즈"),
-                    parameterWithName("sort").optional().description("정렬 기준 id [ASC,DESC]")
+                    parameterWithName("size").optional().description("페이지 사이즈")
                 ),
                 responseFields(
                     fieldWithPath("chatRoomResponseList[].roomId").type(NUMBER)
@@ -248,6 +247,8 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                         .description("기본 이미지 타입 번호"),
                     fieldWithPath("chatRoomResponseList[].roomImageUri").optional().type(STRING)
                         .description("채팅방 이미지 URI"),
+                    fieldWithPath("chatRoomResponseList[].lastChatId").type(NUMBER)
+                        .description("마지막 채팅 ID"),
                     fieldWithPath("chatRoomResponseList[].lastActiveTime").type(STRING)
                         .description("마지막 채팅 활성 시간"),
                     fieldWithPath("chatRoomResponseList[].lastChatContent").type(STRING)
@@ -262,6 +263,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .roomName(chatRoom.getRoomName())
             .roomMemberCount(2L)
             .defaultRoomImageType(1)
+            .lastChatId(chat.getId())
             .lastActiveTime(chat.getCreatedAt())
             .lastChatContent(chat.getMessage())
             .build();
