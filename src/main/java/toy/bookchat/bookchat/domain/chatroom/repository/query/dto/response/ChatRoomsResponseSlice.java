@@ -2,7 +2,6 @@ package toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import lombok.Getter;
 import org.springframework.data.domain.Slice;
 import toy.bookchat.bookchat.domain.chat.Chat;
@@ -24,9 +23,11 @@ public class ChatRoomsResponseSlice {
     }
 
     private Long getNextCursorId(List<ChatRoomResponse> content) {
-        return Optional.ofNullable(content.get(content.size() - 1))
-            .map(ChatRoomResponse::getLastChatId)
-            .orElse(null);
+        if (content == null || content.isEmpty()) {
+            return null;
+        }
+
+        return content.get(content.size() - 1).getLastChatId();
     }
 
     private List<ChatRoomResponse> from(List<Chat> content) {
