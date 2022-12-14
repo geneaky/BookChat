@@ -9,19 +9,19 @@ public class BookResponse {
 
     private String isbn;
     private String title;
-    private String datetime;
-    private List<String> author;
+    private String publishAt;
+    private List<String> authors;
     private String publisher;
     private String bookCoverImageUrl;
 
     @Builder
-    private BookResponse(String isbn, String title, String datetime, List<String> author,
+    private BookResponse(String isbn, String title, String publishAt, List<String> authors,
         String publisher,
         String bookCoverImageUrl) {
         this.isbn = isbn;
         this.title = title;
-        this.datetime = datetime;
-        this.author = author;
+        this.publishAt = publishAt;
+        this.authors = authors;
         this.publisher = publisher;
         this.bookCoverImageUrl = bookCoverImageUrl;
     }

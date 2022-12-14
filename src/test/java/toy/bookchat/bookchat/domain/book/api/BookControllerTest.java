@@ -96,12 +96,12 @@ class BookControllerTest extends ControllerTestExtension {
     }
 
     private BookResponse getBookResponse(String isbn, String title, String datetime,
-        List<String> author) {
+        List<String> authors) {
         return BookResponse.builder()
             .isbn(isbn)
             .title(title)
-            .datetime(datetime.substring(0, 10))
-            .author(author)
+            .publishAt(datetime.substring(0, 10))
+            .authors(authors)
             .publisher("testPublisher")
             .bookCoverImageUrl("bookCoverImageUrl")
             .build();
@@ -174,8 +174,8 @@ class BookControllerTest extends ControllerTestExtension {
                 responseFields(
                     fieldWithPath("bookResponses[].isbn").type(STRING).description("ISBN"),
                     fieldWithPath("bookResponses[].title").type(STRING).description("제목"),
-                    fieldWithPath("bookResponses[].datetime").type(STRING).description("출간일"),
-                    fieldWithPath("bookResponses[].author[]").type(ARRAY).description("저자"),
+                    fieldWithPath("bookResponses[].publishAt").type(STRING).description("출간일"),
+                    fieldWithPath("bookResponses[].authors[]").type(ARRAY).description("저자"),
                     fieldWithPath("bookResponses[].publisher").type(STRING).description("출판사"),
                     fieldWithPath("bookResponses[].bookCoverImageUrl").type(STRING)
                         .description("책 표지 이미지"),

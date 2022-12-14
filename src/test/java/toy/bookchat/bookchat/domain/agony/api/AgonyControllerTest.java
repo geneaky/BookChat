@@ -161,7 +161,7 @@ class AgonyControllerTest extends ControllerTestExtension {
                 .with(user(getUserPrincipal()))
                 .queryParam("size", "2")
                 .queryParam("sort", "id,DESC")
-                .queryParam("postAgonyCursorId", "1"))
+                .queryParam("postCursorId", "1"))
             .andExpect(status().isOk())
             .andDo(print())
             .andDo(document("get-agonies",
@@ -171,8 +171,8 @@ class AgonyControllerTest extends ControllerTestExtension {
                 requestParameters(
                     parameterWithName("size").description("page 당 size"),
                     parameterWithName("sort").description("[최신순] - id,DESC | [등록순] - id,ASC"),
-                    parameterWithName("postAgonyCursorId").optional()
-                        .description("다음 Cursor로 지정할 마지막 AgonyId")
+                    parameterWithName("postCursorId").optional()
+                        .description("마지막 커서 ID")
                 ),
                 responseFields(
                     fieldWithPath("agonyResponseList[].agonyId").type(NUMBER).description("고민 Id"),

@@ -26,7 +26,7 @@ import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 class OpenIdTokenConfigTest {
 
     @MockBean
-    OAuth2Config oAuth2Config;
+    OAuth2Properties oAuth2Properties;
     @Autowired
     OpenIdTokenConfig openIdTokenConfig;
     @Autowired
@@ -41,7 +41,7 @@ class OpenIdTokenConfigTest {
     @Test
     public void kakao_keyId_oAuth2Provider로_요청시_일치하는_publickey반환() throws Exception {
 
-        when(oAuth2Config.getKakaoURI()).thenReturn(apiUri);
+        when(oAuth2Properties.getKakaoUri()).thenReturn(apiUri);
         mockServer.expect(requestTo(apiUri))
             .andRespond(withSuccess(result, MediaType.APPLICATION_JSON));
 

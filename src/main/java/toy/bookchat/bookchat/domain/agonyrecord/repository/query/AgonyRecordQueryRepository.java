@@ -9,7 +9,7 @@ import toy.bookchat.bookchat.domain.agonyrecord.AgonyRecord;
 public interface AgonyRecordQueryRepository {
 
     Slice<AgonyRecord> findSliceOfUserAgonyRecords(Long agonyId, Long userId,
-        Pageable pageable, Optional<Long> postRecordCursorId);
+        Pageable pageable, Optional<Long> postCursorId);
 
     void deleteAgony(Long userId, Long agonyId, Long recordId);
 

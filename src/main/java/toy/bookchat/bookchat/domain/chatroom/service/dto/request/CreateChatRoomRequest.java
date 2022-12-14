@@ -25,27 +25,33 @@ public class CreateChatRoomRequest {
     private String roomName;
     @Min(2)
     private Integer roomSize;
+    @NotNull
+    private Integer defaultRoomImageType;
     private List<String> hashTags;
     @Valid
     @NotNull
     private BookRequest bookRequest;
 
     @Builder
-    public CreateChatRoomRequest(String roomName, Integer roomSize, List<String> hashTags,
+    public CreateChatRoomRequest(String roomName, Integer roomSize, Integer defaultRoomImageType,
+        List<String> hashTags,
         BookRequest bookRequest) {
         this.roomName = roomName;
         this.roomSize = roomSize;
+        this.defaultRoomImageType = defaultRoomImageType;
         this.hashTags = hashTags;
         this.bookRequest = bookRequest;
     }
 
     public ChatRoom makeChatRoom(Book book,
-        ChatRoomHost chatRoomHost) {
+        ChatRoomHost chatRoomHost, String fileUrl) {
         return ChatRoom.builder()
             .book(book)
-            .roomSID(UUID.randomUUID().toString())
+            .roomSid(UUID.randomUUID().toString())
             .roomName(this.roomName)
             .roomSize(this.roomSize)
+            .defaultRoomImageType(this.defaultRoomImageType)
+            .roomImageUri(fileUrl)
             .chatRoomHost(chatRoomHost)
             .build();
     }

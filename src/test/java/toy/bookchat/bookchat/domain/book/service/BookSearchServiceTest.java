@@ -65,11 +65,11 @@ class BookSearchServiceTest {
                 isbn),
             () -> assertThat(bookSearchResponse.getBookResponses().get(0).getTitle()).isEqualTo(
                 title),
-            () -> assertThat(bookSearchResponse.getBookResponses().get(0).getDatetime()).isEqualTo(
+            () -> assertThat(bookSearchResponse.getBookResponses().get(0).getPublishAt()).isEqualTo(
                 datetime),
             () -> assertThat(bookSearchResponse.getBookResponses().get(0).getPublisher()).isEqualTo(
                 publisher),
-            () -> assertThat(bookSearchResponse.getBookResponses().get(0).getAuthor()).isEqualTo(
+            () -> assertThat(bookSearchResponse.getBookResponses().get(0).getAuthors()).isEqualTo(
                 List.of(authors)),
             () -> assertThat(
                 bookSearchResponse.getBookResponses().get(0).getBookCoverImageUrl()).isEqualTo(
@@ -98,11 +98,11 @@ class BookSearchServiceTest {
                 isbn),
             () -> assertThat(bookSearchResponse.getBookResponses().get(0).getTitle()).isEqualTo(
                 title),
-            () -> assertThat(bookSearchResponse.getBookResponses().get(0).getDatetime()).isEqualTo(
+            () -> assertThat(bookSearchResponse.getBookResponses().get(0).getPublishAt()).isEqualTo(
                 datetime),
             () -> assertThat(bookSearchResponse.getBookResponses().get(0).getPublisher()).isEqualTo(
                 publisher),
-            () -> assertThat(bookSearchResponse.getBookResponses().get(0).getAuthor()).isEqualTo(
+            () -> assertThat(bookSearchResponse.getBookResponses().get(0).getAuthors()).isEqualTo(
                 List.of(authors)),
             () -> assertThat(
                 bookSearchResponse.getBookResponses().get(0).getBookCoverImageUrl()).isEqualTo(
@@ -131,11 +131,11 @@ class BookSearchServiceTest {
                 isbn),
             () -> assertThat(bookSearchResponse.getBookResponses().get(0).getTitle()).isEqualTo(
                 title),
-            () -> assertThat(bookSearchResponse.getBookResponses().get(0).getDatetime()).isEqualTo(
+            () -> assertThat(bookSearchResponse.getBookResponses().get(0).getPublishAt()).isEqualTo(
                 datetime),
             () -> assertThat(bookSearchResponse.getBookResponses().get(0).getPublisher()).isEqualTo(
                 publisher),
-            () -> assertThat(bookSearchResponse.getBookResponses().get(0).getAuthor()).isEqualTo(
+            () -> assertThat(bookSearchResponse.getBookResponses().get(0).getAuthors()).isEqualTo(
                 List.of(authors)),
             () -> assertThat(
                 bookSearchResponse.getBookResponses().get(0).getBookCoverImageUrl()).isEqualTo(

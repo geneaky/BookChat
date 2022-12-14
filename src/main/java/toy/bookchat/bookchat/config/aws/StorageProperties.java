@@ -7,22 +7,24 @@ import org.springframework.boot.context.properties.ConstructorBinding;
 @Getter
 @ConstructorBinding
 @ConfigurationProperties(prefix = "aws.s3")
-public class S3Config {
+public class StorageProperties {
 
     private final String accessKey;
     private final String secretKey;
     private final String region;
     private final String bucketName;
-    private final String imageFolder;
+    private final String userProfileImageFolder;
+    private final String chatRoomImageFolder;
     private final String imageBucketUrl;
 
-    public S3Config(String accessKey, String secretKey, String region, String imageBucketUrl, String bucketName, String imageFolder) {
+    public StorageProperties(String accessKey, String secretKey, String region, String bucketName,
+        String userProfileImageFolder, String chatRoomImageFolder, String imageBucketUrl) {
         this.accessKey = accessKey;
         this.secretKey = secretKey;
         this.region = region;
         this.bucketName = bucketName;
-        this.imageFolder = imageFolder;
+        this.userProfileImageFolder = userProfileImageFolder;
+        this.chatRoomImageFolder = chatRoomImageFolder;
         this.imageBucketUrl = imageBucketUrl;
     }
 }
-

@@ -7,13 +7,13 @@ import org.springframework.boot.context.properties.ConstructorBinding;
 @Getter
 @ConstructorBinding
 @ConfigurationProperties(prefix = "oauth2")
-public class OAuth2Config {
+public class OAuth2Properties {
 
-    private final String kakaoURI;
-    private final String googleURI;
+    private final String kakaoUri;
+    private final String googleUri;
 
-    public OAuth2Config(String kakaoURI, String googleURI) {
-        this.kakaoURI = kakaoURI;
-        this.googleURI = googleURI;
+    public OAuth2Properties(String kakaoUri, String googleUri) {
+        this.kakaoUri = kakaoUri;
+        this.googleUri = googleUri;
     }
 }

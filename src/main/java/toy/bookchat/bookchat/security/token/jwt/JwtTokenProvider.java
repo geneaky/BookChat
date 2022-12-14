@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import toy.bookchat.bookchat.config.JwtTokenConfig;
+import toy.bookchat.bookchat.config.JwtTokenProperties;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.api.dto.Token;
 
@@ -25,10 +25,10 @@ import toy.bookchat.bookchat.domain.user.api.dto.Token;
 @Component
 public class JwtTokenProvider {
 
-    private final JwtTokenConfig jwtTokenConfig;
+    private final JwtTokenProperties jwtTokenProperties;
 
-    public JwtTokenProvider(JwtTokenConfig jwtTokenConfig) {
-        this.jwtTokenConfig = jwtTokenConfig;
+    public JwtTokenProvider(JwtTokenProperties jwtTokenProperties) {
+        this.jwtTokenProperties = jwtTokenProperties;
     }
 
     public Token createToken(User user) {
@@ -40,23 +40,23 @@ public class JwtTokenProvider {
 
     public String createRefreshToken(User user) {
         Date date = new Date();
-        date.setTime(date.getTime() + jwtTokenConfig.getRefreshTokenExpiredTime());
+        date.setTime(date.getTime() + jwtTokenProperties.getRefreshTokenExpiredTime());
 
         return Jwts.builder()
             .setClaims(createClaims(user))
             .setExpiration(date)
-            .signWith(SignatureAlgorithm.HS256, jwtTokenConfig.getSecret())
+            .signWith(SignatureAlgorithm.HS256, jwtTokenProperties.getSecret())
             .compact();
     }
 
     public String createAccessToken(User user) {
         Date date = new Date();
-        date.setTime(date.getTime() + jwtTokenConfig.getAccessTokenExpiredTime());
+        date.setTime(date.getTime() + jwtTokenProperties.getAccessTokenExpiredTime());
 
         return Jwts.builder()
             .setClaims(createClaims(user))
             .setExpiration(date)
-            .signWith(SignatureAlgorithm.HS256, jwtTokenConfig.getSecret())
+            .signWith(SignatureAlgorithm.HS256, jwtTokenProperties.getSecret())
             .compact();
     }
 

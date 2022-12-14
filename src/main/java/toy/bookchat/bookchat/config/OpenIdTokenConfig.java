@@ -18,16 +18,17 @@ import toy.bookchat.bookchat.security.token.openid.keys.KakaoPublicKeys;
 public class OpenIdTokenConfig {
 
     public static final String RSA = "RSA";
-    private final OAuth2Config oAuth2Config;
+    private final OAuth2Properties oAuth2Properties;
     private final RestTemplate restTemplate;
     private final ConcurrentHashMap<OAuth2Provider, LocalDateTime> publicKeysCachedTime;
     private final KeyFactory keyFactory;
     private KakaoPublicKeys kakaoPublicKeys;
     private GooglePublicKeys googlePublicKeys;
 
-    public OpenIdTokenConfig(RestTemplateBuilder restTemplateBuilder, OAuth2Config oAuth2Config) {
+    public OpenIdTokenConfig(RestTemplateBuilder restTemplateBuilder,
+        OAuth2Properties oAuth2Properties) {
         this.restTemplate = restTemplateBuilder.build();
-        this.oAuth2Config = oAuth2Config;
+        this.oAuth2Properties = oAuth2Properties;
         this.publicKeysCachedTime = new ConcurrentHashMap<>();
         this.keyFactory = createKeyFactory();
     }
@@ -96,7 +97,7 @@ public class OpenIdTokenConfig {
     }
 
     private KakaoPublicKeys fetchKakaoPublicKey() {
-        return restTemplate.exchange(oAuth2Config.getKakaoURI(),
+        return restTemplate.exchange(oAuth2Properties.getKakaoUri(),
             HttpMethod.GET,
             null, KakaoPublicKeys.class).getBody();
     }

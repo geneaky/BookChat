@@ -4,13 +4,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Consumer;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import toy.bookchat.bookchat.domain.agony.service.AgonyService;
 import toy.bookchat.bookchat.domain.bookshelf.service.BookShelfService;
 import toy.bookchat.bookchat.domain.storage.StorageService;
-import toy.bookchat.bookchat.domain.storage.image.ImageValidator;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.domain.user.service.dto.request.ChangeUserNicknameRequest;
@@ -25,18 +26,15 @@ public class UserService {
     private final BookShelfService bookShelfService;
     private final AgonyService agonyService;
     private final StorageService storageService;
-    private final ImageValidator imageValidator;
 
     public UserService(UserRepository userRepository,
         BookShelfService bookShelfService,
         AgonyService agonyService,
-        StorageService storageService,
-        ImageValidator imageValidator) {
+        @Qualifier("userProfileStorageService") StorageService storageService) {
         this.userRepository = userRepository;
         this.bookShelfService = bookShelfService;
         this.agonyService = agonyService;
         this.storageService = storageService;
-        this.imageValidator = imageValidator;
     }
 
     @Transactional(readOnly = true)
@@ -46,29 +44,26 @@ public class UserService {
 
     @Transactional
     public void registerNewUser(UserSignUpRequest userSignUpRequest,
-        MultipartFile userProfileImage, String userName, String userEmail) {
-        if (imageValidator.hasValidImage(userProfileImage)) {
-            String prefixedUUIDFileName = createFileName(userProfileImage);
-            String prefixedUUIDFileUrl = createFileUrl(prefixedUUIDFileName);
+        Optional<MultipartFile> userProfileImage, String userName, String userEmail) {
+        userProfileImage.ifPresentOrElse(uploadWithImage(userSignUpRequest, userName, userEmail),
+            uploadWithoutImage(userSignUpRequest, userName, userEmail));
+    }
 
+    private Runnable uploadWithoutImage(UserSignUpRequest userSignUpRequest, String userName,
+        String userEmail) {
+        return () -> saveUser(userSignUpRequest, userName, userEmail, null);
+    }
+
+    private Consumer<MultipartFile> uploadWithImage(UserSignUpRequest userSignUpRequest,
+        String userName, String userEmail) {
+        return image -> {
+            String prefixedUUIDFileName = storageService.createFileName(
+                image, UUID.randomUUID().toString(),
+                new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+            String prefixedUUIDFileUrl = storageService.getFileUrl(prefixedUUIDFileName);
             saveUser(userSignUpRequest, userName, userEmail, prefixedUUIDFileUrl);
-
-            storageService.upload(userProfileImage, prefixedUUIDFileName);
-            return;
-        }
-
-        saveUser(userSignUpRequest, userName, userEmail, null);
-    }
-
-    private String createFileUrl(String prefixedUUIDFileName) {
-        return storageService.getFileUrl(prefixedUUIDFileName);
-    }
-
-    private String createFileName(MultipartFile userProfileImage) {
-        return storageService.createFileName(
-            imageValidator.getFileExtension(userProfileImage),
-            UUID.randomUUID().toString(),
-            new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+            storageService.upload(image, prefixedUUIDFileName);
+        };
     }
 
     @Transactional(readOnly = true)
@@ -93,8 +88,7 @@ public class UserService {
 
     private void saveUser(UserSignUpRequest userSignUpRequest, String userName,
         String email, String profileImageUrl) {
-        Optional<User> optionalUser = userRepository.findByName(userName);
-        optionalUser.ifPresentOrElse(user -> {
+        userRepository.findByName(userName).ifPresentOrElse(user -> {
             throw new UserAlreadySignUpException();
         }, () -> {
             User user = userSignUpRequest.getUser(userName, email, profileImageUrl);

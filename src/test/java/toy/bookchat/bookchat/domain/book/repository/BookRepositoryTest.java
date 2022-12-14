@@ -27,6 +27,7 @@ class BookRepositoryTest {
         CountDownLatch countDownLatch = new CountDownLatch(maxSize);
         Book book = Book.builder()
             .isbn("1234")
+            .publishAt(LocalDate.now())
             .build();
 
         AtomicReference<Throwable> exception = new AtomicReference<>();

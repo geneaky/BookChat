@@ -155,7 +155,7 @@ class AgonyRecordControllerTest extends ControllerTestExtension {
         mockMvc.perform(get("/v1/api/agonies/{agonyId}/records", 1, 1)
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
-                .queryParam("recordCursorId", "1")
+                .queryParam("postCursorId", "1")
                 .queryParam("size", "2")
                 .queryParam("sort", "id,ASC"))
             .andExpect(status().isOk())
@@ -167,8 +167,8 @@ class AgonyRecordControllerTest extends ControllerTestExtension {
                     parameterWithName("agonyId").description("Agony Id")
                 ),
                 requestParameters(
-                    parameterWithName("recordCursorId").optional()
-                        .description("다음 Cursor로 지정할 마지막 Agony Record Id"),
+                    parameterWithName("postCursorId").optional()
+                        .description("마지막 커서 ID"),
                     parameterWithName("size").description("page당 size"),
                     parameterWithName("sort").description("[최신순] - id,DESC | [등록순] - id,ASC")
                 ),

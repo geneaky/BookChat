@@ -10,7 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import toy.bookchat.bookchat.config.JwtTokenConfig;
+import toy.bookchat.bookchat.config.JwtTokenProperties;
 import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.api.dto.Token;
@@ -20,7 +20,7 @@ import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 class JwtTokenProviderTest {
 
     @Mock
-    JwtTokenConfig jwtTokenConfig;
+    JwtTokenProperties jwtTokenProperties;
 
     @InjectMocks
     JwtTokenManagerImpl jwtTokenManager;
@@ -43,9 +43,9 @@ class JwtTokenProviderTest {
 
     @Test
     void 토큰을_생성_성공() throws Exception {
-        when(jwtTokenConfig.getAccessTokenExpiredTime()).thenReturn(99956L);
-        when(jwtTokenConfig.getRefreshTokenExpiredTime()).thenReturn(991628L);
-        when(jwtTokenConfig.getSecret()).thenReturn("test");
+        when(jwtTokenProperties.getAccessTokenExpiredTime()).thenReturn(99956L);
+        when(jwtTokenProperties.getRefreshTokenExpiredTime()).thenReturn(991628L);
+        when(jwtTokenProperties.getSecret()).thenReturn("test");
         Token token = tokenProvider.createToken(getUser());
 
         String userName = jwtTokenManager.getOAuth2MemberNumberFromToken(

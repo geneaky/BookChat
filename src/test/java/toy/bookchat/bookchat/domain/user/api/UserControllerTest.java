@@ -12,6 +12,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -65,7 +66,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.Base64Utils;
-import org.springframework.web.multipart.MultipartFile;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.api.dto.Token;
@@ -316,7 +316,7 @@ class UserControllerTest extends ControllerTestExtension {
 
         mockMvc.perform(multipart("/v1/api/users/signup")
                 .file(multipartFile)
-                .file(new MockMultipartFile("userSignUpRequest", "", "application/json",
+                .file(new MockMultipartFile("userSignUpRequest", "", APPLICATION_JSON_VALUE,
                     objectMapper.writeValueAsString(userSignUpRequest)
                         .getBytes(UTF_8)))
                 .header(OIDC, BEARER + testToken))
@@ -335,10 +335,7 @@ class UserControllerTest extends ControllerTestExtension {
                     fieldWithPath("oauth2Provider").description("프로바이더 타입[kakao/google]")
                 )));
 
-        verify(userService).registerNewUser(any(UserSignUpRequest.class),
-            any(MultipartFile.class),
-            anyString(),
-            anyString());
+        verify(userService).registerNewUser(any(), any(), any(), any());
     }
 
     @Test

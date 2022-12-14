@@ -38,11 +38,11 @@ public class AgonyController {
 
     @GetMapping("/v1/api/agonies")
     public SliceOfAgoniesResponse searchSliceOfAgonies(
-        @RequestParam Optional<Long> postAgonyCursorId, Pageable pageable,
+        @RequestParam Optional<Long> postCursorId, Pageable pageable,
         @UserPayload TokenPayload tokenPayload) {
 
         return agonyService.searchSliceOfAgonies(tokenPayload.getUserId(), pageable,
-            postAgonyCursorId);
+            postCursorId);
     }
 
     @DeleteMapping("/v1/api/agonies/{agoniesIds}")

@@ -44,10 +44,10 @@ public class AgonyService {
 
     @Transactional(readOnly = true)
     public SliceOfAgoniesResponse searchSliceOfAgonies(Long userId,
-        Pageable pageable, Optional<Long> postAgonyCursorId) {
+        Pageable pageable, Optional<Long> postCursorId) {
         return new SliceOfAgoniesResponse(
             agonyRepository.findUserBookShelfSliceOfAgonies(userId, pageable,
-                postAgonyCursorId));
+                postCursorId));
     }
 
     @Transactional
