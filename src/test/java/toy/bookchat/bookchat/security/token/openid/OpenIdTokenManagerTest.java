@@ -2,7 +2,6 @@ package toy.bookchat.bookchat.security.token.openid;
 
 import static io.jsonwebtoken.JwsHeader.KEY_ID;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -26,7 +25,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.util.Base64Utils;
-import toy.bookchat.bookchat.config.OpenIdTokenConfig;
+import toy.bookchat.bookchat.config.security.OpenIdTokenConfig;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
 @ExtendWith(MockitoExtension.class)

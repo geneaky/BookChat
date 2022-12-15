@@ -12,7 +12,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.restdocs.payload.FieldDescriptor;
-import toy.bookchat.bookchat.config.OpenIdTokenConfig;
+import toy.bookchat.bookchat.config.security.OpenIdTokenConfig;
 import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.security.ipblock.IpBlockManager;

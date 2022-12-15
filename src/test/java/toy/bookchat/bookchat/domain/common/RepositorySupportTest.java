@@ -13,7 +13,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import toy.bookchat.bookchat.config.JpaAuditingConfig;
+import toy.bookchat.bookchat.config.query.JpaAuditingConfig;
 import toy.bookchat.bookchat.domain.configuration.TestConfig;
 
 @DataJpaTest
