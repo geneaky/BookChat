@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import toy.bookchat.bookchat.config.JwtTokenProperties;
+import toy.bookchat.bookchat.config.security.JwtTokenProperties;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.api.dto.Token;
 

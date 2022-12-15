@@ -19,7 +19,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import toy.bookchat.bookchat.config.JwtTokenProperties;
+import toy.bookchat.bookchat.config.security.JwtTokenProperties;
 import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.api.dto.Token;

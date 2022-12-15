@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.config;
+package toy.bookchat.bookchat.config.query;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

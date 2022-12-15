@@ -6,8 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import toy.bookchat.bookchat.config.JpaAuditingConfig;
 import toy.bookchat.bookchat.config.log.P6spyLogMessageFormatConfig;
+import toy.bookchat.bookchat.config.query.JpaAuditingConfig;
 import toy.bookchat.bookchat.domain.configuration.TestConfig;
 
 @Retention(RetentionPolicy.RUNTIME)

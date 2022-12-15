@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.config;
+package toy.bookchat.bookchat.config.query;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import javax.persistence.EntityManager;

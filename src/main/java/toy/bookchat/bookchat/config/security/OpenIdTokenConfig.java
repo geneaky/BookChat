@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.config;
+package toy.bookchat.bookchat.config.security;
 
 import java.security.Key;
 import java.security.KeyFactory;
