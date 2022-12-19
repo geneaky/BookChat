@@ -1,0 +1,9 @@
+### 도서 검색
+GET localhost:8080/v1/api/books?query=effective&size=3&page=1&sort=LATEST
+Authorization: {{jwt_token}}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
