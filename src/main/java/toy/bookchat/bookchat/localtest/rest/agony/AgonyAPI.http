@@ -1,0 +1,34 @@
+### 고민 폴더 생성
+POST localhost:8080/v1/api/bookshelf/books/{{bookId}}/agonies
+Authorization: {{jwt_token}}
+Content-Type: application/json
+
+{
+  "title": "고민2",
+  "hexColorCode": "파랑"
+}
+
+### 고민 폴더 조회
+GET localhost:8080/v1/api/agonies?page=0&size=3&sort=id,ASC
+Authorization: {{jwt_token}}
+
+> {%
+client.test("Request executed successfully", function() {
+client.assert(response.status === 200, "Response status is not 200");
+});
+client.global.set("agonyId", response.body.agonyResponseList[0].agonyId);
+%}
+
+### 고민 폴더 수정
+PUT localhost:8080/v1/api/agonies/{{agonyId}}
+Authorization: {{jwt_token}}
+Content-Type: application/json
+
+{
+  "agonyTitle": "새로운 고민",
+  "agonyColor": "보라색"
+}
+
+### 고민 폴더 삭제
+DELETE localhost:8080/v1/api/agonies/{{agonyId}}
+Authorization: {{jwt_token}}

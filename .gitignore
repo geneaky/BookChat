@@ -8,7 +8,6 @@ build/
 !**/src/test/**/build/
 src/main/resources/*
 !src/main/resources/.gitkeep
-src/main/java/toy/bookchat/bookchat/localtest/
 logs/
 !src/main/resources/log4j2-spring-production.xml
 spy.log

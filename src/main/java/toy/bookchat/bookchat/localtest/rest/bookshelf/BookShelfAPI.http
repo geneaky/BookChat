@@ -1,0 +1,49 @@
+### 서재에 책 등록
+POST localhost:8080/v1/api/bookshelf/books
+Authorization: {{jwt_token}}
+Content-Type: application/json
+
+{
+  "bookRequest": {
+    "isbn": "1162240032 9791162240038",
+    "title": "Effective C#(이펙티브)",
+    "authors": ["빌 와그너"],
+    "publisher": "한빛미디어",
+    "bookCoverImageUrl": "https://search1.kakaocdn.net/thumb/R120x174.q85/?fname=http%3A%2F%2Ft1.daumcdn.net%2Flbook%2Fimage%2F1611826%3Ftimestamp%3D20221107221559",
+    "publishAt": "2017-11-06"
+  },
+  "readingStatus": "READING",
+  "star": null
+}
+
+### 서재에서 책 조회
+GET localhost:8080/v1/api/bookshelf/books?readingStatus=READING&size=1&page=0&sort=id,ASC
+Authorization: {{jwt_token}}
+
+> {%
+client.test("Request executed successfully", function() {
+client.assert(response.status === 200, "Response status is not 200");
+});
+client.global.set("bookId", response.body.contents[0].bookId);
+client.global.set("isbn", response.body.contents[0].isbn);
+client.global.set("publishAt", response.body.contents[0].publishAt);
+%}
+
+### 서재에서 책 삭제
+DELETE localhost:8080/v1/api/bookshelf/books/{{bookId}}
+Authorization: {{jwt_token}}
+
+### 서재 페이지|별점|독서상태변경
+PUT localhost:8080/v1/api/bookshelf/books/{{bookId}}/pages
+Authorization: {{jwt_token}}
+Content-Type: application/json
+
+{
+  "pages": 100,
+  "star": "FIVE",
+  "readingStatus": "COMPLETE"
+}
+
+### 서재에 등록된 책이면 조회
+GET localhost:8080/v1/api/bookshelf/books/existence?isbn={{isbn}}&publishAt={{publishAt}}
+Authorization: {{jwt_token}}
