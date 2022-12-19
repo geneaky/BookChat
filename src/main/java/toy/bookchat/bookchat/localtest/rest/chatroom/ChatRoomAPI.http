@@ -1,0 +1,29 @@
+### 채팅방 생성
+POST localhost:8080/v1/api/chatrooms
+Authorization: {{jwt_token}}
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Type: application/json
+Content-Disposition: form-data; name="createChatRoomRequest"; filename="createChatRoomRequest";
+
+{
+  "roomName": "effective java 부수기3",
+  "roomSize": 5,
+  "hashTags": ["java", "joshua"],
+  "defaultRoomImageType": 1,
+  "bookRequest": {
+    "isbn": "1234567890",
+    "title": "effective java",
+    "authors": ["joshua"],
+    "publisher": "insight",
+    "bookCoverImageUrl": "test cover image url",
+    "publishAt": "2022-12-02"
+  }
+}
+
+--WebAppBoundary
+
+### 채팅방 조회
+GET localhost:8080/v1/api/chatrooms?size=1
+Authorization: {{jwt_token}}
