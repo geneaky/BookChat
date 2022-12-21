@@ -15,12 +15,13 @@ Content-Type: application/json
 }
 
 --boundary
-#Content-Disposition: form-data; name="userProfileImage"; filename="test_profile_image.webp"
-#Content-Type: image/webp
-#
-#< test_profile_image.webp
-#
-#--boundary
+Content-Disposition: form-data; name="userProfileImage"; filename="test_profile_image.webp"
+Content-Transfer-Encoding: base64
+Content-Type: image/webp
+
+< test_profile_image.webp
+
+--boundary
 
 ### 테스트 유저 로그인 후 토큰 받기
 POST localhost:8080/v1/api/users/signin
