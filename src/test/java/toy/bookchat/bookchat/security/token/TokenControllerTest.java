@@ -10,14 +10,12 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static toy.bookchat.bookchat.domain.user.ROLE.USER;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,13 +28,10 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
-import toy.bookchat.bookchat.domain.user.ReadingTaste;
-import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.api.dto.Token;
 import toy.bookchat.bookchat.exception.security.DenidedTokenException;
 import toy.bookchat.bookchat.exception.security.ExpiredTokenException;
 import toy.bookchat.bookchat.security.SecurityConfig;
-import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.token.dto.RefreshTokenRequest;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenProvider;
 
@@ -54,20 +49,6 @@ class TokenControllerTest extends ControllerTestExtension {
     ObjectMapper objectMapper;
     @Autowired
     private MockMvc mockMvc;
-
-    private User getUser() {
-        return User.builder()
-            .id(1L)
-            .email("test@gmail.com")
-            .nickname("nickname")
-            .role(USER)
-            .name("testGOOGLE")
-            .profileImageUrl("test@gamil.com")
-            .defaultProfileImageType(1)
-            .provider(OAuth2Provider.GOOGLE)
-            .readingTastes(List.of(ReadingTaste.DEVELOPMENT, ReadingTaste.ART))
-            .build();
-    }
 
     @Test
     void Access토큰_만료시_만료되지_않은_리프레시_토큰으로_갱신() throws Exception {
