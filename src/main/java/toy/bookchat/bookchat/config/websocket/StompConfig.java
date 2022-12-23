@@ -1,23 +1,38 @@
 package toy.bookchat.bookchat.config.websocket;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.messaging.StompSubProtocolErrorHandler;
-import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
 @Configuration
 @EnableWebSocketMessageBroker
 public class StompConfig implements WebSocketMessageBrokerConfigurer {
 
+    private final ChannelInterceptor webSocketTokenValidationInterceptor;
+    private final StompSubProtocolErrorHandler stompErrorHandler;
+
+    public StompConfig(ChannelInterceptor webSocketTokenValidationInterceptor,
+        StompSubProtocolErrorHandler stompErrorHandler) {
+        this.webSocketTokenValidationInterceptor = webSocketTokenValidationInterceptor;
+        this.stompErrorHandler = stompErrorHandler;
+    }
+
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        registration.interceptors(webSocketTokenValidationInterceptor);
+    }
+
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.setErrorHandler(new StompSubProtocolErrorHandler());
-        registry.addEndpoint("/chat")
-            .setHandshakeHandler(new DefaultHandshakeHandler());
+        registry.setErrorHandler(stompErrorHandler)
+            .addEndpoint("/stomp-connection");
+
     }
 
     @Override
