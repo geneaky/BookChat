@@ -12,6 +12,9 @@ import static toy.bookchat.bookchat.exception.ExceptionResponse.WRONG_KEY_SPEC;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.MessagingException;
+import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import toy.bookchat.bookchat.exception.agony.AgonyNotFoundException;
@@ -106,6 +109,14 @@ public class GlobalExceptionHandler {
         NotSupportedPagingConditionException exception) {
         log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
         return BAD_REQUEST.getValue();
+    }
+
+    @MessageExceptionHandler(MessagingException.class)
+    @SendToUser
+    public final ResponseEntity<String> handleMissingSessionUserException(
+        MessagingException exception) {
+        log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
+        return NOT_VERIFIED_TOKEN.getValue();
     }
 
     @ExceptionHandler(Exception.class)
