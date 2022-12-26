@@ -5,6 +5,7 @@ import static org.springframework.messaging.simp.stomp.StompCommand.CONNECT;
 import static toy.bookchat.bookchat.domain.common.AuthConstants.BEARER;
 import static toy.bookchat.bookchat.domain.common.AuthConstants.BEGIN_INDEX;
 
+import java.util.List;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageDeliveryException;
@@ -37,14 +38,15 @@ public class WebSocketTokenValidationInterceptor implements ChannelInterceptor {
                 TokenPayload tokenPayload = jwtTokenManager.getTokenPayloadFromToken(token);
                 registerUserAuthenticationOnSecurityContext(tokenPayload);
             } catch (Exception exception) {
-                throw new MessageDeliveryException("")
+                throw new MessageDeliveryException("");
             }
         }
         return message;
     }
 
     private String getJwtTokenFromMessage(StompHeaderAccessor accessor) {
-        String bearerToken = (String) accessor.getMessageHeaders().get(AUTHORIZATION);
+        List<String> nativeHeader = accessor.getNativeHeader(AUTHORIZATION);
+        String bearerToken = nativeHeader.get(0);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER)) {
             return bearerToken.substring(BEGIN_INDEX);
         }
