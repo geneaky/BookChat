@@ -15,11 +15,14 @@ import org.springframework.web.socket.messaging.StompSubProtocolErrorHandler;
 public class StompConfig implements WebSocketMessageBrokerConfigurer {
 
     private final ChannelInterceptor webSocketTokenValidationInterceptor;
+    private final WebSocketHandShakeTokenValidationInterceptor webSocketHandShakeTokenValidationInterceptor;
     private final StompSubProtocolErrorHandler stompErrorHandler;
 
     public StompConfig(ChannelInterceptor webSocketTokenValidationInterceptor,
+        WebSocketHandShakeTokenValidationInterceptor webSocketHandShakeTokenValidationInterceptor,
         StompSubProtocolErrorHandler stompErrorHandler) {
         this.webSocketTokenValidationInterceptor = webSocketTokenValidationInterceptor;
+        this.webSocketHandShakeTokenValidationInterceptor = webSocketHandShakeTokenValidationInterceptor;
         this.stompErrorHandler = stompErrorHandler;
     }
 
@@ -31,7 +34,8 @@ public class StompConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.setErrorHandler(stompErrorHandler)
-            .addEndpoint("/stomp-connection");
+            .addEndpoint("/stomp-connection")
+            .addInterceptors(webSocketHandShakeTokenValidationInterceptor);
 
     }
 

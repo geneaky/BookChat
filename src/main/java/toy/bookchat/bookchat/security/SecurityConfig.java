@@ -53,7 +53,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .and()
             .authorizeRequests()
             .antMatchers("/v1/api/users/profile/nickname", "/v1/api/users/signup",
-                "/v1/api/users/signin", "/v1/api/auth/token")
+                "/v1/api/users/signin", "/v1/api/auth/token", "/stomp-connection/**")
             .permitAll()
             .anyRequest().authenticated();
     }
