@@ -64,6 +64,7 @@ dependencies {
     runtimeOnly 'com.h2database:h2'
 
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.security:spring-security-messaging'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
     implementation 'org.sejda.imageio:webp-imageio:0.1.6'
