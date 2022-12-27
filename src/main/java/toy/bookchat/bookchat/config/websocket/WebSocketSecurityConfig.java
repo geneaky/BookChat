@@ -4,39 +4,42 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.security.config.annotation.web.messaging.MessageSecurityMetadataSourceRegistry;
+import org.springframework.security.config.annotation.web.socket.AbstractSecurityWebSocketMessageBrokerConfigurer;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
-import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.messaging.StompSubProtocolErrorHandler;
 
 @Configuration
 @EnableWebSocketMessageBroker
-public class StompConfig implements WebSocketMessageBrokerConfigurer {
+public class WebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBrokerConfigurer {
 
     private final ChannelInterceptor webSocketTokenValidationInterceptor;
-    private final WebSocketHandShakeTokenValidationInterceptor webSocketHandShakeTokenValidationInterceptor;
     private final StompSubProtocolErrorHandler stompErrorHandler;
 
-    public StompConfig(ChannelInterceptor webSocketTokenValidationInterceptor,
-        WebSocketHandShakeTokenValidationInterceptor webSocketHandShakeTokenValidationInterceptor,
+    public WebSocketSecurityConfig(ChannelInterceptor webSocketTokenValidationInterceptor,
         StompSubProtocolErrorHandler stompErrorHandler) {
         this.webSocketTokenValidationInterceptor = webSocketTokenValidationInterceptor;
-        this.webSocketHandShakeTokenValidationInterceptor = webSocketHandShakeTokenValidationInterceptor;
         this.stompErrorHandler = stompErrorHandler;
     }
 
     @Override
-    public void configureClientInboundChannel(ChannelRegistration registration) {
+    protected void configureInbound(MessageSecurityMetadataSourceRegistry messages) {
+        messages.simpDestMatchers("/pub/**").authenticated()
+            .simpDestMatchers("/stomp-connection").authenticated()
+            .anyMessage().permitAll();
+    }
+
+    @Override
+    protected void customizeClientInboundChannel(ChannelRegistration registration) {
         registration.interceptors(webSocketTokenValidationInterceptor);
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.setErrorHandler(stompErrorHandler)
-            .addEndpoint("/stomp-connection")
-            .addInterceptors(webSocketHandShakeTokenValidationInterceptor);
-
+            .addEndpoint("/stomp-connection");
     }
 
     @Override
@@ -45,4 +48,10 @@ public class StompConfig implements WebSocketMessageBrokerConfigurer {
         registry.setApplicationDestinationPrefixes("/pub");
         registry.enableStompBrokerRelay("/queue", "/topic", "/exchange", "/amq/queue");
     }
+
+    @Override
+    protected boolean sameOriginDisabled() {
+        return true;
+    }
+
 }
