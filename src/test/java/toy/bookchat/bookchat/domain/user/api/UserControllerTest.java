@@ -78,7 +78,7 @@ import toy.bookchat.bookchat.security.token.openid.OpenIdTestUtil;
 @UserPresentationTest
 class UserControllerTest extends ControllerTestExtension {
 
-    public final String JWT_TOKEN = BEARER + getTestToken();
+    public final String JWT_TOKEN = getTestToken();
     @MockBean
     UserService userService;
     @MockBean

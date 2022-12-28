@@ -7,6 +7,7 @@ import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.VARIES;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static toy.bookchat.bookchat.domain.common.AuthConstants.BEARER;
 import static toy.bookchat.bookchat.domain.user.ROLE.USER;
 import static toy.bookchat.bookchat.security.oauth.OAuth2Provider.GOOGLE;
 
@@ -121,7 +122,7 @@ public abstract class ControllerTestExtension implements
         claims.put("provider", GOOGLE);
         claims.put("email", "test@gmail.com");
 
-        return Jwts.builder()
+        return BEARER + Jwts.builder()
             .setClaims(claims)
             .signWith(HS256, "test")
             .compact();

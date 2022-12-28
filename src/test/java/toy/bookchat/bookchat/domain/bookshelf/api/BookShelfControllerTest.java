@@ -29,7 +29,6 @@ import static toy.bookchat.bookchat.domain.bookshelf.ReadingStatus.READING;
 import static toy.bookchat.bookchat.domain.bookshelf.ReadingStatus.WISH;
 import static toy.bookchat.bookchat.domain.bookshelf.Star.FOUR;
 import static toy.bookchat.bookchat.domain.bookshelf.Star.FOUR_HALF;
-import static toy.bookchat.bookchat.domain.common.AuthConstants.BEARER;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
@@ -59,7 +58,7 @@ import toy.bookchat.bookchat.domain.user.User;
 @BookShelfPresentationTest
 class BookShelfControllerTest extends ControllerTestExtension {
 
-    public final String JWT_TOKEN = BEARER + getTestToken();
+    public final String JWT_TOKEN = getTestToken();
 
     @MockBean
     BookShelfService bookShelfService;

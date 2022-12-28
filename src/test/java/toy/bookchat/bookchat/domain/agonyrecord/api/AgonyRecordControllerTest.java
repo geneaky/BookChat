@@ -22,7 +22,6 @@ import static org.springframework.restdocs.request.RequestDocumentation.pathPara
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static toy.bookchat.bookchat.domain.common.AuthConstants.BEARER;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
@@ -45,7 +44,7 @@ import toy.bookchat.bookchat.domain.agonyrecord.service.AgonyRecordService;
 @AgonyRecordPresentationTest
 class AgonyRecordControllerTest extends ControllerTestExtension {
 
-    public final String JWT_TOKEN = BEARER + getTestToken();
+    public final String JWT_TOKEN = getTestToken();
 
     @MockBean
     AgonyRecordService agonyRecordService;
