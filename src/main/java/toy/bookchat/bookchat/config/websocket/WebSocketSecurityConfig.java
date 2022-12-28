@@ -39,7 +39,7 @@ public class WebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBro
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.setErrorHandler(stompErrorHandler)
-            .addEndpoint("/stomp-connection");
+            .addEndpoint("/stomp-connection").setAllowedOrigins("*");
     }
 
     @Override
