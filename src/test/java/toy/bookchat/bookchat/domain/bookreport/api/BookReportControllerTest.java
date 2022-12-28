@@ -20,7 +20,6 @@ import static org.springframework.restdocs.request.RequestDocumentation.paramete
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static toy.bookchat.bookchat.domain.common.AuthConstants.BEARER;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
@@ -38,7 +37,7 @@ import toy.bookchat.bookchat.domain.bookreport.service.dto.response.BookReportRe
 @BookReportPresentationTest
 class BookReportControllerTest extends ControllerTestExtension {
 
-    public final String JWT_TOKEN = BEARER + getTestToken();
+    public final String JWT_TOKEN = getTestToken();
     @Autowired
     ObjectMapper objectMapper;
     @Autowired

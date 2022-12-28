@@ -1,5 +1,7 @@
 package toy.bookchat.bookchat.domain.chat.api;
 
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
@@ -58,10 +60,11 @@ class ChatControllerTest extends ControllerTestExtension {
     @Test
     void 웹소켓_연결성공() throws Exception {
         WebSocketHttpHeaders webSocketHttpHeaders = new WebSocketHttpHeaders();
-        webSocketHttpHeaders.setBearerAuth(
-            getTestToken()); //최초 websocket connection을 맺기위한 요청은 http이므로 토큰을 달아준다.
+        webSocketHttpHeaders.set(AUTHORIZATION,
+            getTestToken());//최초 websocket connection을 맺기위한 요청은 http이므로 토큰을 달아준다.
         StompHeaders stompHeaders = new StompHeaders(); // stomp protocol로 통신시에는 메시지로 요청을 주고 받으므로 stomp header spec에 토큰을 달아주고 interceptor에서 검증 후 security context에 넣어줌.
-        stompHeaders.set("Authorization", "Bearer " + getTestToken());
+        stompHeaders.set(AUTHORIZATION, getTestToken());
+
         ListenableFuture<StompSession> connect = this.webSocketStompClient.connect(
             "ws://localhost:" + port + "/stomp-connection", webSocketHttpHeaders, stompHeaders,
             new StompSessionHandlerAdapter() {
@@ -72,7 +75,7 @@ class ChatControllerTest extends ControllerTestExtension {
             });
 
         SuccessCallback<StompSession> successCallback = (result) -> {
-            log.info("Success Callback +==============");
+            log.info("Success Callback ==============");
             log.info("success result::{}", result);
         };
         FailureCallback failureCallback = (result) -> {

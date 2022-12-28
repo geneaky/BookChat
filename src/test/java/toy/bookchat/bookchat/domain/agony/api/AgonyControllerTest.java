@@ -24,7 +24,6 @@ import static org.springframework.restdocs.request.RequestDocumentation.requestP
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static toy.bookchat.bookchat.domain.common.AuthConstants.BEARER;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
@@ -47,7 +46,7 @@ import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 @AgonyPresentationTest
 class AgonyControllerTest extends ControllerTestExtension {
 
-    public final String JWT_TOKEN = BEARER + getTestToken();
+    public final String JWT_TOKEN = getTestToken();
 
     @MockBean
     AgonyService agonyService;
