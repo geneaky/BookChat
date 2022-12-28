@@ -2,6 +2,7 @@ package toy.bookchat.bookchat.domain.chat.api;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -24,6 +25,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
 
+@Slf4j
 @Testcontainers
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -65,16 +67,16 @@ class ChatControllerTest extends ControllerTestExtension {
             new StompSessionHandlerAdapter() {
                 @Override
                 public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
-                    System.out.println("=======connected========");
+                    log.info("=======connected========");
                 }
             });
 
         SuccessCallback<StompSession> successCallback = (result) -> {
-            System.out.println("Success Callback +==============");
-            System.out.println(result);
+            log.info("Success Callback +==============");
+            log.info("success result::{}", result);
         };
         FailureCallback failureCallback = (result) -> {
-            System.out.println(result.getMessage());
+            log.info("failure result :: {}", result);
         };
         connect.addCallback(successCallback, failureCallback);
         this.stompSession = connect.get(30, TimeUnit.SECONDS);
