@@ -24,7 +24,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import toy.bookchat.bookchat.config.security.OpenIdTokenConfig;
 import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.domain.user.User;
-import toy.bookchat.bookchat.security.ipblock.IpBlockManager;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenManager;
 import toy.bookchat.bookchat.security.token.openid.OpenIdTokenManager;
@@ -44,8 +43,6 @@ public abstract class ControllerTestExtension implements
     JwtTokenManager jwtTokenManager;
     @MockBean
     OpenIdTokenConfig openIdTokenConfig;
-    @MockBean
-    IpBlockManager ipBlockManager;
 
     protected User getUser() {
         return User.builder()
@@ -72,7 +69,6 @@ public abstract class ControllerTestExtension implements
     public void setUp() {
         when(jwtTokenManager.getTokenPayloadFromToken(any())).thenReturn(
             getTokenPayload(getUser()));
-        when(ipBlockManager.validateRequest(any())).thenReturn(true);
     }
 
     public OpenIdTokenConfig getOpenIdTokenConfig() {
