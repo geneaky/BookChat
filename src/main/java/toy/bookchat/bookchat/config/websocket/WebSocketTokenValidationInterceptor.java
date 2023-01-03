@@ -11,14 +11,10 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageDeliveryException;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import toy.bookchat.bookchat.exception.security.DenidedTokenException;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenManager;
-import toy.bookchat.bookchat.security.user.TokenPayload;
-import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @Component
 public class WebSocketTokenValidationInterceptor implements ChannelInterceptor {
@@ -32,13 +28,13 @@ public class WebSocketTokenValidationInterceptor implements ChannelInterceptor {
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+
         if (CONNECT.equals(accessor.getCommand())) {
             try {
                 String token = getJwtTokenFromMessage(accessor);
-                TokenPayload tokenPayload = jwtTokenManager.getTokenPayloadFromToken(token);
-                registerUserAuthenticationOnSecurityContext(tokenPayload);
+                jwtTokenManager.getTokenPayloadFromToken(token);
             } catch (Exception exception) {
-                throw new MessageDeliveryException("");
+                throw new MessageDeliveryException("Access Denied");
             }
         }
         return message;
@@ -52,14 +48,4 @@ public class WebSocketTokenValidationInterceptor implements ChannelInterceptor {
         }
         throw new DenidedTokenException();
     }
-
-    private void registerUserAuthenticationOnSecurityContext(TokenPayload tokenPayload) {
-        UserPrincipal userPrincipal = UserPrincipal.create(tokenPayload);
-
-        SecurityContextHolder
-            .getContext()
-            .setAuthentication(new UsernamePasswordAuthenticationToken(userPrincipal, null,
-                userPrincipal.getAuthorities()));
-    }
-
 }

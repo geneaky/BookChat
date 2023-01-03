@@ -1,17 +1,16 @@
 package toy.bookchat.bookchat.security.user;
 
+import java.security.Principal;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 
 @Getter
-public class UserPrincipal implements UserDetails, OAuth2User {
+public class UserPrincipal implements UserDetails, Principal {
 
     private final TokenPayload tokenPayload;
     private final Collection<? extends GrantedAuthority> authorities;
@@ -45,12 +44,6 @@ public class UserPrincipal implements UserDetails, OAuth2User {
     @Deprecated
     public String getUsername() {
         return this.tokenPayload.getUserName();
-    }
-
-    @Override
-    @Deprecated
-    public Map<String, Object> getAttributes() {
-        return null;
     }
 
     @Override
