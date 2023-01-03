@@ -15,6 +15,7 @@ import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
+import org.springframework.util.MimeType;
 import org.springframework.util.concurrent.FailureCallback;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.SuccessCallback;
@@ -26,6 +27,7 @@ import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
+import toy.bookchat.bookchat.domain.chat.api.dto.ChatDto;
 
 @Slf4j
 @Testcontainers
@@ -60,8 +62,6 @@ class ChatControllerTest extends ControllerTestExtension {
     @Test
     void 웹소켓_연결성공() throws Exception {
         WebSocketHttpHeaders webSocketHttpHeaders = new WebSocketHttpHeaders();
-        webSocketHttpHeaders.set(AUTHORIZATION,
-            getTestToken());//최초 websocket connection을 맺기위한 요청은 http이므로 토큰을 달아준다.
         StompHeaders stompHeaders = new StompHeaders(); // stomp protocol로 통신시에는 메시지로 요청을 주고 받으므로 stomp header spec에 토큰을 달아주고 interceptor에서 검증 후 security context에 넣어줌.
         stompHeaders.set(AUTHORIZATION, getTestToken());
 
@@ -83,6 +83,16 @@ class ChatControllerTest extends ControllerTestExtension {
         };
         connect.addCallback(successCallback, failureCallback);
         this.stompSession = connect.get(30, TimeUnit.SECONDS);
+
+        StompHeaders sendHeader = new StompHeaders();
+        sendHeader.set(AUTHORIZATION, getTestToken());
+        sendHeader.setDestination("/pub/chat/enter/heho");
+        sendHeader.setContentType(MimeType.valueOf("application/json"));
+
+        ChatDto dto = ChatDto.builder()
+            .message("test test test")
+            .build();
+        this.stompSession.send(sendHeader, dto);
         this.stompSession.disconnect();
     }
 }
