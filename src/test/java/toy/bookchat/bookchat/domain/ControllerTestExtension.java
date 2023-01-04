@@ -2,7 +2,7 @@ package toy.bookchat.bookchat.domain;
 
 import static io.jsonwebtoken.SignatureAlgorithm.HS256;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doReturn;
 import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.VARIES;
@@ -18,9 +18,6 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.restdocs.payload.FieldDescriptor;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import toy.bookchat.bookchat.config.security.OpenIdTokenConfig;
 import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.domain.user.User;
@@ -34,8 +31,7 @@ import toy.bookchat.bookchat.security.user.UserPrincipal;
     controller 테스트는 security까지 포함시켜 테스트하여 restdoc 문서에
     token 정보가 포함되도록 진행
  */
-public abstract class ControllerTestExtension implements
-    UserDetailsService {
+public abstract class ControllerTestExtension {
 
     @MockBean
     OpenIdTokenManager openIdTokenManager;
@@ -67,8 +63,7 @@ public abstract class ControllerTestExtension implements
 
     @BeforeEach
     public void setUp() {
-        when(jwtTokenManager.getTokenPayloadFromToken(any())).thenReturn(
-            getTokenPayload(getUser()));
+        doReturn(getTokenPayload(getUser())).when(jwtTokenManager).getTokenPayloadFromToken(any());
     }
 
     public OpenIdTokenConfig getOpenIdTokenConfig() {
@@ -131,10 +126,5 @@ public abstract class ControllerTestExtension implements
             user.getEmail(), user.getProfileImageUrl(), user.getDefaultProfileImageType(),
             user.getRole());
         return UserPrincipal.create(tokenPayload);
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return getUserPrincipal();
     }
 }

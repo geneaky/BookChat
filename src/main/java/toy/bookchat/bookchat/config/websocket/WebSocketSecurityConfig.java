@@ -7,6 +7,7 @@ import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.security.config.annotation.web.socket.AbstractSecurityWebSocketMessageBrokerConfigurer;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.messaging.StompSubProtocolErrorHandler;
@@ -45,7 +46,7 @@ public class WebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBro
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-//        registry.setPathMatcher(new AntPathMatcher("."));
+        registry.setPathMatcher(new AntPathMatcher("."));
         registry.setApplicationDestinationPrefixes("/pub");
         registry.enableStompBrokerRelay("/queue", "/topic", "/exchange", "/amq/queue");
     }
