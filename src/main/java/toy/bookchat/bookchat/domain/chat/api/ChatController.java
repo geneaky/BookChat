@@ -23,7 +23,7 @@ public class ChatController {
         this.simpMessageSendingOperations = simpMessageSendingOperations;
     }
 
-    @MessageMapping("chat/enter/{chatRoomSid}")
+    @MessageMapping("chat.enter.{chatRoomSid}")
     public void enter(ChatDto chat, @UserPayload TokenPayload tokenPayload,
         @DestinationVariable String chatRoomSid) {
 //        rabbitTemplate.convertAndSend("chat.exchange", "room." + chatRoomSid, chat);

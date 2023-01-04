@@ -5,9 +5,9 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -15,10 +15,7 @@ import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
-import org.springframework.util.MimeType;
-import org.springframework.util.concurrent.FailureCallback;
 import org.springframework.util.concurrent.ListenableFuture;
-import org.springframework.util.concurrent.SuccessCallback;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
@@ -31,7 +28,6 @@ import toy.bookchat.bookchat.domain.chat.api.dto.ChatDto;
 
 @Slf4j
 @Testcontainers
-@ExtendWith(MockitoExtension.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 class ChatControllerTest extends ControllerTestExtension {
 
@@ -56,43 +52,45 @@ class ChatControllerTest extends ControllerTestExtension {
         this.webSocketClient = new StandardWebSocketClient();
         this.webSocketStompClient = new WebSocketStompClient(this.webSocketClient);
         this.webSocketStompClient.setMessageConverter(new MappingJackson2MessageConverter());
-        ;
+    }
+
+    @NotNull
+    private String getStompConnectionEndPointUrl() {
+        return "ws://localhost:" + port + "/stomp-connection";
+    }
+
+    @NotNull
+    private StompSessionHandlerAdapter getStompSessionHandlerAdapter() {
+        return new StompSessionHandlerAdapter() {
+            @Override
+            public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
+                log.info("=======connected========");
+            }
+        };
+    }
+
+    @BeforeEach
+    public void connect() throws Exception {
+        StompHeaders stompHeaders = new StompHeaders();
+        stompHeaders.set(AUTHORIZATION, getTestToken());
+        ListenableFuture<StompSession> connect = this.webSocketStompClient.connect(
+            getStompConnectionEndPointUrl(), new WebSocketHttpHeaders(), stompHeaders,
+            getStompSessionHandlerAdapter());
+        this.stompSession = connect.get(30, TimeUnit.SECONDS);
     }
 
     @Test
-    void 웹소켓_연결성공() throws Exception {
-        WebSocketHttpHeaders webSocketHttpHeaders = new WebSocketHttpHeaders();
-        StompHeaders stompHeaders = new StompHeaders(); // stomp protocol로 통신시에는 메시지로 요청을 주고 받으므로 stomp header spec에 토큰을 달아주고 interceptor에서 검증 후 security context에 넣어줌.
-        stompHeaders.set(AUTHORIZATION, getTestToken());
-
-        ListenableFuture<StompSession> connect = this.webSocketStompClient.connect(
-            "ws://localhost:" + port + "/stomp-connection", webSocketHttpHeaders, stompHeaders,
-            new StompSessionHandlerAdapter() {
-                @Override
-                public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
-                    log.info("=======connected========");
-                }
-            });
-
-        SuccessCallback<StompSession> successCallback = (result) -> {
-            log.info("Success Callback ==============");
-            log.info("success result::{}", result);
-        };
-        FailureCallback failureCallback = (result) -> {
-            log.info("failure result :: {}", result);
-        };
-        connect.addCallback(successCallback, failureCallback);
-        this.stompSession = connect.get(30, TimeUnit.SECONDS);
-
+    void STOMP_메시지_전송() throws Exception {
         StompHeaders sendHeader = new StompHeaders();
         sendHeader.set(AUTHORIZATION, getTestToken());
-        sendHeader.setDestination("/pub/chat/enter/heho");
-        sendHeader.setContentType(MimeType.valueOf("application/json"));
+        sendHeader.setDestination("/pub/chat.enter.heho");
 
         ChatDto dto = ChatDto.builder()
             .message("test test test")
             .build();
+
         this.stompSession.send(sendHeader, dto);
+        Thread.sleep(1000);
         this.stompSession.disconnect();
     }
 }
