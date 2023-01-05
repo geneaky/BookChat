@@ -6,41 +6,38 @@ import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
-import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
-@Configuration
-@EnableRabbit
+//@Configuration
+//@EnableRabbit
 public class RabbitConfig {
 
     /* TODO: 2022-12-15 rabbit properties로 추출하기
      */
-    private final static String CHAT_QUEUE_NAME = "chat.testQ";
-    private final static String CHAT_EXCHANGE_NAME = "chat.testEx";
+    private final static String CHAT_QUEUE_NAME = "chat.queue";
+    private final static String CHAT_EXCHANGE_NAME = "chat.exchange";
     private final static String CHAT_ROUTING_KEY = "room.*";
 
-    @Bean
+    //    @Bean
     public Queue queue() {
         return new Queue(CHAT_QUEUE_NAME, true);
     }
 
-    @Bean
+    //    @Bean
     public TopicExchange topicExchange() {
         return new TopicExchange(CHAT_EXCHANGE_NAME);
     }
 
-    @Bean
+    //    @Bean
     public Binding binding(Queue queue, TopicExchange topicExchange) {
         return BindingBuilder.bind(queue).to(topicExchange).with(CHAT_ROUTING_KEY);
     }
 
-    @Bean
+    //    @Bean
     public RabbitTemplate rabbitTemplate() {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory());
         rabbitTemplate.setMessageConverter(jackson2JsonMessageConverter());
@@ -48,7 +45,7 @@ public class RabbitConfig {
         return rabbitTemplate;
     }
 
-    @Bean
+    //    @Bean
     public SimpleMessageListenerContainer container() {
         SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
         container.setConnectionFactory(connectionFactory());
@@ -56,7 +53,7 @@ public class RabbitConfig {
         return container;
     }
 
-    @Bean
+    //    @Bean
     public ConnectionFactory connectionFactory() {
         CachingConnectionFactory factory = new CachingConnectionFactory();
         factory.setHost("localhost");
@@ -65,7 +62,7 @@ public class RabbitConfig {
         return factory;
     }
 
-    @Bean
+    //    @Bean
     public Jackson2JsonMessageConverter jackson2JsonMessageConverter() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true);
