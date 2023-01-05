@@ -662,3 +662,16 @@ include::{snippets}/get-user-chatrooms/http-request.adoc[]
 
 include::{snippets}/get-user-chatrooms/response-fields.adoc[]
 include::{snippets}/get-user-chatrooms/http-response.adoc[]
+
+== 채팅
+
+=== 채팅방 Connection 수립
+
+```stomp
+    CONNECT
+    Authorizaiton: Bearer [JWT Token]
+    host: wss://bookchat.link/stomp-connection
+
+    ^@
+```
+
