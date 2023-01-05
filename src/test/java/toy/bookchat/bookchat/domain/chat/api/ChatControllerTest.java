@@ -2,7 +2,6 @@ package toy.bookchat.bookchat.domain.chat.api;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -20,27 +19,12 @@ import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
-import org.testcontainers.containers.RabbitMQContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
 import toy.bookchat.bookchat.domain.chat.api.dto.ChatDto;
 
 @Slf4j
-@Testcontainers
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 class ChatControllerTest extends ControllerTestExtension {
-
-    @Container
-    static RabbitMQContainer rabbitMQContainer;
-
-    static {
-        rabbitMQContainer = new RabbitMQContainer(
-            "rabbitmq:3.11-management")
-            .withPluginsEnabled("rabbitmq_stomp", "rabbitmq_web_stomp")
-            .withUser("guest", "guest");
-        rabbitMQContainer.setPortBindings(List.of("5672:5672", "15672:15672", "61613:61613"));
-    }
 
     @LocalServerPort
     private int port;
@@ -89,8 +73,16 @@ class ChatControllerTest extends ControllerTestExtension {
             .message("test test test")
             .build();
 
-        this.stompSession.send(sendHeader, dto);
+        this.stompSession.subscribe("/pub/topic.chatrooms.heho",
+            new StompSessionHandlerAdapter() {
+                @Override
+                public void handleFrame(StompHeaders headers, Object payload) {
+                    log.info("checkkkkk");
+                }
+            });
         Thread.sleep(1000);
+        this.stompSession.send(sendHeader, dto);
+        Thread.sleep(3000);
         this.stompSession.disconnect();
     }
 }

@@ -48,7 +48,13 @@ public class WebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBro
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.setPathMatcher(new AntPathMatcher("."));
         registry.setApplicationDestinationPrefixes("/pub");
-        registry.enableStompBrokerRelay("/queue", "/topic", "/exchange", "/amq/queue");
+        registry.setUserDestinationPrefix("/user");
+        registry.enableStompBrokerRelay("/topic", "/queue", "/exchange", "/amq/queue")
+            .setRelayHost("localhost")
+            .setVirtualHost("/")
+            .setRelayPort(61613)
+            .setClientLogin("guest")
+            .setClientPasscode("guest");
     }
 
     @Override
