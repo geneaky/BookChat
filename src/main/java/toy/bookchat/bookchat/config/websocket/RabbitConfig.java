@@ -19,8 +19,8 @@ public class RabbitConfig {
     /* TODO: 2022-12-15 rabbit properties로 추출하기
      */
     private final static String CHAT_QUEUE_NAME = "chat.queue";
-    private final static String CHAT_EXCHANGE_NAME = "chat.exchange";
-    private final static String CHAT_ROUTING_KEY = "room.*";
+    private final static String CHAT_EXCHANGE_NAME = "amq.topic";
+    private final static String CHAT_ROUTING_KEY = "chatrooms.*";
 
     //    @Bean
     public Queue queue() {
