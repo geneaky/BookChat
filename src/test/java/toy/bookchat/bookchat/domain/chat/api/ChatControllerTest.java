@@ -14,6 +14,7 @@ import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.WebSocketClient;
@@ -35,6 +36,9 @@ class ChatControllerTest extends ControllerTestExtension {
     ChatControllerTest() throws Exception {
         this.webSocketClient = new StandardWebSocketClient();
         this.webSocketStompClient = new WebSocketStompClient(this.webSocketClient);
+        ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
+        taskScheduler.afterPropertiesSet();
+        this.webSocketStompClient.setTaskScheduler(taskScheduler);
         this.webSocketStompClient.setMessageConverter(new MappingJackson2MessageConverter());
     }
 
@@ -50,6 +54,12 @@ class ChatControllerTest extends ControllerTestExtension {
             public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
                 log.info("=======connected========");
             }
+
+            @Override
+            public void handleFrame(StompHeaders headers, Object payload) {
+                log.info("handle frame");
+            }
+
         };
     }
 
@@ -63,6 +73,16 @@ class ChatControllerTest extends ControllerTestExtension {
         this.stompSession = connect.get(30, TimeUnit.SECONDS);
     }
 
+    private StompSession stompSession() throws Exception {
+        StompHeaders stompHeaders = new StompHeaders();
+        stompHeaders.set(AUTHORIZATION, getTestToken());
+        ListenableFuture<StompSession> connect = this.webSocketStompClient.connect(
+            getStompConnectionEndPointUrl(), new WebSocketHttpHeaders(), stompHeaders,
+            getStompSessionHandlerAdapter());
+
+        return connect.get(30, TimeUnit.SECONDS);
+    }
+
     @Test
     void STOMP_메시지_전송() throws Exception {
         StompHeaders sendHeader = new StompHeaders();
@@ -73,14 +93,13 @@ class ChatControllerTest extends ControllerTestExtension {
             .message("test test test")
             .build();
 
-        this.stompSession.subscribe("/pub/topic.chatrooms.heho",
-            new StompSessionHandlerAdapter() {
-                @Override
-                public void handleFrame(StompHeaders headers, Object payload) {
-                    log.info("checkkkkk");
-                }
-            });
-        Thread.sleep(1000);
+//        this.stompSession.subscribe("/pub/topic.chatrooms.heho", getStompSessionHandlerAdapter());
+        StompSession user1 = stompSession();
+        user1.setAutoReceipt(true);
+        user1.subscribe("/topic/heho", getStompSessionHandlerAdapter()).addReceiptTask(() -> {
+            log.info("메시지 전달 받음");
+        });
+
         this.stompSession.send(sendHeader, dto);
         Thread.sleep(3000);
         this.stompSession.disconnect();

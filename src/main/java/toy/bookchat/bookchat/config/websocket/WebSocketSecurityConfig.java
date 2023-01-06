@@ -49,7 +49,7 @@ public class WebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBro
         registry.setPathMatcher(new AntPathMatcher("."));
         registry.setApplicationDestinationPrefixes("/pub");
         registry.setUserDestinationPrefix("/user");
-        registry.enableStompBrokerRelay("/topic", "/queue", "/exchange", "/amq/queue")
+        registry.enableStompBrokerRelay("/topic")
             .setRelayHost("localhost")
             .setVirtualHost("/")
             .setRelayPort(61613)
