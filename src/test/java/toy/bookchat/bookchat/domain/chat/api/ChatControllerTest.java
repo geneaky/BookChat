@@ -1,12 +1,17 @@
 package toy.bookchat.bookchat.domain.chat.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
+import java.lang.reflect.Type;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -20,18 +25,20 @@ import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
-import toy.bookchat.bookchat.domain.ControllerTestExtension;
+import toy.bookchat.bookchat.domain.StompTestExtension;
 import toy.bookchat.bookchat.domain.chat.api.dto.ChatDto;
 
 @Slf4j
+@AutoConfigureTestDatabase
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-class ChatControllerTest extends ControllerTestExtension {
+class ChatControllerTest extends StompTestExtension {
 
     @LocalServerPort
     private int port;
     private StompSession stompSession;
     private final WebSocketClient webSocketClient;
     private final WebSocketStompClient webSocketStompClient;
+    private final BlockingQueue<ChatDto> blockingQueue = new LinkedBlockingQueue<>();
 
     ChatControllerTest() throws Exception {
         this.webSocketClient = new StandardWebSocketClient();
@@ -50,41 +57,34 @@ class ChatControllerTest extends ControllerTestExtension {
     @NotNull
     private StompSessionHandlerAdapter getStompSessionHandlerAdapter() {
         return new StompSessionHandlerAdapter() {
+
             @Override
-            public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
-                log.info("=======connected========");
+            public Type getPayloadType(StompHeaders headers) {
+                return ChatDto.class;
             }
 
             @Override
             public void handleFrame(StompHeaders headers, Object payload) {
-                log.info("handle frame");
+                ChatDto chatDto = (ChatDto) payload;
+                blockingQueue.offer(chatDto);
             }
-
         };
     }
 
     @BeforeEach
-    public void connect() throws Exception {
+    public void initNewSession() throws Exception {
         StompHeaders stompHeaders = new StompHeaders();
         stompHeaders.set(AUTHORIZATION, getTestToken());
         ListenableFuture<StompSession> connect = this.webSocketStompClient.connect(
             getStompConnectionEndPointUrl(), new WebSocketHttpHeaders(), stompHeaders,
             getStompSessionHandlerAdapter());
         this.stompSession = connect.get(30, TimeUnit.SECONDS);
-    }
-
-    private StompSession stompSession() throws Exception {
-        StompHeaders stompHeaders = new StompHeaders();
-        stompHeaders.set(AUTHORIZATION, getTestToken());
-        ListenableFuture<StompSession> connect = this.webSocketStompClient.connect(
-            getStompConnectionEndPointUrl(), new WebSocketHttpHeaders(), stompHeaders,
-            getStompSessionHandlerAdapter());
-
-        return connect.get(30, TimeUnit.SECONDS);
+        this.stompSession.setAutoReceipt(true);
+        this.blockingQueue.clear();
     }
 
     @Test
-    void STOMP_메시지_전송() throws Exception {
+    void STOMP_메시지_송신_수신_성공() throws Exception {
         StompHeaders sendHeader = new StompHeaders();
         sendHeader.set(AUTHORIZATION, getTestToken());
         sendHeader.setDestination("/pub/chat.enter.heho");
@@ -93,15 +93,14 @@ class ChatControllerTest extends ControllerTestExtension {
             .message("test test test")
             .build();
 
-//        this.stompSession.subscribe("/pub/topic.chatrooms.heho", getStompSessionHandlerAdapter());
-        StompSession user1 = stompSession();
-        user1.setAutoReceipt(true);
-        user1.subscribe("/topic/heho", getStompSessionHandlerAdapter()).addReceiptTask(() -> {
-            log.info("메시지 전달 받음");
-        });
+        this.stompSession.subscribe("/topic/heho", getStompSessionHandlerAdapter())
+            .addReceiptTask(() -> {
+                this.stompSession.send(sendHeader, dto);
+            });
 
-        this.stompSession.send(sendHeader, dto);
-        Thread.sleep(3000);
-        this.stompSession.disconnect();
+        Thread.sleep(10000);
+
+        ChatDto chatDto = blockingQueue.poll();
+        assertThat(chatDto.getMessage()).isEqualTo(dto.getMessage());
     }
 }
