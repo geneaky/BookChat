@@ -21,13 +21,8 @@ public class ChatController {
 
     @MessageMapping("chat.enter.{chatRoomSid}")
     public void send(ChatDto chat, @UserPayload TokenPayload tokenPayload,
-        @DestinationVariable String chatRoomSid) {
-        messagingTemplate.convertAndSend("/topic/" + chatRoomSid,
-            "hellow new user");
-
-        log.info(chat.getMessage());
-        log.info(tokenPayload.getUserName());
-        log.info(chatRoomSid);
+        @DestinationVariable String chatRoomSid) throws InterruptedException {
+        messagingTemplate.convertAndSend("/topic/" + chatRoomSid, chat);
     }
 
 //    @SubscribeMapping("topic.chatrooms.{chatRoomSid}")
