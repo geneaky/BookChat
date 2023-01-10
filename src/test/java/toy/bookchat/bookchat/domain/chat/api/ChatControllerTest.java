@@ -5,6 +5,7 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 import java.lang.reflect.Type;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
@@ -55,7 +56,7 @@ class ChatControllerTest extends StompTestExtension {
     }
 
     @NotNull
-    private StompSessionHandlerAdapter getStompSessionHandlerAdapter() {
+    private StompSessionHandlerAdapter subscribeFrameSessionHandler(CountDownLatch latch) {
         return new StompSessionHandlerAdapter() {
 
             @Override
@@ -67,6 +68,7 @@ class ChatControllerTest extends StompTestExtension {
             public void handleFrame(StompHeaders headers, Object payload) {
                 ChatDto chatDto = (ChatDto) payload;
                 blockingQueue.offer(chatDto);
+                latch.countDown();
             }
         };
     }
@@ -77,7 +79,8 @@ class ChatControllerTest extends StompTestExtension {
         stompHeaders.set(AUTHORIZATION, getTestToken());
         ListenableFuture<StompSession> connect = this.webSocketStompClient.connect(
             getStompConnectionEndPointUrl(), new WebSocketHttpHeaders(), stompHeaders,
-            getStompSessionHandlerAdapter());
+            new StompSessionHandlerAdapter() {
+            });
         this.stompSession = connect.get(30, TimeUnit.SECONDS);
         this.stompSession.setAutoReceipt(true);
         this.blockingQueue.clear();
@@ -85,6 +88,7 @@ class ChatControllerTest extends StompTestExtension {
 
     @Test
     void STOMP_메시지_송신_수신_성공() throws Exception {
+        CountDownLatch chatAttemptCountLatch = new CountDownLatch(1);
         StompHeaders sendHeader = new StompHeaders();
         sendHeader.set(AUTHORIZATION, getTestToken());
         sendHeader.setDestination("/pub/chat.enter.heho");
@@ -93,14 +97,14 @@ class ChatControllerTest extends StompTestExtension {
             .message("test test test")
             .build();
 
-        this.stompSession.subscribe("/topic/heho", getStompSessionHandlerAdapter())
+        this.stompSession.subscribe("/topic/heho",
+                subscribeFrameSessionHandler(chatAttemptCountLatch))
             .addReceiptTask(() -> {
                 this.stompSession.send(sendHeader, dto);
             });
-
-        Thread.sleep(10000);
+        chatAttemptCountLatch.await();
 
         ChatDto chatDto = blockingQueue.poll();
-        assertThat(chatDto.getMessage()).isEqualTo(dto.getMessage());
+        assertThat(chatDto).isEqualTo(dto);
     }
 }
