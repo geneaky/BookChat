@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.config.security;
+package toy.bookchat.bookchat.config.token;
 
 import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;

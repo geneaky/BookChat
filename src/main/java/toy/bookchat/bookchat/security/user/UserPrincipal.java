@@ -41,7 +41,6 @@ public class UserPrincipal implements UserDetails, Principal {
     }
 
     @Override
-    @Deprecated
     public String getUsername() {
         return this.tokenPayload.getUserName();
     }

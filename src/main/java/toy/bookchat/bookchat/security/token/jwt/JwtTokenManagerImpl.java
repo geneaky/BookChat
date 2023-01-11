@@ -1,7 +1,7 @@
 package toy.bookchat.bookchat.security.token.jwt;
 
 import org.springframework.stereotype.Component;
-import toy.bookchat.bookchat.config.security.JwtTokenProperties;
+import toy.bookchat.bookchat.config.token.JwtTokenProperties;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 

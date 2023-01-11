@@ -11,7 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.util.Base64Utils;
-import toy.bookchat.bookchat.config.openid.OAuthPublicKey;
+import toy.bookchat.bookchat.config.token.openid.OAuthPublicKey;
 import toy.bookchat.bookchat.exception.security.ExpiredPublicKeyCachedException;
 import toy.bookchat.bookchat.exception.security.WrongKeySpecException;
 
