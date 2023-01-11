@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.config.openid;
+package toy.bookchat.bookchat.config.token.openid;
 
 import java.security.Key;
 import java.security.KeyFactory;

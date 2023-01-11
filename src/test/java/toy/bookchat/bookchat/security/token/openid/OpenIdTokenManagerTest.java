@@ -25,7 +25,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.util.Base64Utils;
-import toy.bookchat.bookchat.config.security.OpenIdTokenConfig;
+import toy.bookchat.bookchat.config.token.openid.OpenIdTokenConfig;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
 @ExtendWith(MockitoExtension.class)

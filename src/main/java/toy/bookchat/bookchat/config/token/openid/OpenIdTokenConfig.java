@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.config.security;
+package toy.bookchat.bookchat.config.token.openid;
 
 import java.security.Key;
 import java.security.KeyFactory;
@@ -9,6 +9,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import toy.bookchat.bookchat.config.token.OAuth2Properties;
 import toy.bookchat.bookchat.exception.security.NotVerifiedRequestFormatException;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.token.openid.keys.GooglePublicKeys;
