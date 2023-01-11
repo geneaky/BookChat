@@ -6,8 +6,10 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import java.lang.reflect.Type;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
@@ -73,38 +75,82 @@ class ChatControllerTest extends StompTestExtension {
         };
     }
 
-    @BeforeEach
-    public void initNewSession() throws Exception {
+    private StompSession stompSession()
+        throws InterruptedException, ExecutionException, TimeoutException {
         StompHeaders stompHeaders = new StompHeaders();
         stompHeaders.set(AUTHORIZATION, getTestToken());
         ListenableFuture<StompSession> connect = this.webSocketStompClient.connect(
             getStompConnectionEndPointUrl(), new WebSocketHttpHeaders(), stompHeaders,
             new StompSessionHandlerAdapter() {
             });
-        this.stompSession = connect.get(30, TimeUnit.SECONDS);
-        this.stompSession.setAutoReceipt(true);
+        StompSession stompSession = connect.get(30, TimeUnit.SECONDS);
+        stompSession.setAutoReceipt(true);
+        return stompSession;
+    }
+
+    @NotNull
+    private StompHeaders stompSubscribeHeaders(String destination) {
+        StompHeaders subscribeHeader = new StompHeaders();
+        subscribeHeader.set(AUTHORIZATION, getTestToken());
+        subscribeHeader.setDestination(destination);
+        return subscribeHeader;
+    }
+
+    @NotNull
+    private StompHeaders stompSendHeaders(String destination) {
+        StompHeaders stompHeaders = new StompHeaders();
+        stompHeaders.set(AUTHORIZATION, getTestToken());
+        stompHeaders.setDestination(destination);
+        return stompHeaders;
+    }
+
+    @BeforeEach
+    public void initNewSession() throws Exception {
+        this.stompSession = stompSession();
         this.blockingQueue.clear();
     }
 
     @Test
     void STOMP_메시지_송신_수신_성공() throws Exception {
-        CountDownLatch chatAttemptCountLatch = new CountDownLatch(1);
-        StompHeaders sendHeader = new StompHeaders();
-        sendHeader.set(AUTHORIZATION, getTestToken());
-        sendHeader.setDestination("/pub/chat.enter.heho");
+        CountDownLatch chatAttemptCountLatch = new CountDownLatch(2);
 
-        ChatDto dto = ChatDto.builder()
+        StompHeaders subscribeHeader = stompSubscribeHeaders("/topic/heho");
+        StompHeaders enterHeader = stompSendHeaders("/subscriptions/enter/chatrooms/heho");
+        StompHeaders sendHeader = stompSendHeaders("/subscriptions/send/chatrooms/heho");
+//        StompHeaders subscribeHeader2 = stompSubscribeHeaders("/topic/heho.#"); //채팅방은 user specific한 큐가 아니라 room_name.#으로 routing key를 지정
+
+        ChatDto dto1 = ChatDto.builder()
+            .message(getUser().getNickname() + "님이 입장하셨습니다.")
+            .build();
+
+        ChatDto dto2 = ChatDto.builder()
             .message("test test test")
             .build();
 
-        this.stompSession.subscribe("/topic/heho",
+        this.stompSession.subscribe(subscribeHeader, // subscribe
                 subscribeFrameSessionHandler(chatAttemptCountLatch))
             .addReceiptTask(() -> {
-                this.stompSession.send(sendHeader, dto);
+                this.stompSession.send(enterHeader, null); // enter
+                this.stompSession.send(sendHeader, dto2); // send
             });
+
         chatAttemptCountLatch.await();
 
-        ChatDto chatDto = blockingQueue.poll();
-        assertThat(chatDto).isEqualTo(dto);
+        ChatDto chatDto1 = blockingQueue.poll();
+        ChatDto chatDto2 = blockingQueue.poll();
+
+        assertThat(chatDto1).isEqualTo(dto1);
+        assertThat(chatDto2).isEqualTo(dto2);
     }
+
+//    @Test
+//    void 채팅방_입장시_입장메시지_publish_성공() throws Exception {
+//        CountDownLatch chatAttemptCountLatch = new CountDownLatch(1);
+//        StompHeaders sendHeader = new StompHeaders();
+//        sendHeader.set(AUTHORIZATION, getTestToken());
+//        sendHeader.setDestination("/subscriptions/enter/chatrooms/chatRoomSid");
+//
+//        Subscription subscribe = this.stompSession.subscribe("/topic/chatRoomSid",
+//            subscribeFrameSessionHandler(chatAttemptCountLatch));
+//    }
 }
