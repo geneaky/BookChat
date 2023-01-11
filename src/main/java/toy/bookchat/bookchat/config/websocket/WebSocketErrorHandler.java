@@ -10,6 +10,8 @@ public class WebSocketErrorHandler extends StompSubProtocolErrorHandler {
     @Override
     public Message<byte[]> handleClientMessageProcessingError(Message<byte[]> clientMessage,
         Throwable ex) {
+        /* TODO: 2023-01-10 ERROR 응답에 custom message 처리 추가
+         */
         return super.handleClientMessageProcessingError(clientMessage, ex);
     }
 
@@ -17,4 +19,6 @@ public class WebSocketErrorHandler extends StompSubProtocolErrorHandler {
     public Message<byte[]> handleErrorMessageToClient(Message<byte[]> errorMessage) {
         return super.handleErrorMessageToClient(errorMessage);
     }
+
+
 }

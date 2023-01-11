@@ -2,6 +2,8 @@ package toy.bookchat.bookchat.config.websocket;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.messaging.simp.stomp.StompCommand.CONNECT;
+import static org.springframework.messaging.simp.stomp.StompCommand.SEND;
+import static org.springframework.messaging.simp.stomp.StompCommand.SUBSCRIBE;
 import static toy.bookchat.bookchat.domain.common.AuthConstants.BEARER;
 import static toy.bookchat.bookchat.domain.common.AuthConstants.BEGIN_INDEX;
 
@@ -29,7 +31,8 @@ public class WebSocketTokenValidationInterceptor implements ChannelInterceptor {
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 
-        if (CONNECT.equals(accessor.getCommand())) {
+        if (CONNECT.equals(accessor.getCommand()) || SUBSCRIBE.equals(
+            accessor.getCommand()) || SEND.equals(accessor.getCommand())) {
             try {
                 String token = getJwtTokenFromMessage(accessor);
                 jwtTokenManager.getTokenPayloadFromToken(token);

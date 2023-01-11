@@ -18,7 +18,7 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.restdocs.payload.FieldDescriptor;
-import toy.bookchat.bookchat.config.security.OpenIdTokenConfig;
+import toy.bookchat.bookchat.config.token.openid.OpenIdTokenConfig;
 import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
@@ -44,7 +44,7 @@ public abstract class ControllerTestExtension {
         return User.builder()
             .id(1L)
             .email("test@gmail.com")
-            .nickname("nickname")
+            .nickname("testUserNickname")
             .role(USER)
             .name("testUser")
             .profileImageUrl("somethingImageUrl@naver.com")
