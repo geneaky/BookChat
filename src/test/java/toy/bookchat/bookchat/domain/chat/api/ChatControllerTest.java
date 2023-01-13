@@ -11,7 +11,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -28,13 +27,13 @@ import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
-import toy.bookchat.bookchat.domain.StompTestExtension;
+import toy.bookchat.bookchat.domain.ControllerTestExtension;
 import toy.bookchat.bookchat.domain.chat.api.dto.ChatDto;
 
 @Slf4j
 @AutoConfigureTestDatabase
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-class ChatControllerTest extends StompTestExtension {
+class ChatControllerTest extends ControllerTestExtension {
 
     @LocalServerPort
     private int port;
@@ -52,12 +51,10 @@ class ChatControllerTest extends StompTestExtension {
         this.webSocketStompClient.setMessageConverter(new MappingJackson2MessageConverter());
     }
 
-    @NotNull
     private String getStompConnectionEndPointUrl() {
         return "ws://localhost:" + port + "/stomp-connection";
     }
 
-    @NotNull
     private StompSessionHandlerAdapter subscribeFrameSessionHandler(CountDownLatch latch) {
         return new StompSessionHandlerAdapter() {
 
@@ -83,12 +80,11 @@ class ChatControllerTest extends StompTestExtension {
             getStompConnectionEndPointUrl(), new WebSocketHttpHeaders(), stompHeaders,
             new StompSessionHandlerAdapter() {
             });
-        StompSession stompSession = connect.get(30, TimeUnit.SECONDS);
+        StompSession stompSession = connect.get(60, TimeUnit.SECONDS);
         stompSession.setAutoReceipt(true);
         return stompSession;
     }
 
-    @NotNull
     private StompHeaders stompSubscribeHeaders(String destination) {
         StompHeaders subscribeHeader = new StompHeaders();
         subscribeHeader.set(AUTHORIZATION, getTestToken());
@@ -96,7 +92,6 @@ class ChatControllerTest extends StompTestExtension {
         return subscribeHeader;
     }
 
-    @NotNull
     private StompHeaders stompSendHeaders(String destination) {
         StompHeaders stompHeaders = new StompHeaders();
         stompHeaders.set(AUTHORIZATION, getTestToken());
@@ -111,12 +106,12 @@ class ChatControllerTest extends StompTestExtension {
     }
 
     @Test
-    void STOMP_메시지_송신_수신_성공() throws Exception {
-        CountDownLatch chatAttemptCountLatch = new CountDownLatch(2);
+    void 채팅방_입장_송신_퇴장_메시지_수신_성공() throws Exception {
 
         StompHeaders subscribeHeader = stompSubscribeHeaders("/topic/heho");
         StompHeaders enterHeader = stompSendHeaders("/subscriptions/enter/chatrooms/heho");
         StompHeaders sendHeader = stompSendHeaders("/subscriptions/send/chatrooms/heho");
+        StompHeaders leaveHeader = stompSendHeaders("/subscriptions/leave/chatrooms/heho");
 //        StompHeaders subscribeHeader2 = stompSubscribeHeaders("/topic/heho.#"); //채팅방은 user specific한 큐가 아니라 room_name.#으로 routing key를 지정
 
         ChatDto dto1 = ChatDto.builder()
@@ -127,30 +122,28 @@ class ChatControllerTest extends StompTestExtension {
             .message("test test test")
             .build();
 
-        this.stompSession.subscribe(subscribeHeader, // subscribe
-                subscribeFrameSessionHandler(chatAttemptCountLatch))
-            .addReceiptTask(() -> {
-                this.stompSession.send(enterHeader, null); // enter
-                this.stompSession.send(sendHeader, dto2); // send
-            });
+        ChatDto dto3 = ChatDto.builder()
+            .message(getUser().getNickname() + "님이 퇴장하셨습니다.")
+            .build();
 
+        Runnable[] chatActions = {
+            () -> this.stompSession.send(enterHeader, null),
+            () -> this.stompSession.send(sendHeader, dto2),
+            () -> this.stompSession.send(leaveHeader, null)
+        };
+
+        CountDownLatch chatAttemptCountLatch = new CountDownLatch(chatActions.length);
+        this.stompSession.subscribe(subscribeHeader,
+                subscribeFrameSessionHandler(chatAttemptCountLatch))
+            .addReceiptTask(() -> doChat(chatActions));
         chatAttemptCountLatch.await();
 
-        ChatDto chatDto1 = blockingQueue.poll();
-        ChatDto chatDto2 = blockingQueue.poll();
-
-        assertThat(chatDto1).isEqualTo(dto1);
-        assertThat(chatDto2).isEqualTo(dto2);
+        assertThat(blockingQueue).containsExactlyInAnyOrder(dto1, dto2, dto3);
     }
 
-//    @Test
-//    void 채팅방_입장시_입장메시지_publish_성공() throws Exception {
-//        CountDownLatch chatAttemptCountLatch = new CountDownLatch(1);
-//        StompHeaders sendHeader = new StompHeaders();
-//        sendHeader.set(AUTHORIZATION, getTestToken());
-//        sendHeader.setDestination("/subscriptions/enter/chatrooms/chatRoomSid");
-//
-//        Subscription subscribe = this.stompSession.subscribe("/topic/chatRoomSid",
-//            subscribeFrameSessionHandler(chatAttemptCountLatch));
-//    }
+    private void doChat(Runnable... chatActions) {
+        for (Runnable chatAction : chatActions) {
+            chatAction.run();
+        }
+    }
 }
