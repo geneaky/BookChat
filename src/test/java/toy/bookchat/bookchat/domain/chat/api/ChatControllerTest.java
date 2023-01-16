@@ -1,9 +1,16 @@
 package toy.bookchat.bookchat.domain.chat.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static toy.bookchat.bookchat.exception.ExceptionResponse.BAD_REQUEST;
 
 import java.lang.reflect.Type;
+import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -16,8 +23,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
+import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
@@ -29,6 +38,12 @@ import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
 import toy.bookchat.bookchat.domain.chat.api.dto.ChatDto;
+import toy.bookchat.bookchat.domain.chat.repository.ChatRepository;
+import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
+import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomRepository;
+import toy.bookchat.bookchat.domain.participant.Participant;
+import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
+import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 
 @Slf4j
 @AutoConfigureTestDatabase
@@ -41,6 +56,15 @@ class ChatControllerTest extends ControllerTestExtension {
     private final WebSocketClient webSocketClient;
     private final WebSocketStompClient webSocketStompClient;
     private final BlockingQueue<ChatDto> blockingQueue = new LinkedBlockingQueue<>();
+
+    @MockBean
+    private UserRepository userRepository;
+    @MockBean
+    private ChatRoomRepository chatRoomRepository;
+    @MockBean
+    private ParticipantRepository participantRepository;
+    @MockBean
+    private ChatRepository chatRepository;
 
     ChatControllerTest() throws Exception {
         this.webSocketClient = new StandardWebSocketClient();
@@ -69,6 +93,17 @@ class ChatControllerTest extends ControllerTestExtension {
                 blockingQueue.offer(chatDto);
                 latch.countDown();
             }
+
+            @Override
+            public void handleException(StompSession session, StompCommand command,
+                StompHeaders headers, byte[] payload, Throwable exception) {
+                log.info(session.toString());
+                log.info(command.toString());
+                log.info(headers.toString());
+                log.info(payload.toString());
+                log.info(exception.getMessage());
+                latch.countDown();
+            }
         };
     }
 
@@ -89,6 +124,7 @@ class ChatControllerTest extends ControllerTestExtension {
         StompHeaders subscribeHeader = new StompHeaders();
         subscribeHeader.set(AUTHORIZATION, getTestToken());
         subscribeHeader.setDestination(destination);
+        subscribeHeader.set("auto-delete", "true");
         return subscribeHeader;
     }
 
@@ -106,31 +142,61 @@ class ChatControllerTest extends ControllerTestExtension {
     }
 
     @Test
-    void 채팅방_입장_송신_퇴장_메시지_수신_성공() throws Exception {
+    void 채팅방_입장_메시지_수신_성공() throws Exception {
 
         StompHeaders subscribeHeader = stompSubscribeHeaders("/topic/heho");
         StompHeaders enterHeader = stompSendHeaders("/subscriptions/enter/chatrooms/heho");
-        StompHeaders sendHeader = stompSendHeaders("/subscriptions/send/chatrooms/heho");
-        StompHeaders leaveHeader = stompSendHeaders("/subscriptions/leave/chatrooms/heho");
-//        StompHeaders subscribeHeader2 = stompSubscribeHeaders("/topic/heho.#"); //채팅방은 user specific한 큐가 아니라 room_name.#으로 routing key를 지정
 
-        ChatDto dto1 = ChatDto.builder()
+        ChatDto dto = ChatDto.builder()
             .message(getUser().getNickname() + "님이 입장하셨습니다.")
-            .build();
-
-        ChatDto dto2 = ChatDto.builder()
-            .message("test test test")
-            .build();
-
-        ChatDto dto3 = ChatDto.builder()
-            .message(getUser().getNickname() + "님이 퇴장하셨습니다.")
             .build();
 
         Runnable[] chatActions = {
             () -> this.stompSession.send(enterHeader, null),
-            () -> this.stompSession.send(sendHeader, dto2),
-            () -> this.stompSession.send(leaveHeader, null)
         };
+
+        ChatRoom chatRoom = mock(ChatRoom.class);
+        when(userRepository.findById(any())).thenReturn(Optional.ofNullable(getUser()));
+        when(chatRoomRepository.findByRoomSid(any())).thenReturn(Optional.of(chatRoom));
+
+        CountDownLatch chatAttemptCountLatch = new CountDownLatch(chatActions.length);
+        this.stompSession.subscribe(subscribeHeader,
+                subscribeFrameSessionHandler(chatAttemptCountLatch))
+            .addReceiptTask(() -> doChat(chatActions));
+        chatAttemptCountLatch.await();
+
+        assertThat(blockingQueue).containsExactlyInAnyOrder(dto);
+        verify(chatRepository).save(any());
+        verify(participantRepository).save(any());
+    }
+
+    @Test
+    void 채팅방_메시지_송신_수신_성공() throws Exception {
+        StompHeaders subscribeHeader = stompSubscribeHeaders("/topic/heho");
+        StompHeaders sendHeader = stompSendHeaders("/subscriptions/send/chatrooms/heho");
+
+        ChatDto dto1 = ChatDto.builder()
+            .message("test")
+            .build();
+        ChatDto dto2 = ChatDto.builder()
+            .message("test test")
+            .build();
+        ChatDto dto3 = ChatDto.builder()
+            .message("test test test")
+            .build();
+
+        Runnable[] chatActions = {
+            () -> this.stompSession.send(sendHeader, dto1),
+            () -> this.stompSession.send(sendHeader, dto2),
+            () -> this.stompSession.send(sendHeader, dto3)
+        };
+
+        ChatRoom chatRoom = mock(ChatRoom.class);
+        Participant participant = mock(Participant.class);
+        when(userRepository.findById(any())).thenReturn(Optional.ofNullable(getUser()));
+        when(chatRoomRepository.findByRoomSid(any())).thenReturn(Optional.of(chatRoom));
+        when(participantRepository.findByUserAndChatRoom(any(), any())).thenReturn(
+            Optional.ofNullable(participant));
 
         CountDownLatch chatAttemptCountLatch = new CountDownLatch(chatActions.length);
         this.stompSession.subscribe(subscribeHeader,
@@ -139,6 +205,65 @@ class ChatControllerTest extends ControllerTestExtension {
         chatAttemptCountLatch.await();
 
         assertThat(blockingQueue).containsExactlyInAnyOrder(dto1, dto2, dto3);
+        verify(chatRepository, times(3)).save(any());
+    }
+
+    @Test
+    void 채팅방_퇴장_메시지_수신_성공() throws Exception {
+        StompHeaders subscribeHeader = stompSubscribeHeaders("/topic/heho");
+        StompHeaders leaveHeader = stompSendHeaders("/subscriptions/leave/chatrooms/heho");
+
+        ChatDto dto = ChatDto.builder()
+            .message(getUser().getNickname() + "님이 퇴장하셨습니다.")
+            .build();
+
+        Runnable[] chatActions = {
+            () -> this.stompSession.send(leaveHeader, null)
+        };
+
+        ChatRoom chatRoom = mock(ChatRoom.class);
+        Participant participant = mock(Participant.class);
+        when(userRepository.findById(any())).thenReturn(Optional.ofNullable(getUser()));
+        when(chatRoomRepository.findByRoomSid(any())).thenReturn(Optional.of(chatRoom));
+        when(participantRepository.findByUserAndChatRoom(any(), any())).thenReturn(
+            Optional.ofNullable(participant));
+
+        CountDownLatch chatAttemptCountLatch = new CountDownLatch(chatActions.length);
+        this.stompSession.subscribe(subscribeHeader,
+                subscribeFrameSessionHandler(chatAttemptCountLatch))
+            .addReceiptTask(() -> doChat(chatActions));
+        chatAttemptCountLatch.await();
+
+        assertThat(blockingQueue).containsExactlyInAnyOrder(dto);
+        verify(participantRepository).delete(any());
+        verify(chatRepository).save(any());
+    }
+
+    @Test
+    void 메시지_예외_테스트() throws Exception {
+        StompHeaders subscribeHeader = stompSubscribeHeaders("/topic/heho");
+        StompHeaders subscribeError = stompSubscribeHeaders("/user/exchange/amq.direct/error");
+        StompHeaders enterHeader = stompSendHeaders("/subscriptions/enter/chatrooms/heho");
+
+        ChatDto dto = ChatDto.builder()
+            .message(BAD_REQUEST.getValue().toString())
+            .build();
+
+        Runnable[] chatActions = {
+            () -> this.stompSession.send(enterHeader, null),
+        };
+
+        CountDownLatch chatAttemptCountLatch = new CountDownLatch(chatActions.length);
+        this.stompSession.subscribe(subscribeError,
+            subscribeFrameSessionHandler(chatAttemptCountLatch));
+
+        this.stompSession.subscribe(subscribeHeader,
+                subscribeFrameSessionHandler(chatAttemptCountLatch))
+            .addReceiptTask(() -> doChat(chatActions));
+
+        chatAttemptCountLatch.await();
+
+        assertThat(blockingQueue).containsExactlyInAnyOrder(dto);
     }
 
     private void doChat(Runnable... chatActions) {

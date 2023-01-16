@@ -45,10 +45,10 @@ public class WebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBro
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.setPreservePublishOrder(true); //message 순서를 보장해야 작성시간과 받은 시간을 맞출 수 있음
+        registry.setPreservePublishOrder(true); //broker로 메시지 전달 순서 보장
         registry.setApplicationDestinationPrefixes("/subscriptions");
-//        registry.setUserDestinationPrefix("/user"); //specific하게 지정해야 routing key에 적용됨.
-        registry.enableStompBrokerRelay("/topic")
+        registry.setUserDestinationPrefix("/user");
+        registry.enableStompBrokerRelay("/topic", "/exchange")
             .setRelayHost("localhost")
             .setVirtualHost("/")
             .setRelayPort(61613)

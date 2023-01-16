@@ -14,8 +14,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.MessagingException;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import toy.bookchat.bookchat.domain.chat.api.dto.ChatDto;
 import toy.bookchat.bookchat.exception.agony.AgonyNotFoundException;
 import toy.bookchat.bookchat.exception.book.BookNotFoundException;
 import toy.bookchat.bookchat.exception.security.DenidedTokenException;
@@ -118,9 +120,13 @@ public class GlobalExceptionHandler {
     }
 
     @MessageExceptionHandler(Exception.class)
-    public final ResponseEntity<String> handleUnExpectedMessagingException(Exception exception) {
+    @SendToUser("/exchange/amq.direct/error")
+    public final ChatDto handleUnExpectedMessagingException(Exception exception) {
         log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
-        return BAD_REQUEST.getValue();
+        ChatDto chatDto = ChatDto.builder()
+            .message(BAD_REQUEST.getValue().toString())
+            .build();
+        return chatDto;
     }
 
     @ExceptionHandler(Exception.class)
