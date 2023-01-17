@@ -39,5 +39,4 @@ public class ChatController {
         @DestinationVariable String chatRoomSid) {
         chatService.sendMessage(tokenPayload.getUserId(), chatRoomSid, chat);
     }
-
 }

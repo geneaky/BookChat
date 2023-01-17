@@ -64,6 +64,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.Base64Utils;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
+import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.api.dto.Token;
 import toy.bookchat.bookchat.domain.user.api.dto.UserProfileResponse;
 import toy.bookchat.bookchat.domain.user.service.UserService;
@@ -116,11 +117,12 @@ class UserControllerTest extends ControllerTestExtension {
     @Test
     void 사용자_프로필_정보_반환() throws Exception {
 
+        User user = getUser();
         String real = objectMapper.writeValueAsString(UserProfileResponse.builder()
-            .userEmail("test@gmail.com")
-            .userNickname("nickname")
-            .userProfileImageUri("somethingImageUrl@naver.com")
-            .defaultProfileImageType(1)
+            .userEmail(user.getEmail())
+            .userNickname(user.getNickname())
+            .userProfileImageUri(user.getProfileImageUrl())
+            .defaultProfileImageType(user.getDefaultProfileImageType())
             .build());
 
         MvcResult mvcResult = mockMvc.perform(get("/v1/api/users/profile")
