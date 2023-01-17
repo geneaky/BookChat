@@ -17,7 +17,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -26,17 +25,15 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
-import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.web.socket.WebSocketHttpHeaders;
-import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
-import toy.bookchat.bookchat.domain.ControllerTestExtension;
+import toy.bookchat.bookchat.domain.StompTestExtension;
 import toy.bookchat.bookchat.domain.chat.api.dto.ChatDto;
 import toy.bookchat.bookchat.domain.chat.repository.ChatRepository;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
@@ -45,15 +42,13 @@ import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 
-@Slf4j
 @AutoConfigureTestDatabase
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-class ChatControllerTest extends ControllerTestExtension {
+class ChatControllerTest extends StompTestExtension {
 
     @LocalServerPort
     private int port;
     private StompSession stompSession;
-    private final WebSocketClient webSocketClient;
     private final WebSocketStompClient webSocketStompClient;
     private final BlockingQueue<ChatDto> blockingQueue = new LinkedBlockingQueue<>();
 
@@ -67,8 +62,7 @@ class ChatControllerTest extends ControllerTestExtension {
     private ChatRepository chatRepository;
 
     ChatControllerTest() throws Exception {
-        this.webSocketClient = new StandardWebSocketClient();
-        this.webSocketStompClient = new WebSocketStompClient(this.webSocketClient);
+        this.webSocketStompClient = new WebSocketStompClient(new StandardWebSocketClient());
         ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
         taskScheduler.afterPropertiesSet();
         this.webSocketStompClient.setTaskScheduler(taskScheduler);
@@ -93,17 +87,6 @@ class ChatControllerTest extends ControllerTestExtension {
                 blockingQueue.offer(chatDto);
                 latch.countDown();
             }
-
-            @Override
-            public void handleException(StompSession session, StompCommand command,
-                StompHeaders headers, byte[] payload, Throwable exception) {
-                log.info(session.toString());
-                log.info(command.toString());
-                log.info(headers.toString());
-                log.info(payload.toString());
-                log.info(exception.getMessage());
-                latch.countDown();
-            }
         };
     }
 
@@ -124,7 +107,6 @@ class ChatControllerTest extends ControllerTestExtension {
         StompHeaders subscribeHeader = new StompHeaders();
         subscribeHeader.set(AUTHORIZATION, getTestToken());
         subscribeHeader.setDestination(destination);
-        subscribeHeader.set("auto-delete", "true");
         return subscribeHeader;
     }
 
@@ -171,7 +153,7 @@ class ChatControllerTest extends ControllerTestExtension {
     }
 
     @Test
-    void 채팅방_메시지_송신_수신_성공() throws Exception {
+    void 서로다른_세션_메시지_송신_수신_성공() throws Exception {
         StompHeaders subscribeHeader = stompSubscribeHeaders("/topic/heho");
         StompHeaders sendHeader = stompSendHeaders("/subscriptions/send/chatrooms/heho");
 
@@ -199,9 +181,12 @@ class ChatControllerTest extends ControllerTestExtension {
             Optional.ofNullable(participant));
 
         CountDownLatch chatAttemptCountLatch = new CountDownLatch(chatActions.length);
-        this.stompSession.subscribe(subscribeHeader,
+
+        StompSession stompSession2 = stompSession();
+        stompSession2.subscribe(subscribeHeader,
                 subscribeFrameSessionHandler(chatAttemptCountLatch))
             .addReceiptTask(() -> doChat(chatActions));
+
         chatAttemptCountLatch.await();
 
         assertThat(blockingQueue).containsExactlyInAnyOrder(dto1, dto2, dto3);

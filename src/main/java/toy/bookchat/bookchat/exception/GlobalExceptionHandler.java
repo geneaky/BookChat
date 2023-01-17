@@ -12,7 +12,6 @@ import static toy.bookchat.bookchat.exception.ExceptionResponse.WRONG_KEY_SPEC;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.MessagingException;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -112,21 +111,13 @@ public class GlobalExceptionHandler {
         return BAD_REQUEST.getValue();
     }
 
-    @MessageExceptionHandler(MessagingException.class)
-    public final ResponseEntity<String> handleMissingSessionUserException(
-        MessagingException exception) {
-        log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
-        return NOT_VERIFIED_TOKEN.getValue();
-    }
-
     @MessageExceptionHandler(Exception.class)
-    @SendToUser("/exchange/amq.direct/error")
+    @SendToUser(value = "/exchange/amq.direct/error", broadcast = false)
     public final ChatDto handleUnExpectedMessagingException(Exception exception) {
         log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
-        ChatDto chatDto = ChatDto.builder()
+        return ChatDto.builder()
             .message(BAD_REQUEST.getValue().toString())
             .build();
-        return chatDto;
     }
 
     @ExceptionHandler(Exception.class)

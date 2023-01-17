@@ -39,6 +39,11 @@ public class StompTestExtension {
     @MockBean
     JwtTokenManager jwtTokenManager;
 
+    @BeforeEach
+    public void setUp() {
+        doReturn(getTokenPayload(getUser())).when(jwtTokenManager).getTokenPayloadFromToken(any());
+    }
+
     protected User getUser() {
         return User.builder()
             .id(1L)
@@ -71,10 +76,5 @@ public class StompTestExtension {
             .setClaims(claims)
             .signWith(HS256, "test")
             .compact();
-    }
-
-    @BeforeEach
-    public void setUp() {
-        doReturn(getTokenPayload(getUser())).when(jwtTokenManager).getTokenPayloadFromToken(any());
     }
 }
