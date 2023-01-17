@@ -50,19 +50,13 @@ public class UserController {
         this.jwtTokenRecorder = jwtTokenRecorder;
     }
 
-    /* TODO: 2022-08-29
-            추후: 사용자 프로필의 경우 프로필 수정을 누르지 않으면 동일한 데이터에 대해 read
-            연산을 하므로 캐시할 수 있을듯 하다
-            s3와 cdn을 사용해서 사용자 프로필을 캐시해서 제공해 성능 개선
-        */
     @GetMapping("/users/profile")
     public UserProfileResponse userProfile(@UserPayload TokenPayload tokenPayload) {
 
         return UserProfileResponse.of(tokenPayload);
     }
 
-    /* TODO: 2022-08-29 인터셉터 적용해서 1분안에 50번 요청 보낼시 1시간동안
-        해당 ip block
+    /* TODO: 2022-08-29 bucket4j 적용 트래픽제어 aop로 만들기
      */
     @GetMapping("/users/profile/nickname")
     public ResponseEntity<Void> checkDuplicatedNickname(String nickname) {
