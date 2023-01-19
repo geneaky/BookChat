@@ -7,41 +7,32 @@ import toy.bookchat.bookchat.domain.chat.Chat;
 import toy.bookchat.bookchat.domain.chat.api.dto.ChatDto;
 import toy.bookchat.bookchat.domain.chat.repository.ChatRepository;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
-import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomRepository;
 import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
 import toy.bookchat.bookchat.domain.user.User;
-import toy.bookchat.bookchat.domain.user.repository.UserRepository;
-import toy.bookchat.bookchat.exception.chatroom.ChatRoomNotFoundException;
 import toy.bookchat.bookchat.exception.participant.AlreadyParticipatedException;
-import toy.bookchat.bookchat.exception.participant.NotParticipatedException;
-import toy.bookchat.bookchat.exception.user.UserNotFoundException;
 
 @Service
 public class ChatService {
 
     private final ChatRepository chatRepository;
-    private final ChatRoomRepository chatRoomRepository;
-    private final UserRepository userRepository;
     private final ParticipantRepository participantRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    private final ChatCacheService chatCacheService;
 
 
-    public ChatService(ChatRepository chatRepository, ChatRoomRepository chatRoomRepository,
-        UserRepository userRepository, ParticipantRepository participantRepository,
-        SimpMessagingTemplate messagingTemplate) {
+    public ChatService(ChatRepository chatRepository, ParticipantRepository participantRepository,
+        SimpMessagingTemplate messagingTemplate, ChatCacheService chatCacheService) {
         this.chatRepository = chatRepository;
-        this.chatRoomRepository = chatRoomRepository;
-        this.userRepository = userRepository;
         this.participantRepository = participantRepository;
         this.messagingTemplate = messagingTemplate;
+        this.chatCacheService = chatCacheService;
     }
 
     @Transactional
     public void enterChatRoom(Long userId, String chatRoomSid) {
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        ChatRoom chatRoom = chatRoomRepository.findByRoomSid(chatRoomSid).orElseThrow(
-            ChatRoomNotFoundException::new);
+        User user = chatCacheService.findUserByUserId(userId);
+        ChatRoom chatRoom = chatCacheService.findChatRoomByRoomSid(chatRoomSid);
         participantRepository.findByUserAndChatRoom(user, chatRoom).ifPresent(p -> {
             throw new AlreadyParticipatedException();
         });
@@ -61,9 +52,7 @@ public class ChatService {
             .message(chat.getMessage())
             .build();
 
-        participantRepository.save(participant);
-        /* TODO: 2023-01-16 cache 등록
-         */
+        chatCacheService.saveParticipantCache(participant);
         chatRepository.save(chat);
         messagingTemplate.convertAndSend("/topic/" + chatRoomSid,
             chatDto);
@@ -78,11 +67,12 @@ public class ChatService {
 
     @Transactional
     public void leaveChatRoom(Long userId, String chatRoomSid) {
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        ChatRoom chatRoom = chatRoomRepository.findByRoomSid(chatRoomSid)
-            .orElseThrow(ChatRoomNotFoundException::new);
-        Participant participant = participantRepository.findByUserAndChatRoom(user, chatRoom)
-            .orElseThrow(NotParticipatedException::new);
+        User user = chatCacheService.findUserByUserId(userId);
+        ChatRoom chatRoom = chatCacheService.findChatRoomByRoomSid(chatRoomSid);
+        Participant participant = chatCacheService.findParticipantByUserAndChatRoom(user, chatRoom);
+
+        participant.getUser();
+        participant.getChatRoom().getRoomSid();
 
         Chat chat = Chat.builder()
             .chatRoom(chatRoom)
@@ -94,9 +84,7 @@ public class ChatService {
             .message(chat.getMessage())
             .build();
 
-        participantRepository.delete(participant);
-        /* TODO: 2023-01-16 cache 삭제
-         */
+        chatCacheService.deleteParticipant(participant);
         chatRepository.save(chat);
         messagingTemplate.convertAndSend("/topic/" + chatRoomSid,
             chatDto);
@@ -111,13 +99,9 @@ public class ChatService {
 
     @Transactional
     public void sendMessage(Long userId, String chatRoomSid, ChatDto chatDto) {
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        ChatRoom chatRoom = chatRoomRepository.findByRoomSid(chatRoomSid)
-            .orElseThrow(ChatRoomNotFoundException::new);
-        participantRepository.findByUserAndChatRoom(user, chatRoom)
-            .orElseThrow(NotParticipatedException::new);
-        /* TODO: 2023-01-16 cache 등록, 조회
-         */
+        User user = chatCacheService.findUserByUserId(userId);
+        ChatRoom chatRoom = chatCacheService.findChatRoomByRoomSid(chatRoomSid);
+        chatCacheService.findParticipantByUserAndChatRoom(user, chatRoom);
 
         Chat chat = Chat.builder()
             .chatRoom(chatRoom)
