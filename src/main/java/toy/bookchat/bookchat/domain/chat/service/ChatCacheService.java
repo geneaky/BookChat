@@ -28,7 +28,7 @@ public class ChatCacheService {
     }
 
 
-    @Cacheable(cacheNames = "user")
+    @Cacheable(cacheNames = "user", key = "#userId")
     public User findUserByUserId(Long userId) {
         return userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
     }
@@ -54,6 +54,6 @@ public class ChatCacheService {
     public void deleteParticipant(Participant participant) {
         participantRepository.delete(participant);
     }
-    
+
 
 }
