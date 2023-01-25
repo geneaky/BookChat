@@ -15,6 +15,7 @@ import toy.bookchat.bookchat.exception.participant.AlreadyParticipatedException;
 @Service
 public class ChatService {
 
+    public static final String DESTINATION_PREFIX = "/topic/";
     private final ChatRepository chatRepository;
     private final ParticipantRepository participantRepository;
     private final SimpMessagingTemplate messagingTemplate;
@@ -30,9 +31,9 @@ public class ChatService {
     }
 
     @Transactional
-    public void enterChatRoom(Long userId, String chatRoomSid) {
+    public void enterChatRoom(Long userId, String roomSid) {
         User user = chatCacheService.findUserByUserId(userId);
-        ChatRoom chatRoom = chatCacheService.findChatRoomByRoomSid(chatRoomSid);
+        ChatRoom chatRoom = chatCacheService.findChatRoomByRoomSid(roomSid);
         participantRepository.findByUserAndChatRoom(user, chatRoom).ifPresent(p -> {
             throw new AlreadyParticipatedException();
         });
@@ -55,8 +56,14 @@ public class ChatService {
         participantRepository.save(participant);
         chatCacheService.saveParticipantCache(user, chatRoom, participant);
         chatRepository.save(chat);
-        messagingTemplate.convertAndSend("/topic/" + chatRoomSid,
+        messagingTemplate.convertAndSend(getDestination(roomSid),
             chatDto);
+    }
+
+    private static String getDestination(String roomSid) {
+        StringBuilder stringBuilder = new StringBuilder(DESTINATION_PREFIX);
+        stringBuilder.append(roomSid);
+        return stringBuilder.toString();
     }
 
     private String getWelcomeMessage(User user) {
@@ -67,13 +74,10 @@ public class ChatService {
     }
 
     @Transactional
-    public void leaveChatRoom(Long userId, String chatRoomSid) {
+    public void leaveChatRoom(Long userId, String roomSid) {
         User user = chatCacheService.findUserByUserId(userId);
-        ChatRoom chatRoom = chatCacheService.findChatRoomByRoomSid(chatRoomSid);
+        ChatRoom chatRoom = chatCacheService.findChatRoomByRoomSid(roomSid);
         Participant participant = chatCacheService.findParticipantByUserAndChatRoom(user, chatRoom);
-
-        participant.getUser();
-        participant.getChatRoom().getRoomSid();
 
         Chat chat = Chat.builder()
             .chatRoom(chatRoom)
@@ -88,7 +92,7 @@ public class ChatService {
         participantRepository.delete(participant);
         chatCacheService.deleteParticipantCache(user, chatRoom);
         chatRepository.save(chat);
-        messagingTemplate.convertAndSend("/topic/" + chatRoomSid,
+        messagingTemplate.convertAndSend(getDestination(roomSid),
             chatDto);
     }
 
@@ -100,9 +104,9 @@ public class ChatService {
     }
 
     @Transactional
-    public void sendMessage(Long userId, String chatRoomSid, ChatDto chatDto) {
+    public void sendMessage(Long userId, String roomSid, ChatDto chatDto) {
         User user = chatCacheService.findUserByUserId(userId);
-        ChatRoom chatRoom = chatCacheService.findChatRoomByRoomSid(chatRoomSid);
+        ChatRoom chatRoom = chatCacheService.findChatRoomByRoomSid(roomSid);
         chatCacheService.findParticipantByUserAndChatRoom(user, chatRoom);
 
         Chat chat = Chat.builder()
@@ -112,7 +116,7 @@ public class ChatService {
             .build();
 
         chatRepository.save(chat);
-        messagingTemplate.convertAndSend("/topic/" + chatRoomSid,
+        messagingTemplate.convertAndSend(getDestination(roomSid),
             chatDto);
     }
 }

@@ -1,9 +1,9 @@
 package toy.bookchat.bookchat.domain.chat.api;
 
+import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import toy.bookchat.bookchat.domain.chat.api.dto.ChatDto;
 import toy.bookchat.bookchat.domain.chat.service.ChatService;
@@ -14,29 +14,27 @@ import toy.bookchat.bookchat.security.user.UserPayload;
 @Controller
 public class ChatController {
 
-    private final SimpMessagingTemplate messagingTemplate;
     private final ChatService chatService;
 
-    public ChatController(SimpMessagingTemplate messagingTemplate, ChatService chatService) {
-        this.messagingTemplate = messagingTemplate;
+    public ChatController(ChatService chatService) {
         this.chatService = chatService;
     }
 
-    @MessageMapping("/enter/chatrooms/{chatRoomSid}")
+    @MessageMapping("/enter/chatrooms/{roomSid}")
     public void enterChatRoom(@UserPayload TokenPayload tokenPayload,
-        @DestinationVariable String chatRoomSid) {
-        chatService.enterChatRoom(tokenPayload.getUserId(), chatRoomSid);
+        @DestinationVariable String roomSid) {
+        chatService.enterChatRoom(tokenPayload.getUserId(), roomSid);
     }
 
-    @MessageMapping("/leave/chatrooms/{chatRoomSid}")
+    @MessageMapping("/leave/chatrooms/{roomSid}")
     public void leaveChatRoom(@UserPayload TokenPayload tokenPayload,
-        @DestinationVariable String chatRoomSid) {
-        chatService.leaveChatRoom(tokenPayload.getUserId(), chatRoomSid);
+        @DestinationVariable String roomSid) {
+        chatService.leaveChatRoom(tokenPayload.getUserId(), roomSid);
     }
 
-    @MessageMapping("/send/chatrooms/{chatRoomSid}")
-    public void sendMessage(ChatDto chat, @UserPayload TokenPayload tokenPayload,
-        @DestinationVariable String chatRoomSid) {
-        chatService.sendMessage(tokenPayload.getUserId(), chatRoomSid, chat);
+    @MessageMapping("/send/chatrooms/{roomSid}")
+    public void sendMessage(@Valid ChatDto chat, @UserPayload TokenPayload tokenPayload,
+        @DestinationVariable String roomSid) {
+        chatService.sendMessage(tokenPayload.getUserId(), roomSid, chat);
     }
 }
