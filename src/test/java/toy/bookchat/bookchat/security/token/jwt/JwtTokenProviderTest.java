@@ -21,7 +21,6 @@ class JwtTokenProviderTest {
 
     @Mock
     JwtTokenProperties jwtTokenProperties;
-
     @InjectMocks
     JwtTokenManagerImpl jwtTokenManager;
     @InjectMocks

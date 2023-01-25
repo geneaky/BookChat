@@ -27,10 +27,8 @@ class JwtTokenManagerTest {
 
     @Mock
     JwtTokenProperties jwtTokenProperties;
-
     @InjectMocks
     JwtTokenProvider jwtTokenProvider;
-
     @InjectMocks
     JwtTokenManagerImpl jwtTokenManager;
 
@@ -58,11 +56,8 @@ class JwtTokenManagerTest {
     @Test
     void 토큰에서_사용자_이름_추출_성공() throws Exception {
         generalTokenConfigContext();
-
         User user = getUser();
-
         Token token = jwtTokenProvider.createToken(getUser());
-
         String findUserName = jwtTokenManager.getOAuth2MemberNumberFromToken(
             token.getAccessToken());
 
@@ -78,9 +73,7 @@ class JwtTokenManagerTest {
     @Test
     void 토큰에서_사용자_이메일_추출_성공() throws Exception {
         generalTokenConfigContext();
-
         User user = getUser();
-
         Token token = jwtTokenProvider.createToken(getUser());
         String findUserEmail = jwtTokenManager.getUserEmailFromToken(token.getAccessToken());
 
@@ -89,13 +82,7 @@ class JwtTokenManagerTest {
 
     @Test
     void 토큰에서_provider_type_추출_성공() throws Exception {
-        generalTokenConfigContext();
-
         User user = getUser();
-
-        Token token = jwtTokenProvider.createToken(getUser());
-        OAuth2Provider provider = jwtTokenManager.getOAuth2ProviderFromToken(
-            token.getAccessToken());
 
         assertThat(user.getProvider()).isEqualTo(OAuth2Provider.KAKAO);
     }
@@ -127,11 +114,7 @@ class JwtTokenManagerTest {
     @Test
     void 토큰에서_사용자_id_추출_성공() throws Exception {
         generalTokenConfigContext();
-
-        User user = getUser();
-
         Token token = jwtTokenProvider.createToken(getUser());
-
         Long result = jwtTokenManager.getUserIdFromToken(token.getAccessToken());
 
         assertThat(result).isEqualTo(1L);
@@ -140,13 +123,10 @@ class JwtTokenManagerTest {
     @Test
     void 토큰에서_TokenPayload_반환_성공() throws Exception {
         generalTokenConfigContext();
-
         User user = getUser();
-
         Token token = jwtTokenProvider.createToken(getUser());
         TokenPayload result = jwtTokenManager.getTokenPayloadFromToken(
             token.getAccessToken());
-
         TokenPayload expect = getTokenPayload(user);
 
         assertThat(result).isEqualTo(expect);

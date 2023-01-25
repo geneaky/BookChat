@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.domain.configuration;
+package toy.bookchat.bookchat.domain;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import javax.persistence.EntityManager;
@@ -7,7 +7,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
 @TestConfiguration
-public class TestConfig {
+public class RepositoryTestConfiguration {
 
     @PersistenceContext
     private EntityManager entityManager;
