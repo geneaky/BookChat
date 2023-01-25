@@ -14,8 +14,6 @@ jobs:
       checks: write
       pull-requests: write
       actions: read
-    env:
-     APPLICATION: ${{secrets.TEST}}
 
     steps:
     - name: Check out
@@ -30,17 +28,6 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x ./gradlew
       shell: bash
-
-    - name: Create Configuration File
-      run: echo "${{ env.APPLICATION }}" > ./src/main/resources/application.yml
-      shell: bash
-      
-    - name: Substitute Configuration File
-      uses: actions/upload-artifact@v3
-      with: 
-        name: application.yml
-        path: ./src/main/resources/application.yml
-      
 
     - name: Test with Gradle
       run: ./gradlew clean test -x asciidoctor
