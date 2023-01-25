@@ -18,13 +18,16 @@ public class WebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBro
     private final ChannelInterceptor webSocketTokenValidationInterceptor;
     private final StompSubProtocolErrorHandler stompErrorHandler;
     private final MessageAuthenticationArgumentResolver messageAuthenticationArgumentResolver;
+    private final ExternalBrokerProperties externalBrokerProperties;
 
     public WebSocketSecurityConfig(ChannelInterceptor webSocketTokenValidationInterceptor,
         StompSubProtocolErrorHandler stompErrorHandler,
-        MessageAuthenticationArgumentResolver messageAuthenticationArgumentResolver) {
+        MessageAuthenticationArgumentResolver messageAuthenticationArgumentResolver,
+        ExternalBrokerProperties externalBrokerProperties) {
         this.webSocketTokenValidationInterceptor = webSocketTokenValidationInterceptor;
         this.stompErrorHandler = stompErrorHandler;
         this.messageAuthenticationArgumentResolver = messageAuthenticationArgumentResolver;
+        this.externalBrokerProperties = externalBrokerProperties;
     }
 
     @Override
@@ -49,11 +52,11 @@ public class WebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBro
         registry.setApplicationDestinationPrefixes("/subscriptions");
         registry.setUserDestinationPrefix("/user");
         registry.enableStompBrokerRelay("/topic", "/exchange")
-            .setRelayHost("localhost")
-            .setVirtualHost("/")
-            .setRelayPort(61613)
-            .setClientLogin("guest")
-            .setClientPasscode("guest");
+            .setRelayHost(externalBrokerProperties.getHost())
+            .setVirtualHost(externalBrokerProperties.getVirtualHost())
+            .setRelayPort(externalBrokerProperties.getPort())
+            .setClientLogin(externalBrokerProperties.getLogin())
+            .setClientPasscode(externalBrokerProperties.getPasscode());
     }
 
     @Override
