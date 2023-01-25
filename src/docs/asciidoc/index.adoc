@@ -675,3 +675,80 @@ include::{snippets}/get-user-chatrooms/http-response.adoc[]
     ^@
 ```
 
+=== 채팅방 Subscribe
+
+[cols="1,1"]
+|===
+|roomSid|/topic/{roomSid}
+|UUID   |/topic/heho
+|===
+
+```stomp
+    SUBSCRIBE
+    Authorizaiton: Bearer [JWT Token]
+    host: wss://bookchat.link/topic/[heho]
+
+    ^@
+```
+
+=== 에러응답 Subscribe
+
+```stomp
+    SUBSCRIBE
+    Authorizaiton: Bearer [JWT Token]
+    host: wss://bookchat.link/user/exchange/amq.direct/error
+
+    ^@
+```
+
+=== 채팅방 입장 Send
+
+[cols="1,1"]
+|===
+|roomSid|/enter/chatrooms/{roomSid}
+|UUID   |/enter/chatrooms/heho
+|===
+
+```stomp
+    SEND
+    Authorizaiton: Bearer [JWT Token]
+    host: wss://bookchat.link/subscriptions/enter/chatrooms/[heho]
+
+    ^@
+```
+
+=== 채팅방 퇴장 Send
+
+[cols="1,1"]
+|===
+|roomSid|/leave/chatrooms/{roomSid}
+|UUID   |/leave/chatrooms/heho
+|===
+
+```stomp
+    SEND
+    Authorizaiton: Bearer [JWT Token]
+    host: wss://bookchat.link/subscriptions/leave/chatrooms/[heho]
+
+    ^@
+```
+
+=== 채팅방 메시지 전송 Send
+
+[cols="1,1"]
+|===
+|roomSid|/subscriptions/send/chatrooms/{roomSid}
+|UUID   |/subscriptions/send/chatrooms/heho
+|===
+
+```stomp
+    SEND
+    Authorizaiton: Bearer [JWT Token]
+    host: wss://bookchat.link/subscriptions/send/chatrooms/[heho]
+
+    {
+        message: "hi hi"
+    }
+
+    ^@
+```
