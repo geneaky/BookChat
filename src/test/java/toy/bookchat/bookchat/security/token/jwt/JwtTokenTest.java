@@ -25,7 +25,6 @@ class JwtTokenTest {
 
     @Mock
     JwtTokenProperties jwtTokenProperties;
-
     @InjectMocks
     JwtTokenProvider jwtTokenProvider;
 
@@ -68,10 +67,7 @@ class JwtTokenTest {
 
     @Test
     void 유효하지않은_토큰에서_사용자이름_추출시_예외발생() throws Exception {
-        when(jwtTokenProperties.getSecret()).thenReturn("test");
-        when(jwtTokenProperties.getAccessTokenExpiredTime()).thenReturn(8888888L);
-        when(jwtTokenProperties.getRefreshTokenExpiredTime()).thenReturn(999999999L);
-
+        generalTokenConfigContext();
         Token token = jwtTokenProvider.createToken(getUser());
 
         assertThatThrownBy(() -> {

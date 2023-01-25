@@ -1,0 +1,49 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:test
+    username: sa
+    password:
+
+  jackson:
+    parser:
+      allow-unquoted-control-chars: true
+
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: true
+
+rabbit:
+  host: localhost
+  virtual-host: /
+  port: 61613
+  login: guest
+  passcode: guest
+
+book:
+  api:
+    header: test-header
+    uri: test-uri
+
+cloud:
+  aws:
+    stack:
+      auto: false
+    region:
+      static: ap-northeast-2
+
+aws:
+  s3:
+    access-key: test
+    secret-key: test
+    region: test
+    bucket-name: test
+    user-profile-image-folder: test
+    chat-room-image-folder: test
+    image-bucket-url: test
+
+token:
+  secret: test
+  access-token-expired-time: 1800000 #30분
+  refresh-token-expired-time: 1210000000 #2주
+  reissue-period: 259200000 #3일

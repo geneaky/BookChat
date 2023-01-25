@@ -29,17 +29,16 @@ import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 @SpringBootTest
 class ChatCacheServiceTest {
 
-    @Autowired
-    private ChatCacheService cacheService;
-    @Autowired
-    private CacheManager cacheManager;
-
     @MockBean
     UserRepository userRepository;
     @MockBean
     ChatRoomRepository chatRoomRepository;
     @MockBean
     ParticipantRepository participantRepository;
+    @Autowired
+    private ChatCacheService cacheService;
+    @Autowired
+    private CacheManager cacheManager;
 
     @AfterEach
     public void tearDown() {

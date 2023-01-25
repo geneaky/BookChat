@@ -8,12 +8,12 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import toy.bookchat.bookchat.config.log.P6spyLogMessageFormatConfig;
 import toy.bookchat.bookchat.config.query.JpaAuditingConfig;
-import toy.bookchat.bookchat.domain.configuration.TestConfig;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @DataJpaTest(showSql = false)
-@Import({JpaAuditingConfig.class, TestConfig.class, P6spyLogMessageFormatConfig.class})
+@Import({JpaAuditingConfig.class, RepositoryTestConfiguration.class,
+    P6spyLogMessageFormatConfig.class})
 public @interface RepositoryTest {
 
 }

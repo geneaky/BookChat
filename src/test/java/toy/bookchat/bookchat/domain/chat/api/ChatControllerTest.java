@@ -19,7 +19,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -42,16 +41,14 @@ import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 
-@AutoConfigureTestDatabase
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 class ChatControllerTest extends StompTestExtension {
 
+    private final WebSocketStompClient webSocketStompClient;
+    private final BlockingQueue<ChatDto> blockingQueue = new LinkedBlockingQueue<>();
     @LocalServerPort
     private int port;
     private StompSession stompSession;
-    private final WebSocketStompClient webSocketStompClient;
-    private final BlockingQueue<ChatDto> blockingQueue = new LinkedBlockingQueue<>();
-
     @MockBean
     private UserRepository userRepository;
     @MockBean
