@@ -3,9 +3,8 @@ package toy.bookchat.bookchat.config.token.openid;
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
-import java.time.LocalDateTime;
-import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -21,16 +20,12 @@ public class OpenIdTokenConfig {
     public static final String RSA = "RSA";
     private final OAuth2Properties oAuth2Properties;
     private final RestTemplate restTemplate;
-    private final ConcurrentHashMap<OAuth2Provider, LocalDateTime> publicKeysCachedTime;
     private final KeyFactory keyFactory;
-    private KakaoPublicKeys kakaoPublicKeys;
-    private GooglePublicKeys googlePublicKeys;
 
     public OpenIdTokenConfig(RestTemplateBuilder restTemplateBuilder,
         OAuth2Properties oAuth2Properties) {
         this.restTemplate = restTemplateBuilder.build();
         this.oAuth2Properties = oAuth2Properties;
-        this.publicKeysCachedTime = new ConcurrentHashMap<>();
         this.keyFactory = createKeyFactory();
     }
 
@@ -40,13 +35,11 @@ public class OpenIdTokenConfig {
     public Key getPublicKey(String keyId, OAuth2Provider oAuth2Provider) {
 
         if (OAuth2Provider.KAKAO.equals(oAuth2Provider)) {
-            checkKakaoPublicKeyCache();
-            return this.kakaoPublicKeys.getKey(keyId, this.keyFactory);
+            return fetchKakaoPublicKey().getKey(keyId, this.keyFactory);
         }
 
         if (OAuth2Provider.GOOGLE.equals(oAuth2Provider)) {
-            checkGooglePublicKeyCache();
-            return this.googlePublicKeys.getKey(keyId, this.keyFactory);
+            return fetchGooglePublicKey().getKey(keyId, this.keyFactory);
         }
 
         throw new NotVerifiedRequestFormatException(keyId);
@@ -61,43 +54,13 @@ public class OpenIdTokenConfig {
         return keyFactory;
     }
 
-    private void checkGooglePublicKeyCache() {
-        if (isGooglePublicKeyCacheExpired()) {
-            refreshGooglePublicKeys();
-        }
-    }
-
-    private boolean isGooglePublicKeyCacheExpired() {
-        return LocalDateTime.now()
-            .isAfter(publicKeysCachedTime.getOrDefault(OAuth2Provider.GOOGLE, LocalDateTime.MIN));
-    }
-
-    private void refreshGooglePublicKeys() {
-        this.googlePublicKeys = fetchGooglePublicKey();
-        this.publicKeysCachedTime.put(OAuth2Provider.GOOGLE, LocalDateTime.now().plusDays(3L));
-    }
-
-    private GooglePublicKeys fetchGooglePublicKey() {
+    @Cacheable(cacheNames = "google", key = "#root.methodName")
+    public GooglePublicKeys fetchGooglePublicKey() {
         return null;
     }
 
-    private void checkKakaoPublicKeyCache() {
-        if (isKakaoPublicKeyCacheExpired()) {
-            refreshKakaoPublicKeys();
-        }
-    }
-
-    private boolean isKakaoPublicKeyCacheExpired() {
-        return LocalDateTime.now()
-            .isAfter(publicKeysCachedTime.getOrDefault(OAuth2Provider.KAKAO, LocalDateTime.MIN));
-    }
-
-    private void refreshKakaoPublicKeys() {
-        this.kakaoPublicKeys = fetchKakaoPublicKey();
-        this.publicKeysCachedTime.put(OAuth2Provider.KAKAO, LocalDateTime.now().plusDays(3L));
-    }
-
-    private KakaoPublicKeys fetchKakaoPublicKey() {
+    @Cacheable(cacheNames = "kakao", key = "#root.methodName")
+    public KakaoPublicKeys fetchKakaoPublicKey() {
         return restTemplate.exchange(oAuth2Properties.getKakaoUri(),
             HttpMethod.GET,
             null, KakaoPublicKeys.class).getBody();
