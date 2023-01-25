@@ -52,7 +52,8 @@ public class ChatService {
             .message(chat.getMessage())
             .build();
 
-        chatCacheService.saveParticipantCache(participant);
+        participantRepository.save(participant);
+        chatCacheService.saveParticipantCache(user, chatRoom, participant);
         chatRepository.save(chat);
         messagingTemplate.convertAndSend("/topic/" + chatRoomSid,
             chatDto);
@@ -84,7 +85,8 @@ public class ChatService {
             .message(chat.getMessage())
             .build();
 
-        chatCacheService.deleteParticipant(participant);
+        participantRepository.delete(participant);
+        chatCacheService.deleteParticipantCache(user, chatRoom);
         chatRepository.save(chat);
         messagingTemplate.convertAndSend("/topic/" + chatRoomSid,
             chatDto);

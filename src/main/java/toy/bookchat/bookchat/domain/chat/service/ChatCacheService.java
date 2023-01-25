@@ -1,6 +1,7 @@
 package toy.bookchat.bookchat.domain.chat.service;
 
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
@@ -28,7 +29,7 @@ public class ChatCacheService {
     }
 
 
-    @Cacheable(cacheNames = "user", key = "#userId")
+    @Cacheable(cacheNames = "user")
     public User findUserByUserId(Long userId) {
         return userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
     }
@@ -39,21 +40,18 @@ public class ChatCacheService {
             ChatRoomNotFoundException::new);
     }
 
-    @Cacheable(cacheNames = "participant")
-    public Participant saveParticipantCache(Participant participant) {
-        return participantRepository.save(participant);
+    @CachePut(cacheNames = "participant", key = "'U' + #user.id + 'CR' + #chatRoom.id")
+    public Participant saveParticipantCache(User user, ChatRoom chatRoom, Participant participant) {
+        return participant;
     }
 
-    @Cacheable(cacheNames = "participant")
+    @Cacheable(cacheNames = "participant", key = "'U' + #user.id + 'CR' + #chatRoom.id")
     public Participant findParticipantByUserAndChatRoom(User user, ChatRoom chatRoom) {
         return participantRepository.findByUserAndChatRoom(user, chatRoom).orElseThrow(
             NotParticipatedException::new);
     }
 
-    @CacheEvict(cacheNames = "participant")
-    public void deleteParticipant(Participant participant) {
-        participantRepository.delete(participant);
+    @CacheEvict(cacheNames = "participant", key = "'U' + #user.id + 'CR' + #chatRoom.id")
+    public void deleteParticipantCache(User user, ChatRoom chatRoom) {
     }
-
-
 }
