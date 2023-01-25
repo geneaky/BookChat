@@ -1,17 +1,17 @@
 package toy.bookchat.bookchat.domain.chat.api.dto;
 
 import java.util.Objects;
+import javax.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 @Getter
-@ToString
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ChatDto {
 
+    @NotBlank
     private String message;
 
     @Builder
