@@ -1,25 +1,31 @@
 package toy.bookchat.bookchat.domain;
 
+import static io.jsonwebtoken.SignatureAlgorithm.HS256;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doReturn;
 import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.VARIES;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static toy.bookchat.bookchat.domain.common.AuthConstants.BEARER;
 import static toy.bookchat.bookchat.domain.user.ROLE.USER;
+import static toy.bookchat.bookchat.security.oauth.OAuth2Provider.GOOGLE;
 
+import io.jsonwebtoken.Jwts;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.restdocs.payload.FieldDescriptor;
-import toy.bookchat.bookchat.config.OpenIdTokenConfig;
+import toy.bookchat.bookchat.config.token.openid.OpenIdTokenConfig;
 import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.domain.user.User;
-import toy.bookchat.bookchat.security.ipblock.IpBlockManager;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenManager;
 import toy.bookchat.bookchat.security.token.openid.OpenIdTokenManager;
 import toy.bookchat.bookchat.security.user.TokenPayload;
+import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 /*
     controller 테스트는 security까지 포함시켜 테스트하여 restdoc 문서에
@@ -33,14 +39,12 @@ public abstract class ControllerTestExtension {
     JwtTokenManager jwtTokenManager;
     @MockBean
     OpenIdTokenConfig openIdTokenConfig;
-    @MockBean
-    IpBlockManager ipBlockManager;
 
-    private User getUser() {
+    protected User getUser() {
         return User.builder()
             .id(1L)
             .email("test@gmail.com")
-            .nickname("nickname")
+            .nickname("testUserNickname")
             .role(USER)
             .name("testUser")
             .profileImageUrl("somethingImageUrl@naver.com")
@@ -59,9 +63,7 @@ public abstract class ControllerTestExtension {
 
     @BeforeEach
     public void setUp() {
-        when(jwtTokenManager.getTokenPayloadFromToken(any())).thenReturn(
-            getTokenPayload(getUser()));
-        when(ipBlockManager.validateRequest(any())).thenReturn(true);
+        doReturn(getTokenPayload(getUser())).when(jwtTokenManager).getTokenPayloadFromToken(any());
     }
 
     public OpenIdTokenConfig getOpenIdTokenConfig() {
@@ -102,5 +104,27 @@ public abstract class ControllerTestExtension {
             fieldWithPath("cursorMeta.last").type(BOOLEAN).description("마지막 슬라이스 여부"),
             fieldWithPath("cursorMeta.first").type(BOOLEAN).description("처음 슬라이스 여부"),
             fieldWithPath("cursorMeta.nextCursorId").type(VARIES).description("다음 커서 ID"));
+    }
+
+    protected String getTestToken() {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("sub", "test");
+        claims.put("name", "google123");
+        claims.put("provider", GOOGLE);
+        claims.put("email", "test@gmail.com");
+
+        return BEARER + Jwts.builder()
+            .setClaims(claims)
+            .signWith(HS256, "test")
+            .compact();
+    }
+
+    protected UserPrincipal getUserPrincipal() {
+        User user = getUser();
+        TokenPayload tokenPayload = TokenPayload.of(user.getId(), user.getName(),
+            user.getNickname(),
+            user.getEmail(), user.getProfileImageUrl(), user.getDefaultProfileImageType(),
+            user.getRole());
+        return UserPrincipal.create(tokenPayload);
     }
 }

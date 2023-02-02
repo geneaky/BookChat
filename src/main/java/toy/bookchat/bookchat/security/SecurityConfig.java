@@ -6,10 +6,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import toy.bookchat.bookchat.security.handler.CustomExceptionHandlingFilter;
 import toy.bookchat.bookchat.security.handler.RestAuthenticationEntryPoint;
-import toy.bookchat.bookchat.security.ipblock.IpBlockCheckingFilter;
-import toy.bookchat.bookchat.security.ipblock.IpBlockManager;
 import toy.bookchat.bookchat.security.token.jwt.JwtAuthenticationFilter;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenManager;
 
@@ -17,11 +14,9 @@ import toy.bookchat.bookchat.security.token.jwt.JwtTokenManager;
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final IpBlockManager ipBlockManager;
     private final JwtTokenManager jwtTokenManager;
 
-    public SecurityConfig(IpBlockManager ipBlockManager, JwtTokenManager jwtTokenManager) {
-        this.ipBlockManager = ipBlockManager;
+    public SecurityConfig(JwtTokenManager jwtTokenManager) {
         this.jwtTokenManager = jwtTokenManager;
     }
 
@@ -32,16 +27,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
          * custom filter를 bean으로 등록해두면 websecurity configure설정에서 security filter chain에서는 제외되지만 defautl chain에는 포함되므로 직접 생성하여 등록해줌 - 블로깅, ip 차단이랑 같이
          * https://stackoverflow.com/questions/39152803/spring-websecurity-ignoring-doesnt-ignore-custom-filter/40969780#40969780
          * */
-        http.addFilterBefore(
-            new CustomExceptionHandlingFilter(),
-            UsernamePasswordAuthenticationFilter.class);
-
         http.addFilterAt(
-            new JwtAuthenticationFilter(jwtTokenManager, ipBlockManager),
-            UsernamePasswordAuthenticationFilter.class);
-
-        http.addFilterAfter(
-            new IpBlockCheckingFilter(ipBlockManager),
+            new JwtAuthenticationFilter(jwtTokenManager),
             UsernamePasswordAuthenticationFilter.class);
 
         http.csrf().disable();
@@ -53,7 +40,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .and()
             .authorizeRequests()
             .antMatchers("/v1/api/users/profile/nickname", "/v1/api/users/signup",
-                "/v1/api/users/signin", "/v1/api/auth/token", "/v2/api/test/users/token")
+                "/v1/api/users/signin", "/v1/api/auth/token", "/stomp-connection/**")
             .permitAll()
             .anyRequest().authenticated();
     }

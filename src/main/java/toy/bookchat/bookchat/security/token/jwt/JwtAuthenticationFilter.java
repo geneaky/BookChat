@@ -14,18 +14,15 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import toy.bookchat.bookchat.exception.security.DenidedTokenException;
-import toy.bookchat.bookchat.security.ipblock.IpBlockManager;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenManager jwtTokenManager;
-    private final IpBlockManager ipBlockManager;
 
-    public JwtAuthenticationFilter(JwtTokenManager jwtTokenManager, IpBlockManager ipBlockManager) {
+    public JwtAuthenticationFilter(JwtTokenManager jwtTokenManager) {
         this.jwtTokenManager = jwtTokenManager;
-        this.ipBlockManager = ipBlockManager;
     }
 
     @Override
@@ -54,7 +51,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER)) {
             return bearerToken.substring(BEGIN_INDEX);
         }
-        ipBlockManager.increase(request);
         throw new DenidedTokenException();
     }
 

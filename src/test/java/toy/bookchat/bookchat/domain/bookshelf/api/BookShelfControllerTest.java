@@ -1,6 +1,5 @@
 package toy.bookchat.bookchat.domain.bookshelf.api;
 
-import static io.jsonwebtoken.SignatureAlgorithm.HS256;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -30,20 +29,11 @@ import static toy.bookchat.bookchat.domain.bookshelf.ReadingStatus.READING;
 import static toy.bookchat.bookchat.domain.bookshelf.ReadingStatus.WISH;
 import static toy.bookchat.bookchat.domain.bookshelf.Star.FOUR;
 import static toy.bookchat.bookchat.domain.bookshelf.Star.FOUR_HALF;
-import static toy.bookchat.bookchat.domain.common.AuthConstants.BEARER;
-import static toy.bookchat.bookchat.domain.user.ROLE.USER;
-import static toy.bookchat.bookchat.domain.user.ReadingTaste.ART;
-import static toy.bookchat.bookchat.domain.user.ReadingTaste.DEVELOPMENT;
-import static toy.bookchat.bookchat.security.oauth.OAuth2Provider.GOOGLE;
-import static toy.bookchat.bookchat.security.oauth.OAuth2Provider.KAKAO;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.Jwts;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,13 +54,11 @@ import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ReviseBookShel
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.ExistenceBookOnBookShelfResponse;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.SearchBookShelfByReadingStatus;
 import toy.bookchat.bookchat.domain.user.User;
-import toy.bookchat.bookchat.security.user.TokenPayload;
-import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @BookShelfPresentationTest
 class BookShelfControllerTest extends ControllerTestExtension {
 
-    public static final String JWT_TOKEN = BEARER + getTestToken();
+    public final String JWT_TOKEN = getTestToken();
 
     @MockBean
     BookShelfService bookShelfService;
@@ -78,42 +66,6 @@ class BookShelfControllerTest extends ControllerTestExtension {
     ObjectMapper objectMapper;
     @Autowired
     private MockMvc mockMvc;
-
-    private static String getTestToken() {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("sub", "test");
-        claims.put("name", "google123");
-        claims.put("provider", GOOGLE);
-        claims.put("email", "test@gmail.com");
-
-        return Jwts.builder()
-            .setClaims(claims)
-            .signWith(HS256, "test")
-            .compact();
-    }
-
-    private User getUser() {
-        return User.builder()
-            .id(1L)
-            .email("test@gmail.com")
-            .nickname("nickname")
-            .role(USER)
-            .name("testUser")
-            .profileImageUrl("somethingImageUrl@naver.com")
-            .defaultProfileImageType(1)
-            .provider(KAKAO)
-            .readingTastes(List.of(DEVELOPMENT, ART))
-            .build();
-    }
-
-    private UserPrincipal getUserPrincipal() {
-        User user = getUser();
-        TokenPayload tokenPayload = TokenPayload.of(user.getId(), user.getName(),
-            user.getNickname(),
-            user.getEmail(), user.getProfileImageUrl(), user.getDefaultProfileImageType(),
-            user.getRole());
-        return UserPrincipal.create(tokenPayload);
-    }
 
     private BookRequest getBookRequest() {
         return BookRequest.builder()

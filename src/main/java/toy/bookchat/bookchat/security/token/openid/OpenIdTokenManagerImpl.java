@@ -4,7 +4,7 @@ import static toy.bookchat.bookchat.domain.common.AuthConstants.BEGIN_INDEX;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import toy.bookchat.bookchat.config.OpenIdTokenConfig;
+import toy.bookchat.bookchat.config.token.openid.OpenIdTokenConfig;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
 @Slf4j

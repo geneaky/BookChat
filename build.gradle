@@ -4,7 +4,7 @@ buildscript {
     }
 
     dependencies {
-        classpath ("org.ysb33r.gradle:grolifant:0.17.0")
+        classpath("org.ysb33r.gradle:grolifant:0.17.0")
     }
 }
 
@@ -41,6 +41,10 @@ ext {
 dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.springframework.boot:spring-boot-starter-reactor-netty'
+
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-configuration-processor'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
@@ -50,7 +54,6 @@ dependencies {
         }
     }
     implementation 'org.springframework.boot:spring-boot-starter-log4j2'
-    compile 'org.springframework.boot:spring-boot-starter-log4j2'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -61,13 +64,24 @@ dependencies {
     runtimeOnly 'com.h2database:h2'
 
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation 'org.springframework.security:spring-security-messaging'
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
+
     implementation 'org.sejda.imageio:webp-imageio:0.1.6'
+//    implementation 'com.google.code.gson:gson:2.10.1'
+
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'com.github.ben-manes.caffeine:caffeine'
 
     compileOnly 'org.projectlombok:lombok'
+    testCompileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
 
+    testImplementation 'org.testcontainers:testcontainers:1.17.6'
+    testImplementation 'org.testcontainers:junit-jupiter:1.17.6'
+    testImplementation "org.testcontainers:rabbitmq:1.17.6"
+    testImplementation 'org.springframework.amqp:spring-rabbit-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
     asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'

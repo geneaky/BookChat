@@ -12,8 +12,11 @@ import static toy.bookchat.bookchat.exception.ExceptionResponse.WRONG_KEY_SPEC;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import toy.bookchat.bookchat.domain.chat.api.dto.ChatDto;
 import toy.bookchat.bookchat.exception.agony.AgonyNotFoundException;
 import toy.bookchat.bookchat.exception.book.BookNotFoundException;
 import toy.bookchat.bookchat.exception.security.DenidedTokenException;
@@ -106,6 +109,15 @@ public class GlobalExceptionHandler {
         NotSupportedPagingConditionException exception) {
         log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
         return BAD_REQUEST.getValue();
+    }
+
+    @MessageExceptionHandler(Exception.class)
+    @SendToUser(value = "/exchange/amq.direct/error", broadcast = false)
+    public final ChatDto handleUnExpectedMessagingException(Exception exception) {
+        log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
+        return ChatDto.builder()
+            .message(BAD_REQUEST.getValue().toString())
+            .build();
     }
 
     @ExceptionHandler(Exception.class)

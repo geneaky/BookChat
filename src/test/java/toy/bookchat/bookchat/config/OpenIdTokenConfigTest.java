@@ -19,6 +19,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.util.Base64Utils;
+import toy.bookchat.bookchat.config.token.OAuth2Properties;
+import toy.bookchat.bookchat.config.token.openid.OpenIdTokenConfig;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
 @RestClientTest(OpenIdTokenConfig.class)

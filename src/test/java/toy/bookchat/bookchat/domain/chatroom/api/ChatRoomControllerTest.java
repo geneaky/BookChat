@@ -1,6 +1,5 @@
 package toy.bookchat.bookchat.domain.chatroom.api;
 
-import static io.jsonwebtoken.SignatureAlgorithm.HS256;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -24,20 +23,11 @@ import static org.springframework.restdocs.request.RequestDocumentation.requestP
 import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static toy.bookchat.bookchat.domain.common.AuthConstants.BEARER;
-import static toy.bookchat.bookchat.domain.user.ROLE.USER;
-import static toy.bookchat.bookchat.domain.user.ReadingTaste.ART;
-import static toy.bookchat.bookchat.domain.user.ReadingTaste.DEVELOPMENT;
-import static toy.bookchat.bookchat.security.oauth.OAuth2Provider.GOOGLE;
-import static toy.bookchat.bookchat.security.oauth.OAuth2Provider.KAKAO;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.Jwts;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -55,14 +45,11 @@ import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatR
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomsResponseSlice;
 import toy.bookchat.bookchat.domain.chatroom.service.ChatRoomService;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.CreateChatRoomRequest;
-import toy.bookchat.bookchat.domain.user.User;
-import toy.bookchat.bookchat.security.user.TokenPayload;
-import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @ChatRoomPresentationTest
 class ChatRoomControllerTest extends ControllerTestExtension {
 
-    public static final String JWT_TOKEN = BEARER + getTestToken();
+    public final String JWT_TOKEN = getTestToken();
 
     @MockBean
     private ChatRoomService chatRoomService;
@@ -70,42 +57,6 @@ class ChatRoomControllerTest extends ControllerTestExtension {
     private ObjectMapper objectMapper;
     @Autowired
     private MockMvc mockMvc;
-
-    private static String getTestToken() {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("sub", "test");
-        claims.put("name", "google123");
-        claims.put("provider", GOOGLE);
-        claims.put("email", "test@gmail.com");
-
-        return Jwts.builder()
-            .setClaims(claims)
-            .signWith(HS256, "test")
-            .compact();
-    }
-
-    private User getUser() {
-        return User.builder()
-            .id(1L)
-            .email("test@gmail.com")
-            .nickname("nickname")
-            .role(USER)
-            .name("testUser")
-            .profileImageUrl("somethingImageUrl@naver.com")
-            .defaultProfileImageType(1)
-            .provider(KAKAO)
-            .readingTastes(List.of(DEVELOPMENT, ART))
-            .build();
-    }
-
-    private UserPrincipal getUserPrincipal() {
-        User user = getUser();
-        TokenPayload tokenPayload = TokenPayload.of(user.getId(), user.getName(),
-            user.getNickname(),
-            user.getEmail(), user.getProfileImageUrl(), user.getDefaultProfileImageType(),
-            user.getRole());
-        return UserPrincipal.create(tokenPayload);
-    }
 
     @Test
     void 채팅방_생성_성공() throws Exception {

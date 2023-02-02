@@ -13,26 +13,12 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import toy.bookchat.bookchat.config.JpaAuditingConfig;
-import toy.bookchat.bookchat.domain.configuration.TestConfig;
+import toy.bookchat.bookchat.config.query.JpaAuditingConfig;
+import toy.bookchat.bookchat.domain.RepositoryTestConfiguration;
 
 @DataJpaTest
-@Import({JpaAuditingConfig.class, TestConfig.class})
+@Import({JpaAuditingConfig.class, RepositoryTestConfiguration.class})
 class RepositorySupportTest {
-
-    public class SupportTest {
-
-        private Long id;
-    }
-
-    public class QTest extends EntityPathBase<SupportTest> {
-
-        public final NumberPath<Long> id = createNumber("id", Long.class);
-
-        public QTest(String variable) {
-            super(SupportTest.class, forVariable(variable));
-        }
-    }
 
     @Test
     void DESC_정렬조건_조회_성공() throws Exception {
@@ -61,5 +47,19 @@ class RepositorySupportTest {
 
         assertThat(resultOrder).isEqualTo(Order.ASC);
         assertThat(resultTarget).isEqualTo(test.id);
+    }
+
+    public class SupportTest {
+
+        private Long id;
+    }
+
+    public class QTest extends EntityPathBase<SupportTest> {
+
+        public final NumberPath<Long> id = createNumber("id", Long.class);
+
+        public QTest(String variable) {
+            super(SupportTest.class, forVariable(variable));
+        }
     }
 }

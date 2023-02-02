@@ -1,0 +1,27 @@
+### 독후감 작성
+POST localhost:8080/v1/api/books/{{bookId}}/report
+Authorization: {{jwt_token}}
+Content-Type: application/json
+
+{
+  "title": "이펙티브 감상문",
+  "content": "재밌네"
+}
+
+### 독후감 조회
+GET localhost:8080/v1/api/books/{{bookId}}/report
+Authorization: {{jwt_token}}
+
+### 독후감 삭제
+DELETE localhost:8080/v1/api/books/{{bookId}}/report
+Authorization: {{jwt_token}}
+
+### 독후감 수정
+PUT localhost:8080/v1/api/books/{{bookId}}/report
+Authorization: {{jwt_token}}
+Content-Type: application/json
+
+{
+  "title": "이펙티브 독후감2",
+  "content": "재밌다 2"
+}
