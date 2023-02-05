@@ -107,7 +107,7 @@ class AgonyControllerTest extends ControllerTestExtension {
         SliceOfAgoniesResponse pageOfAgoniesResponse = new SliceOfAgoniesResponse(slice);
         when(agonyService.searchSliceOfAgonies(any(), any(), any())).thenReturn(
             pageOfAgoniesResponse);
-        mockMvc.perform(get("/v1/api/agonies")
+        mockMvc.perform(get("/v1/api/bookshelf/books/{bookId}/agonies")
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
                 .queryParam("size", "2")
@@ -118,6 +118,9 @@ class AgonyControllerTest extends ControllerTestExtension {
             .andDo(document("get-agonies",
                 requestHeaders(
                     headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
+                ),
+                pathParameters(
+                    parameterWithName("bookId")
                 ),
                 requestParameters(
                     parameterWithName("size").description("page 당 size"),
