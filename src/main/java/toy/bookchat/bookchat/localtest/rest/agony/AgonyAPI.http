@@ -4,12 +4,12 @@ Authorization: {{jwt_token}}
 Content-Type: application/json
 
 {
-  "title": "고민2",
+  "title": "고민1",
   "hexColorCode": "파랑"
 }
 
 ### 고민 폴더 조회
-GET localhost:8080/v1/api/agonies?page=0&size=3&sort=id,ASC
+GET localhost:8080/v1/api/agonies?postCursorId=0&size=3&sort=id,DESC
 Authorization: {{jwt_token}}
 
 > {%

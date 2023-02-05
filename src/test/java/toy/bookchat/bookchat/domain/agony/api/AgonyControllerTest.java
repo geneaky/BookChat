@@ -154,8 +154,8 @@ class AgonyControllerTest extends ControllerTestExtension {
     @Test
     void 고민_폴더_수정_성공() throws Exception {
         ReviseAgonyRequest reviseAgonyRequest = ReviseAgonyRequest.builder()
-            .agonyTitle("고민 바꾸기")
-            .agonyColor("보라색")
+            .title("고민 바꾸기")
+            .hexColorCode("보라색")
             .build();
 
         mockMvc.perform(put("/v1/api/agonies/{agonyId}", 1L)
@@ -172,8 +172,8 @@ class AgonyControllerTest extends ControllerTestExtension {
                     parameterWithName("agonyId").description("Agony Id")
                 ),
                 requestFields(
-                    fieldWithPath("agonyTitle").type(STRING).description("고민 폴더 이름"),
-                    fieldWithPath("agonyColor").type(STRING).description("고민 폴더 색")
+                    fieldWithPath("title").type(STRING).description("고민 폴더 이름"),
+                    fieldWithPath("hexColorCode").type(STRING).description("고민 폴더 색")
                 )));
 
         verify(agonyService).reviseAgony(any(), any(), any());

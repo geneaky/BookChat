@@ -123,6 +123,7 @@ class ChatRoomServiceTest {
             .build();
         chatRoom1.setCreatedAt(LocalDateTime.now());
         Chat chat1 = Chat.builder()
+            .id(1L)
             .message("안녕")
             .chatRoom(chatRoom1)
             .build();
@@ -132,7 +133,8 @@ class ChatRoomServiceTest {
             .roomSid(chatRoom1.getRoomSid())
             .roomName(chatRoom1.getRoomName())
             .roomMemberCount(1L)
-            .defaultRoomImageType(1)
+            .defaultRoomImageType(chatRoom1.getDefaultRoomImageType())
+            .lastChatId(chat1.getId())
             .lastActiveTime(chat1.getCreatedAt())
             .lastChatContent(chat1.getMessage())
             .build();

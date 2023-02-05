@@ -11,13 +11,13 @@ import lombok.NoArgsConstructor;
 public class ReviseAgonyRequest {
 
     @NotBlank
-    private String agonyTitle;
+    private String title;
     @NotBlank
-    private String agonyColor;
+    private String hexColorCode;
 
     @Builder
-    private ReviseAgonyRequest(String agonyTitle, String agonyColor) {
-        this.agonyTitle = agonyTitle;
-        this.agonyColor = agonyColor;
+    private ReviseAgonyRequest(String title, String hexColorCode) {
+        this.title = title;
+        this.hexColorCode = hexColorCode;
     }
 }

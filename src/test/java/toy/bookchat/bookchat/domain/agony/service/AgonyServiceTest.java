@@ -40,8 +40,9 @@ class AgonyServiceTest {
     @InjectMocks
     private AgonyService agonyService;
 
-    private static Agony getAgony(String title, String color) {
+    private static Agony getAgony(Long id, String title, String color) {
         return Agony.builder()
+            .id(id)
             .title(title)
             .hexColorCode(color)
             .bookShelf(mock(BookShelf.class))
@@ -75,8 +76,8 @@ class AgonyServiceTest {
     void 사용자_서재에_등록된_고민_조회_성공() throws Exception {
         PageRequest pageRequest = PageRequest.of(0, 1, Sort.by("id").descending());
 
-        Agony agony1 = getAgony("agony1", "blue");
-        Agony agony2 = getAgony("agony2", "red");
+        Agony agony1 = getAgony(1L, "agony1", "blue");
+        Agony agony2 = getAgony(2L, "agony2", "red");
 
         List<Agony> contents = List.of(agony1, agony2);
         Slice<Agony> page = new SliceImpl<>(contents, pageRequest, true);
@@ -99,11 +100,11 @@ class AgonyServiceTest {
 
     @Test
     void 고민폴더_수정_성공() throws Exception {
-        Agony agony = getAgony("폴더", "파랑");
+        Agony agony = getAgony(1L, "폴더", "파랑");
 
         ReviseAgonyRequest reviseAgonyRequest = ReviseAgonyRequest.builder()
-            .agonyTitle("폴더 이름 바꾸기")
-            .agonyColor("보라색")
+            .title("폴더 이름 바꾸기")
+            .hexColorCode("보라색")
             .build();
         when(agonyRepository.findUserBookShelfAgony(any(), any())).thenReturn(
             Optional.of(agony));

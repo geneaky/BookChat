@@ -2,7 +2,6 @@ package toy.bookchat.bookchat.domain.agony.service.dto.response;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import lombok.Getter;
 import org.springframework.data.domain.Slice;
 import toy.bookchat.bookchat.domain.agonyrecord.AgonyRecord;
@@ -12,16 +11,11 @@ import toy.bookchat.bookchat.domain.common.CursorMeta;
 public class SliceOfAgonyRecordsResponse {
 
     private List<AgonyRecordResponse> agonyRecordResponseList;
-    private CursorMeta<Long> cursorMeta;
+    private CursorMeta<AgonyRecord, Long> cursorMeta;
 
     public SliceOfAgonyRecordsResponse(Slice<AgonyRecord> slice) {
-        this.cursorMeta = CursorMeta.from(slice, getNextCursorId(slice.getContent()));
+        this.cursorMeta = new CursorMeta<>(slice, AgonyRecord::getId);
         this.agonyRecordResponseList = from(slice.getContent());
-    }
-
-    private Long getNextCursorId(List<AgonyRecord> content) {
-        return Optional.ofNullable(content.get(content.size() - 1)).map(AgonyRecord::getId)
-            .orElse(null);
     }
 
     private List<AgonyRecordResponse> from(List<AgonyRecord> content) {

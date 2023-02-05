@@ -11,23 +11,15 @@ import toy.bookchat.bookchat.domain.common.CursorMeta;
 public class ChatRoomsResponseSlice {
 
     private List<ChatRoomResponse> chatRoomResponseList;
-    private CursorMeta<Long> cursorMeta;
+    private CursorMeta<ChatRoomResponse, Long> cursorMeta;
 
     private ChatRoomsResponseSlice(Slice<ChatRoomResponse> slice) {
-        this.cursorMeta = CursorMeta.from(slice, getNextCursorId(slice.getContent()));
+        this.cursorMeta = new CursorMeta<>(slice, ChatRoomResponse::getLastChatId);
         this.chatRoomResponseList = slice.getContent();
     }
 
     public static ChatRoomsResponseSlice of(Slice<ChatRoomResponse> slice) {
         return new ChatRoomsResponseSlice(slice);
-    }
-
-    private Long getNextCursorId(List<ChatRoomResponse> content) {
-        if (content == null || content.isEmpty()) {
-            return null;
-        }
-
-        return content.get(content.size() - 1).getLastChatId();
     }
 
     private List<ChatRoomResponse> from(List<Chat> content) {
