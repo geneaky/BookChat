@@ -427,7 +427,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
                     parameterWithName("readingStatus").description("READING"),
                     parameterWithName("size").description("page 당 size"),
                     parameterWithName("page").description("한번에 조회할 page수"),
-                    parameterWithName("sort").description("등록순-id")
+                    parameterWithName("sort").description("등록순-id | 변경순-updatedAt")
                 ),
                 responseFields(
                     fieldWithPath("contents[].bookId").type(NUMBER).description("Book Id"),
@@ -498,7 +498,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
                     parameterWithName("readingStatus").description("COMPLETE"),
                     parameterWithName("size").description("page 당 size"),
                     parameterWithName("page").description("한번에 조회할 page수"),
-                    parameterWithName("sort").description("등록순-id")
+                    parameterWithName("sort").description("등록순-id | 변경순-updatedAt")
                 ),
                 responseFields(
                     fieldWithPath("contents[].bookId").type(NUMBER).description("Book Id"),
@@ -568,7 +568,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
                     parameterWithName("readingStatus").description("WISH"),
                     parameterWithName("size").description("page 당 size"),
                     parameterWithName("page").description("한번에 조회할 page수"),
-                    parameterWithName("sort").description("등록순-id")
+                    parameterWithName("sort").description("등록순-id | 변경순-updatedAt")
                 ),
                 responseFields(
                     fieldWithPath("contents[].bookId").type(NUMBER).description("Book Id"),
