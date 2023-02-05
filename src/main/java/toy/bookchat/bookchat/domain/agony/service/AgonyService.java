@@ -61,8 +61,8 @@ public class AgonyService {
         ReviseAgonyRequest reviseAgonyRequest) {
         Agony agony = agonyRepository.findUserBookShelfAgony(userId, agonyId)
             .orElseThrow(AgonyNotFoundException::new);
-        agony.changeTitle(reviseAgonyRequest.getAgonyTitle());
-        agony.changeHexColorCode(reviseAgonyRequest.getAgonyColor());
+        agony.changeTitle(reviseAgonyRequest.getTitle());
+        agony.changeHexColorCode(reviseAgonyRequest.getHexColorCode());
     }
 
     @Transactional

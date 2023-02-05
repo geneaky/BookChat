@@ -24,6 +24,7 @@ import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.exception.book.BookNotFoundException;
+import toy.bookchat.bookchat.exception.bookshelf.BookReportNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class BookReportServiceTest {
@@ -94,6 +95,19 @@ class BookReportServiceTest {
     }
 
     @Test
+    void 서재에_등록된_책_독후감_없을시_조회하면_예외발생() throws Exception {
+        BookShelf bookShelf = BookShelf.builder()
+            .build();
+
+        when(bookShelfRepository.findByUserIdAndBookId(any(), any())).thenReturn(
+            Optional.of(bookShelf));
+
+        assertThatThrownBy(() -> {
+            bookReportService.getBookReportResponse(1L, 1L);
+        }).isInstanceOf(BookReportNotFoundException.class);
+    }
+
+    @Test
     void 서재에_등록된_책_독후감_조회_성공() throws Exception {
         BookReport bookReport = getBookReport();
 
@@ -126,8 +140,8 @@ class BookReportServiceTest {
 
         bookReportService.deleteBookReport(1L, 1L);
 
-        BookReport result = bookShelf.getBookReport();
-        assertThat(result).isNull();
+        assertThatThrownBy(bookShelf::getBookReport).isInstanceOf(
+            BookReportNotFoundException.class);
     }
 
     @Test
