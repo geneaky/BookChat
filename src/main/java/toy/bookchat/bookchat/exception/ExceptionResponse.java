@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 public enum ExceptionResponse {
 
     BOOK_NOT_FOUND(ResponseEntity.status(HttpStatus.NOT_FOUND).body("도서를 찾을 수 없습니다")),
+    BOOK_REPORT_NOT_FOUND(ResponseEntity.status(HttpStatus.NOT_FOUND).body("저장된 독후감이 없습니다.")),
     USER_NOT_FOUND(ResponseEntity.status(HttpStatus.NOT_FOUND).body("등록된 사용자가 아닙니다")),
     NOT_VERIFIED_TOKEN(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유효하지 않은 토큰입니다.")),
     IMAGE_PROCESSING_FAIL(

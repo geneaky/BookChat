@@ -22,6 +22,7 @@ import toy.bookchat.bookchat.domain.BaseEntity;
 import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.bookreport.BookReport;
 import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.exception.bookshelf.BookReportNotFoundException;
 
 @Entity
 @Table(uniqueConstraints = {
@@ -105,6 +106,17 @@ public class BookShelf extends BaseEntity {
     public void writeReportInStateOfCompleteReading(BookReport bookReport) {
         this.readingStatus = COMPLETE;
         this.bookReport = bookReport;
+    }
+
+    public BookReport getBookReport() {
+        isReportedBook();
+        return this.bookReport;
+    }
+
+    private void isReportedBook() {
+        if (this.bookReport == null) {
+            throw new BookReportNotFoundException();
+        }
     }
 
     public void deleteBookReport() {

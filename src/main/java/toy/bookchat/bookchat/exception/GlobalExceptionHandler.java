@@ -2,6 +2,7 @@ package toy.bookchat.bookchat.exception;
 
 import static toy.bookchat.bookchat.exception.ExceptionResponse.BAD_REQUEST;
 import static toy.bookchat.bookchat.exception.ExceptionResponse.BOOK_NOT_FOUND;
+import static toy.bookchat.bookchat.exception.ExceptionResponse.BOOK_REPORT_NOT_FOUND;
 import static toy.bookchat.bookchat.exception.ExceptionResponse.EXPIRED_PUBLIC_KEY;
 import static toy.bookchat.bookchat.exception.ExceptionResponse.IMAGE_PROCESSING_FAIL;
 import static toy.bookchat.bookchat.exception.ExceptionResponse.IMAGE_UPLOAD_FAIL;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import toy.bookchat.bookchat.domain.chat.api.dto.ChatDto;
 import toy.bookchat.bookchat.exception.agony.AgonyNotFoundException;
 import toy.bookchat.bookchat.exception.book.BookNotFoundException;
+import toy.bookchat.bookchat.exception.bookshelf.BookReportNotFoundException;
 import toy.bookchat.bookchat.exception.security.DenidedTokenException;
 import toy.bookchat.bookchat.exception.security.ExpiredPublicKeyCachedException;
 import toy.bookchat.bookchat.exception.security.ExpiredTokenException;
@@ -39,6 +41,13 @@ public class GlobalExceptionHandler {
         BookNotFoundException exception) {
         log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
         return BOOK_NOT_FOUND.getValue();
+    }
+
+    @ExceptionHandler(BookReportNotFoundException.class)
+    public final ResponseEntity<String> handleBookReportNotFoundException(
+        BookReportNotFoundException exception) {
+        log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
+        return BOOK_REPORT_NOT_FOUND.getValue();
     }
 
     @ExceptionHandler(UserNotFoundException.class)
