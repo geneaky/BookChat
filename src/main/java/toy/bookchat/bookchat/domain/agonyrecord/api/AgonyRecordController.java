@@ -28,7 +28,7 @@ public class AgonyRecordController {
         this.agonyRecordService = agonyRecordService;
     }
 
-    @PostMapping("/v1/api/bookshelf/{bookShelfId}/agonies/{agonyId}/records")
+    @PostMapping("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records")
     public void addAgonyRecordOnBookAgony(@PathVariable Long bookShelfId,
         @PathVariable Long agonyId,
         @Valid @RequestBody CreateAgonyRecordRequest createAgonyRecordRequest,
@@ -39,7 +39,7 @@ public class AgonyRecordController {
             agonyId);
     }
 
-    @GetMapping("/v1/api/bookshelf/{bookShelfId}/agonies/{agonyId}/records")
+    @GetMapping("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records")
     public SliceOfAgonyRecordsResponse getAgonyRecordsOnBookAgony(@PathVariable Long bookShelfId,
         @PathVariable Long agonyId,
         @RequestParam Optional<Long> postCursorId,
@@ -50,7 +50,7 @@ public class AgonyRecordController {
             pageable, postCursorId);
     }
 
-    @DeleteMapping("/v1/api/bookshelf/{bookShelfId}/agonies/{agonyId}/records/{recordId}")
+    @DeleteMapping("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records/{recordId}")
     public void deleteAgonyRecord(@PathVariable Long bookShelfId, @PathVariable Long agonyId,
         @PathVariable Long recordId,
         @UserPayload TokenPayload tokenPayload) {
@@ -59,7 +59,7 @@ public class AgonyRecordController {
             tokenPayload.getUserId());
     }
 
-    @PutMapping("/v1/api/bookshelf/{bookShelfId}/agonies/{agonyId}/records/{recordId}")
+    @PutMapping("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records/{recordId}")
     public void reviseAgonyRecord(@PathVariable Long bookShelfId, @PathVariable Long agonyId,
         @PathVariable Long recordId,
         @Valid @RequestBody ReviseAgonyRecordRequest reviseAgonyRecordRequest,

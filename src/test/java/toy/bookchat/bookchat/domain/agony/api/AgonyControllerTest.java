@@ -77,7 +77,7 @@ class AgonyControllerTest extends ControllerTestExtension {
     void 고민_생성_성공() throws Exception {
         CreateBookAgonyRequest createBookAgonyRequest = new CreateBookAgonyRequest("title",
             "#062498");
-        mockMvc.perform(post("/v1/api/bookshelf/{bookShelfId}/agonies", 1)
+        mockMvc.perform(post("/v1/api/bookshelves/{bookShelfId}/agonies", 1)
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
                 .contentType(APPLICATION_JSON)
@@ -106,7 +106,7 @@ class AgonyControllerTest extends ControllerTestExtension {
         SliceOfAgoniesResponse pageOfAgoniesResponse = new SliceOfAgoniesResponse(slice);
         when(agonyService.searchSliceOfAgonies(any(), any(), any(), any())).thenReturn(
             pageOfAgoniesResponse);
-        mockMvc.perform(get("/v1/api/bookshelf/{bookShelfId}/agonies", 1)
+        mockMvc.perform(get("/v1/api/bookshelves/{bookShelfId}/agonies", 1)
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
                 .queryParam("size", "2")
@@ -138,7 +138,7 @@ class AgonyControllerTest extends ControllerTestExtension {
 
     @Test
     void 고민_폴더_삭제_성공() throws Exception {
-        mockMvc.perform(delete("/v1/api/bookshelf/{bookShelfId}/agonies/{agoniesIds}", 1, "1,2,3")
+        mockMvc.perform(delete("/v1/api/bookshelves/{bookShelfId}/agonies/{agoniesIds}", 1, "1,2,3")
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isOk())
@@ -161,7 +161,7 @@ class AgonyControllerTest extends ControllerTestExtension {
             .hexColorCode("보라색")
             .build();
 
-        mockMvc.perform(put("/v1/api/bookshelf/{bookShelfId}/agonies/{agonyId}", 1L, 1L)
+        mockMvc.perform(put("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}", 1L, 1L)
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
                 .contentType(APPLICATION_JSON)

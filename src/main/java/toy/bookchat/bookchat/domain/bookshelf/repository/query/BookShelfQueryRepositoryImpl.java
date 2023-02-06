@@ -1,7 +1,6 @@
 package toy.bookchat.bookchat.domain.bookshelf.repository.query;
 
 import static toy.bookchat.bookchat.domain.book.QBook.book;
-import static toy.bookchat.bookchat.domain.bookreport.QBookReport.bookReport;
 import static toy.bookchat.bookchat.domain.bookshelf.QBookShelf.bookShelf;
 import static toy.bookchat.bookchat.domain.common.RepositorySupport.extractOrderSpecifierFrom;
 
@@ -51,23 +50,13 @@ public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
     }
 
     @Override
-    public void deleteBookByUserIdAndBookId(Long userId, Long bookId) {
+    public void deleteBookShelfByIdAndUserId(Long bookShelfId, Long userId) {
         queryFactory.delete(bookShelf)
-            .where(bookShelf.user.id.eq(userId)
-                .and(bookShelf.book.id.eq(bookId)))
+            .where(bookShelf.id.eq(bookShelfId)
+                .and(bookShelf.user.id.eq(userId)))
             .execute();
     }
-
-    @Override
-    public Optional<BookShelf> findByUserIdAndBookId(Long userId, Long bookId) {
-        return Optional.ofNullable(queryFactory.select(bookShelf)
-            .from(bookShelf).join(bookShelf.book, book).fetchJoin()
-            .leftJoin(bookShelf.bookReport, bookReport).fetchJoin()
-            .where(bookShelf.user.id.eq(userId)
-                .and(bookShelf.book.id.eq(bookId)))
-            .fetchOne());
-    }
-
+    
     @Override
     public void deleteAllByUserId(Long userId) {
         queryFactory.delete(bookShelf)

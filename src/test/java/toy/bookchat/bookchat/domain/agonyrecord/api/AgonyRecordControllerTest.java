@@ -58,7 +58,7 @@ class AgonyRecordControllerTest extends ControllerTestExtension {
         CreateAgonyRecordRequest createAgonyRecordRequest = new CreateAgonyRecordRequest(
             "title", "blabla");
 
-        mockMvc.perform(post("/v1/api/bookshelf/{bookShelfId}/agonies/{agonyId}/records", 1, 1)
+        mockMvc.perform(post("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records", 1, 1)
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
                 .contentType(APPLICATION_JSON)
@@ -104,7 +104,7 @@ class AgonyRecordControllerTest extends ControllerTestExtension {
         when(agonyRecordService.searchPageOfAgonyRecords(any(), any(), any(), any(),
             any())).thenReturn(
             pageOfAgonyRecordsResponse);
-        mockMvc.perform(get("/v1/api/bookshelf/{bookShelfId}/agonies/{agonyId}/records", 1, 1)
+        mockMvc.perform(get("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records", 1, 1)
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
                 .queryParam("postCursorId", "1")
@@ -140,7 +140,7 @@ class AgonyRecordControllerTest extends ControllerTestExtension {
     @Test
     void 고민기록_삭제_성공() throws Exception {
         mockMvc.perform(
-                delete("/v1/api/bookshelf/{bookShelfId}/agonies/{agonyId}/records/{recordId}", 1L, 1L,
+                delete("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records/{recordId}", 1L, 1L,
                     1L)
                     .header(AUTHORIZATION, JWT_TOKEN)
                     .with(user(getUserPrincipal())))
@@ -166,7 +166,8 @@ class AgonyRecordControllerTest extends ControllerTestExtension {
             .build();
 
         mockMvc.perform(
-                put("/v1/api/bookshelf/{bookShelfId}/agonies/{agonyId}/records/{recordId}", 1L, 1L, 1L)
+                put("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records/{recordId}", 1L, 1L,
+                    1L)
                     .header(AUTHORIZATION, JWT_TOKEN)
                     .with(user(getUserPrincipal()))
                     .contentType(APPLICATION_JSON)

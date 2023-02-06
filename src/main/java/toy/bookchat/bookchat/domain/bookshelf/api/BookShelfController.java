@@ -31,42 +31,42 @@ public class BookShelfController {
         this.bookShelfService = bookShelfService;
     }
 
-    @PostMapping("/bookshelf/books")
+    @PostMapping("/bookshelves")
     public void putBookOnBookShelf(@RequestBody @Valid BookShelfRequest bookShelfRequest,
         @UserPayload TokenPayload tokenPayload) {
 
         bookShelfService.putBookOnBookShelf(bookShelfRequest, tokenPayload.getUserId());
     }
 
-    @GetMapping("/bookshelf/books")
-    public SearchBookShelfByReadingStatus takeBookOutOfBookShelf(ReadingStatus readingStatus,
+    @GetMapping("/bookshelves")
+    public SearchBookShelfByReadingStatus takeBooksOutOfBookShelves(ReadingStatus readingStatus,
         Pageable pageable, @UserPayload TokenPayload tokenPayload) {
-        return bookShelfService.takeBooksOutOfBookShelf(readingStatus, pageable,
+        return bookShelfService.takeBooksOutOfBookShelves(readingStatus, pageable,
             tokenPayload.getUserId());
     }
 
-    @GetMapping("/bookshelf/books/existence")
-    public ExistenceBookOnBookShelfResponse findBookIfExistedOnBookShelf(String isbn,
+    @GetMapping("/bookshelves/book")
+    public ExistenceBookOnBookShelfResponse findBookIfExistedOnBookShelves(String isbn,
         @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate publishAt,
         @UserPayload TokenPayload tokenPayload) {
 
         return bookShelfService.getBookIfExisted(isbn, publishAt, tokenPayload.getUserId());
     }
 
-    @PutMapping("/bookshelf/books/{bookId}")
-    public void reviseBookOnBookShelf(@PathVariable Long bookId,
+    @PutMapping("/bookshelves/{bookShelfId}")
+    public void reviseBookOnBookShelf(@PathVariable Long bookShelfId,
         @Valid @RequestBody ReviseBookShelfRequest reviseBookShelfStarRequest,
         @UserPayload TokenPayload tokenPayload) {
 
-        bookShelfService.reviseBookShelf(bookId, reviseBookShelfStarRequest,
+        bookShelfService.reviseBookShelf(bookShelfId, reviseBookShelfStarRequest,
             tokenPayload.getUserId());
     }
 
-    @DeleteMapping("/bookshelf/books/{bookId}")
-    public void deleteBookOnBookShelf(@PathVariable Long bookId,
+    @DeleteMapping("/bookshelves/{bookShelfId}")
+    public void deleteBookOnBookShelf(@PathVariable Long bookShelfId,
         @UserPayload TokenPayload tokenPayload) {
 
-        bookShelfService.deleteBookOnBookShelf(bookId, tokenPayload.getUserId());
+        bookShelfService.deleteBookShelf(bookShelfId, tokenPayload.getUserId());
     }
 
 }

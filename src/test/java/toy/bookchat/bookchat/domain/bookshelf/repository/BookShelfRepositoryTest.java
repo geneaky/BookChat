@@ -196,7 +196,7 @@ class BookShelfRepositoryTest {
 
         bookShelfRepository.save(bookShelf);
 
-        bookShelfRepository.deleteBookByUserIdAndBookId(user.getId(), book.getId());
+        bookShelfRepository.deleteBookShelfByIdAndUserId(bookShelf.getId(), user.getId());
 
         int result = bookShelfRepository.findAll().size();
         assertThat(result).isZero();
@@ -224,29 +224,7 @@ class BookShelfRepositoryTest {
         assertThat(findBookShelf).isEqualTo(bookShelf);
 
     }
-
-    @Test
-    void user_id_book_id로_서재_조회성공() throws Exception {
-        Book book = getBook("1-4133-0454-0");
-
-        bookRepository.save(book);
-
-        User user = User.builder().name("hi").build();
-        userRepository.save(user);
-
-        BookShelf bookShelf = BookShelf.builder()
-            .book(book)
-            .user(user)
-            .readingStatus(ReadingStatus.READING)
-            .build();
-
-        bookShelfRepository.save(bookShelf);
-
-        BookShelf findBookShelf = bookShelfRepository.findByUserIdAndBookId(
-            user.getId(), book.getId()).get();
-        assertThat(findBookShelf).isEqualTo(bookShelf);
-    }
-
+    
     @Test
     void 사용자가_생성한_책장_전부_삭제성공() throws Exception {
         Book book1 = getBook("1-4133-0454-0");

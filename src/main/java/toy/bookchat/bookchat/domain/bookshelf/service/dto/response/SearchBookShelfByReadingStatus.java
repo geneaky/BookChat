@@ -23,6 +23,7 @@ public class SearchBookShelfByReadingStatus {
 
         for (BookShelf bookShelf : bookShelves) {
             BookShelfResponse bookShelfResponse = BookShelfResponse.builder()
+                .bookShelfId(bookShelf.getId())
                 .bookId(bookShelf.getBookId())
                 .title(bookShelf.getBookTitle())
                 .isbn(bookShelf.getIsbn())
