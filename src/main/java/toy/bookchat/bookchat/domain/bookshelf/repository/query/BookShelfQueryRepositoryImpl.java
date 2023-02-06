@@ -51,21 +51,11 @@ public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
     }
 
     @Override
-    public void deleteBookByUserIdAndBookId(Long userId, Long bookId) {
+    public void deleteBookShelfByIdAndUserId(Long bookShelfId, Long userId) {
         queryFactory.delete(bookShelf)
-            .where(bookShelf.user.id.eq(userId)
-                .and(bookShelf.book.id.eq(bookId)))
+            .where(bookShelf.id.eq(bookShelfId)
+                .and(bookShelf.user.id.eq(userId)))
             .execute();
-    }
-
-    @Override
-    public Optional<BookShelf> findByUserIdAndBookId(Long userId, Long bookId) {
-        return Optional.ofNullable(queryFactory.select(bookShelf)
-            .from(bookShelf).join(bookShelf.book, book).fetchJoin()
-            .leftJoin(bookShelf.bookReport, bookReport).fetchJoin()
-            .where(bookShelf.user.id.eq(userId)
-                .and(bookShelf.book.id.eq(bookId)))
-            .fetchOne());
     }
 
     @Override
@@ -83,5 +73,25 @@ public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
                 .and(bookShelf.book.isbn.eq(isbn))
                 .and(bookShelf.book.publishAt.eq(publishAt)))
             .fetchOne());
+    }
+
+    @Override
+    public Optional<BookShelf> findByIdAndUserId(Long bookShelfId, Long userId) {
+        return Optional.ofNullable(queryFactory.select(bookShelf)
+            .from(bookShelf)
+            .where(bookShelf.id.eq(bookShelfId)
+                .and(bookShelf.user.id.eq(userId)))
+            .fetchOne());
+    }
+
+    @Override
+    public Optional<BookShelf> findWithReportByIdAndUserId(Long bookShelfId, Long userId) {
+        return Optional.ofNullable(queryFactory.select(bookShelf)
+            .from(bookShelf)
+            .join(bookShelf.bookReport, bookReport).fetchJoin()
+            .where(bookShelf.id.eq(bookShelfId)
+                .and(bookShelf.user.id.eq(userId)))
+            .fetchOne());
+
     }
 }

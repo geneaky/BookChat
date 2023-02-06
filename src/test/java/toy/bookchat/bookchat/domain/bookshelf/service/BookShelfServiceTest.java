@@ -171,7 +171,7 @@ class BookShelfServiceTest {
 
         when(bookShelfRepository.findSpecificStatusBookByUserId(any(), any(), any())).thenReturn(
             bookShelves);
-        SearchBookShelfByReadingStatus searchBookShelfByReadingStatus = bookShelfService.takeBooksOutOfBookShelf(
+        SearchBookShelfByReadingStatus searchBookShelfByReadingStatus = bookShelfService.takeBooksOutOfBookShelves(
             READING, pageable, 1L);
 
         verify(bookShelfRepository).findSpecificStatusBookByUserId(READING, pageable, 1L);
@@ -205,7 +205,7 @@ class BookShelfServiceTest {
         when(bookShelfRepository.findSpecificStatusBookByUserId(any(), any(), any())).thenReturn(
             bookShelves);
 
-        SearchBookShelfByReadingStatus searchBookShelfByReadingStatus = bookShelfService.takeBooksOutOfBookShelf(
+        SearchBookShelfByReadingStatus searchBookShelfByReadingStatus = bookShelfService.takeBooksOutOfBookShelves(
             COMPLETE, pageable, user.getId());
 
         verify(bookShelfRepository).findSpecificStatusBookByUserId(COMPLETE, pageable,
@@ -238,7 +238,7 @@ class BookShelfServiceTest {
         when(bookShelfRepository.findSpecificStatusBookByUserId(any(), any(), any())).thenReturn(
             bookShelves);
 
-        SearchBookShelfByReadingStatus searchBookShelfByReadingStatus = bookShelfService.takeBooksOutOfBookShelf(
+        SearchBookShelfByReadingStatus searchBookShelfByReadingStatus = bookShelfService.takeBooksOutOfBookShelves(
             WISH, pageable, user.getId());
 
         verify(bookShelfRepository).findSpecificStatusBookByUserId(WISH, pageable, user.getId());
@@ -261,7 +261,7 @@ class BookShelfServiceTest {
             .star(null)
             .build();
 
-        when(bookShelfRepository.findByUserIdAndBookId(any(), any())).thenReturn(
+        when(bookShelfRepository.findByIdAndUserId(any(), any())).thenReturn(
             Optional.of(bookShelf));
 
         bookShelfService.reviseBookShelf(1L, reviseBookShelfRequest, 1L);
@@ -272,9 +272,9 @@ class BookShelfServiceTest {
 
     @Test
     void 책장에서_책_삭제_성공() throws Exception {
-        bookShelfService.deleteBookOnBookShelf(1L, 1L);
+        bookShelfService.deleteBookShelf(1L, 1L);
 
-        verify(bookShelfRepository).deleteBookByUserIdAndBookId(any(), any());
+        verify(bookShelfRepository).deleteBookShelfByIdAndUserId(any(), any());
     }
 
     @Test
@@ -289,7 +289,7 @@ class BookShelfServiceTest {
             .readingStatus(WISH)
             .build();
 
-        when(bookShelfRepository.findByUserIdAndBookId(any(), any())).thenReturn(
+        when(bookShelfRepository.findByIdAndUserId(any(), any())).thenReturn(
             Optional.of(bookShelf));
 
         bookShelfService.reviseBookShelf(1L, reviseBookShelfRequest, 1L);
@@ -318,7 +318,7 @@ class BookShelfServiceTest {
             .readingStatus(COMPLETE)
             .build();
 
-        when(bookShelfRepository.findByUserIdAndBookId(any(), any())).thenReturn(
+        when(bookShelfRepository.findByIdAndUserId(any(), any())).thenReturn(
             Optional.of(bookShelf));
         bookShelfService.reviseBookShelf(1L, reviseBookShelfRequest, 1L);
 

@@ -8,15 +8,15 @@ import toy.bookchat.bookchat.domain.agonyrecord.AgonyRecord;
 
 public interface AgonyRecordQueryRepository {
 
-    Slice<AgonyRecord> findSliceOfUserAgonyRecords(Long agonyId, Long userId,
+    Slice<AgonyRecord> findSliceOfUserAgonyRecords(Long bookShelfId, Long agonyId, Long userId,
         Pageable pageable, Optional<Long> postCursorId);
 
-    void deleteAgony(Long userId, Long agonyId, Long recordId);
+    void deleteAgonyRecord(Long bookShelfId, Long agonyId, Long recordId, Long userId);
 
-    void reviseAgonyRecord(Long userId, Long agonyId, Long recordId,
+    void reviseAgonyRecord(Long bookShelfId, Long agonyId, Long recordId, Long userId,
         String recordTitle, String recordContent);
 
-    void deleteByAgoniesIds(Long userId, List<Long> agoniesIds);
+    void deleteByAgoniesIds(Long bookShelfId, Long userId, List<Long> agoniesIds);
 
     void deleteAllByUserId(Long userId);
 }

@@ -8,12 +8,12 @@ import toy.bookchat.bookchat.domain.agony.Agony;
 
 public interface AgonyQueryRepository {
 
-    Optional<Agony> findUserBookShelfAgony(Long userId, Long agonyId);
+    Optional<Agony> findUserBookShelfAgony(Long bookShelfId, Long agonyId, Long userId);
 
-    Slice<Agony> findUserBookShelfSliceOfAgonies(long userId, Pageable pageable,
+    Slice<Agony> findUserBookShelfSliceOfAgonies(Long bookShelfId, Long userId, Pageable pageable,
         Optional<Long> postCursorId);
 
-    void deleteByAgoniesIds(Long userId, List<Long> agoniesIds);
+    void deleteByAgoniesIds(Long bookShelfId, Long userId, List<Long> agoniesIds);
 
     void deleteAllByUserId(Long userId);
 }

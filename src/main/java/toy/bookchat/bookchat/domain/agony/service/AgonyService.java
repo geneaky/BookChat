@@ -33,33 +33,32 @@ public class AgonyService {
     }
 
     @Transactional
-    public void storeBookAgony(CreateBookAgonyRequest createBookAgonyRequest, Long userId,
-        Long bookId) {
-
-        BookShelf bookShelf = bookShelfRepository.findByUserIdAndBookId(userId, bookId)
+    public void storeBookShelfAgony(CreateBookAgonyRequest createBookAgonyRequest, Long userId,
+        Long bookShelfId) {
+        BookShelf bookShelf = bookShelfRepository.findByIdAndUserId(bookShelfId, userId)
             .orElseThrow(BookNotFoundException::new);
 
         agonyRepository.save(createBookAgonyRequest.getAgony(bookShelf));
     }
 
     @Transactional(readOnly = true)
-    public SliceOfAgoniesResponse searchSliceOfAgonies(Long userId,
+    public SliceOfAgoniesResponse searchSliceOfAgonies(Long bookShelfId, Long userId,
         Pageable pageable, Optional<Long> postCursorId) {
         return new SliceOfAgoniesResponse(
-            agonyRepository.findUserBookShelfSliceOfAgonies(userId, pageable,
+            agonyRepository.findUserBookShelfSliceOfAgonies(bookShelfId, userId, pageable,
                 postCursorId));
     }
 
     @Transactional
-    public void deleteAgony(List<Long> agoniesIds, Long userId) {
-        agonyRecordRepository.deleteByAgoniesIds(userId, agoniesIds);
-        agonyRepository.deleteByAgoniesIds(userId, agoniesIds);
+    public void deleteAgony(Long bookShelfId, List<Long> agoniesIds, Long userId) {
+        agonyRecordRepository.deleteByAgoniesIds(bookShelfId, userId, agoniesIds);
+        agonyRepository.deleteByAgoniesIds(bookShelfId, userId, agoniesIds);
     }
 
     @Transactional
-    public void reviseAgony(Long agonyId, Long userId,
+    public void reviseAgony(Long bookShelfId, Long agonyId, Long userId,
         ReviseAgonyRequest reviseAgonyRequest) {
-        Agony agony = agonyRepository.findUserBookShelfAgony(userId, agonyId)
+        Agony agony = agonyRepository.findUserBookShelfAgony(bookShelfId, agonyId, userId)
             .orElseThrow(AgonyNotFoundException::new);
         agony.changeTitle(reviseAgonyRequest.getTitle());
         agony.changeHexColorCode(reviseAgonyRequest.getHexColorCode());

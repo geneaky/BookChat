@@ -28,37 +28,45 @@ public class AgonyRecordController {
         this.agonyRecordService = agonyRecordService;
     }
 
-    @PostMapping("/v1/api/agonies/{agonyId}/records")
-    public void addAgonyRecordOnBookAgony(@PathVariable Long agonyId,
+    @PostMapping("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records")
+    public void addAgonyRecordOnBookAgony(@PathVariable Long bookShelfId,
+        @PathVariable Long agonyId,
         @Valid @RequestBody CreateAgonyRecordRequest createAgonyRecordRequest,
         @UserPayload TokenPayload tokenPayload) {
 
-        agonyRecordService.storeAgonyRecord(createAgonyRecordRequest, tokenPayload.getUserId(),
+        agonyRecordService.storeAgonyRecord(bookShelfId, createAgonyRecordRequest,
+            tokenPayload.getUserId(),
             agonyId);
     }
 
-    @GetMapping("/v1/api/agonies/{agonyId}/records")
-    public SliceOfAgonyRecordsResponse getAgonyRecordsOnBookAgony(@PathVariable Long agonyId,
+    @GetMapping("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records")
+    public SliceOfAgonyRecordsResponse getAgonyRecordsOnBookAgony(@PathVariable Long bookShelfId,
+        @PathVariable Long agonyId,
         @RequestParam Optional<Long> postCursorId,
         @UserPayload TokenPayload tokenPayload, Pageable pageable) {
 
-        return agonyRecordService.searchPageOfAgonyRecords(agonyId, tokenPayload.getUserId(),
+        return agonyRecordService.searchPageOfAgonyRecords(bookShelfId, agonyId,
+            tokenPayload.getUserId(),
             pageable, postCursorId);
     }
 
-    @DeleteMapping("/v1/api/agonies/{agonyId}/records/{recordId}")
-    public void deleteAgonyRecord(@PathVariable Long agonyId, @PathVariable Long recordId,
+    @DeleteMapping("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records/{recordId}")
+    public void deleteAgonyRecord(@PathVariable Long bookShelfId, @PathVariable Long agonyId,
+        @PathVariable Long recordId,
         @UserPayload TokenPayload tokenPayload) {
 
-        agonyRecordService.deleteAgonyRecord(agonyId, recordId, tokenPayload.getUserId());
+        agonyRecordService.deleteAgonyRecord(bookShelfId, agonyId, recordId,
+            tokenPayload.getUserId());
     }
 
-    @PutMapping("/v1/api/agonies/{agonyId}/records/{recordId}")
-    public void reviseAgonyRecord(@PathVariable Long agonyId, @PathVariable Long recordId,
+    @PutMapping("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records/{recordId}")
+    public void reviseAgonyRecord(@PathVariable Long bookShelfId, @PathVariable Long agonyId,
+        @PathVariable Long recordId,
         @Valid @RequestBody ReviseAgonyRecordRequest reviseAgonyRecordRequest,
         @UserPayload TokenPayload tokenPayload) {
 
-        agonyRecordService.reviseAgonyRecord(agonyId, recordId, tokenPayload.getUserId(),
+        agonyRecordService.reviseAgonyRecord(bookShelfId, agonyId, recordId,
+            tokenPayload.getUserId(),
             reviseAgonyRecordRequest);
     }
 }

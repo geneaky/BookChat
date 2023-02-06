@@ -94,7 +94,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
 
     @Test
     void 로그인하지_않은_사용자_요청_401() throws Exception {
-        mockMvc.perform(post("/v1/api/bookshelf/books")
+        mockMvc.perform(post("/v1/api/bookshelves")
                 .content(objectMapper.writeValueAsString(getBookShelfRequest(READING)))
                 .contentType(APPLICATION_JSON))
             .andExpect(status().isUnauthorized());
@@ -102,7 +102,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
 
     @Test
     void 읽고_있는_책_등록_성공() throws Exception {
-        mockMvc.perform(post("/v1/api/bookshelf/books")
+        mockMvc.perform(post("/v1/api/bookshelves")
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .content(objectMapper.writeValueAsString(getBookShelfRequest(READING)))
                 .contentType(APPLICATION_JSON)
@@ -126,7 +126,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
 
     @Test
     void 읽은_책_등록_성공() throws Exception {
-        mockMvc.perform(post("/v1/api/bookshelf/books")
+        mockMvc.perform(post("/v1/api/bookshelves")
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .content(
                     objectMapper.writeValueAsString(getBookShelfRequest(COMPLETE)))
@@ -153,7 +153,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
 
     @Test
     void 읽을_책_등록_성공() throws Exception {
-        mockMvc.perform(post("/v1/api/bookshelf/books")
+        mockMvc.perform(post("/v1/api/bookshelves")
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .content(objectMapper.writeValueAsString(getBookShelfRequest(WISH)))
                 .contentType(APPLICATION_JSON)
@@ -179,7 +179,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
 
     @Test
     void null로_요청_실패() throws Exception {
-        mockMvc.perform(post("/v1/api/bookshelf/books")
+        mockMvc.perform(post("/v1/api/bookshelves")
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
@@ -192,7 +192,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .bookRequest(getBookRequest())
             .build();
 
-        mockMvc.perform(post("/v1/api/bookshelf/books")
+        mockMvc.perform(post("/v1/api/bookshelves")
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .content(objectMapper.writeValueAsString(bookShelfRequest))
                 .contentType(APPLICATION_JSON)
@@ -214,7 +214,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .readingStatus(WISH)
             .build();
 
-        mockMvc.perform(post("/v1/api/bookshelf/books")
+        mockMvc.perform(post("/v1/api/bookshelves")
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .content(objectMapper.writeValueAsString(bookShelfRequest))
                 .contentType(APPLICATION_JSON)
@@ -236,7 +236,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .readingStatus(WISH)
             .build();
 
-        mockMvc.perform(post("/v1/api/bookshelf/books")
+        mockMvc.perform(post("/v1/api/bookshelves")
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .content(objectMapper.writeValueAsString(bookShelfRequest))
                 .contentType(APPLICATION_JSON)
@@ -257,7 +257,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .readingStatus(WISH)
             .build();
 
-        mockMvc.perform(post("/v1/api/bookshelf/books")
+        mockMvc.perform(post("/v1/api/bookshelves")
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .content(objectMapper.writeValueAsString(bookShelfRequest))
                 .contentType(APPLICATION_JSON)
@@ -280,7 +280,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .readingStatus(WISH)
             .build();
 
-        mockMvc.perform(post("/v1/api/bookshelf/books")
+        mockMvc.perform(post("/v1/api/bookshelves")
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .content(objectMapper.writeValueAsString(bookShelfRequest))
                 .contentType(APPLICATION_JSON)
@@ -302,7 +302,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .readingStatus(WISH)
             .build();
 
-        mockMvc.perform(post("/v1/api/bookshelf/books")
+        mockMvc.perform(post("/v1/api/bookshelves")
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .content(objectMapper.writeValueAsString(bookShelfRequest))
                 .contentType(APPLICATION_JSON)
@@ -325,7 +325,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .readingStatus(WISH)
             .build();
 
-        mockMvc.perform(post("/v1/api/bookshelf/books")
+        mockMvc.perform(post("/v1/api/bookshelves")
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .content(objectMapper.writeValueAsString(bookShelfRequest))
                 .contentType(APPLICATION_JSON)
@@ -347,7 +347,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .readingStatus(WISH)
             .build();
 
-        mockMvc.perform(post("/v1/api/bookshelf/books")
+        mockMvc.perform(post("/v1/api/bookshelves")
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .content(objectMapper.writeValueAsString(bookShelfRequest))
                 .contentType(APPLICATION_JSON)
@@ -370,7 +370,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .readingStatus(WISH)
             .build();
 
-        mockMvc.perform(post("/v1/api/bookshelf/books")
+        mockMvc.perform(post("/v1/api/bookshelves")
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .content(objectMapper.writeValueAsString(bookShelfRequest))
                 .contentType(APPLICATION_JSON)
@@ -394,6 +394,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .build();
 
         BookShelf bookShelf = BookShelf.builder()
+            .id(1L)
             .book(book)
             .user(user)
             .pages(152)
@@ -407,10 +408,11 @@ class BookShelfControllerTest extends ControllerTestExtension {
         SearchBookShelfByReadingStatus searchBookShelfByReadingStatus = new SearchBookShelfByReadingStatus(
             bookShelves);
 
-        when(bookShelfService.takeBooksOutOfBookShelf(any(ReadingStatus.class), any(Pageable.class),
+        when(bookShelfService.takeBooksOutOfBookShelves(any(ReadingStatus.class),
+            any(Pageable.class),
             any())).thenReturn(searchBookShelfByReadingStatus);
 
-        mockMvc.perform(get("/v1/api/bookshelf/books")
+        mockMvc.perform(get("/v1/api/bookshelves")
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .queryParam("readingStatus", "READING")
                 .queryParam("size", "5")
@@ -427,10 +429,11 @@ class BookShelfControllerTest extends ControllerTestExtension {
                     parameterWithName("readingStatus").description("READING"),
                     parameterWithName("size").description("page 당 size"),
                     parameterWithName("page").description("한번에 조회할 page수"),
-                    parameterWithName("sort").description("등록순-id")
+                    parameterWithName("sort").description("등록순-id | 변경순-updatedAt")
                 ),
                 responseFields(
-                    fieldWithPath("contents[].bookId").type(NUMBER).description("Book Id"),
+                    fieldWithPath("contents[].bookShelfId").type(NUMBER)
+                        .description("BookShelf Id"),
                     fieldWithPath("contents[].title").type(STRING).description("제목"),
                     fieldWithPath("contents[].isbn").type(STRING).description("ISBN"),
                     fieldWithPath("contents[].bookCoverImageUrl").type(STRING).optional()
@@ -443,7 +446,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
                     .and(getPageField()))
             );
 
-        verify(bookShelfService).takeBooksOutOfBookShelf(any(ReadingStatus.class),
+        verify(bookShelfService).takeBooksOutOfBookShelves(any(ReadingStatus.class),
             any(Pageable.class), any());
     }
 
@@ -464,6 +467,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .build();
 
         BookShelf bookShelf = BookShelf.builder()
+            .id(1L)
             .book(book)
             .user(user)
             .pages(0)
@@ -478,10 +482,11 @@ class BookShelfControllerTest extends ControllerTestExtension {
         SearchBookShelfByReadingStatus searchBookShelfByReadingStatus = new SearchBookShelfByReadingStatus(
             bookShelves);
 
-        when(bookShelfService.takeBooksOutOfBookShelf(any(ReadingStatus.class), any(Pageable.class),
+        when(bookShelfService.takeBooksOutOfBookShelves(any(ReadingStatus.class),
+            any(Pageable.class),
             any())).thenReturn(searchBookShelfByReadingStatus);
 
-        mockMvc.perform(get("/v1/api/bookshelf/books")
+        mockMvc.perform(get("/v1/api/bookshelves")
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .queryParam("readingStatus", "COMPLETE")
                 .queryParam("size", "5")
@@ -498,10 +503,11 @@ class BookShelfControllerTest extends ControllerTestExtension {
                     parameterWithName("readingStatus").description("COMPLETE"),
                     parameterWithName("size").description("page 당 size"),
                     parameterWithName("page").description("한번에 조회할 page수"),
-                    parameterWithName("sort").description("등록순-id")
+                    parameterWithName("sort").description("등록순-id | 변경순-updatedAt")
                 ),
                 responseFields(
-                    fieldWithPath("contents[].bookId").type(NUMBER).description("Book Id"),
+                    fieldWithPath("contents[].bookShelfId").type(NUMBER)
+                        .description("BookShelf Id"),
                     fieldWithPath("contents[].title").type(STRING).description("제목"),
                     fieldWithPath("contents[].isbn").type(STRING).description("ISBN"),
                     fieldWithPath("contents[].bookCoverImageUrl").type(STRING).optional()
@@ -514,7 +520,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
                     .and(getPageField()))
             );
 
-        verify(bookShelfService).takeBooksOutOfBookShelf(any(ReadingStatus.class),
+        verify(bookShelfService).takeBooksOutOfBookShelves(any(ReadingStatus.class),
             any(Pageable.class), any());
     }
 
@@ -534,6 +540,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .build();
 
         BookShelf bookShelf = BookShelf.builder()
+            .id(1L)
             .book(book)
             .user(user)
             .pages(0)
@@ -548,10 +555,11 @@ class BookShelfControllerTest extends ControllerTestExtension {
         SearchBookShelfByReadingStatus searchBookShelfByReadingStatus = new SearchBookShelfByReadingStatus(
             bookShelves);
 
-        when(bookShelfService.takeBooksOutOfBookShelf(any(ReadingStatus.class), any(Pageable.class),
+        when(bookShelfService.takeBooksOutOfBookShelves(any(ReadingStatus.class),
+            any(Pageable.class),
             any())).thenReturn(searchBookShelfByReadingStatus);
 
-        mockMvc.perform(get("/v1/api/bookshelf/books")
+        mockMvc.perform(get("/v1/api/bookshelves")
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .queryParam("readingStatus", "WISH")
                 .queryParam("size", "5")
@@ -568,10 +576,11 @@ class BookShelfControllerTest extends ControllerTestExtension {
                     parameterWithName("readingStatus").description("WISH"),
                     parameterWithName("size").description("page 당 size"),
                     parameterWithName("page").description("한번에 조회할 page수"),
-                    parameterWithName("sort").description("등록순-id")
+                    parameterWithName("sort").description("등록순-id | 변경순-updatedAt")
                 ),
                 responseFields(
-                    fieldWithPath("contents[].bookId").type(NUMBER).description("Book Id"),
+                    fieldWithPath("contents[].bookShelfId").type(NUMBER)
+                        .description("BookShelf Id"),
                     fieldWithPath("contents[].title").type(STRING).description("제목"),
                     fieldWithPath("contents[].isbn").type(STRING).description("ISBN"),
                     fieldWithPath("contents[].bookCoverImageUrl").type(STRING).optional()
@@ -584,7 +593,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
                     .and(getPageField()))
             );
 
-        verify(bookShelfService).takeBooksOutOfBookShelf(any(ReadingStatus.class),
+        verify(bookShelfService).takeBooksOutOfBookShelves(any(ReadingStatus.class),
             any(Pageable.class), any());
     }
 
@@ -596,7 +605,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .readingStatus(READING)
             .build();
 
-        mockMvc.perform(put("/v1/api/bookshelf/books/{bookId}", 1L)
+        mockMvc.perform(put("/v1/api/bookshelves/{bookShelfId}", 1L)
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
                 .contentType(APPLICATION_JSON)
@@ -607,7 +616,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
                     headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 pathParameters(
-                    parameterWithName("bookId").description("Book Id")
+                    parameterWithName("bookShelfId").description("BookShelf Id")
                 ),
                 requestFields(
                     fieldWithPath("pages").type(NUMBER).optional().description("현재 읽고 있는 페이지 번호"),
@@ -620,7 +629,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
 
     @Test
     void 서재에_넣어둔_책_삭제_성공() throws Exception {
-        mockMvc.perform(delete("/v1/api/bookshelf/books/{bookId}", 1)
+        mockMvc.perform(delete("/v1/api/bookshelves/{bookShelfId}", 1)
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isOk())
@@ -629,11 +638,11 @@ class BookShelfControllerTest extends ControllerTestExtension {
                     headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 pathParameters(
-                    parameterWithName("bookId").description("Book Id")
+                    parameterWithName("bookShelfId").description("BookShelf Id")
                 )
             ));
 
-        verify(bookShelfService).deleteBookOnBookShelf(any(), any());
+        verify(bookShelfService).deleteBookShelf(any(), any());
     }
 
     @Test
@@ -644,7 +653,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .readingStatus(READING)
             .build();
 
-        mockMvc.perform(put("/v1/api/bookshelf/books/{bookId}", 1)
+        mockMvc.perform(put("/v1/api/bookshelves/{bookShelfId}", 1)
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
                 .contentType(APPLICATION_JSON)
@@ -655,7 +664,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
                     headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 pathParameters(
-                    parameterWithName("bookId").description("Book Id")
+                    parameterWithName("bookShelfId").description("BookShelf Id")
                 ),
                 requestFields(
                     fieldWithPath("pages").type(NUMBER).optional().description("현재 읽고 있는 페이지 번호"),
@@ -674,7 +683,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .readingStatus(COMPLETE)
             .build();
 
-        mockMvc.perform(put("/v1/api/bookshelf/books/{bookId}", 1L)
+        mockMvc.perform(put("/v1/api/bookshelves/{bookShelfId}", 1L)
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
                 .contentType(APPLICATION_JSON)
@@ -685,7 +694,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
                     headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 pathParameters(
-                    parameterWithName("bookId").description("Book Id")
+                    parameterWithName("bookShelfId").description("BookShelf Id")
                 ),
                 requestFields(
                     fieldWithPath("pages").optional().description("현재 읽고 있는 페이지 번호"),
@@ -704,7 +713,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .readingStatus(COMPLETE)
             .build();
 
-        mockMvc.perform(put("/v1/api/bookshelf/books/{bookId}", 1L)
+        mockMvc.perform(put("/v1/api/bookshelves/{bookShelfId}", 1L)
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
                 .contentType(APPLICATION_JSON)
@@ -715,7 +724,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
                     headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 pathParameters(
-                    parameterWithName("bookId").description("Book Id")
+                    parameterWithName("bookShelfId").description("BookShelf Id")
                 ),
                 requestFields(
                     fieldWithPath("pages").optional().description("현재 읽고 있는 페이지 번호"),
@@ -730,13 +739,12 @@ class BookShelfControllerTest extends ControllerTestExtension {
     void isbn과_출판일자로_서재에_책이_등록되었는지_조회_성공() throws Exception {
         ExistenceBookOnBookShelfResponse existenceBookOnBookShelfResponse = ExistenceBookOnBookShelfResponse.builder()
             .bookShelfId(1L)
-            .bookId(1L)
             .readingStatus(WISH)
             .build();
 
         when(bookShelfService.getBookIfExisted(any(), any(), any())).thenReturn(
             existenceBookOnBookShelfResponse);
-        mockMvc.perform(get("/v1/api/bookshelf/books/existence")
+        mockMvc.perform(get("/v1/api/bookshelves/book")
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .param("isbn", "1234567891011 0123456789")
                 .param("publishAt", LocalDate.now().toString()))
@@ -751,7 +759,6 @@ class BookShelfControllerTest extends ControllerTestExtension {
                 ),
                 responseFields(
                     fieldWithPath("bookShelfId").type(NUMBER).description("책이 등록된 서재 ID"),
-                    fieldWithPath("bookId").type(NUMBER).description("책 ID"),
                     fieldWithPath("readingStatus").type(STRING).description("서재에 등록된 책의 현재 상태")
                 )));
 

@@ -9,15 +9,17 @@ import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 
 public interface BookShelfQueryRepository {
 
-    Page<BookShelf> findSpecificStatusBookByUserId(
-        ReadingStatus readingStatus, Pageable pageable, Long userId);
-
-    void deleteBookByUserIdAndBookId(Long userId, Long bookId);
-
-    Optional<BookShelf> findByUserIdAndBookId(Long userId, Long bookId);
-
-    void deleteAllByUserId(Long userId);
+    Page<BookShelf> findSpecificStatusBookByUserId(ReadingStatus readingStatus, Pageable pageable,
+        Long userId);
 
     Optional<BookShelf> findByUserIdAndIsbnAndPublishAt(Long userId, String isbn,
         LocalDate publishAt);
+
+    Optional<BookShelf> findByIdAndUserId(Long bookShelfId, Long userId);
+
+    Optional<BookShelf> findWithReportByIdAndUserId(Long bookShelfId, Long userId);
+
+    void deleteBookShelfByIdAndUserId(Long bookShelfId, Long userId);
+
+    void deleteAllByUserId(Long userId);
 }

@@ -513,6 +513,7 @@ include::{snippets}/get-agonies/request-headers.adoc[]
 
 `Request`
 
+include::{snippets}/get-agonies/path-parameters.adoc[]
 include::{snippets}/get-agonies/request-parameters.adoc[]
 include::{snippets}/get-agonies/http-request.adoc[]
 
@@ -531,6 +532,7 @@ include::{snippets}/delete-agony/request-headers.adoc[]
 
 `Request`
 
+include::{snippets}/delete-agony/path-parameters.adoc[]
 include::{snippets}/delete-agony/http-request.adoc[]
 
 `Response`

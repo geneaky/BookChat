@@ -9,19 +9,17 @@ import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 public class ExistenceBookOnBookShelfResponse {
 
     private Long bookShelfId;
-    private Long bookId;
     private ReadingStatus readingStatus;
 
     @Builder
-    private ExistenceBookOnBookShelfResponse(Long bookShelfId, Long bookId,
+    private ExistenceBookOnBookShelfResponse(Long bookShelfId,
         ReadingStatus readingStatus) {
         this.bookShelfId = bookShelfId;
-        this.bookId = bookId;
         this.readingStatus = readingStatus;
     }
 
     public static ExistenceBookOnBookShelfResponse from(BookShelf bookShelf) {
-        return new ExistenceBookOnBookShelfResponse(bookShelf.getId(), bookShelf.getBookId(),
+        return new ExistenceBookOnBookShelfResponse(bookShelf.getId(),
             bookShelf.getReadingStatus());
     }
 }

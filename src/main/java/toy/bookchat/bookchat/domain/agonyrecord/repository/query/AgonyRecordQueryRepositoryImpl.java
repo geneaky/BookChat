@@ -2,10 +2,10 @@ package toy.bookchat.bookchat.domain.agonyrecord.repository.query;
 
 import static toy.bookchat.bookchat.domain.agony.QAgony.agony;
 import static toy.bookchat.bookchat.domain.agonyrecord.QAgonyRecord.agonyRecord;
+import static toy.bookchat.bookchat.domain.bookshelf.QBookShelf.bookShelf;
 import static toy.bookchat.bookchat.domain.common.RepositorySupport.extractOrderSpecifierFrom;
 import static toy.bookchat.bookchat.domain.common.RepositorySupport.numberBasedPagination;
 import static toy.bookchat.bookchat.domain.common.RepositorySupport.toSlice;
-import static toy.bookchat.bookchat.domain.user.QUser.user;
 
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -26,14 +26,15 @@ public class AgonyRecordQueryRepositoryImpl implements AgonyRecordQueryRepositor
         this.queryFactory = queryFactory;
     }
 
-
     @Override
-    public Slice<AgonyRecord> findSliceOfUserAgonyRecords(Long agonyId, Long userId,
+    public Slice<AgonyRecord> findSliceOfUserAgonyRecords(Long bookShelfId, Long agonyId,
+        Long userId,
         Pageable pageable, Optional<Long> postCursorId) {
         List<AgonyRecord> contents = queryFactory.select(agonyRecord)
             .from(agonyRecord)
             .join(agonyRecord.agony, agony).on(agony.id.eq(agonyId))
-            .join(agony.user, user).on(user.id.eq(userId))
+            .join(agony.bookShelf, bookShelf).on(bookShelf.id.eq(bookShelfId)
+                .and(bookShelf.user.id.eq(userId)))
             .where(numberBasedPagination(agonyRecord, agonyRecord.id, postCursorId, pageable))
             .limit(pageable.getPageSize())
             .orderBy(extractOrderSpecifierFrom(agonyRecord, pageable))
@@ -43,20 +44,22 @@ public class AgonyRecordQueryRepositoryImpl implements AgonyRecordQueryRepositor
     }
 
     @Override
-    public void deleteAgony(Long userId, Long agonyId, Long recordId) {
+    public void deleteAgonyRecord(Long bookShelfId, Long agonyId, Long recordId, Long userId) {
         QAgonyRecord subAgonyRecord = new QAgonyRecord("subAgonyRecord");
         queryFactory.delete(agonyRecord)
             .where(agonyRecord.id.eq(
                 JPAExpressions.select(subAgonyRecord.id)
                     .from(subAgonyRecord)
                     .join(subAgonyRecord.agony, agony).on(agony.id.eq(agonyId))
-                    .join(agony.user, user).on(user.id.eq(userId))
+                    .join(agony.bookShelf, bookShelf).on(bookShelf.id.eq(bookShelfId)
+                        .and(bookShelf.user.id.eq(userId)))
                     .where(subAgonyRecord.id.eq(recordId))
             )).execute();
     }
 
     @Override
-    public void reviseAgonyRecord(Long userId, Long agonyId, Long recordId, String recordTitle,
+    public void reviseAgonyRecord(Long bookShelfId, Long agonyId, Long recordId, Long userId,
+        String recordTitle,
         String recordContent) {
         QAgonyRecord subAgonyRecord = new QAgonyRecord("subAgonyRecord");
         queryFactory.update(agonyRecord)
@@ -66,19 +69,21 @@ public class AgonyRecordQueryRepositoryImpl implements AgonyRecordQueryRepositor
                 JPAExpressions.select(subAgonyRecord.id)
                     .from(subAgonyRecord)
                     .join(subAgonyRecord.agony, agony).on(agony.id.eq(agonyId))
-                    .join(agony.user, user).on(user.id.eq(userId))
+                    .join(agony.bookShelf, bookShelf).on(bookShelf.id.eq(bookShelfId)
+                        .and(bookShelf.user.id.eq(userId)))
                     .where(subAgonyRecord.id.eq(recordId))
             )).execute();
     }
 
     @Override
-    public void deleteByAgoniesIds(Long userId, List<Long> agoniesIds) {
+    public void deleteByAgoniesIds(Long bookShelfId, Long userId, List<Long> agoniesIds) {
         queryFactory.delete(agonyRecord)
             .where(agonyRecord.agony.id.in(
                 JPAExpressions.select(agony.id)
                     .from(agony)
-                    .join(agony.user, user)
-                    .on(user.id.eq(userId))
+                    .join(agony.bookShelf, bookShelf)
+                    .on(bookShelf.id.eq(bookShelfId)
+                        .and(bookShelf.user.id.eq(userId)))
                     .where(agony.id.in(agoniesIds))
             )).execute();
     }
@@ -89,7 +94,8 @@ public class AgonyRecordQueryRepositoryImpl implements AgonyRecordQueryRepositor
             .where(agonyRecord.agony.id.in(
                 JPAExpressions.select(agony.id)
                     .from(agony)
-                    .where(agony.user.id.eq(userId))
+                    .join(agony.bookShelf, bookShelf)
+                    .on(bookShelf.user.id.eq(userId))
             )).execute();
     }
 

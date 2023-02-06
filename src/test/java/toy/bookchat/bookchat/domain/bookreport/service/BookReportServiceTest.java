@@ -58,7 +58,7 @@ class BookReportServiceTest {
         BookShelf bookShelf = mock(BookShelf.class);
 
         when(user.getId()).thenReturn(1L);
-        when(bookShelfRepository.findByUserIdAndBookId(any(), any())).thenReturn(
+        when(bookShelfRepository.findByIdAndUserId(any(), any())).thenReturn(
             Optional.of(bookShelf));
 
         bookReportService.writeReport(writeBookReportRequest, 1L, user.getId());
@@ -76,7 +76,7 @@ class BookReportServiceTest {
             .build();
 
         when(user.getId()).thenReturn(1L);
-        when(bookShelfRepository.findByUserIdAndBookId(any(), any())).thenReturn(
+        when(bookShelfRepository.findByIdAndUserId(any(), any())).thenReturn(
             Optional.of(bookShelf));
 
         bookReportService.writeReport(writeBookReportRequest, 1L, user.getId());
@@ -99,7 +99,7 @@ class BookReportServiceTest {
         BookShelf bookShelf = BookShelf.builder()
             .build();
 
-        when(bookShelfRepository.findByUserIdAndBookId(any(), any())).thenReturn(
+        when(bookShelfRepository.findByIdAndUserId(any(), any())).thenReturn(
             Optional.of(bookShelf));
 
         assertThatThrownBy(() -> {
@@ -117,7 +117,7 @@ class BookReportServiceTest {
             .bookReport(bookReport)
             .build();
 
-        when(bookShelfRepository.findByUserIdAndBookId(any(), any())).thenReturn(
+        when(bookShelfRepository.findByIdAndUserId(any(), any())).thenReturn(
             Optional.of(bookShelf));
         BookReportResponse bookReportResponse = bookReportService.getBookReportResponse(1L, 1L);
 
@@ -135,7 +135,7 @@ class BookReportServiceTest {
             .bookReport(bookReport)
             .build();
 
-        when(bookShelfRepository.findByUserIdAndBookId(any(), any())).thenReturn(
+        when(bookShelfRepository.findByIdAndUserId(any(), any())).thenReturn(
             Optional.of(bookShelf));
 
         bookReportService.deleteBookReport(1L, 1L);
@@ -158,7 +158,7 @@ class BookReportServiceTest {
             .bookReport(bookReport)
             .build();
 
-        when(bookShelfRepository.findByUserIdAndBookId(any(), any())).thenReturn(
+        when(bookShelfRepository.findWithReportByIdAndUserId(any(), any())).thenReturn(
             Optional.of(bookShelf));
 
         bookReportService.reviseBookReport(1L, 1L, reviseBookReportRequest);

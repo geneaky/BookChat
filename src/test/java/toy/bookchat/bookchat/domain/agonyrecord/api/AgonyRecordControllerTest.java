@@ -58,7 +58,7 @@ class AgonyRecordControllerTest extends ControllerTestExtension {
         CreateAgonyRecordRequest createAgonyRecordRequest = new CreateAgonyRecordRequest(
             "title", "blabla");
 
-        mockMvc.perform(post("/v1/api/agonies/{agonyId}/records", 1)
+        mockMvc.perform(post("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records", 1, 1)
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
                 .contentType(APPLICATION_JSON)
@@ -69,6 +69,7 @@ class AgonyRecordControllerTest extends ControllerTestExtension {
                     headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 pathParameters(
+                    parameterWithName("bookShelfId").description("BookShelf Id"),
                     parameterWithName("agonyId").description("Agony Id")
                 ),
                 requestFields(
@@ -76,7 +77,7 @@ class AgonyRecordControllerTest extends ControllerTestExtension {
                     fieldWithPath("content").optional().description("고민기록의 내용")
                 )));
 
-        verify(agonyRecordService).storeAgonyRecord(any(), any(), any());
+        verify(agonyRecordService).storeAgonyRecord(any(), any(), any(), any());
     }
 
     @Test
@@ -100,10 +101,10 @@ class AgonyRecordControllerTest extends ControllerTestExtension {
         SliceOfAgonyRecordsResponse pageOfAgonyRecordsResponse = new SliceOfAgonyRecordsResponse(
             slice);
 
-        when(agonyRecordService.searchPageOfAgonyRecords(any(), any(), any(),
+        when(agonyRecordService.searchPageOfAgonyRecords(any(), any(), any(), any(),
             any())).thenReturn(
             pageOfAgonyRecordsResponse);
-        mockMvc.perform(get("/v1/api/agonies/{agonyId}/records", 1, 1)
+        mockMvc.perform(get("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records", 1, 1)
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
                 .queryParam("postCursorId", "1")
@@ -115,6 +116,7 @@ class AgonyRecordControllerTest extends ControllerTestExtension {
                     headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 pathParameters(
+                    parameterWithName("bookShelfId").description("BookShelf Id"),
                     parameterWithName("agonyId").description("Agony Id")
                 ),
                 requestParameters(
@@ -138,7 +140,8 @@ class AgonyRecordControllerTest extends ControllerTestExtension {
     @Test
     void 고민기록_삭제_성공() throws Exception {
         mockMvc.perform(
-                delete("/v1/api/agonies/{agonyId}/records/{recordId}", 1L, 1L)
+                delete("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records/{recordId}", 1L, 1L,
+                    1L)
                     .header(AUTHORIZATION, JWT_TOKEN)
                     .with(user(getUserPrincipal())))
             .andExpect(status().isOk())
@@ -147,11 +150,12 @@ class AgonyRecordControllerTest extends ControllerTestExtension {
                     headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 pathParameters(
+                    parameterWithName("bookShelfId").description("BookShelf Id"),
                     parameterWithName("agonyId").description("Agony Id"),
                     parameterWithName("recordId").description("Record Id")
                 )));
 
-        verify(agonyRecordService).deleteAgonyRecord(any(), any(), any());
+        verify(agonyRecordService).deleteAgonyRecord(any(), any(), any(), any());
     }
 
     @Test
@@ -162,7 +166,8 @@ class AgonyRecordControllerTest extends ControllerTestExtension {
             .build();
 
         mockMvc.perform(
-                put("/v1/api/agonies/{agonyId}/records/{recordId}", 1L, 1L)
+                put("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records/{recordId}", 1L, 1L,
+                    1L)
                     .header(AUTHORIZATION, JWT_TOKEN)
                     .with(user(getUserPrincipal()))
                     .contentType(APPLICATION_JSON)
@@ -173,6 +178,7 @@ class AgonyRecordControllerTest extends ControllerTestExtension {
                     headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 pathParameters(
+                    parameterWithName("bookShelfId").description("BookShelf Id"),
                     parameterWithName("agonyId").description("Agony Id"),
                     parameterWithName("recordId").description("Record Id")
                 ),
@@ -181,6 +187,6 @@ class AgonyRecordControllerTest extends ControllerTestExtension {
                     fieldWithPath("recordContent").type(STRING).description("고민 기록 내용")
                 )));
 
-        verify(agonyRecordService).reviseAgonyRecord(any(), any(), any(), any());
+        verify(agonyRecordService).reviseAgonyRecord(any(), any(), any(), any(), any());
     }
 }

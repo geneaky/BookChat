@@ -62,9 +62,8 @@ public class BookShelfService {
     }
 
     @Transactional(readOnly = true)
-    public SearchBookShelfByReadingStatus takeBooksOutOfBookShelf(ReadingStatus readingStatus,
+    public SearchBookShelfByReadingStatus takeBooksOutOfBookShelves(ReadingStatus readingStatus,
         Pageable pageable, Long userId) {
-
         Page<BookShelf> pagingBookShelves = bookShelfRepository.findSpecificStatusBookByUserId(
             readingStatus, pageable,
             userId);
@@ -83,18 +82,17 @@ public class BookShelfService {
     }
 
     @Transactional
-    public void reviseBookShelf(Long bookId, ReviseBookShelfRequest reviseBookShelfRequest,
+    public void reviseBookShelf(Long bookShelfId, ReviseBookShelfRequest reviseBookShelfRequest,
         Long userId) {
-        BookShelf bookShelf = bookShelfRepository.findByUserIdAndBookId(userId, bookId)
+        BookShelf bookShelf = bookShelfRepository.findByIdAndUserId(bookShelfId, userId)
             .orElseThrow(BookNotFoundException::new);
 
         reviseBookShelfRequest.applyChanges(bookShelf);
     }
 
     @Transactional
-    public void deleteBookOnBookShelf(Long bookId, Long userId) {
-        bookShelfRepository.deleteBookByUserIdAndBookId(userId,
-            bookId);
+    public void deleteBookShelf(Long bookShelfId, Long userId) {
+        bookShelfRepository.deleteBookShelfByIdAndUserId(bookShelfId, userId);
     }
 
     @Transactional

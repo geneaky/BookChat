@@ -9,7 +9,7 @@ import toy.bookchat.bookchat.domain.bookshelf.Star;
 @Getter
 public class BookShelfResponse {
 
-    private Long bookId;
+    private Long bookShelfId;
     private String title;
     private String isbn;
     private String bookCoverImageUrl;
@@ -20,10 +20,10 @@ public class BookShelfResponse {
     private Integer pages;
 
     @Builder
-    private BookShelfResponse(Long bookId, String title, String isbn,
+    private BookShelfResponse(Long bookShelfId, String title, String isbn,
         String bookCoverImageUrl, LocalDate publishAt, List<String> authors, String publisher,
         Star star, Integer pages) {
-        this.bookId = bookId;
+        this.bookShelfId = bookShelfId;
         this.title = title;
         this.isbn = isbn;
         this.bookCoverImageUrl = bookCoverImageUrl;

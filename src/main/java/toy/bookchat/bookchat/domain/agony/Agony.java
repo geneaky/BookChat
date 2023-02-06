@@ -10,7 +10,6 @@ import lombok.Builder;
 import lombok.Getter;
 import toy.bookchat.bookchat.domain.BaseEntity;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
-import toy.bookchat.bookchat.domain.user.User;
 
 @Getter
 @Entity
@@ -23,16 +22,13 @@ public class Agony extends BaseEntity {
     private String hexColorCode;
     @ManyToOne(fetch = FetchType.LAZY)
     private BookShelf bookShelf;
-    @ManyToOne(fetch = FetchType.LAZY)
-    private User user;
 
     @Builder
-    private Agony(Long id, String title, String hexColorCode, BookShelf bookShelf, User user) {
+    private Agony(Long id, String title, String hexColorCode, BookShelf bookShelf) {
         this.id = id;
         this.title = title;
         this.hexColorCode = hexColorCode;
         this.bookShelf = bookShelf;
-        this.user = user;
     }
 
     protected Agony() {

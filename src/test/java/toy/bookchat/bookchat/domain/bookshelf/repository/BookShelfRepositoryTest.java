@@ -13,6 +13,8 @@ import org.springframework.data.domain.Sort;
 import toy.bookchat.bookchat.domain.RepositoryTest;
 import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.book.repository.BookRepository;
+import toy.bookchat.bookchat.domain.bookreport.BookReport;
+import toy.bookchat.bookchat.domain.bookreport.repository.BookReportRepository;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.Star;
@@ -24,6 +26,8 @@ class BookShelfRepositoryTest {
 
     @Autowired
     private BookRepository bookRepository;
+    @Autowired
+    private BookReportRepository bookReportRepository;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -196,14 +200,14 @@ class BookShelfRepositoryTest {
 
         bookShelfRepository.save(bookShelf);
 
-        bookShelfRepository.deleteBookByUserIdAndBookId(user.getId(), book.getId());
+        bookShelfRepository.deleteBookShelfByIdAndUserId(bookShelf.getId(), user.getId());
 
         int result = bookShelfRepository.findAll().size();
         assertThat(result).isZero();
     }
 
     @Test
-    void user_id_book_id로_서재_조회성공() throws Exception {
+    void bookShelfId_userId로_서재_조회_성공() throws Exception {
         Book book = getBook("1-4133-0454-0");
 
         bookRepository.save(book);
@@ -219,9 +223,38 @@ class BookShelfRepositoryTest {
 
         bookShelfRepository.save(bookShelf);
 
-        BookShelf findBookShelf = bookShelfRepository.findByUserIdAndBookId(
-            user.getId(), book.getId()).get();
+        BookShelf findBookShelf = bookShelfRepository.findByIdAndUserId(bookShelf.getId(),
+            user.getId()).get();
         assertThat(findBookShelf).isEqualTo(bookShelf);
+
+    }
+
+    @Test
+    void bookShelfId_userId로_서재_독후감_조회_성공() throws Exception {
+        Book book = getBook("1-4133-0454-0");
+        bookRepository.save(book);
+
+        User user = User.builder().name("hi").build();
+        userRepository.save(user);
+
+        BookReport bookReport = BookReport.builder()
+            .title("test report")
+            .content("test report content")
+            .build();
+        bookReportRepository.save(bookReport);
+
+        BookShelf bookShelf = BookShelf.builder()
+            .book(book)
+            .user(user)
+            .bookReport(bookReport)
+            .readingStatus(ReadingStatus.READING)
+            .build();
+        bookShelfRepository.save(bookShelf);
+
+        BookShelf findBookShelf = bookShelfRepository.findWithReportByIdAndUserId(bookShelf.getId(),
+            user.getId()).get();
+
+        assertThat(findBookShelf.getBookReport().getTitle()).isEqualTo(bookReport.getTitle());
     }
 
     @Test

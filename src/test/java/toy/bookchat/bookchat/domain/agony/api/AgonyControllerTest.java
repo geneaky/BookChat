@@ -77,7 +77,7 @@ class AgonyControllerTest extends ControllerTestExtension {
     void 고민_생성_성공() throws Exception {
         CreateBookAgonyRequest createBookAgonyRequest = new CreateBookAgonyRequest("title",
             "#062498");
-        mockMvc.perform(post("/v1/api/bookshelf/books/{bookId}/agonies", 1)
+        mockMvc.perform(post("/v1/api/bookshelves/{bookShelfId}/agonies", 1)
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
                 .contentType(APPLICATION_JSON)
@@ -88,26 +88,25 @@ class AgonyControllerTest extends ControllerTestExtension {
                     headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 pathParameters(
-                    parameterWithName("bookId").description("Book Id")
+                    parameterWithName("bookShelfId").description("BookShelf Id")
                 ),
                 requestFields(
                     fieldWithPath("title").type(STRING).description("고민 제목"),
                     fieldWithPath("hexColorCode").type(STRING).description("고민 폴더 색상")
                 )));
 
-        verify(agonyService).storeBookAgony(any(), any(), any());
+        verify(agonyService).storeBookShelfAgony(any(), any(), any());
     }
 
     @Test
     void 고민_조회_성공() throws Exception {
-
         List<Agony> agonies = getAgonies();
         PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("id").descending());
         Slice<Agony> slice = new SliceImpl<>(agonies, pageRequest, true);
         SliceOfAgoniesResponse pageOfAgoniesResponse = new SliceOfAgoniesResponse(slice);
-        when(agonyService.searchSliceOfAgonies(any(), any(), any())).thenReturn(
+        when(agonyService.searchSliceOfAgonies(any(), any(), any(), any())).thenReturn(
             pageOfAgoniesResponse);
-        mockMvc.perform(get("/v1/api/agonies")
+        mockMvc.perform(get("/v1/api/bookshelves/{bookShelfId}/agonies", 1)
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
                 .queryParam("size", "2")
@@ -118,6 +117,9 @@ class AgonyControllerTest extends ControllerTestExtension {
             .andDo(document("get-agonies",
                 requestHeaders(
                     headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
+                ),
+                pathParameters(
+                    parameterWithName("bookShelfId").description("BookShelf Id")
                 ),
                 requestParameters(
                     parameterWithName("size").description("page 당 size"),
@@ -136,7 +138,7 @@ class AgonyControllerTest extends ControllerTestExtension {
 
     @Test
     void 고민_폴더_삭제_성공() throws Exception {
-        mockMvc.perform(delete("/v1/api/agonies/{agoniesIds}", "1,2,3")
+        mockMvc.perform(delete("/v1/api/bookshelves/{bookShelfId}/agonies/{agoniesIds}", 1, "1,2,3")
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isOk())
@@ -145,10 +147,11 @@ class AgonyControllerTest extends ControllerTestExtension {
                     headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 pathParameters(
+                    parameterWithName("bookShelfId").description("BookShelf Id"),
                     parameterWithName("agoniesIds").description("삭제할 고민폴더 ID")
                 )));
 
-        verify(agonyService).deleteAgony(any(), any());
+        verify(agonyService).deleteAgony(any(), any(), any());
     }
 
     @Test
@@ -158,7 +161,7 @@ class AgonyControllerTest extends ControllerTestExtension {
             .hexColorCode("보라색")
             .build();
 
-        mockMvc.perform(put("/v1/api/agonies/{agonyId}", 1L)
+        mockMvc.perform(put("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}", 1L, 1L)
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
                 .contentType(APPLICATION_JSON)
@@ -169,6 +172,7 @@ class AgonyControllerTest extends ControllerTestExtension {
                     headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 pathParameters(
+                    parameterWithName("bookShelfId").description("BookShelf Id"),
                     parameterWithName("agonyId").description("Agony Id")
                 ),
                 requestFields(
@@ -176,6 +180,6 @@ class AgonyControllerTest extends ControllerTestExtension {
                     fieldWithPath("hexColorCode").type(STRING).description("고민 폴더 색")
                 )));
 
-        verify(agonyService).reviseAgony(any(), any(), any());
+        verify(agonyService).reviseAgony(any(), any(), any(), any());
     }
 }
