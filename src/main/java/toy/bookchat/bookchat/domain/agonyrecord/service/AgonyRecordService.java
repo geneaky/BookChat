@@ -27,30 +27,31 @@ public class AgonyRecordService {
     }
 
     @Transactional
-    public void storeAgonyRecord(CreateAgonyRecordRequest createAgonyRecordRequest,
+    public void storeAgonyRecord(Long bookShelfId,
+        CreateAgonyRecordRequest createAgonyRecordRequest,
         Long userId, Long agonyId) {
-        Agony agony = agonyRepository.findUserBookShelfAgony(userId, agonyId)
+        Agony agony = agonyRepository.findUserBookShelfAgony(bookShelfId, agonyId, userId)
             .orElseThrow(AgonyNotFoundException::new);
         agonyRecordRepository.save(createAgonyRecordRequest.generateAgonyRecord(agony));
     }
 
     @Transactional(readOnly = true)
-    public SliceOfAgonyRecordsResponse searchPageOfAgonyRecords(Long agonyId,
+    public SliceOfAgonyRecordsResponse searchPageOfAgonyRecords(Long bookShelfId, Long agonyId,
         Long userId, Pageable pageable, Optional<Long> postCursorId) {
         Slice<AgonyRecord> agonyRecordSlice = agonyRecordRepository.findSliceOfUserAgonyRecords(
-            agonyId, userId, pageable, postCursorId);
+            bookShelfId, agonyId, userId, pageable, postCursorId);
         return new SliceOfAgonyRecordsResponse(agonyRecordSlice);
     }
 
     @Transactional
-    public void deleteAgonyRecord(Long agonyId, Long recordId, Long userId) {
-        agonyRecordRepository.deleteAgony(userId, agonyId, recordId);
+    public void deleteAgonyRecord(Long bookShelfId, Long agonyId, Long recordId, Long userId) {
+        agonyRecordRepository.deleteAgonyRecord(bookShelfId, agonyId, recordId, userId);
     }
 
     @Transactional
-    public void reviseAgonyRecord(Long agonyId, Long recordId, Long userId,
+    public void reviseAgonyRecord(Long bookShelfId, Long agonyId, Long recordId, Long userId,
         ReviseAgonyRecordRequest reviseAgonyRecordRequest) {
-        agonyRecordRepository.reviseAgonyRecord(userId, agonyId, recordId,
+        agonyRecordRepository.reviseAgonyRecord(bookShelfId, agonyId, recordId, userId,
             reviseAgonyRecordRequest.getRecordTitle(), reviseAgonyRecordRequest.getRecordContent());
     }
 }

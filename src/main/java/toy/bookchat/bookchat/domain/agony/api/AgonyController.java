@@ -37,27 +37,28 @@ public class AgonyController {
             bookShelfId);
     }
 
-    @GetMapping("/v1/api/agonies")
-    public SliceOfAgoniesResponse searchSliceOfAgonies(
+    @GetMapping("/v1/api/bookshelf/{bookShelfId}/agonies")
+    public SliceOfAgoniesResponse searchSliceOfAgonies(@PathVariable Long bookShelfId,
         @RequestParam Optional<Long> postCursorId, Pageable pageable,
         @UserPayload TokenPayload tokenPayload) {
 
-        return agonyService.searchSliceOfAgonies(tokenPayload.getUserId(), pageable,
+        return agonyService.searchSliceOfAgonies(bookShelfId, tokenPayload.getUserId(), pageable,
             postCursorId);
     }
 
-    @DeleteMapping("/v1/api/agonies/{agoniesIds}")
-    public void deleteAgony(@PathVariable List<Long> agoniesIds,
+    @DeleteMapping("/v1/api/bookshelf/{bookShelfId}/agonies/{agoniesIds}")
+    public void deleteAgony(@PathVariable Long bookShelfId, @PathVariable List<Long> agoniesIds,
         @UserPayload TokenPayload tokenPayload) {
 
-        agonyService.deleteAgony(agoniesIds, tokenPayload.getUserId());
+        agonyService.deleteAgony(bookShelfId, agoniesIds, tokenPayload.getUserId());
     }
 
-    @PutMapping("/v1/api/agonies/{agonyId}")
-    public void reviseAgony(@PathVariable Long agonyId,
+    @PutMapping("/v1/api/bookshelf/{bookShelfId}/agonies/{agonyId}")
+    public void reviseAgony(@PathVariable Long bookShelfId, @PathVariable Long agonyId,
         @Valid @RequestBody ReviseAgonyRequest reviseAgonyRequest,
         @UserPayload TokenPayload tokenPayload) {
 
-        agonyService.reviseAgony(agonyId, tokenPayload.getUserId(), reviseAgonyRequest);
+        agonyService.reviseAgony(bookShelfId, agonyId, tokenPayload.getUserId(),
+            reviseAgonyRequest);
     }
 }

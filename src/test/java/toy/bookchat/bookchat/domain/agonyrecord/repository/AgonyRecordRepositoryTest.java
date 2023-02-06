@@ -67,7 +67,6 @@ class AgonyRecordRepositoryTest {
             .title("title")
             .hexColorCode("blue")
             .bookShelf(bookShelf)
-            .user(bookShelf.getUser())
             .build();
     }
 
@@ -118,7 +117,9 @@ class AgonyRecordRepositoryTest {
         agonyRecordRepository.save(agonyRecord);
 
         Pageable pageable = PageRequest.of(0, 1, Sort.by("id").descending());
-        List<AgonyRecord> content = agonyRecordRepository.findSliceOfUserAgonyRecords(agony.getId(),
+        List<AgonyRecord> content = agonyRecordRepository.findSliceOfUserAgonyRecords(
+            bookShelf.getId(),
+            agony.getId(),
             user.getId(), pageable, Optional.empty()).getContent();
         assertThat(content).containsExactly(agonyRecord);
     }
@@ -145,7 +146,9 @@ class AgonyRecordRepositoryTest {
         agonyRecordRepository.save(agonyRecord3);
 
         Pageable pageable = PageRequest.of(0, 1, Sort.by("id").descending());
-        List<AgonyRecord> content = agonyRecordRepository.findSliceOfUserAgonyRecords(agony.getId(),
+        List<AgonyRecord> content = agonyRecordRepository.findSliceOfUserAgonyRecords(
+                bookShelf.getId(),
+                agony.getId(),
                 user.getId(), pageable, Optional.of(agonyRecord3.getId()))
             .getContent();
         assertThat(content).containsExactly(agonyRecord2);
@@ -173,7 +176,9 @@ class AgonyRecordRepositoryTest {
         agonyRecordRepository.save(agonyRecord3);
 
         Pageable pageable = PageRequest.of(0, 2, Sort.by("id").ascending());
-        List<AgonyRecord> content = agonyRecordRepository.findSliceOfUserAgonyRecords(agony.getId(),
+        List<AgonyRecord> content = agonyRecordRepository.findSliceOfUserAgonyRecords(
+                bookShelf.getId(),
+                agony.getId(),
                 user.getId(), pageable, Optional.of(agonyRecord1.getId()))
             .getContent();
         assertThat(content).containsExactly(agonyRecord2, agonyRecord3);
@@ -202,7 +207,8 @@ class AgonyRecordRepositoryTest {
 
         Pageable pageable = PageRequest.of(0, 2, Sort.by("title").ascending());
         assertThatThrownBy(() -> {
-            agonyRecordRepository.findSliceOfUserAgonyRecords(agony.getId(), user.getId(), pageable,
+            agonyRecordRepository.findSliceOfUserAgonyRecords(bookShelf.getId(), agony.getId(),
+                user.getId(), pageable,
                 Optional.of(agonyRecord1.getId()));
         }).isInstanceOf(NotSupportedPagingConditionException.class);
     }
@@ -224,8 +230,8 @@ class AgonyRecordRepositoryTest {
         AgonyRecord agonyRecord = getAgonyRecord(agony);
         agonyRecordRepository.save(agonyRecord);
 
-        agonyRecordRepository.deleteAgony(user.getId(), agony.getId(),
-            agonyRecord.getId());
+        agonyRecordRepository.deleteAgonyRecord(bookShelf.getId(), agony.getId(),
+            agonyRecord.getId(), user.getId());
 
         List<AgonyRecord> all = agonyRecordRepository.findAll();
         assertThat(all).isEmpty();
@@ -248,8 +254,8 @@ class AgonyRecordRepositoryTest {
         AgonyRecord agonyRecord = getAgonyRecord(agony);
         agonyRecordRepository.save(agonyRecord);
 
-        agonyRecordRepository.reviseAgonyRecord(user.getId(), agony.getId(),
-            agonyRecord.getId(), "수정 제목", "수정 내용");
+        agonyRecordRepository.reviseAgonyRecord(bookShelf.getId(), agony.getId(),
+            agonyRecord.getId(), user.getId(), "수정 제목", "수정 내용");
 
         em.flush();
         em.clear();
@@ -277,7 +283,8 @@ class AgonyRecordRepositoryTest {
         List<AgonyRecord> agonyRecords = List.of(agonyRecord1, agonyRecord2, agonyRecord3);
         agonyRecordRepository.saveAll(agonyRecords);
 
-        agonyRecordRepository.deleteByAgoniesIds(user.getId(), List.of(agony.getId()));
+        agonyRecordRepository.deleteByAgoniesIds(bookShelf.getId(), user.getId(),
+            List.of(agony.getId()));
 
         List<AgonyRecord> result = agonyRecordRepository.findAll();
         assertThat(result).isEmpty();

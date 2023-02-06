@@ -21,7 +21,6 @@ public class CreateBookAgonyRequest {
             .title(this.title)
             .hexColorCode(this.hexColorCode)
             .bookShelf(bookShelf)
-            .user(bookShelf.getUser())
             .build();
     }
 
