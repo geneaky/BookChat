@@ -434,7 +434,6 @@ class BookShelfControllerTest extends ControllerTestExtension {
                 responseFields(
                     fieldWithPath("contents[].bookShelfId").type(NUMBER)
                         .description("BookShelf Id"),
-                    fieldWithPath("contents[].bookId").type(NUMBER).description("Book Id"),
                     fieldWithPath("contents[].title").type(STRING).description("제목"),
                     fieldWithPath("contents[].isbn").type(STRING).description("ISBN"),
                     fieldWithPath("contents[].bookCoverImageUrl").type(STRING).optional()
@@ -509,7 +508,6 @@ class BookShelfControllerTest extends ControllerTestExtension {
                 responseFields(
                     fieldWithPath("contents[].bookShelfId").type(NUMBER)
                         .description("BookShelf Id"),
-                    fieldWithPath("contents[].bookId").type(NUMBER).description("Book Id"),
                     fieldWithPath("contents[].title").type(STRING).description("제목"),
                     fieldWithPath("contents[].isbn").type(STRING).description("ISBN"),
                     fieldWithPath("contents[].bookCoverImageUrl").type(STRING).optional()
@@ -583,7 +581,6 @@ class BookShelfControllerTest extends ControllerTestExtension {
                 responseFields(
                     fieldWithPath("contents[].bookShelfId").type(NUMBER)
                         .description("BookShelf Id"),
-                    fieldWithPath("contents[].bookId").type(NUMBER).description("Book Id"),
                     fieldWithPath("contents[].title").type(STRING).description("제목"),
                     fieldWithPath("contents[].isbn").type(STRING).description("ISBN"),
                     fieldWithPath("contents[].bookCoverImageUrl").type(STRING).optional()
@@ -742,7 +739,6 @@ class BookShelfControllerTest extends ControllerTestExtension {
     void isbn과_출판일자로_서재에_책이_등록되었는지_조회_성공() throws Exception {
         ExistenceBookOnBookShelfResponse existenceBookOnBookShelfResponse = ExistenceBookOnBookShelfResponse.builder()
             .bookShelfId(1L)
-            .bookId(1L)
             .readingStatus(WISH)
             .build();
 
@@ -763,7 +759,6 @@ class BookShelfControllerTest extends ControllerTestExtension {
                 ),
                 responseFields(
                     fieldWithPath("bookShelfId").type(NUMBER).description("책이 등록된 서재 ID"),
-                    fieldWithPath("bookId").type(NUMBER).description("책 ID"),
                     fieldWithPath("readingStatus").type(STRING).description("서재에 등록된 책의 현재 상태")
                 )));
 
