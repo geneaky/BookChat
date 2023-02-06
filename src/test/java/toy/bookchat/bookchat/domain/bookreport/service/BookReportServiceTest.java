@@ -158,7 +158,7 @@ class BookReportServiceTest {
             .bookReport(bookReport)
             .build();
 
-        when(bookShelfRepository.findByIdAndUserId(any(), any())).thenReturn(
+        when(bookShelfRepository.findWithReportByIdAndUserId(any(), any())).thenReturn(
             Optional.of(bookShelf));
 
         bookReportService.reviseBookReport(1L, 1L, reviseBookReportRequest);

@@ -51,9 +51,11 @@ public class BookReportService {
         bookShelf.deleteBookReport();
     }
 
+    @Transactional
     public void reviseBookReport(Long bookShelfId, Long userId,
         ReviseBookReportRequest reviseBookReportRequest) {
-        BookShelf bookShelf = bookShelfRepository.findByIdAndUserId(bookShelfId, userId)
+        BookShelf bookShelf = bookShelfRepository.findWithReportByIdAndUserId(bookShelfId,
+                userId)
             .orElseThrow(BookNotFoundException::new);
         BookReport bookReport = bookShelf.getBookReport();
 
