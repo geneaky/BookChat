@@ -53,7 +53,7 @@ class BookReportControllerTest extends ControllerTestExtension {
             .content("요런 요런 내용, 저런저런 내용을 많이 배움")
             .build();
 
-        mockMvc.perform(post("/v1/api/books/{bookId}/report", 1L)
+        mockMvc.perform(post("/v1/api/bookshelves/{bookShelfId}/report", 1L)
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
                 .contentType(APPLICATION_JSON)
@@ -64,7 +64,7 @@ class BookReportControllerTest extends ControllerTestExtension {
                     headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 pathParameters(
-                    parameterWithName("bookId").description("Book Id")
+                    parameterWithName("bookShelfId").description("BookShelf Id")
                 ),
                 requestFields(
                     fieldWithPath("title").type(STRING).description("독후감 제목"),
@@ -84,7 +84,7 @@ class BookReportControllerTest extends ControllerTestExtension {
         bookReport.setCreatedAt(LocalDateTime.now());
         BookReportResponse bookReportResponse = BookReportResponse.from(bookReport);
         when(bookReportService.getBookReportResponse(any(), any())).thenReturn(bookReportResponse);
-        mockMvc.perform(get("/v1/api/books/{bookId}/report", 1L)
+        mockMvc.perform(get("/v1/api/bookshelves/{bookShelfId}/report", 1L)
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isOk())
@@ -93,7 +93,7 @@ class BookReportControllerTest extends ControllerTestExtension {
                     headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 pathParameters(
-                    parameterWithName("bookId").description("Book Id")
+                    parameterWithName("bookShelfId").description("BookShelf Id")
                 ),
                 responseFields(
                     fieldWithPath("reportTitle").type(STRING).description("독후감 제목"),
@@ -104,7 +104,7 @@ class BookReportControllerTest extends ControllerTestExtension {
 
     @Test
     void 독후감_삭제_성공() throws Exception {
-        mockMvc.perform(delete("/v1/api/books/{bookId}/report", 1L)
+        mockMvc.perform(delete("/v1/api/bookshelves/{bookShelfId}/report", 1L)
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isOk())
@@ -113,7 +113,7 @@ class BookReportControllerTest extends ControllerTestExtension {
                     headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 pathParameters(
-                    parameterWithName("bookId").description("Book Id")
+                    parameterWithName("bookShelfId").description("BookShelf Id")
                 )));
 
         verify(bookReportService).deleteBookReport(any(), any());
@@ -127,7 +127,7 @@ class BookReportControllerTest extends ControllerTestExtension {
                 "내용은 바꿀수도 아닐수도 있기 때문에 이전 상태 값을 완전히 가지고있기 때문에 똑같이 보내주거나 바꿔서 보내주세요 put으로 멱등성을 보장해줍시다.")
             .build();
 
-        mockMvc.perform(put("/v1/api/books/{bookId}/report", 1L)
+        mockMvc.perform(put("/v1/api/bookshelves/{bookShelfId}/report", 1L)
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
                 .contentType(APPLICATION_JSON)
@@ -138,7 +138,7 @@ class BookReportControllerTest extends ControllerTestExtension {
                     headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 pathParameters(
-                    parameterWithName("bookId").description("Book Id")
+                    parameterWithName("bookShelfId").description("BookShelf Id")
                 ),
                 requestFields(
                     fieldWithPath("title").type(STRING).description("독후감 제목"),

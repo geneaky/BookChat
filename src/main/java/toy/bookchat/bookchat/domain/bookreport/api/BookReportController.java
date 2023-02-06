@@ -17,7 +17,7 @@ import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPayload;
 
 @RestController
-@RequestMapping("/v1/api/books/{bookId}/report")
+@RequestMapping("/v1/api/bookshelves/{bookShelfId}/report")
 public class BookReportController {
 
     private final BookReportService bookReportService;
@@ -29,31 +29,32 @@ public class BookReportController {
     @PostMapping
     public void writeBookReport(
         @Valid @RequestBody WriteBookReportRequest writeBookReportRequest,
-        @PathVariable Long bookId, @UserPayload TokenPayload tokenPayload) {
+        @PathVariable Long bookShelfId, @UserPayload TokenPayload tokenPayload) {
 
-        bookReportService.writeReport(writeBookReportRequest, bookId, tokenPayload.getUserId());
+        bookReportService.writeReport(writeBookReportRequest, bookShelfId,
+            tokenPayload.getUserId());
     }
 
     @GetMapping
-    public BookReportResponse findBookReportFromBook(@PathVariable Long bookId,
+    public BookReportResponse findBookReportFromBook(@PathVariable Long bookShelfId,
         @UserPayload TokenPayload tokenPayload) {
 
-        return bookReportService.getBookReportResponse(bookId, tokenPayload.getUserId());
+        return bookReportService.getBookReportResponse(bookShelfId, tokenPayload.getUserId());
     }
 
     @DeleteMapping
-    public void deleteBookReport(@PathVariable Long bookId,
+    public void deleteBookReport(@PathVariable Long bookShelfId,
         @UserPayload TokenPayload tokenPayload) {
 
-        bookReportService.deleteBookReport(bookId, tokenPayload.getUserId());
+        bookReportService.deleteBookReport(bookShelfId, tokenPayload.getUserId());
     }
 
     @PutMapping
-    public void reviseBookReport(@PathVariable Long bookId,
+    public void reviseBookReport(@PathVariable Long bookShelfId,
         @Valid @RequestBody ReviseBookReportRequest reviseBookReportRequest,
         @UserPayload TokenPayload tokenPayload) {
 
-        bookReportService.reviseBookReport(bookId, tokenPayload.getUserId(),
+        bookReportService.reviseBookReport(bookShelfId, tokenPayload.getUserId(),
             reviseBookReportRequest);
     }
 }

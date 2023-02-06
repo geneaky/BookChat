@@ -24,10 +24,10 @@ public class BookReportService {
     }
 
     @Transactional
-    public void writeReport(WriteBookReportRequest writeBookReportRequest, Long bookId,
+    public void writeReport(WriteBookReportRequest writeBookReportRequest, Long bookShelfId,
         Long userId) {
 
-        BookShelf bookShelf = bookShelfRepository.findByUserIdAndBookId(userId, bookId)
+        BookShelf bookShelf = bookShelfRepository.findByIdAndUserId(bookShelfId, userId)
             .orElseThrow(BookNotFoundException::new);
 
         BookReport bookReport = writeBookReportRequest.getBookReport(bookShelf);
@@ -36,24 +36,24 @@ public class BookReportService {
     }
 
     @Transactional(readOnly = true)
-    public BookReportResponse getBookReportResponse(Long bookId, Long userId) {
-        BookShelf bookShelf = bookShelfRepository.findByUserIdAndBookId(userId, bookId)
+    public BookReportResponse getBookReportResponse(Long bookShelfId, Long userId) {
+        BookShelf bookShelf = bookShelfRepository.findByIdAndUserId(bookShelfId, userId)
             .orElseThrow(BookNotFoundException::new);
 
         return BookReportResponse.from(bookShelf.getBookReport());
     }
 
     @Transactional
-    public void deleteBookReport(Long bookId, Long userId) {
-        BookShelf bookShelf = bookShelfRepository.findByUserIdAndBookId(userId, bookId)
+    public void deleteBookReport(Long bookShelfId, Long userId) {
+        BookShelf bookShelf = bookShelfRepository.findByIdAndUserId(bookShelfId, userId)
             .orElseThrow(BookNotFoundException::new);
 
         bookShelf.deleteBookReport();
     }
 
-    public void reviseBookReport(Long bookId, Long userId,
+    public void reviseBookReport(Long bookShelfId, Long userId,
         ReviseBookReportRequest reviseBookReportRequest) {
-        BookShelf bookShelf = bookShelfRepository.findByUserIdAndBookId(userId, bookId)
+        BookShelf bookShelf = bookShelfRepository.findByIdAndUserId(bookShelfId, userId)
             .orElseThrow(BookNotFoundException::new);
         BookReport bookReport = bookShelf.getBookReport();
 
