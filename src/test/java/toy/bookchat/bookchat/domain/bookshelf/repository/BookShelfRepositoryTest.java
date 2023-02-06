@@ -203,6 +203,29 @@ class BookShelfRepositoryTest {
     }
 
     @Test
+    void bookShelfId_userId로_서재_조회_성공() throws Exception {
+        Book book = getBook("1-4133-0454-0");
+
+        bookRepository.save(book);
+
+        User user = User.builder().name("hi").build();
+        userRepository.save(user);
+
+        BookShelf bookShelf = BookShelf.builder()
+            .book(book)
+            .user(user)
+            .readingStatus(ReadingStatus.READING)
+            .build();
+
+        bookShelfRepository.save(bookShelf);
+
+        BookShelf findBookShelf = bookShelfRepository.findByIdAndUserId(bookShelf.getId(),
+            user.getId()).get();
+        assertThat(findBookShelf).isEqualTo(bookShelf);
+
+    }
+
+    @Test
     void user_id_book_id로_서재_조회성공() throws Exception {
         Book book = getBook("1-4133-0454-0");
 

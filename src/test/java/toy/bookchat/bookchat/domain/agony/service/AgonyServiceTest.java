@@ -55,10 +55,10 @@ class AgonyServiceTest {
         BookShelf bookShelf = mock(BookShelf.class);
         CreateBookAgonyRequest createBookAgonyRequest = mock(CreateBookAgonyRequest.class);
 
-        when(bookShelfRepository.findByUserIdAndBookId(any(), any())).thenReturn(
+        when(bookShelfRepository.findByIdAndUserId(any(), any())).thenReturn(
             Optional.of(bookShelf));
 
-        agonyService.storeBookAgony(createBookAgonyRequest, 1L, 1L);
+        agonyService.storeBookShelfAgony(createBookAgonyRequest, 1L, 1L);
 
         verify(agonyRepository).save(any());
     }
@@ -68,7 +68,7 @@ class AgonyServiceTest {
         CreateBookAgonyRequest createBookAgonyRequest = mock(CreateBookAgonyRequest.class);
 
         assertThatThrownBy(() -> {
-            agonyService.storeBookAgony(createBookAgonyRequest, 1L, 1L);
+            agonyService.storeBookShelfAgony(createBookAgonyRequest, 1L, 1L);
         }).isInstanceOf(BookNotFoundException.class);
     }
 

@@ -20,4 +20,6 @@ public interface BookShelfQueryRepository {
 
     Optional<BookShelf> findByUserIdAndIsbnAndPublishAt(Long userId, String isbn,
         LocalDate publishAt);
+
+    Optional<BookShelf> findByIdAndUserId(Long bookShelfId, Long userId);
 }

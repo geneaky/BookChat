@@ -33,10 +33,9 @@ public class AgonyService {
     }
 
     @Transactional
-    public void storeBookAgony(CreateBookAgonyRequest createBookAgonyRequest, Long userId,
-        Long bookId) {
-
-        BookShelf bookShelf = bookShelfRepository.findByUserIdAndBookId(userId, bookId)
+    public void storeBookShelfAgony(CreateBookAgonyRequest createBookAgonyRequest, Long userId,
+        Long bookShelfId) {
+        BookShelf bookShelf = bookShelfRepository.findByIdAndUserId(bookShelfId, userId)
             .orElseThrow(BookNotFoundException::new);
 
         agonyRepository.save(createBookAgonyRequest.getAgony(bookShelf));

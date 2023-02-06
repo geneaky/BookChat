@@ -28,12 +28,13 @@ public class AgonyController {
         this.agonyService = agonyService;
     }
 
-    @PostMapping("/v1/api/bookshelf/books/{bookId}/agonies")
-    public void makeBookAgony(@PathVariable Long bookId,
+    @PostMapping("/v1/api/bookshelf/{bookShelfId}/agonies")
+    public void makeBookAgony(@PathVariable Long bookShelfId,
         @Valid @RequestBody CreateBookAgonyRequest createBookAgonyRequest,
         @UserPayload TokenPayload tokenPayload) {
 
-        agonyService.storeBookAgony(createBookAgonyRequest, tokenPayload.getUserId(), bookId);
+        agonyService.storeBookShelfAgony(createBookAgonyRequest, tokenPayload.getUserId(),
+            bookShelfId);
     }
 
     @GetMapping("/v1/api/agonies")

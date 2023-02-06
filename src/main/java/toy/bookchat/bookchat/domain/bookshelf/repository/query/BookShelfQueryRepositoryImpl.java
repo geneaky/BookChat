@@ -84,4 +84,13 @@ public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
                 .and(bookShelf.book.publishAt.eq(publishAt)))
             .fetchOne());
     }
+
+    @Override
+    public Optional<BookShelf> findByIdAndUserId(Long bookShelfId, Long userId) {
+        return Optional.ofNullable(queryFactory.select(bookShelf)
+            .from(bookShelf)
+            .where(bookShelf.id.eq(bookShelfId)
+                .and(bookShelf.user.id.eq(userId)))
+            .fetchOne());
+    }
 }
