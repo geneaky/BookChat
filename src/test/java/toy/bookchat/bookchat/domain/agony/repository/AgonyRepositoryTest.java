@@ -3,6 +3,7 @@ package toy.bookchat.bookchat.domain.agony.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -37,6 +38,7 @@ class AgonyRepositoryTest {
             .isbn("1-4133-0454-0")
             .title("effective java")
             .publisher("insight")
+            .publishAt(LocalDate.now())
             .bookCoverImageUrl("bookCover@naver.com")
             .authors(List.of("Joshua"))
             .build();
@@ -256,5 +258,35 @@ class AgonyRepositoryTest {
 
         List<Agony> result = agonyRepository.findAll();
         assertThat(result).isEmpty();
+    }
+
+    @Test
+    void 서재에_할당된_고민_삭제_성공() throws Exception {
+        Book book1 = getBook();
+        Book book2 = Book.builder()
+            .isbn("123")
+            .publishAt(LocalDate.of(2020, 1, 26))
+            .build();
+        bookRepository.save(book1);
+        bookRepository.save(book2);
+
+        User user = getUser();
+        userRepository.save(user);
+
+        BookShelf bookShelf1 = getBookShelf(user, book1);
+        BookShelf bookShelf2 = getBookShelf(user, book2);
+        bookShelfRepository.save(bookShelf1);
+        bookShelfRepository.save(bookShelf2);
+
+        Agony agony1 = getAgony(bookShelf1);
+        Agony agony2 = getAgony(bookShelf1);
+        Agony agony3 = getAgony(bookShelf2);
+
+        List<Agony> agonyList = List.of(agony1, agony2, agony3);
+        agonyRepository.saveAll(agonyList);
+
+        agonyRepository.deleteByBookShelfIdAndUserId(bookShelf1.getId(), user.getId());
+        List<Agony> result = agonyRepository.findAll();
+        assertThat(result.size()).isOne();
     }
 }

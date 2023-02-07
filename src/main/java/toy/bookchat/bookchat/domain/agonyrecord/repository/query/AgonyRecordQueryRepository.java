@@ -19,4 +19,6 @@ public interface AgonyRecordQueryRepository {
     void deleteByAgoniesIds(Long bookShelfId, Long userId, List<Long> agoniesIds);
 
     void deleteAllByUserId(Long userId);
+
+    void deleteByBookShelfIdAndUserId(Long bookShelfId, Long userId);
 }

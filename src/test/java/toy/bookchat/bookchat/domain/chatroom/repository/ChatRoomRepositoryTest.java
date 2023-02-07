@@ -3,6 +3,7 @@ package toy.bookchat.bookchat.domain.chatroom.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 import static toy.bookchat.bookchat.domain.common.RepositorySupport.toSlice;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -57,7 +58,10 @@ class ChatRoomRepositoryTest {
         userRepository.save(user1);
         userRepository.save(user2);
 
-        Book book = Book.builder().build();
+        Book book = Book.builder()
+            .isbn("12342")
+            .publishAt(LocalDate.now())
+            .build();
         bookRepository.save(book);
 
         ChatRoom chatRoom1 = ChatRoom.builder().book(book).build();
@@ -118,7 +122,10 @@ class ChatRoomRepositoryTest {
         userRepository.save(user1);
         userRepository.save(user2);
 
-        Book book = Book.builder().build();
+        Book book = Book.builder()
+            .isbn("12345")
+            .publishAt(LocalDate.now())
+            .build();
         bookRepository.save(book);
 
         ChatRoom chatRoom1 = ChatRoom.builder().book(book).build();

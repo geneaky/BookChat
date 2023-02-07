@@ -7,6 +7,7 @@ import static toy.bookchat.bookchat.exception.ExceptionResponse.EXPIRED_PUBLIC_K
 import static toy.bookchat.bookchat.exception.ExceptionResponse.IMAGE_PROCESSING_FAIL;
 import static toy.bookchat.bookchat.exception.ExceptionResponse.IMAGE_UPLOAD_FAIL;
 import static toy.bookchat.bookchat.exception.ExceptionResponse.NOT_VERIFIED_TOKEN;
+import static toy.bookchat.bookchat.exception.ExceptionResponse.TOO_MANY_REQUESTS;
 import static toy.bookchat.bookchat.exception.ExceptionResponse.USER_ALREADY_EXISTED;
 import static toy.bookchat.bookchat.exception.ExceptionResponse.USER_NOT_FOUND;
 import static toy.bookchat.bookchat.exception.ExceptionResponse.WRONG_KEY_SPEC;
@@ -21,6 +22,7 @@ import toy.bookchat.bookchat.domain.chat.api.dto.ChatDto;
 import toy.bookchat.bookchat.exception.agony.AgonyNotFoundException;
 import toy.bookchat.bookchat.exception.book.BookNotFoundException;
 import toy.bookchat.bookchat.exception.bookshelf.BookReportNotFoundException;
+import toy.bookchat.bookchat.exception.common.RateOverLimitException;
 import toy.bookchat.bookchat.exception.security.DenidedTokenException;
 import toy.bookchat.bookchat.exception.security.ExpiredPublicKeyCachedException;
 import toy.bookchat.bookchat.exception.security.ExpiredTokenException;
@@ -118,6 +120,13 @@ public class GlobalExceptionHandler {
         NotSupportedPagingConditionException exception) {
         log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
         return BAD_REQUEST.getValue();
+    }
+
+    @ExceptionHandler(RateOverLimitException.class)
+    public final ResponseEntity<String> handleRateOverLimitException(
+        RateOverLimitException exception) {
+        log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
+        return TOO_MANY_REQUESTS.getValue();
     }
 
     @MessageExceptionHandler(Exception.class)

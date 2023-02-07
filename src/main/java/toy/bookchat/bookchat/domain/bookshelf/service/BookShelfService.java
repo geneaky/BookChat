@@ -5,6 +5,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import toy.bookchat.bookchat.domain.agony.repository.AgonyRepository;
+import toy.bookchat.bookchat.domain.agonyrecord.repository.AgonyRecordRepository;
 import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.book.repository.BookRepository;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
@@ -23,13 +25,18 @@ import toy.bookchat.bookchat.exception.user.UserNotFoundException;
 public class BookShelfService {
 
     private final BookShelfRepository bookShelfRepository;
+    private final AgonyRepository agonyRepository;
+    private final AgonyRecordRepository agonyRecordRepository;
     private final BookRepository bookRepository;
     private final UserRepository userRepository;
 
     public BookShelfService(BookShelfRepository bookShelfRepository,
+        AgonyRepository agonyRepository, AgonyRecordRepository agonyRecordRepository,
         BookRepository bookRepository,
         UserRepository userRepository) {
         this.bookShelfRepository = bookShelfRepository;
+        this.agonyRepository = agonyRepository;
+        this.agonyRecordRepository = agonyRecordRepository;
         this.bookRepository = bookRepository;
         this.userRepository = userRepository;
     }
@@ -92,6 +99,8 @@ public class BookShelfService {
 
     @Transactional
     public void deleteBookShelf(Long bookShelfId, Long userId) {
+        agonyRecordRepository.deleteByBookShelfIdAndUserId(bookShelfId, userId);
+        agonyRepository.deleteByBookShelfIdAndUserId(bookShelfId, userId);
         bookShelfRepository.deleteBookShelfByIdAndUserId(bookShelfId, userId);
     }
 

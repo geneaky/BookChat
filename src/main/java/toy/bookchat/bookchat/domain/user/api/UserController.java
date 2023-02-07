@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import toy.bookchat.bookchat.domain.common.RateLimit;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.api.dto.Token;
 import toy.bookchat.bookchat.domain.user.api.dto.UserProfileResponse;
@@ -56,9 +57,8 @@ public class UserController {
         return UserProfileResponse.of(tokenPayload);
     }
 
-    /* TODO: 2022-08-29 bucket4j 적용 트래픽제어 aop로 만들기
-     */
     @GetMapping("/users/profile/nickname")
+    @RateLimit(keyName = "nicknameCall", capacity = 300, tokens = 100, seconds = 1)
     public ResponseEntity<Void> checkDuplicatedNickname(String nickname) {
         if (userService.isDuplicatedName(nickname)) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
