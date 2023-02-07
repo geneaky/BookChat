@@ -43,13 +43,13 @@ import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookRequest;
 import toy.bookchat.bookchat.domain.chat.Chat;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomResponse;
+import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomUsersResponse;
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomsResponseSlice;
+import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.RoomGuest;
+import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.RoomHost;
+import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.RoomSubHost;
 import toy.bookchat.bookchat.domain.chatroom.service.ChatRoomService;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.CreateChatRoomRequest;
-import toy.bookchat.bookchat.domain.chatroom.service.dto.response.ChatRoomUsersResponse;
-import toy.bookchat.bookchat.domain.chatroom.service.dto.response.RoomGuest;
-import toy.bookchat.bookchat.domain.chatroom.service.dto.response.RoomHost;
-import toy.bookchat.bookchat.domain.chatroom.service.dto.response.RoomSubHost;
 
 @ChatRoomPresentationTest
 class ChatRoomControllerTest extends ControllerTestExtension {

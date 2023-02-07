@@ -14,9 +14,9 @@ import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.book.repository.BookRepository;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
 import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomRepository;
+import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomUsersResponse;
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomsResponseSlice;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.CreateChatRoomRequest;
-import toy.bookchat.bookchat.domain.chatroom.service.dto.response.ChatRoomUsersResponse;
 import toy.bookchat.bookchat.domain.chatroomhashtag.ChatRoomHashTag;
 import toy.bookchat.bookchat.domain.chatroomhashtag.repository.ChatRoomHashTagRepository;
 import toy.bookchat.bookchat.domain.chatroomhost.ChatRoomHost;
@@ -134,7 +134,8 @@ public class ChatRoomService {
             chatRoomRepository.findUserChatRoomsWithLastChat(pageable, postCursorId, userId));
     }
 
+    @Transactional(readOnly = true)
     public ChatRoomUsersResponse getChatRoomUsers(Long roomId, Long userId) {
-        return null;
+        return chatRoomRepository.findChatRoomUsers(roomId, userId);
     }
 }

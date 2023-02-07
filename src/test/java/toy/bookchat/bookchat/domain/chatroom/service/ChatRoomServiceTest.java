@@ -150,4 +150,11 @@ class ChatRoomServiceTest {
         Assertions.assertThat(chatRoomsResponseSlice).usingRecursiveComparison()
             .isEqualTo(ChatRoomsResponseSlice.of(slice));
     }
+
+    @Test
+    void 채팅방_참여인원_조회_성공() throws Exception {
+        chatRoomService.getChatRoomUsers(1L, 1L);
+
+        verify(chatRoomRepository).findChatRoomUsers(any(), any());
+    }
 }

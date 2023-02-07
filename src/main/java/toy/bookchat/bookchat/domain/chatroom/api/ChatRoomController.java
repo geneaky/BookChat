@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomUsersResponse;
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomsResponseSlice;
 import toy.bookchat.bookchat.domain.chatroom.service.ChatRoomService;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.CreateChatRoomRequest;
-import toy.bookchat.bookchat.domain.chatroom.service.dto.response.ChatRoomUsersResponse;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPayload;
 

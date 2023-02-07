@@ -1,10 +1,10 @@
-package toy.bookchat.bookchat.domain.chatroom.service.dto.response;
+package toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class RoomHost {
+public class RoomSubHost {
 
     private final Long id;
     private final String nickname;
@@ -12,7 +12,7 @@ public class RoomHost {
     private final Long defaultProfileImageType;
 
     @Builder
-    private RoomHost(Long id, String nickname, String profileImageUrl,
+    private RoomSubHost(Long id, String nickname, String profileImageUrl,
         Long defaultProfileImageType) {
         this.id = id;
         this.nickname = nickname;

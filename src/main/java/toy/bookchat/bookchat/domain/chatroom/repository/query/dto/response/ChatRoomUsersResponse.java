@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.domain.chatroom.service.dto.response;
+package toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response;
 
 import java.util.List;
 import lombok.Builder;
