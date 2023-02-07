@@ -24,6 +24,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import toy.bookchat.bookchat.domain.agony.repository.AgonyRepository;
+import toy.bookchat.bookchat.domain.agonyrecord.repository.AgonyRecordRepository;
 import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.book.repository.BookRepository;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
@@ -48,6 +50,10 @@ class BookShelfServiceTest {
     BookRepository bookRepository;
     @Mock
     BookShelfRepository bookShelfRepository;
+    @Mock
+    AgonyRepository agonyRepository;
+    @Mock
+    AgonyRecordRepository agonyRecordRepository;
     @InjectMocks
     BookShelfService bookShelfService;
 
@@ -274,6 +280,8 @@ class BookShelfServiceTest {
     void 책장에서_책_삭제_성공() throws Exception {
         bookShelfService.deleteBookShelf(1L, 1L);
 
+        verify(agonyRecordRepository).deleteByBookShelfIdAndUserId(any(), any());
+        verify(agonyRepository).deleteByBookShelfIdAndUserId(any(), any());
         verify(bookShelfRepository).deleteBookShelfByIdAndUserId(any(), any());
     }
 

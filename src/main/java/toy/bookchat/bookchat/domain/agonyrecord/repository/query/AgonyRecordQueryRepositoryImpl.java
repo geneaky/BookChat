@@ -99,4 +99,16 @@ public class AgonyRecordQueryRepositoryImpl implements AgonyRecordQueryRepositor
             )).execute();
     }
 
+    @Override
+    public void deleteByBookShelfIdAndUserId(Long bookShelfId, Long userId) {
+        queryFactory.delete(agonyRecord)
+            .where(agonyRecord.agony.id.in(
+                JPAExpressions.select(agony.id)
+                    .from(agony)
+                    .join(agony.bookShelf, bookShelf)
+                    .on(bookShelf.id.eq(bookShelfId)
+                        .and(bookShelf.user.id.eq(userId)))
+            )).execute();
+    }
+
 }

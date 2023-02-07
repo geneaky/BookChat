@@ -3,6 +3,7 @@ package toy.bookchat.bookchat.domain.agonyrecord.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
@@ -44,6 +45,7 @@ class AgonyRecordRepositoryTest {
         return Book.builder()
             .isbn("1-4133-0454-0")
             .title("effective java")
+            .publishAt(LocalDate.now())
             .authors(List.of("Joshua"))
             .publisher("insight")
             .bookCoverImageUrl("bookCover@naver.com")
@@ -313,5 +315,40 @@ class AgonyRecordRepositoryTest {
         agonyRecordRepository.deleteAllByUserId(user.getId());
         List<AgonyRecord> result = agonyRecordRepository.findAll();
         assertThat(result).isEmpty();
+    }
+
+    @Test
+    void 서재에_할당된_고민기록_삭제_성공() throws Exception {
+        Book book1 = getBook();
+        Book book2 = Book.builder()
+            .isbn("123")
+            .publishAt(LocalDate.of(2020, 1, 26))
+            .build();
+        ;
+        bookRepository.save(book1);
+        bookRepository.save(book2);
+
+        User user = getUser();
+        userRepository.save(user);
+
+        BookShelf bookShelf1 = getBookShelf(user, book1);
+        BookShelf bookShelf2 = getBookShelf(user, book2);
+        bookShelfRepository.save(bookShelf1);
+        bookShelfRepository.save(bookShelf2);
+
+        Agony agony1 = getAgony(bookShelf1);
+        Agony agony2 = getAgony(bookShelf2);
+        agonyRepository.save(agony1);
+        agonyRepository.save(agony2);
+
+        AgonyRecord agonyRecord1 = getAgonyRecord(agony1);
+        AgonyRecord agonyRecord2 = getAgonyRecord(agony1);
+        AgonyRecord agonyRecord3 = getAgonyRecord(agony2);
+        List<AgonyRecord> agonyRecords = List.of(agonyRecord1, agonyRecord2, agonyRecord3);
+        agonyRecordRepository.saveAll(agonyRecords);
+
+        agonyRecordRepository.deleteByBookShelfIdAndUserId(bookShelf1.getId(), user.getId());
+        List<AgonyRecord> result = agonyRecordRepository.findAll();
+        assertThat(result.size()).isOne();
     }
 }

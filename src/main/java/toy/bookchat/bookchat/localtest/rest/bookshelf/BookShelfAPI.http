@@ -6,7 +6,7 @@ Content-Type: application/json
 {
   "bookRequest": {
     "isbn": "1162240033 9791162240038",
-    "title": "Effective C#(이펙티브2)",
+    "title": "Effective C#(이펙티브)",
     "authors": [
       "빌 와그너"
     ],
@@ -32,7 +32,7 @@ Authorization: {{jwt_token}}
 %}
 
 ### 서재에서 책 삭제
-DELETE localhost:8080/v1/api/bookshelves{{bookShelfId}}
+DELETE localhost:8080/v1/api/bookshelves/{{bookShelfId}}
 Authorization: {{jwt_token}}
 
 ### 서재 페이지|별점|독서상태변경
