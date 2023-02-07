@@ -665,6 +665,22 @@ include::{snippets}/get-user-chatrooms/http-request.adoc[]
 include::{snippets}/get-user-chatrooms/response-fields.adoc[]
 include::{snippets}/get-user-chatrooms/http-response.adoc[]
 
+=== 채팅방 참여인원 조회
+
+`Request Header`
+
+include::{snippets}/get-chatroom-users/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/get-chatroom-users/path-parameters.adoc[]
+include::{snippets}/get-chatroom-users/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/get-chatroom-users/response-fields.adoc[]
+include::{snippets}/get-chatroom-users/http-response.adoc[]
+
 == 채팅
 
 === 채팅방 Connection 수립
