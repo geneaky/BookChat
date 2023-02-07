@@ -68,7 +68,7 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
 
     implementation 'org.sejda.imageio:webp-imageio:0.1.6'
-//    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation 'com.github.vladimir-bukhtoyarov:bucket4j-core:7.6.0'
 
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'com.github.ben-manes.caffeine:caffeine'

@@ -15,6 +15,8 @@ public enum ExceptionResponse {
     USER_ALREADY_EXISTED(ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 가입된 사용자입니다")),
     EXPIRED_PUBLIC_KEY(ResponseEntity.status(HttpStatus.NOT_FOUND).body("다시 요청해주세요")),
     WRONG_KEY_SPEC(ResponseEntity.status(HttpStatus.BAD_REQUEST).body("잘 못된 키 생성 형식")),
+    TOO_MANY_REQUESTS(
+        ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body("현재 요청이 많습니다, 잠시후 다시 시도해주세요.")),
     BAD_REQUEST(ResponseEntity.status(HttpStatus.BAD_REQUEST).body("올바르지 않은 요청 형식입니다"));
 
     private final ResponseEntity<String> value;
