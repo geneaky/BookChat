@@ -5,13 +5,11 @@ import java.util.List;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.ToString;
 import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.user.User;
 
 @Getter
 @EqualsAndHashCode
-@ToString
 public class ChatRoomParticipantsResponse {
 
     private RoomHost roomHost;

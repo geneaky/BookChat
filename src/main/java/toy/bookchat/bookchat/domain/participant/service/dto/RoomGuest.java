@@ -3,11 +3,9 @@ package toy.bookchat.bookchat.domain.participant.service.dto;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.ToString;
 
 @Getter
 @EqualsAndHashCode
-@ToString
 public class RoomGuest {
 
     private final Long id;

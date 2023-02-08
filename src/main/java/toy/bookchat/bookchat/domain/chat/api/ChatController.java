@@ -49,6 +49,7 @@ public class ChatController {
         @RequestParam Optional<Long> postCursorId, Pageable pageable,
         @UserPayload TokenPayload tokenPayload) {
 
-        return chatService.getChatRoomChats(roomId, postCursorId, pageable, tokenPayload);
+        return chatService.getChatRoomChats(roomId, postCursorId, pageable,
+            tokenPayload.getUserId());
     }
 }
