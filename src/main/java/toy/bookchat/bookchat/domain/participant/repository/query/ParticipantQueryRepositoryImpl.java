@@ -28,7 +28,6 @@ public class ParticipantQueryRepositoryImpl implements ParticipantQueryRepositor
             .from(participant)
             .join(participant.user, user).fetchJoin()
             .join(participant.chatRoom, chatRoom).fetchJoin()
-            .join(chatRoom.host, user).fetchJoin() //넣고 빼고 테스트
             .where(participant.chatRoom.id.eq(JPAExpressions.select(subParticipant.chatRoom.id)
                 .from(subParticipant)
                 .where(subParticipant.chatRoom.id.eq(roomId)
