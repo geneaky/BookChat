@@ -65,7 +65,7 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
 
         return toSlice(contents, pageable);
     }
-
+    
     private BooleanExpression afterPostCursorId(Optional<Long> postCursorId) {
         return postCursorId.map(chat.id::lt).orElse(null);
     }

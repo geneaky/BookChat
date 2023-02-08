@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookRequest;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
-import toy.bookchat.bookchat.domain.chatroomhost.ChatRoomHost;
+import toy.bookchat.bookchat.domain.user.User;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -44,7 +44,7 @@ public class CreateChatRoomRequest {
     }
 
     public ChatRoom makeChatRoom(Book book,
-        ChatRoomHost chatRoomHost, String fileUrl) {
+        User host, String fileUrl) {
         return ChatRoom.builder()
             .book(book)
             .roomSid(UUID.randomUUID().toString())
@@ -52,7 +52,7 @@ public class CreateChatRoomRequest {
             .roomSize(this.roomSize)
             .defaultRoomImageType(this.defaultRoomImageType)
             .roomImageUri(fileUrl)
-            .chatRoomHost(chatRoomHost)
+            .host(host)
             .build();
     }
 

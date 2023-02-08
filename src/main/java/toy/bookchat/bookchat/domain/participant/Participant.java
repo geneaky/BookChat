@@ -17,6 +17,7 @@ public class Participant {
     @Id
     @GeneratedValue
     private Long id;
+    private boolean isSubHost;
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
     @ManyToOne(fetch = FetchType.LAZY)
@@ -26,9 +27,26 @@ public class Participant {
     }
 
     @Builder
-    private Participant(Long id, User user, ChatRoom chatRoom) {
+    private Participant(Long id, boolean isSubHost, User user, ChatRoom chatRoom) {
         this.id = id;
+        this.isSubHost = isSubHost;
         this.user = user;
         this.chatRoom = chatRoom;
+    }
+
+    public Long getUserId() {
+        return this.user.getId();
+    }
+
+    public String getUserNickname() {
+        return this.user.getNickname();
+    }
+
+    public String getUserProfileImageUrl() {
+        return this.user.getProfileImageUrl();
+    }
+
+    public Integer getUserDefaultProfileImageType() {
+        return this.user.getDefaultProfileImageType();
     }
 }
