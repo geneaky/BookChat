@@ -35,4 +35,24 @@ public class Chat extends BaseEntity {
         this.user = user;
         this.chatRoom = chatRoom;
     }
+
+    public Long getUserId() {
+        return this.user.getId();
+    }
+
+    public String getUserNickname() {
+        return this.user.getNickname();
+    }
+
+    public String getUserProfileImageUrl() {
+        return this.user.getProfileImageUrl();
+    }
+
+    public Integer getUserDefaultProfileImageType() {
+        return this.user.getDefaultProfileImageType();
+    }
+
+    public String getDispatchTime() {
+        return getCreatedAt().toString();
+    }
 }
