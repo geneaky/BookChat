@@ -14,13 +14,10 @@ import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.book.repository.BookRepository;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
 import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomRepository;
-import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomUsersResponse;
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomsResponseSlice;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.CreateChatRoomRequest;
 import toy.bookchat.bookchat.domain.chatroomhashtag.ChatRoomHashTag;
 import toy.bookchat.bookchat.domain.chatroomhashtag.repository.ChatRoomHashTagRepository;
-import toy.bookchat.bookchat.domain.chatroomhost.ChatRoomHost;
-import toy.bookchat.bookchat.domain.chatroomhost.repository.ChatRoomHostRepository;
 import toy.bookchat.bookchat.domain.hashtag.HashTag;
 import toy.bookchat.bookchat.domain.hashtag.repository.HashTagRepository;
 import toy.bookchat.bookchat.domain.participant.Participant;
@@ -34,7 +31,6 @@ import toy.bookchat.bookchat.exception.user.UserNotFoundException;
 public class ChatRoomService {
 
     private final ChatRoomRepository chatRoomRepository;
-    private final ChatRoomHostRepository chatRoomHostRepository;
     private final ParticipantRepository participantRepository;
     private final HashTagRepository hashTagRepository;
     private final ChatRoomHashTagRepository chatRoomHashTagRepository;
@@ -44,7 +40,6 @@ public class ChatRoomService {
 
     public ChatRoomService(
         ChatRoomRepository chatRoomRepository,
-        ChatRoomHostRepository chatRoomHostRepository,
         ParticipantRepository participantRepository,
         HashTagRepository hashTagRepository,
         ChatRoomHashTagRepository chatRoomHashTagRepository,
@@ -52,7 +47,6 @@ public class ChatRoomService {
         BookRepository bookRepository,
         UserRepository userRepository) {
         this.chatRoomRepository = chatRoomRepository;
-        this.chatRoomHostRepository = chatRoomHostRepository;
         this.participantRepository = participantRepository;
         this.hashTagRepository = hashTagRepository;
         this.chatRoomHashTagRepository = chatRoomHashTagRepository;
@@ -67,27 +61,26 @@ public class ChatRoomService {
         Book book = bookRepository.findByIsbnAndPublishAt(createChatRoomRequest.getIsbn(),
                 createChatRoomRequest.getPublishAt())
             .orElseGet(() -> bookRepository.save(createChatRoomRequest.createBook()));
-        User mainHost = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        ChatRoomHost chatRoomHost = saveChatRoomHost(mainHost);
+        User host = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         chatRoomImage.ifPresentOrElse(
-            saveChatRoomAndHashTagWithImage(createChatRoomRequest, book, chatRoomHost),
-            saveChatRoomAndHashTagWithoutImage(createChatRoomRequest, book, chatRoomHost));
+            saveChatRoomAndHashTagWithImage(createChatRoomRequest, book, host),
+            saveChatRoomAndHashTagWithoutImage(createChatRoomRequest, book, host));
     }
 
     private Runnable saveChatRoomAndHashTagWithoutImage(CreateChatRoomRequest createChatRoomRequest,
-        Book book, ChatRoomHost chatRoomHost) {
+        Book book, User host) {
         return () -> registerHashTagOnChatRoom(createChatRoomRequest,
-            saveChatRoom(createChatRoomRequest, book, chatRoomHost, null));
+            saveChatRoom(createChatRoomRequest, book, host, null));
     }
 
     private Consumer<MultipartFile> saveChatRoomAndHashTagWithImage(
-        CreateChatRoomRequest createChatRoomRequest, Book book, ChatRoomHost chatRoomHost) {
+        CreateChatRoomRequest createChatRoomRequest, Book book, User host) {
         return image -> {
             String prefixedUUIDFileName = storageService.createFileName(
                 image, UUID.randomUUID().toString(),
                 new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
             String prefixedUUIDFileUrl = storageService.getFileUrl(prefixedUUIDFileName);
-            ChatRoom chatRoom = saveChatRoom(createChatRoomRequest, book, chatRoomHost,
+            ChatRoom chatRoom = saveChatRoom(createChatRoomRequest, book, host,
                 prefixedUUIDFileUrl);
             storageService.upload(image, prefixedUUIDFileName);
             registerHashTagOnChatRoom(createChatRoomRequest, chatRoom);
@@ -95,27 +88,19 @@ public class ChatRoomService {
     }
 
     private ChatRoom saveChatRoom(CreateChatRoomRequest createChatRoomRequest, Book book,
-        ChatRoomHost chatRoomHost, String fileUrl) {
-        ChatRoom chatRoom = createChatRoomRequest.makeChatRoom(book, chatRoomHost, fileUrl);
+        User host, String fileUrl) {
+        ChatRoom chatRoom = createChatRoomRequest.makeChatRoom(book, host, fileUrl);
         chatRoomRepository.save(chatRoom);
-        saveParticipantWithRoomHostAndRoom(chatRoomHost, chatRoom);
+        saveParticipantWithRoomHostAndRoom(host, chatRoom);
         return chatRoom;
     }
 
-    private void saveParticipantWithRoomHostAndRoom(ChatRoomHost chatRoomHost, ChatRoom chatRoom) {
+    private void saveParticipantWithRoomHostAndRoom(User host, ChatRoom chatRoom) {
         Participant participant = Participant.builder()
             .chatRoom(chatRoom)
-            .user(chatRoomHost.getMainHost())
+            .user(host)
             .build();
         participantRepository.save(participant);
-    }
-
-    private ChatRoomHost saveChatRoomHost(User mainHost) {
-        ChatRoomHost chatRoomHost = ChatRoomHost.builder()
-            .mainHost(mainHost)
-            .build();
-        chatRoomHostRepository.save(chatRoomHost);
-        return chatRoomHost;
     }
 
     private void registerHashTagOnChatRoom(CreateChatRoomRequest createChatRoomRequest,
@@ -132,10 +117,5 @@ public class ChatRoomService {
         Pageable pageable, Long userId) {
         return ChatRoomsResponseSlice.of(
             chatRoomRepository.findUserChatRoomsWithLastChat(pageable, postCursorId, userId));
-    }
-
-    @Transactional(readOnly = true)
-    public ChatRoomUsersResponse getChatRoomUsers(Long roomId, Long userId) {
-        return chatRoomRepository.findChatRoomUsers(roomId, userId);
     }
 }

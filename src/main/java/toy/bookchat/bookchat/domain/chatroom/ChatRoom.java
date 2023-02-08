@@ -6,12 +6,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import lombok.Builder;
 import lombok.Getter;
 import toy.bookchat.bookchat.domain.BaseEntity;
 import toy.bookchat.bookchat.domain.book.Book;
-import toy.bookchat.bookchat.domain.chatroomhost.ChatRoomHost;
+import toy.bookchat.bookchat.domain.user.User;
 
 @Entity
 @Getter
@@ -27,16 +26,15 @@ public class ChatRoom extends BaseEntity {
     private String roomImageUri;
     @ManyToOne(fetch = FetchType.LAZY)
     private Book book;
-    @OneToOne(fetch = FetchType.LAZY)
-    private ChatRoomHost chatRoomHost;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User host;
 
     protected ChatRoom() {
     }
 
     @Builder
     private ChatRoom(Long id, String roomName, String roomSid, Integer roomSize,
-        Integer defaultRoomImageType, String roomImageUri, Book book,
-        ChatRoomHost chatRoomHost) {
+        Integer defaultRoomImageType, String roomImageUri, Book book, User host) {
         this.id = id;
         this.roomName = roomName;
         this.roomSid = roomSid;
@@ -44,6 +42,6 @@ public class ChatRoom extends BaseEntity {
         this.defaultRoomImageType = defaultRoomImageType;
         this.roomImageUri = roomImageUri;
         this.book = book;
-        this.chatRoomHost = chatRoomHost;
+        this.host = host;
     }
 }

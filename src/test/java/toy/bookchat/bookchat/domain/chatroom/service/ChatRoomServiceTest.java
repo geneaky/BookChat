@@ -31,7 +31,6 @@ import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatR
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomsResponseSlice;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.CreateChatRoomRequest;
 import toy.bookchat.bookchat.domain.chatroomhashtag.repository.ChatRoomHashTagRepository;
-import toy.bookchat.bookchat.domain.chatroomhost.repository.ChatRoomHostRepository;
 import toy.bookchat.bookchat.domain.hashtag.repository.HashTagRepository;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
 import toy.bookchat.bookchat.domain.user.User;
@@ -47,8 +46,6 @@ class ChatRoomServiceTest {
     @Mock
     ParticipantRepository participantRepository;
     @Mock
-    ChatRoomHostRepository chatRoomHostRepository;
-    @Mock
     HashTagRepository hashTagRepository;
     @Mock
     ChatRoomHashTagRepository chatRoomHashTagRepository;
@@ -56,7 +53,6 @@ class ChatRoomServiceTest {
     BookRepository bookRepository;
     @Mock
     UserRepository userRepository;
-
     @InjectMocks
     ChatRoomService chatRoomService;
 
@@ -90,7 +86,6 @@ class ChatRoomServiceTest {
         chatRoomService.createChatRoom(createChatRoomRequest, Optional.empty(), 1L);
 
         verify(chatRoomRepository).save(any());
-        verify(chatRoomHostRepository).save(any());
         verify(hashTagRepository, times(2)).save(any());
         verify(chatRoomHashTagRepository, times(2)).save(any());
     }
@@ -106,7 +101,6 @@ class ChatRoomServiceTest {
 
         verify(bookRepository).save(any());
         verify(chatRoomRepository).save(any());
-        verify(chatRoomHostRepository).save(any());
         verify(hashTagRepository, times(2)).save(any());
         verify(chatRoomHashTagRepository, times(2)).save(any());
     }
@@ -149,12 +143,5 @@ class ChatRoomServiceTest {
 
         Assertions.assertThat(chatRoomsResponseSlice).usingRecursiveComparison()
             .isEqualTo(ChatRoomsResponseSlice.of(slice));
-    }
-
-    @Test
-    void 채팅방_참여인원_조회_성공() throws Exception {
-        chatRoomService.getChatRoomUsers(1L, 1L);
-
-        verify(chatRoomRepository).findChatRoomUsers(any(), any());
     }
 }

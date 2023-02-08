@@ -64,9 +64,9 @@ class ChatRoomRepositoryTest {
             .build();
         bookRepository.save(book);
 
-        ChatRoom chatRoom1 = ChatRoom.builder().book(book).build();
-        ChatRoom chatRoom2 = ChatRoom.builder().book(book).build();
-        ChatRoom chatRoom3 = ChatRoom.builder().book(book).build();
+        ChatRoom chatRoom1 = ChatRoom.builder().book(book).host(user1).build();
+        ChatRoom chatRoom2 = ChatRoom.builder().book(book).host(user1).build();
+        ChatRoom chatRoom3 = ChatRoom.builder().book(book).host(user2).build();
         chatRoomRepository.save(chatRoom1);
         chatRoomRepository.save(chatRoom2);
         chatRoomRepository.save(chatRoom3);
@@ -128,9 +128,9 @@ class ChatRoomRepositoryTest {
             .build();
         bookRepository.save(book);
 
-        ChatRoom chatRoom1 = ChatRoom.builder().book(book).build();
-        ChatRoom chatRoom2 = ChatRoom.builder().book(book).build();
-        ChatRoom chatRoom3 = ChatRoom.builder().book(book).build();
+        ChatRoom chatRoom1 = ChatRoom.builder().book(book).host(user1).build();
+        ChatRoom chatRoom2 = ChatRoom.builder().book(book).host(user1).build();
+        ChatRoom chatRoom3 = ChatRoom.builder().book(book).host(user2).build();
         chatRoomRepository.save(chatRoom1);
         chatRoomRepository.save(chatRoom2);
         chatRoomRepository.save(chatRoom3);
