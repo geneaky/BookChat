@@ -26,7 +26,7 @@ public class ChatRoomChatsResponse {
                 .senderId(chat.getUserId())
                 .senderNickname(chat.getUserNickname())
                 .senderProfileImageUrl(chat.getUserProfileImageUrl())
-                .snederDefaultProfileImageType(chat.getUserDefaultProfileImageType())
+                .senderDefaultProfileImageType(chat.getUserDefaultProfileImageType())
                 .message(chat.getMessage())
                 .dispatchTime(chat.getDispatchTime())
                 .build());

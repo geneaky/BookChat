@@ -685,6 +685,23 @@ include::{snippets}/get-chatroom-participants/http-response.adoc[]
 
 == 채팅
 
+=== 채팅내역 조회
+
+`Request Header`
+
+include::{snippets}/get-chatroom-chats/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/get-chatroom-chats/path-parameters.adoc[]
+include::{snippets}/get-chatroom-chats/request-parameters.adoc[]
+include::{snippets}/get-chatroom-chats/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/get-chatroom-chats/response-fields.adoc[]
+include::{snippets}/get-chatroom-chats/http-response.adoc[]
+
 === 채팅방 Connection 수립
 
 ```stomp
