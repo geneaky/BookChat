@@ -2,12 +2,14 @@ package toy.bookchat.bookchat.domain.chat.service.dto.response;
 
 import java.util.ArrayList;
 import java.util.List;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.springframework.data.domain.Slice;
 import toy.bookchat.bookchat.domain.chat.Chat;
 import toy.bookchat.bookchat.domain.common.CursorMeta;
 
 @Getter
+@EqualsAndHashCode(exclude = "cursorMeta")
 public class ChatRoomChatsResponse {
 
     private List<ChatResponse> chatResponseList;

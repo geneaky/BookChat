@@ -14,7 +14,6 @@ import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.exception.participant.AlreadyParticipatedException;
-import toy.bookchat.bookchat.security.user.TokenPayload;
 
 @Service
 public class ChatService {
@@ -32,6 +31,19 @@ public class ChatService {
         this.participantRepository = participantRepository;
         this.messagingTemplate = messagingTemplate;
         this.chatCacheService = chatCacheService;
+    }
+
+    private static String getDestination(String roomSid) {
+        StringBuilder stringBuilder = new StringBuilder(DESTINATION_PREFIX);
+        stringBuilder.append(roomSid);
+        return stringBuilder.toString();
+    }
+
+    private static String getSendOffMessage(User user) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(user.getNickname());
+        stringBuilder.append("님이 퇴장하셨습니다.");
+        return stringBuilder.toString();
     }
 
     @Transactional
@@ -66,12 +78,6 @@ public class ChatService {
             chatDto);
     }
 
-    private static String getDestination(String roomSid) {
-        StringBuilder stringBuilder = new StringBuilder(DESTINATION_PREFIX);
-        stringBuilder.append(roomSid);
-        return stringBuilder.toString();
-    }
-
     private String getWelcomeMessage(User user) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(user.getNickname());
@@ -102,13 +108,6 @@ public class ChatService {
             chatDto);
     }
 
-    private static String getSendOffMessage(User user) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(user.getNickname());
-        stringBuilder.append("님이 퇴장하셨습니다.");
-        return stringBuilder.toString();
-    }
-
     @Transactional
     public void sendMessage(Long userId, String roomSid, ChatDto chatDto) {
         User user = chatCacheService.findUserByUserId(userId);
@@ -126,8 +125,10 @@ public class ChatService {
             chatDto);
     }
 
+    @Transactional(readOnly = true)
     public ChatRoomChatsResponse getChatRoomChats(Long roomId, Optional<Long> postCursorId,
-        Pageable pageable, TokenPayload tokenPayload) {
-        return null;
+        Pageable pageable, Long userId) {
+        return new ChatRoomChatsResponse(
+            chatRepository.getChatRoomChats(roomId, postCursorId, pageable, userId));
     }
 }

@@ -1,9 +1,11 @@
 package toy.bookchat.bookchat.domain.chat.service.dto.response;
 
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 @Getter
+@EqualsAndHashCode
 public class ChatResponse {
 
     private Long chatId;
