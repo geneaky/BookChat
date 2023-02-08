@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import toy.bookchat.bookchat.domain.participant.service.ParticipantService;
-import toy.bookchat.bookchat.domain.participant.service.dto.ChatRoomUsersResponse;
+import toy.bookchat.bookchat.domain.participant.service.dto.ChatRoomParticipantsResponse;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPayload;
 
@@ -20,7 +20,7 @@ public class ParticipantController {
     }
 
     @GetMapping("/chatrooms/{roomId}/participants")
-    public ChatRoomUsersResponse getChatRoomUsers(@PathVariable Long roomId,
+    public ChatRoomParticipantsResponse getChatRoomUsers(@PathVariable Long roomId,
         @UserPayload TokenPayload tokenPayload) {
         return participantService.getChatRoomUsers(roomId, tokenPayload.getUserId());
     }

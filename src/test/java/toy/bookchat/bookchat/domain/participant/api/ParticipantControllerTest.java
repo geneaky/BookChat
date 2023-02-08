@@ -24,7 +24,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
 import toy.bookchat.bookchat.domain.participant.service.ParticipantService;
-import toy.bookchat.bookchat.domain.participant.service.dto.ChatRoomUsersResponse;
+import toy.bookchat.bookchat.domain.participant.service.dto.ChatRoomParticipantsResponse;
 import toy.bookchat.bookchat.domain.participant.service.dto.RoomGuest;
 import toy.bookchat.bookchat.domain.participant.service.dto.RoomHost;
 import toy.bookchat.bookchat.domain.participant.service.dto.RoomSubHost;
@@ -47,42 +47,43 @@ class ParticipantControllerTest extends ControllerTestExtension {
             .id(1L)
             .nickname("마스터")
             .profileImageUrl("test@s3.com")
-            .defaultProfileImageType(1L)
+            .defaultProfileImageType(1)
             .build();
 
         RoomSubHost roomSubHost1 = RoomSubHost.builder()
             .id(2L)
             .nickname("서브 마스터1")
-            .defaultProfileImageType(2L)
+            .defaultProfileImageType(2)
             .build();
 
         RoomSubHost roomSubHost2 = RoomSubHost.builder()
             .id(3L)
             .nickname("서브 마스터2")
             .profileImageUrl("subHost@s3.com")
-            .defaultProfileImageType(3L)
+            .defaultProfileImageType(3)
             .build();
 
         RoomGuest roomGuest1 = RoomGuest.builder()
             .id(4L)
             .nickname("게스트1")
-            .defaultProfileImageType(4L)
+            .defaultProfileImageType(4)
             .build();
 
         RoomGuest roomGuest2 = RoomGuest.builder()
             .id(5L)
             .nickname("게스트2")
             .profileImageUrl("guest@s3.com")
-            .defaultProfileImageType(1L)
+            .defaultProfileImageType(1)
             .build();
 
-        ChatRoomUsersResponse chatRoomUsersResponse = ChatRoomUsersResponse.builder()
+        ChatRoomParticipantsResponse chatRoomParticipantsResponse = ChatRoomParticipantsResponse.builder()
             .roomHost(roomHost)
             .roomSubHostList(List.of(roomSubHost1, roomSubHost2))
             .roomGuestList(List.of(roomGuest1, roomGuest2))
             .build();
 
-        when(participantService.getChatRoomUsers(any(), any())).thenReturn(chatRoomUsersResponse);
+        when(participantService.getChatRoomUsers(any(), any())).thenReturn(
+            chatRoomParticipantsResponse);
         mockMvc.perform(get("/v1/api/chatrooms/{roomId}/participants", 1)
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal())))
