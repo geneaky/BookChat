@@ -61,7 +61,6 @@ class RateLimiterTest {
         assertThat(result).isEqualTo(4);
     }
 
-    @Test
     @RepeatedTest(100)
     @Disabled("bucket4j 학습 테스트")
     void 멀티스레드_요청제한_테스트() throws Exception {
