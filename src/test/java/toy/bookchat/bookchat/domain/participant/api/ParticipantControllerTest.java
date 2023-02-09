@@ -116,4 +116,9 @@ class ParticipantControllerTest extends ControllerTestExtension {
                         .description("참여자 기본 프로필 이미지 타입")
                 )));
     }
+
+    @Test
+    void 방장의_참여자_권한_주고뺏기_성공() throws Exception {
+        
+    }
 }

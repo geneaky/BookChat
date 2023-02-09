@@ -50,7 +50,8 @@ public class ChatService {
     public void enterChatRoom(Long userId, String roomSid) {
         User user = chatCacheService.findUserByUserId(userId);
         ChatRoom chatRoom = chatCacheService.findChatRoomByRoomSid(roomSid);
-        /* TODO: 2023-02-08 채팅방 인원수 초과시 입장 불가 처리 - 동시성 제어
+        /* TODO: 2023-02-08 채팅방 인원수 초과시 입장 불가 처리 - 동시성 제어 named lock
+            (participant controller로 분리할까)
          */
         participantRepository.findByUserAndChatRoom(user, chatRoom).ifPresent(p -> {
             throw new AlreadyParticipatedException();
@@ -89,6 +90,8 @@ public class ChatService {
     public void leaveChatRoom(Long userId, String roomSid) {
         User user = chatCacheService.findUserByUserId(userId);
         ChatRoom chatRoom = chatCacheService.findChatRoomByRoomSid(roomSid);
+        /* TODO: 2023-02-09 나가는 사람이 방장일 경우 처리 (participant controller로 분리할까)
+         */
         Participant participant = chatCacheService.findParticipantByUserAndChatRoom(user, chatRoom);
 
         Chat chat = Chat.builder()
