@@ -5,8 +5,8 @@ Content-Type: application/json
 
 {
   "bookRequest": {
-    "isbn": "1162240033 9791162240038",
-    "title": "Effective C#(이펙티브)",
+    "isbn": "1162240035 9791162240038",
+    "title": "Effective C#(이펙티브5)",
     "authors": [
       "빌 와그너"
     ],
@@ -19,16 +19,16 @@ Content-Type: application/json
 }
 
 ### 서재에서 책 조회
-GET localhost:8080/v1/api/bookshelves?readingStatus=READING&size=1&page=0&sort=id,ASC
+GET localhost:8080/v1/api/bookshelves?readingStatus=READING&size=3&page=0&sort=updatedAt,DESC
 Authorization: {{jwt_token}}
 
 > {%
   client.test("Request executed successfully", function () {
     client.assert(response.status === 200, "Response status is not 200");
   });
-  client.global.set("bookShelfId", response.body.contents[0].bookShelfId);
-  client.global.set("isbn", response.body.contents[0].isbn);
-  client.global.set("publishAt", response.body.contents[0].publishAt);
+  client.global.set("bookShelfId", response.body.contents[2].bookShelfId);
+  client.global.set("isbn", response.body.contents[2].isbn);
+  client.global.set("publishAt", response.body.contents[2].publishAt);
 %}
 
 ### 서재에서 책 삭제
@@ -43,7 +43,7 @@ Content-Type: application/json
 {
   "pages": 100,
   "star": "FIVE",
-  "readingStatus": "COMPLETE"
+  "readingStatus": "READING"
 }
 
 ### 서재에 등록된 책이면 조회
