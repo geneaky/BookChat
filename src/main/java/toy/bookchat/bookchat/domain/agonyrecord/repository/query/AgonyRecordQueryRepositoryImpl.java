@@ -15,7 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
 import toy.bookchat.bookchat.domain.agonyrecord.AgonyRecord;
-import toy.bookchat.bookchat.domain.agonyrecord.QAgonyRecord;
 
 @Repository
 public class AgonyRecordQueryRepositoryImpl implements AgonyRecordQueryRepository {
@@ -45,34 +44,38 @@ public class AgonyRecordQueryRepositoryImpl implements AgonyRecordQueryRepositor
 
     @Override
     public void deleteAgonyRecord(Long bookShelfId, Long agonyId, Long recordId, Long userId) {
-        QAgonyRecord subAgonyRecord = new QAgonyRecord("subAgonyRecord");
         queryFactory.delete(agonyRecord)
             .where(agonyRecord.id.eq(
-                JPAExpressions.select(subAgonyRecord.id)
-                    .from(subAgonyRecord)
-                    .join(subAgonyRecord.agony, agony).on(agony.id.eq(agonyId))
-                    .join(agony.bookShelf, bookShelf).on(bookShelf.id.eq(bookShelfId)
-                        .and(bookShelf.user.id.eq(userId)))
-                    .where(subAgonyRecord.id.eq(recordId))
-            )).execute();
+                fetchCorrespondedAgonyRecordId(bookShelfId, agonyId, recordId, userId))
+            ).execute();
     }
 
     @Override
     public void reviseAgonyRecord(Long bookShelfId, Long agonyId, Long recordId, Long userId,
-        String recordTitle,
-        String recordContent) {
-        QAgonyRecord subAgonyRecord = new QAgonyRecord("subAgonyRecord");
+        String recordTitle, String recordContent) {
         queryFactory.update(agonyRecord)
             .set(agonyRecord.title, recordTitle)
             .set(agonyRecord.content, recordContent)
             .where(agonyRecord.id.eq(
-                JPAExpressions.select(subAgonyRecord.id)
-                    .from(subAgonyRecord)
-                    .join(subAgonyRecord.agony, agony).on(agony.id.eq(agonyId))
-                    .join(agony.bookShelf, bookShelf).on(bookShelf.id.eq(bookShelfId)
-                        .and(bookShelf.user.id.eq(userId)))
-                    .where(subAgonyRecord.id.eq(recordId))
-            )).execute();
+                fetchCorrespondedAgonyRecordId(bookShelfId, agonyId, recordId, userId)))
+            .execute();
+    }
+
+    private Long fetchCorrespondedAgonyRecordId(Long bookShelfId, Long agonyId, Long recordId,
+        Long userId) {
+        /* TODO: 2023-02-13 mysql error:1093 insert, update, delete시 같은 테이블에서
+            서브쿼리를 가져오는 경우 발생하는 문제로 where절 조건을 subquery로 한 번 더 래핑해서
+            from절 서브쿼리를 통해 해결할 수 있지만 querydsl from절 서브쿼리가 불가능하기 때문에
+             쿼리를 분리
+             추후 이부분 성능 문제시 mybatis나 jdbc template으로 변경
+         */
+        return queryFactory.select(agonyRecord.id)
+            .from(agonyRecord)
+            .join(agonyRecord.agony, agony).on(agony.id.eq(agonyId))
+            .join(agony.bookShelf, bookShelf).on(bookShelf.id.eq(bookShelfId)
+                .and(bookShelf.user.id.eq(userId)))
+            .where(agonyRecord.id.eq(recordId))
+            .fetchOne();
     }
 
     @Override
