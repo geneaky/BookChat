@@ -25,8 +25,8 @@ Authorization: {{jwt_token}}
 Content-Type: application/json
 
 {
-  "agonyTitle": "새로운 고민",
-  "agonyColor": "보라색"
+  "title": "새로운 고민",
+  "hexColorCode": "보라색"
 }
 
 ### 고민 폴더 삭제
