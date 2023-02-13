@@ -2,6 +2,7 @@ package toy.bookchat.bookchat.domain.participant.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import toy.bookchat.bookchat.domain.participant.ParticipantStatus;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
 import toy.bookchat.bookchat.domain.participant.service.dto.ChatRoomParticipantsResponse;
 
@@ -18,5 +19,10 @@ public class ParticipantService {
     public ChatRoomParticipantsResponse getChatRoomUsers(Long roomId, Long userId) {
         return ChatRoomParticipantsResponse.from(
             participantRepository.findChatRoomUsers(roomId, userId));
+    }
+
+    public void changeParticipantRights(Long roomId, ParticipantStatus participantStatus,
+        Long userId) {
+        
     }
 }

@@ -1,5 +1,7 @@
 package toy.bookchat.bookchat.domain.chat.service;
 
+import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.GUEST;
+
 import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -64,6 +66,7 @@ public class ChatService {
             .build();
 
         Participant participant = Participant.builder()
+            .participantStatus(GUEST)
             .chatRoom(chatRoom)
             .user(user)
             .build();

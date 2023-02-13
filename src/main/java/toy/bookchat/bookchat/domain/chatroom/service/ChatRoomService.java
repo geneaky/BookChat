@@ -1,5 +1,7 @@
 package toy.bookchat.bookchat.domain.chatroom.service;
 
+import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.HOST;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Optional;
@@ -97,6 +99,7 @@ public class ChatRoomService {
 
     private void saveParticipantWithRoomHostAndRoom(User host, ChatRoom chatRoom) {
         Participant participant = Participant.builder()
+            .participantStatus(HOST)
             .chatRoom(chatRoom)
             .user(host)
             .build();

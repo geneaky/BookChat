@@ -4,6 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.GUEST;
+import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.HOST;
+import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.SUBHOST;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -50,17 +53,18 @@ class ParticipantServiceTest {
 
         Participant participant1 = Participant.builder()
             .user(aUser)
+            .participantStatus(HOST)
             .chatRoom(chatRoom)
             .build();
         Participant participant2 = Participant.builder()
             .user(bUser)
+            .participantStatus(SUBHOST)
             .chatRoom(chatRoom)
-            .isSubHost(true)
             .build();
         Participant participant3 = Participant.builder()
             .user(cUser)
+            .participantStatus(GUEST)
             .chatRoom(chatRoom)
-            .isSubHost(false)
             .build();
 
         List<Participant> participantList = List.of(participant1, participant2, participant3);

@@ -1,6 +1,10 @@
 package toy.bookchat.bookchat.domain.participant;
 
+import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.SUBHOST;
+
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -17,7 +21,8 @@ public class Participant {
     @Id
     @GeneratedValue
     private Long id;
-    private boolean isSubHost;
+    @Enumerated(EnumType.STRING)
+    private ParticipantStatus participantStatus;
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
     @ManyToOne(fetch = FetchType.LAZY)
@@ -27,9 +32,10 @@ public class Participant {
     }
 
     @Builder
-    private Participant(Long id, boolean isSubHost, User user, ChatRoom chatRoom) {
+    private Participant(Long id, ParticipantStatus participantStatus, User user,
+        ChatRoom chatRoom) {
         this.id = id;
-        this.isSubHost = isSubHost;
+        this.participantStatus = participantStatus;
         this.user = user;
         this.chatRoom = chatRoom;
     }
@@ -48,5 +54,9 @@ public class Participant {
 
     public Integer getUserDefaultProfileImageType() {
         return this.user.getDefaultProfileImageType();
+    }
+
+    public boolean isSubHost() {
+        return this.participantStatus == SUBHOST;
     }
 }

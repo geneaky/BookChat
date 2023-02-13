@@ -683,6 +683,24 @@ include::{snippets}/get-chatroom-participants/http-request.adoc[]
 include::{snippets}/get-chatroom-participants/response-fields.adoc[]
 include::{snippets}/get-chatroom-participants/http-response.adoc[]
 
+---
+
+=== 방장의 참여자 권한 관리
+
+`Request Header`
+
+include::{snippets}/patch-participant-right/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/patch-participant-right/path-parameters.adoc[]
+include::{snippets}/patch-participant-right/request-parameters.adoc[]
+include::{snippets}/patch-participant-right/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/patch-participant-right/http-response.adoc[]
+
 == 채팅
 
 === 채팅내역 조회
