@@ -1,5 +1,7 @@
 package toy.bookchat.bookchat.domain.participant;
 
+import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.GUEST;
+import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.HOST;
 import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.SUBHOST;
 
 import javax.persistence.Entity;
@@ -58,5 +60,17 @@ public class Participant {
 
     public boolean isSubHost() {
         return this.participantStatus == SUBHOST;
+    }
+
+    public void toGuest() {
+        this.participantStatus = GUEST;
+    }
+
+    public void toHost() {
+        this.participantStatus = HOST;
+    }
+
+    public void toSubHost() {
+        this.participantStatus = SUBHOST;
     }
 }

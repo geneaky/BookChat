@@ -44,4 +44,8 @@ public class ChatRoom extends BaseEntity {
         this.book = book;
         this.host = host;
     }
+
+    public void changeHost(User user) {
+        this.host = user;
+    }
 }

@@ -141,6 +141,6 @@ class ParticipantControllerTest extends ControllerTestExtension {
                 )
             ));
 
-        verify(participantService).changeParticipantRights(any(), any(), any());
+        verify(participantService).changeParticipantRights(any(), any(), any(), any());
     }
 }

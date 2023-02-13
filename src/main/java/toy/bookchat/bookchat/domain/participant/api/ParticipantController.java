@@ -28,9 +28,9 @@ public class ParticipantController {
     }
 
     @PatchMapping("/chatrooms/{roomId}/participants/{userId}")
-    public void changeParticipantRights(@PathVariable Long roomId,
+    public void changeParticipantRights(@PathVariable Long roomId, @PathVariable Long userId,
         ParticipantStatus participantStatus, @UserPayload TokenPayload tokenPayload) {
-        participantService.changeParticipantRights(roomId, participantStatus,
+        participantService.changeParticipantRights(roomId, userId, participantStatus,
             tokenPayload.getUserId());
     }
 }

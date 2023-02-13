@@ -23,6 +23,8 @@ import toy.bookchat.bookchat.exception.agony.AgonyNotFoundException;
 import toy.bookchat.bookchat.exception.book.BookNotFoundException;
 import toy.bookchat.bookchat.exception.bookshelf.BookReportNotFoundException;
 import toy.bookchat.bookchat.exception.common.RateOverLimitException;
+import toy.bookchat.bookchat.exception.participant.NotHostException;
+import toy.bookchat.bookchat.exception.participant.ParticipantNotFoundException;
 import toy.bookchat.bookchat.exception.security.DenidedTokenException;
 import toy.bookchat.bookchat.exception.security.ExpiredPublicKeyCachedException;
 import toy.bookchat.bookchat.exception.security.ExpiredTokenException;
@@ -127,6 +129,19 @@ public class GlobalExceptionHandler {
         RateOverLimitException exception) {
         log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
         return TOO_MANY_REQUESTS.getValue();
+    }
+
+    @ExceptionHandler(NotHostException.class)
+    public final ResponseEntity<String> handleNotHostException(NotHostException exception) {
+        log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
+        return BAD_REQUEST.getValue();
+    }
+
+    @ExceptionHandler(ParticipantNotFoundException.class)
+    public final ResponseEntity<String> handleParticipantNotFoundException(
+        ParticipantNotFoundException exception) {
+        log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
+        return BAD_REQUEST.getValue();
     }
 
     @MessageExceptionHandler(Exception.class)
