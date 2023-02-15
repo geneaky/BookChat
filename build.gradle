@@ -30,6 +30,7 @@ configurations {
 
 repositories {
     mavenCentral()
+    google()
 }
 
 ext {
@@ -66,6 +67,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.security:spring-security-messaging'
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
+    implementation 'com.google.api-client:google-api-client:1.33.0'
 
     implementation 'org.sejda.imageio:webp-imageio:0.1.6'
     implementation 'com.github.vladimir-bukhtoyarov:bucket4j-core:7.6.0'

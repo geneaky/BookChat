@@ -77,7 +77,7 @@ public class UserController {
     public void userSignUp(@Valid @RequestPart UserSignUpRequest userSignUpRequest,
         @RequestPart Optional<MultipartFile> userProfileImage,
         @RequestHeader(OIDC) @NotBlank @Pattern(regexp = "^(Bearer)\\s.+") String bearerToken) {
-        String oauth2MemberNumber = openIdTokenManager.getOAuth2MemberNumberFromToken(bearerToken,
+        String oauth2MemberNumber = openIdTokenManager.getOAuth2MemberNumberFromIdToken(bearerToken,
             userSignUpRequest.getOauth2Provider());
         String userEmail = openIdTokenManager.getUserEmailFromToken(bearerToken,
             userSignUpRequest.getOauth2Provider());
@@ -90,7 +90,7 @@ public class UserController {
     public Token userSignIn(
         @RequestHeader(OIDC) @NotBlank @Pattern(regexp = "^(Bearer)\\s.+") String bearerToken,
         @Valid @RequestBody UserSignInRequest userSignInRequest) {
-        String userName = openIdTokenManager.getOAuth2MemberNumberFromToken(bearerToken,
+        String userName = openIdTokenManager.getOAuth2MemberNumberFromIdToken(bearerToken,
             userSignInRequest.getOauth2Provider());
         User user = userService.findUserByUsername(userName);
 

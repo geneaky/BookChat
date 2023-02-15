@@ -11,7 +11,7 @@ import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 public class LocalTestOpenIdTokenManager implements OpenIdTokenManager {
 
     @Override
-    public String getOAuth2MemberNumberFromToken(String token, OAuth2Provider oAuth2Provider) {
+    public String getOAuth2MemberNumberFromIdToken(String token, OAuth2Provider oAuth2Provider) {
         return "google1234";
     }
 

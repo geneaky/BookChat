@@ -236,7 +236,7 @@ class UserControllerTest extends ControllerTestExtension {
 
         when(getOpenIdTokenConfig().getPublicKey(any(), any())).thenReturn(publicKey);
         doThrow(ExpiredTokenException.class).when(getOpenIdTokenManager())
-            .getOAuth2MemberNumberFromToken(any(), any());
+            .getOAuth2MemberNumberFromIdToken(any(), any());
 
         mockMvc.perform(multipart("/v1/api/users/signup")
                 .file(multipartFile)
@@ -254,7 +254,7 @@ class UserControllerTest extends ControllerTestExtension {
         PublicKey publicKey = getPublicKey();
 
         when(getOpenIdTokenConfig().getPublicKey(any(), any())).thenReturn(publicKey);
-        when(getOpenIdTokenManager().getOAuth2MemberNumberFromToken(any(), any())).thenReturn(
+        when(getOpenIdTokenManager().getOAuth2MemberNumberFromIdToken(any(), any())).thenReturn(
             "testkakao");
         when(getOpenIdTokenManager().getUserEmailFromToken(any(), any())).thenReturn(
             "test@gmail.com");

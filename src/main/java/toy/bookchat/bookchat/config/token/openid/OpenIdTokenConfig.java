@@ -18,10 +18,11 @@ import toy.bookchat.bookchat.security.token.openid.keys.KakaoPublicKeys;
 public class OpenIdTokenConfig {
 
     public static final String RSA = "RSA";
+    public static final String KAKAO_APP_KEY = "bde877e4a4632685835cd00431e5dc2d";
     private final OAuth2Properties oAuth2Properties;
     private final RestTemplate restTemplate;
     private final KeyFactory keyFactory;
-
+    
     public OpenIdTokenConfig(RestTemplateBuilder restTemplateBuilder,
         OAuth2Properties oAuth2Properties) {
         this.restTemplate = restTemplateBuilder.build();

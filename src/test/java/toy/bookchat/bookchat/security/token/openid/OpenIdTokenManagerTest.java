@@ -85,7 +85,7 @@ class OpenIdTokenManagerTest {
         when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
 
         assertThat(
-            openIdTokenManager.getOAuth2MemberNumberFromToken(token,
+            openIdTokenManager.getOAuth2MemberNumberFromIdToken(token,
                 OAuth2Provider.KAKAO)).isEqualTo(
             "1234kakao");
     }
