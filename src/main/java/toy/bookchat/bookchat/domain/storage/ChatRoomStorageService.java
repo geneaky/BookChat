@@ -47,10 +47,7 @@ public class ChatRoomStorageService implements StorageService {
 
     @Override
     public String getFileUrl(String fileName) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(storageProperties.getImageBucketUrl());
-        stringBuilder.append(fileName);
-        return stringBuilder.toString();
+        return storageProperties.getImageBucketUrl() + fileName;
     }
 
     /**

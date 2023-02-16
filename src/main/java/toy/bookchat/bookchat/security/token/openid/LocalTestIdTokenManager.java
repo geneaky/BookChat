@@ -8,7 +8,7 @@ import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 @Primary
 @Profile("local")
 @Component
-public class LocalTestOpenIdTokenManager implements OpenIdTokenManager {
+public class LocalTestIdTokenManager implements IdTokenManager {
 
     @Override
     public String getOAuth2MemberNumberFromIdToken(String token, OAuth2Provider oAuth2Provider) {

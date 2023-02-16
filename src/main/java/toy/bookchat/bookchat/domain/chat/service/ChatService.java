@@ -36,16 +36,11 @@ public class ChatService {
     }
 
     private static String getDestination(String roomSid) {
-        StringBuilder stringBuilder = new StringBuilder(DESTINATION_PREFIX);
-        stringBuilder.append(roomSid);
-        return stringBuilder.toString();
+        return DESTINATION_PREFIX + roomSid;
     }
 
     private static String getSendOffMessage(User user) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(user.getNickname());
-        stringBuilder.append("님이 퇴장하셨습니다.");
-        return stringBuilder.toString();
+        return user.getNickname() + "님이 퇴장하셨습니다.";
     }
 
     @Transactional
@@ -81,10 +76,7 @@ public class ChatService {
     }
 
     private String getWelcomeMessage(User user) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(user.getNickname());
-        stringBuilder.append("님이 입장하셨습니다.");
-        return stringBuilder.toString();
+        return user.getNickname() + "님이 입장하셨습니다.";
     }
 
     @Transactional
