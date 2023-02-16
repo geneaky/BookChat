@@ -76,4 +76,7 @@ public class ParticipantService {
             throw new NotHostException();
         }
     }
+
+    public void deleteParticipant(Long roomId, Long userId, Long adminId) {
+    }
 }
