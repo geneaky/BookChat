@@ -13,6 +13,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import toy.bookchat.bookchat.exception.security.DenidedTokenException;
 import toy.bookchat.bookchat.exception.security.ExpiredTokenException;
 import toy.bookchat.bookchat.exception.security.IllegalStandardTokenException;
 import toy.bookchat.bookchat.exception.security.NotSupportedOAuth2ProviderException;
@@ -72,6 +73,8 @@ public class KakaoPublicKeyFetcher {
         } catch (ExpiredJwtException exception) {
             log.info("Token Is Expired :: {}", token);
             throw new ExpiredTokenException(exception.getMessage());
+        } catch (Exception exception) {
+            throw new DenidedTokenException();
         }
     }
 
