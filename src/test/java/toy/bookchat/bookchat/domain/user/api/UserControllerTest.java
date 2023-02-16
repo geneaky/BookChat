@@ -234,7 +234,7 @@ class UserControllerTest extends ControllerTestExtension {
             .setClaims(claims)
             .signWith(RS256, privateKey).compact();
 
-        when(getOpenIdTokenConfig().getPublicKey(any(), any(), any())).thenReturn(publicKey);
+        when(getOpenIdTokenConfig().getPublicKey(any(), any())).thenReturn(publicKey);
         doThrow(ExpiredTokenException.class).when(getOpenIdTokenManager())
             .getOAuth2MemberNumberFromIdToken(any(), any());
 
@@ -253,7 +253,7 @@ class UserControllerTest extends ControllerTestExtension {
         PrivateKey privateKey = getPrivateKey();
         PublicKey publicKey = getPublicKey();
 
-        when(getOpenIdTokenConfig().getPublicKey(any(), any(), any())).thenReturn(publicKey);
+        when(getOpenIdTokenConfig().getPublicKey(any(), any())).thenReturn(publicKey);
         when(getOpenIdTokenManager().getOAuth2MemberNumberFromIdToken(any(), any())).thenReturn(
             "testkakao");
         when(getOpenIdTokenManager().getUserEmailFromToken(any(), any())).thenReturn(
@@ -352,7 +352,7 @@ class UserControllerTest extends ControllerTestExtension {
         PrivateKey privateKey = getPrivateKey();
         PublicKey publicKey = getPublicKey();
 
-        when(getOpenIdTokenConfig().getPublicKey(any(), any(), any())).thenReturn(publicKey);
+        when(getOpenIdTokenConfig().getPublicKey(any(), any())).thenReturn(publicKey);
 
         String testToken = Jwts.builder()
             .setHeaderParam("kid", "abcedf")
@@ -415,7 +415,7 @@ class UserControllerTest extends ControllerTestExtension {
         PrivateKey privateKey = getPrivateKey();
         PublicKey publicKey = getPublicKey();
 
-        when(getOpenIdTokenConfig().getPublicKey(any(), any(), any())).thenReturn(publicKey);
+        when(getOpenIdTokenConfig().getPublicKey(any(), any())).thenReturn(publicKey);
 
         String testToken = Jwts.builder()
             .setHeaderParam("kid", "abcedf")
@@ -434,7 +434,7 @@ class UserControllerTest extends ControllerTestExtension {
         PrivateKey privateKey = getPrivateKey();
         PublicKey publicKey = getPublicKey();
 
-        when(getOpenIdTokenConfig().getPublicKey(any(), any(), any())).thenReturn(publicKey);
+        when(getOpenIdTokenConfig().getPublicKey(any(), any())).thenReturn(publicKey);
 
         Claims claims = Jwts.claims().setIssuer("https://kauth.kakao.com")
             .setSubject("test").setExpiration(new Date(0));

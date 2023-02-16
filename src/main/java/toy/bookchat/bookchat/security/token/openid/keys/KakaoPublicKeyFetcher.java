@@ -8,16 +8,12 @@ import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 import toy.bookchat.bookchat.exception.security.DenidedTokenException;
 import toy.bookchat.bookchat.exception.security.ExpiredTokenException;
 import toy.bookchat.bookchat.exception.security.IllegalStandardTokenException;
-import toy.bookchat.bookchat.exception.security.NotSupportedOAuth2ProviderException;
-import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
 @Slf4j
 @Component
@@ -28,20 +24,16 @@ public class KakaoPublicKeyFetcher {
     public static final int HEADER = 0;
     public static final int PAYLOAD = 1;
     public static final String KID = "kid";
-    private final RestTemplate restTemplate;
+    private final WebClient webClient;
     private final KeyFactory keyFactory;
 
-    public KakaoPublicKeyFetcher(RestTemplateBuilder restTemplateBuilder) {
-        this.restTemplate = restTemplateBuilder.build();
+    public KakaoPublicKeyFetcher(WebClient webClient) {
+        this.webClient = webClient;
         this.keyFactory = createKeyFactory();
     }
 
-    public Key getPublicKey(String token, OAuth2Provider oAuth2Provider, String kakaoUri) {
-        if (OAuth2Provider.KAKAO.equals(oAuth2Provider)) {
-            return fetchKakaoPublicKey(kakaoUri).getKey(getKeyId(token), this.keyFactory);
-        }
-
-        throw new NotSupportedOAuth2ProviderException();
+    public Key getPublicKey(String token, String kakaoUri) {
+        return fetchKakaoPublicKey(kakaoUri).getKey(getKeyId(token), this.keyFactory);
     }
 
     private KeyFactory createKeyFactory() {
@@ -55,8 +47,10 @@ public class KakaoPublicKeyFetcher {
 
     @Cacheable(cacheNames = "kakao", key = "#root.methodName")
     public KakaoPublicKeys fetchKakaoPublicKey(String kakaoUri) {
-        return restTemplate.exchange(kakaoUri, HttpMethod.GET, null, KakaoPublicKeys.class)
-            .getBody();
+        return webClient.get()
+            .uri(kakaoUri)
+            .retrieve()
+            .bodyToMono(KakaoPublicKeys.class).block();
     }
 
     private String getKeyId(String token) {

@@ -26,7 +26,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.util.Base64Utils;
 import toy.bookchat.bookchat.config.token.OAuth2Properties;
-import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.token.openid.keys.KakaoPublicKeyFetcher;
 
 @RestClientTest(KakaoPublicKeyFetcher.class)
@@ -63,7 +62,6 @@ class KakaoPublicKeyFetcherTest {
             new RSAPrivateKeySpec(modulus, exponent));
 
         Key kakaoPublicKey = kakaoPublickeyFetcher.getPublicKey(getMockOpenIdToken(privateKey),
-            OAuth2Provider.KAKAO,
             oAuth2Properties.getKakaoUri());
 
         assertThat(kakaoPublicKey).isEqualTo(publicKey);

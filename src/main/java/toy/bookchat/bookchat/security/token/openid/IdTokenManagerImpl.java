@@ -40,7 +40,7 @@ public class IdTokenManagerImpl implements IdTokenManager {
     public String getOAuth2MemberNumberFromIdToken(String token, OAuth2Provider oAuth2Provider) {
         if (oAuth2Provider == KAKAO) {
             return KakaoIdToken.of(getIdToken(token)).getOAuth2MemberNumber(
-                kakaoPublickeyFetcher.getPublicKey(token, oAuth2Provider,
+                kakaoPublickeyFetcher.getPublicKey(getIdToken(token),
                     oAuth2Properties.getKakaoUri()), oAuth2Properties.getKakaoAppKey());
         }
 
@@ -56,8 +56,8 @@ public class IdTokenManagerImpl implements IdTokenManager {
     public String getUserEmailFromToken(String token, OAuth2Provider oAuth2Provider) {
         if (oAuth2Provider == KAKAO) {
             return KakaoIdToken.of(getIdToken(token))
-                .getEmail(kakaoPublickeyFetcher.getPublicKey(token, oAuth2Provider,
-                    oAuth2Properties.getKakaoUri()), oAuth2Properties.getKakaoAppKey());
+                .getEmail(kakaoPublickeyFetcher.getPublicKey(token, oAuth2Properties.getKakaoUri()),
+                    oAuth2Properties.getKakaoAppKey());
         }
 
         if (oAuth2Provider == GOOGLE) {

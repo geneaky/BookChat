@@ -88,7 +88,7 @@ class IdTokenManagerTest {
         String token = getMockOpenIdToken(privateKey);
 
         when(oAuth2Properties.getKakaoAppKey()).thenReturn(appKey);
-        when(kakaoPublickeyFetcher.getPublicKey(any(), any(), any())).thenReturn(publicKey);
+        when(kakaoPublickeyFetcher.getPublicKey(any(), any())).thenReturn(publicKey);
 
         assertThat(
             openIdTokenManager.getOAuth2MemberNumberFromIdToken(token,
@@ -104,7 +104,7 @@ class IdTokenManagerTest {
         String token = getMockOpenIdToken(privateKey);
 
         when(oAuth2Properties.getKakaoAppKey()).thenReturn(appKey);
-        when(kakaoPublickeyFetcher.getPublicKey(any(), any(), any())).thenReturn(publicKey);
+        when(kakaoPublickeyFetcher.getPublicKey(any(), any())).thenReturn(publicKey);
 
         assertThat(
             openIdTokenManager.getUserEmailFromToken(token, OAuth2Provider.KAKAO)).isEqualTo(
