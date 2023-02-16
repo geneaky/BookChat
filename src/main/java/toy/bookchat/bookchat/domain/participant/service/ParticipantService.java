@@ -77,6 +77,25 @@ public class ParticipantService {
         }
     }
 
+    @Transactional
     public void deleteParticipant(Long roomId, Long userId, Long adminId) {
+        User requester = userRepository.findById(adminId).orElseThrow(UserNotFoundException::new);
+        User target = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
+            .orElseThrow(ChatRoomNotFoundException::new);
+        Participant admin = participantRepository.findByUserAndChatRoom(requester, chatRoom)
+            .orElseThrow(ParticipantNotFoundException::new);
+        Participant targetParticipant = participantRepository.findByUserAndChatRoom(target,
+                chatRoom)
+            .orElseThrow(ParticipantNotFoundException::new);
+
+        if (admin.isHost()) {
+            participantRepository.delete(targetParticipant);
+
+        }
+        
+        if (admin.isSubHost() && targetParticipant.isGuest()) {
+            participantRepository.delete(targetParticipant);
+        }
     }
 }
