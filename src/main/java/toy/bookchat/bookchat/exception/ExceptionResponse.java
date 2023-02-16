@@ -9,6 +9,8 @@ public enum ExceptionResponse {
     BOOK_REPORT_NOT_FOUND(ResponseEntity.status(HttpStatus.NOT_FOUND).body("저장된 독후감이 없습니다.")),
     USER_NOT_FOUND(ResponseEntity.status(HttpStatus.NOT_FOUND).body("등록된 사용자가 아닙니다")),
     NOT_VERIFIED_TOKEN(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유효하지 않은 토큰입니다.")),
+    NOT_SUPPORTED_OAUTH2_PROVIDER(
+        ResponseEntity.status(HttpStatus.BAD_REQUEST).body("지원하지않는 OAuth2 Provider 입니다.")),
     IMAGE_PROCESSING_FAIL(
         ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이미지 처리 실패")),
     IMAGE_UPLOAD_FAIL(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이미지 업로드 실패")),

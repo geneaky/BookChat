@@ -6,6 +6,7 @@ import static toy.bookchat.bookchat.exception.ExceptionResponse.BOOK_REPORT_NOT_
 import static toy.bookchat.bookchat.exception.ExceptionResponse.EXPIRED_PUBLIC_KEY;
 import static toy.bookchat.bookchat.exception.ExceptionResponse.IMAGE_PROCESSING_FAIL;
 import static toy.bookchat.bookchat.exception.ExceptionResponse.IMAGE_UPLOAD_FAIL;
+import static toy.bookchat.bookchat.exception.ExceptionResponse.NOT_SUPPORTED_OAUTH2_PROVIDER;
 import static toy.bookchat.bookchat.exception.ExceptionResponse.NOT_VERIFIED_TOKEN;
 import static toy.bookchat.bookchat.exception.ExceptionResponse.TOO_MANY_REQUESTS;
 import static toy.bookchat.bookchat.exception.ExceptionResponse.USER_ALREADY_EXISTED;
@@ -19,13 +20,14 @@ import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import toy.bookchat.bookchat.domain.chat.api.dto.ChatDto;
-import toy.bookchat.bookchat.exception.agony.AgonyNotFoundException;
 import toy.bookchat.bookchat.exception.book.BookNotFoundException;
 import toy.bookchat.bookchat.exception.bookshelf.BookReportNotFoundException;
 import toy.bookchat.bookchat.exception.common.RateOverLimitException;
 import toy.bookchat.bookchat.exception.security.DenidedTokenException;
 import toy.bookchat.bookchat.exception.security.ExpiredPublicKeyCachedException;
 import toy.bookchat.bookchat.exception.security.ExpiredTokenException;
+import toy.bookchat.bookchat.exception.security.NotSupportedOAuth2ProviderException;
+import toy.bookchat.bookchat.exception.security.NotVerifiedIdTokenException;
 import toy.bookchat.bookchat.exception.security.WrongKeySpecException;
 import toy.bookchat.bookchat.exception.storage.ImageUploadToStorageException;
 import toy.bookchat.bookchat.exception.user.ImageInputStreamException;
@@ -37,6 +39,20 @@ import toy.bookchat.bookchat.exception.user.UserNotFoundException;
 public class GlobalExceptionHandler {
 
     private static final String LOG_FORMAT = "Class :: {}, Message :: {}";
+
+    @ExceptionHandler(NotVerifiedIdTokenException.class)
+    public final ResponseEntity<String> handleNotVerifiedIdTokenException(
+        NotVerifiedIdTokenException exception) {
+        log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
+        return NOT_VERIFIED_TOKEN.getValue();
+    }
+
+    @ExceptionHandler(NotSupportedOAuth2ProviderException.class)
+    public final ResponseEntity<String> handleNotSupportedOAuth2ProviderException(
+        NotSupportedOAuth2ProviderException exception) {
+        log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
+        return NOT_SUPPORTED_OAUTH2_PROVIDER.getValue();
+    }
 
     @ExceptionHandler(BookNotFoundException.class)
     public final ResponseEntity<String> handleBookNotFoundException(
@@ -106,20 +122,6 @@ public class GlobalExceptionHandler {
         WrongKeySpecException exception) {
         log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
         return WRONG_KEY_SPEC.getValue();
-    }
-
-    @ExceptionHandler(AgonyNotFoundException.class)
-    public final ResponseEntity<String> handleAgonyNotFoundException(
-        AgonyNotFoundException exception) {
-        log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
-        return BAD_REQUEST.getValue();
-    }
-
-    @ExceptionHandler(NotSupportedPagingConditionException.class)
-    public final ResponseEntity<String> handleNotSupportedPagingConditionException(
-        NotSupportedPagingConditionException exception) {
-        log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
-        return BAD_REQUEST.getValue();
     }
 
     @ExceptionHandler(RateOverLimitException.class)

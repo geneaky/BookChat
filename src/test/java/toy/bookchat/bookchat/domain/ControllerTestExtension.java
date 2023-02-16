@@ -18,12 +18,12 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.restdocs.payload.FieldDescriptor;
-import toy.bookchat.bookchat.config.token.openid.OpenIdTokenConfig;
 import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenManager;
-import toy.bookchat.bookchat.security.token.openid.OpenIdTokenManager;
+import toy.bookchat.bookchat.security.token.openid.IdTokenManager;
+import toy.bookchat.bookchat.security.token.openid.keys.KakaoPublicKeyFetcher;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
@@ -34,11 +34,11 @@ import toy.bookchat.bookchat.security.user.UserPrincipal;
 public abstract class ControllerTestExtension {
 
     @MockBean
-    OpenIdTokenManager openIdTokenManager;
+    IdTokenManager idTokenManager;
     @MockBean
     JwtTokenManager jwtTokenManager;
     @MockBean
-    OpenIdTokenConfig openIdTokenConfig;
+    KakaoPublicKeyFetcher kakaoPublickeyFetcher;
 
     protected User getUser() {
         return User.builder()
@@ -66,12 +66,12 @@ public abstract class ControllerTestExtension {
         doReturn(getTokenPayload(getUser())).when(jwtTokenManager).getTokenPayloadFromToken(any());
     }
 
-    public OpenIdTokenConfig getOpenIdTokenConfig() {
-        return this.openIdTokenConfig;
+    public KakaoPublicKeyFetcher getOpenIdTokenConfig() {
+        return this.kakaoPublickeyFetcher;
     }
 
-    public OpenIdTokenManager getOpenIdTokenManager() {
-        return this.openIdTokenManager;
+    public IdTokenManager getOpenIdTokenManager() {
+        return this.idTokenManager;
     }
 
     public List<FieldDescriptor> getPageField() {

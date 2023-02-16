@@ -29,7 +29,7 @@ import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignInRequest;
 import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignUpRequest;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenProvider;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenRecorder;
-import toy.bookchat.bookchat.security.token.openid.OpenIdTokenManager;
+import toy.bookchat.bookchat.security.token.openid.IdTokenManager;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPayload;
 
@@ -39,14 +39,14 @@ import toy.bookchat.bookchat.security.user.UserPayload;
 public class UserController {
 
     private final UserService userService;
-    private final OpenIdTokenManager openIdTokenManager;
+    private final IdTokenManager idTokenManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtTokenRecorder jwtTokenRecorder;
 
-    public UserController(UserService userService, OpenIdTokenManager openIdTokenManager,
+    public UserController(UserService userService, IdTokenManager idTokenManager,
         JwtTokenProvider jwtTokenProvider, JwtTokenRecorder jwtTokenRecorder) {
         this.userService = userService;
-        this.openIdTokenManager = openIdTokenManager;
+        this.idTokenManager = idTokenManager;
         this.jwtTokenProvider = jwtTokenProvider;
         this.jwtTokenRecorder = jwtTokenRecorder;
     }
@@ -77,9 +77,9 @@ public class UserController {
     public void userSignUp(@Valid @RequestPart UserSignUpRequest userSignUpRequest,
         @RequestPart Optional<MultipartFile> userProfileImage,
         @RequestHeader(OIDC) @NotBlank @Pattern(regexp = "^(Bearer)\\s.+") String bearerToken) {
-        String oauth2MemberNumber = openIdTokenManager.getOAuth2MemberNumberFromToken(bearerToken,
+        String oauth2MemberNumber = idTokenManager.getOAuth2MemberNumberFromIdToken(bearerToken,
             userSignUpRequest.getOauth2Provider());
-        String userEmail = openIdTokenManager.getUserEmailFromToken(bearerToken,
+        String userEmail = idTokenManager.getUserEmailFromToken(bearerToken,
             userSignUpRequest.getOauth2Provider());
 
         userService.registerNewUser(userSignUpRequest, userProfileImage, oauth2MemberNumber,
@@ -90,7 +90,7 @@ public class UserController {
     public Token userSignIn(
         @RequestHeader(OIDC) @NotBlank @Pattern(regexp = "^(Bearer)\\s.+") String bearerToken,
         @Valid @RequestBody UserSignInRequest userSignInRequest) {
-        String userName = openIdTokenManager.getOAuth2MemberNumberFromToken(bearerToken,
+        String userName = idTokenManager.getOAuth2MemberNumberFromIdToken(bearerToken,
             userSignInRequest.getOauth2Provider());
         User user = userService.findUserByUsername(userName);
 

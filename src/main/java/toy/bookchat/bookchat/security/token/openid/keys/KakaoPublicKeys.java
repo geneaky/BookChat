@@ -11,18 +11,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.util.Base64Utils;
-import toy.bookchat.bookchat.config.token.openid.OAuthPublicKey;
 import toy.bookchat.bookchat.exception.security.ExpiredPublicKeyCachedException;
 import toy.bookchat.bookchat.exception.security.WrongKeySpecException;
 
 @Getter
 @Setter
 @NoArgsConstructor
-public class KakaoPublicKeys implements OAuthPublicKey {
+public class KakaoPublicKeys {
 
     private List<KakakoPublicKey> keys;
 
-    @Override
     public Key getKey(String keyId, KeyFactory keyFactory) {
         try {
             return searchPublicKey(keyId, keyFactory);

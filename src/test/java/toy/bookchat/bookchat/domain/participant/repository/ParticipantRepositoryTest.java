@@ -1,6 +1,9 @@
 package toy.bookchat.bookchat.domain.participant.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.GUEST;
+import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.HOST;
+import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.SUBHOST;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -47,17 +50,18 @@ class ParticipantRepositoryTest {
 
         Participant participant1 = Participant.builder()
             .user(aUser)
+            .participantStatus(HOST)
             .chatRoom(chatRoom)
             .build();
         Participant participant2 = Participant.builder()
             .user(bUser)
+            .participantStatus(SUBHOST)
             .chatRoom(chatRoom)
-            .isSubHost(true)
             .build();
         Participant participant3 = Participant.builder()
             .user(cUser)
+            .participantStatus(GUEST)
             .chatRoom(chatRoom)
-            .isSubHost(false)
             .build();
         participantRepository.saveAll(List.of(participant1, participant2, participant3));
 

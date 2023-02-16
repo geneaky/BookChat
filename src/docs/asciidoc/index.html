@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.17">
+<meta name="generator" content="Asciidoctor 2.0.18">
 <title>BookChat API Documentation</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -84,10 +84,10 @@ code{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-weight:400;
 ul,ol,dl{line-height:1.6;margin-bottom:1.25em;list-style-position:outside;font-family:inherit}
 ul,ol{margin-left:1.5em}
 ul li ul,ul li ol{margin-left:1.25em;margin-bottom:0}
-ul.square li ul,ul.circle li ul,ul.disc li ul{list-style:inherit}
-ul.square{list-style-type:square}
 ul.circle{list-style-type:circle}
 ul.disc{list-style-type:disc}
+ul.square{list-style-type:square}
+ul.circle ul:not([class]),ul.disc ul:not([class]),ul.square ul:not([class]){list-style:inherit}
 ol li ul,ol li ol{margin-left:1.25em;margin-bottom:0}
 dl dt{margin-bottom:.3125em;font-weight:bold}
 dl dd{margin-bottom:1.25em}
@@ -513,6 +513,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_참여자">참여자</a>
 <ul class="sectlevel2">
 <li><a href="#_채팅방_참여인원_조회">채팅방 참여인원 조회</a></li>
+<li><a href="#_방장의_참여자_권한_관리">방장의 참여자 권한 관리</a></li>
 </ul>
 </li>
 <li><a href="#_채팅">채팅</a>
@@ -611,7 +612,7 @@ Content-Type: application/json;charset=UTF-8
 Content-Length: 419
 Host: bookchat.link
 
-{"refreshToken":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJCb29rQ2hhdCIsImRlZmF1bHRQcm9maWxlSW1hZ2VUeXBlIjoxLCJwcm92aWRlciI6Imtha2FvIiwidXNlck5pY2tuYW1lIjoidGVzdFVzZXJOaWNrbmFtZSIsInVzZXJOYW1lIjoidGVzdFVzZXIiLCJ1c2VyUHJvZmlsZUltYWdlVXJpIjoic29tZXRoaW5nSW1hZ2VVcmxAbmF2ZXIuY29tIiwidXNlclJvbGUiOiJST0xFX1VTRVIiLCJleHAiOjE2NzcwNzIxNjksInVzZXJJZCI6IjEiLCJlbWFpbCI6InRlc3RAZ21haWwuY29tIn0.kMapVTq3Nux0TkwrZ6mNAbom09GQ6L_S-VEYc-202sU"}</code></pre>
+{"refreshToken":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJCb29rQ2hhdCIsImRlZmF1bHRQcm9maWxlSW1hZ2VUeXBlIjoxLCJwcm92aWRlciI6Imtha2FvIiwidXNlck5pY2tuYW1lIjoidGVzdFVzZXJOaWNrbmFtZSIsInVzZXJOYW1lIjoidGVzdFVzZXIiLCJ1c2VyUHJvZmlsZUltYWdlVXJpIjoic29tZXRoaW5nSW1hZ2VVcmxAbmF2ZXIuY29tIiwidXNlclJvbGUiOiJST0xFX1VTRVIiLCJleHAiOjE2Nzc0ODE4MDksInVzZXJJZCI6IjEiLCJlbWFpbCI6InRlc3RAZ21haWwuY29tIn0.lwaHQDUuFvvm34iqNedxIbqg2F1VcKrMZkv1jHbrxZQ"}</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -656,7 +657,7 @@ Strict-Transport-Security: max-age=31536000 ; includeSubDomains
 X-Frame-Options: DENY
 Content-Length: 836
 
-{"accessToken":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJCb29rQ2hhdCIsImRlZmF1bHRQcm9maWxlSW1hZ2VUeXBlIjoxLCJwcm92aWRlciI6Imtha2FvIiwidXNlck5pY2tuYW1lIjoidGVzdFVzZXJOaWNrbmFtZSIsInVzZXJOYW1lIjoidGVzdFVzZXIiLCJ1c2VyUHJvZmlsZUltYWdlVXJpIjoic29tZXRoaW5nSW1hZ2VVcmxAbmF2ZXIuY29tIiwidXNlclJvbGUiOiJST0xFX1VTRVIiLCJleHAiOjE2NzU4NjM5NjksInVzZXJJZCI6IjEiLCJlbWFpbCI6InRlc3RAZ21haWwuY29tIn0.I-juULHJLH_ImRO_pcgrdchtxb4iCkkXzzRE6mHioqg","refreshToken":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJCb29rQ2hhdCIsImRlZmF1bHRQcm9maWxlSW1hZ2VUeXBlIjoxLCJwcm92aWRlciI6Imtha2FvIiwidXNlck5pY2tuYW1lIjoidGVzdFVzZXJOaWNrbmFtZSIsInVzZXJOYW1lIjoidGVzdFVzZXIiLCJ1c2VyUHJvZmlsZUltYWdlVXJpIjoic29tZXRoaW5nSW1hZ2VVcmxAbmF2ZXIuY29tIiwidXNlclJvbGUiOiJST0xFX1VTRVIiLCJleHAiOjE2NzcwNzIxNjksInVzZXJJZCI6IjEiLCJlbWFpbCI6InRlc3RAZ21haWwuY29tIn0.kMapVTq3Nux0TkwrZ6mNAbom09GQ6L_S-VEYc-202sU"}</code></pre>
+{"accessToken":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJCb29rQ2hhdCIsImRlZmF1bHRQcm9maWxlSW1hZ2VUeXBlIjoxLCJwcm92aWRlciI6Imtha2FvIiwidXNlck5pY2tuYW1lIjoidGVzdFVzZXJOaWNrbmFtZSIsInVzZXJOYW1lIjoidGVzdFVzZXIiLCJ1c2VyUHJvZmlsZUltYWdlVXJpIjoic29tZXRoaW5nSW1hZ2VVcmxAbmF2ZXIuY29tIiwidXNlclJvbGUiOiJST0xFX1VTRVIiLCJleHAiOjE2Nzc0ODE4MDksInVzZXJJZCI6IjEiLCJlbWFpbCI6InRlc3RAZ21haWwuY29tIn0.lwaHQDUuFvvm34iqNedxIbqg2F1VcKrMZkv1jHbrxZQ","refreshToken":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJCb29rQ2hhdCIsImRlZmF1bHRQcm9maWxlSW1hZ2VUeXBlIjoxLCJwcm92aWRlciI6Imtha2FvIiwidXNlck5pY2tuYW1lIjoidGVzdFVzZXJOaWNrbmFtZSIsInVzZXJOYW1lIjoidGVzdFVzZXIiLCJ1c2VyUHJvZmlsZUltYWdlVXJpIjoic29tZXRoaW5nSW1hZ2VVcmxAbmF2ZXIuY29tIiwidXNlclJvbGUiOiJST0xFX1VTRVIiLCJleHAiOjE2Nzc0ODE4MDksInVzZXJJZCI6IjEiLCJlbWFpbCI6InRlc3RAZ21haWwuY29tIn0.lwaHQDUuFvvm34iqNedxIbqg2F1VcKrMZkv1jHbrxZQ"}</code></pre>
 </div>
 </div>
 </div>
@@ -1670,7 +1671,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwicHJvdmlkZXIiOiJnb
 Content-Length: 204
 Host: bookchat.link
 
-{"bookRequest":{"isbn":"124151214","title":"effectiveJava","authors":["Joshua"],"publisher":"oreilly","bookCoverImageUrl":"bookCoverImage.com","publishAt":"2023-02-08"},"readingStatus":"WISH","star":null}</code></pre>
+{"bookRequest":{"isbn":"124151214","title":"effectiveJava","authors":["Joshua"],"publisher":"oreilly","bookCoverImageUrl":"bookCoverImage.com","publishAt":"2023-02-13"},"readingStatus":"WISH","star":null}</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1782,7 +1783,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwicHJvdmlkZXIiOiJnb
 Content-Length: 207
 Host: bookchat.link
 
-{"bookRequest":{"isbn":"124151214","title":"effectiveJava","authors":["Joshua"],"publisher":"oreilly","bookCoverImageUrl":"bookCoverImage.com","publishAt":"2023-02-08"},"readingStatus":"READING","star":null}</code></pre>
+{"bookRequest":{"isbn":"124151214","title":"effectiveJava","authors":["Joshua"],"publisher":"oreilly","bookCoverImageUrl":"bookCoverImage.com","publishAt":"2023-02-13"},"readingStatus":"READING","star":null}</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1900,7 +1901,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwicHJvdmlkZXIiOiJnb
 Content-Length: 210
 Host: bookchat.link
 
-{"bookRequest":{"isbn":"124151214","title":"effectiveJava","authors":["Joshua"],"publisher":"oreilly","bookCoverImageUrl":"bookCoverImage.com","publishAt":"2023-02-08"},"readingStatus":"COMPLETE","star":"FOUR"}</code></pre>
+{"bookRequest":{"isbn":"124151214","title":"effectiveJava","authors":["Joshua"],"publisher":"oreilly","bookCoverImageUrl":"bookCoverImage.com","publishAt":"2023-02-13"},"readingStatus":"COMPLETE","star":"FOUR"}</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2093,7 +2094,7 @@ Host: bookchat.link</code></pre>
 </table>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-none hljs">{"pageMeta":{"totalElements":1,"totalPages":1,"pageSize":1,"pageNumber":0,"offset":0,"first":true,"last":true,"empty":false},"contents":[{"bookShelfId":1,"title":"effectiveJava","isbn":"12345","bookCoverImageUrl":"testBookCoverImageUrl","publishAt":"2023-02-08","authors":["joshua"],"publisher":"testBookCoverImageUrl","star":null,"pages":0}]}</code></pre>
+<pre class="highlightjs highlight nowrap"><code class="language-none hljs">{"pageMeta":{"totalElements":1,"totalPages":1,"pageSize":1,"pageNumber":0,"offset":0,"first":true,"last":true,"empty":false},"contents":[{"bookShelfId":1,"title":"effectiveJava","isbn":"12345","bookCoverImageUrl":"testBookCoverImageUrl","publishAt":"2023-02-13","authors":["joshua"],"publisher":"testBookCoverImageUrl","star":null,"pages":0}]}</code></pre>
 </div>
 </div>
 <hr>
@@ -2271,7 +2272,7 @@ Host: bookchat.link</code></pre>
 </table>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-none hljs">{"pageMeta":{"totalElements":1,"totalPages":1,"pageSize":1,"pageNumber":0,"offset":0,"first":true,"last":true,"empty":false},"contents":[{"bookShelfId":1,"title":"effectiveJava","isbn":"12345","bookCoverImageUrl":"testBookCoverImageUrl","publishAt":"2023-02-08","authors":["joshua"],"publisher":"testBookCoverImageUrl","star":null,"pages":152}]}</code></pre>
+<pre class="highlightjs highlight nowrap"><code class="language-none hljs">{"pageMeta":{"totalElements":1,"totalPages":1,"pageSize":1,"pageNumber":0,"offset":0,"first":true,"last":true,"empty":false},"contents":[{"bookShelfId":1,"title":"effectiveJava","isbn":"12345","bookCoverImageUrl":"testBookCoverImageUrl","publishAt":"2023-02-13","authors":["joshua"],"publisher":"testBookCoverImageUrl","star":null,"pages":152}]}</code></pre>
 </div>
 </div>
 <hr>
@@ -2449,7 +2450,7 @@ Host: bookchat.link</code></pre>
 </table>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-none hljs">{"pageMeta":{"totalElements":1,"totalPages":1,"pageSize":1,"pageNumber":0,"offset":0,"first":true,"last":true,"empty":false},"contents":[{"bookShelfId":1,"title":"effectiveJava","isbn":"12345","bookCoverImageUrl":"testBookCoverImageUrl","publishAt":"2023-02-08","authors":["joshua"],"publisher":"testBookCoverImageUrl","star":"FOUR_HALF","pages":0}]}</code></pre>
+<pre class="highlightjs highlight nowrap"><code class="language-none hljs">{"pageMeta":{"totalElements":1,"totalPages":1,"pageSize":1,"pageNumber":0,"offset":0,"first":true,"last":true,"empty":false},"contents":[{"bookShelfId":1,"title":"effectiveJava","isbn":"12345","bookCoverImageUrl":"testBookCoverImageUrl","publishAt":"2023-02-13","authors":["joshua"],"publisher":"testBookCoverImageUrl","star":"FOUR_HALF","pages":0}]}</code></pre>
 </div>
 </div>
 <hr>
@@ -2506,7 +2507,7 @@ Host: bookchat.link</code></pre>
 </table>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /v1/api/bookshelves/book?isbn=1234567891011+0123456789&amp;publishAt=2023-02-08 HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /v1/api/bookshelves/book?isbn=1234567891011+0123456789&amp;publishAt=2023-02-13 HTTP/1.1
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwicHJvdmlkZXIiOiJnb29nbGUiLCJuYW1lIjoiZ29vZ2xlMTIzIiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSJ9.LKub56oLOIJFlTzNiwxqH0V4SubOOBiIZESje9yJDco
 Host: bookchat.link</code></pre>
 </div>
@@ -3240,7 +3241,7 @@ Strict-Transport-Security: max-age=31536000 ; includeSubDomains
 X-Frame-Options: DENY
 Content-Length: 116
 
-{"reportTitle":"재미있네","reportContent":"다 읽은 후기 알려드립니다","reportCreatedAt":"2023-02-08"}</code></pre>
+{"reportTitle":"재미있네","reportContent":"다 읽은 후기 알려드립니다","reportCreatedAt":"2023-02-13"}</code></pre>
 </div>
 </div>
 <hr>
@@ -3683,7 +3684,7 @@ Strict-Transport-Security: max-age=31536000 ; includeSubDomains
 X-Frame-Options: DENY
 Content-Length: 256
 
-{"agonyResponseList":[{"agonyId":1,"title":"고민1","hexColorCode":"빨강"},{"agonyId":2,"title":"고민2","hexColorCode":"파랑"}],"cursorMeta":{"sliceSize":2,"contentSize":2,"hasContent":true,"hasNext":true,"nextCursorId":2,"first":true,"last":false}}</code></pre>
+{"agonyResponseList":[{"agonyId":1,"title":"고민1","hexColorCode":"빨강"},{"agonyId":2,"title":"고민2","hexColorCode":"파랑"}],"cursorMeta":{"sliceSize":2,"contentSize":2,"hasContent":true,"hasNext":true,"nextCursorId":2,"last":false,"first":true}}</code></pre>
 </div>
 </div>
 <hr>
@@ -4147,7 +4148,7 @@ Strict-Transport-Security: max-age=31536000 ; includeSubDomains
 X-Frame-Options: DENY
 Content-Length: 360
 
-{"agonyRecordResponseList":[{"agonyRecordId":2,"agonyRecordTitle":"title1","agonyRecordContent":"content1","createdAt":"2023-02-08"},{"agonyRecordId":3,"agonyRecordTitle":"title2","agonyRecordContent":"content2","createdAt":"2023-02-08"}],"cursorMeta":{"sliceSize":2,"contentSize":2,"hasContent":true,"hasNext":false,"nextCursorId":3,"first":true,"last":true}}</code></pre>
+{"agonyRecordResponseList":[{"agonyRecordId":2,"agonyRecordTitle":"title1","agonyRecordContent":"content1","createdAt":"2023-02-13"},{"agonyRecordId":3,"agonyRecordTitle":"title2","agonyRecordContent":"content2","createdAt":"2023-02-13"}],"cursorMeta":{"sliceSize":2,"contentSize":2,"hasContent":true,"hasNext":false,"nextCursorId":3,"last":true,"first":true}}</code></pre>
 </div>
 </div>
 </div>
@@ -4478,7 +4479,7 @@ test
 Content-Disposition: form-data; name=createChatRoomRequest
 Content-Type: application/json
 
-{"roomName":"effective java 부수는 방","roomSize":5,"defaultRoomImageType":1,"hashTags":["Java","스터디"],"bookRequest":{"isbn":"124151214","title":"effective java","authors":["joshua"],"publisher":"insight","bookCoverImageUrl":"testImageUrl","publishAt":"2023-02-08"}}
+{"roomName":"effective java 부수는 방","roomSize":5,"defaultRoomImageType":1,"hashTags":["Java","스터디"],"bookRequest":{"isbn":"124151214","title":"effective java","authors":["joshua"],"publisher":"insight","bookCoverImageUrl":"testImageUrl","publishAt":"2023-02-13"}}
 --6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm--</code></pre>
 </div>
 </div>
@@ -4665,9 +4666,9 @@ Pragma: no-cache
 Expires: 0
 Strict-Transport-Security: max-age=31536000 ; includeSubDomains
 X-Frame-Options: DENY
-Content-Length: 862
+Content-Length: 865
 
-{"chatRoomResponseList":[{"roomId":1,"roomName":"이펙티브 자바 부수는 방","roomSid":"secret1","roomMemberCount":2,"defaultRoomImageType":1,"roomImageUri":null,"lastChatId":1,"lastActiveTime":"2023-02-08T22:16:01.661608","lastChatContent":"안녕"},{"roomId":2,"roomName":"이펙티브 코틀린 부수는 방","roomSid":"secret2","roomMemberCount":2,"defaultRoomImageType":1,"roomImageUri":null,"lastChatId":2,"lastActiveTime":"2023-02-08T22:16:01.661623","lastChatContent":"잘가"},{"roomId":3,"roomName":"토비의 스프링 부수는 방","roomSid":"secret3","roomMemberCount":2,"defaultRoomImageType":1,"roomImageUri":null,"lastChatId":3,"lastActiveTime":"2023-02-08T22:16:01.661635","lastChatContent":"이거 모르겠음"}],"cursorMeta":{"sliceSize":3,"contentSize":3,"hasContent":true,"hasNext":true,"nextCursorId":3,"first":true,"last":false}}</code></pre>
+{"chatRoomResponseList":[{"roomId":1,"roomName":"이펙티브 자바 부수는 방","roomSid":"secret1","roomMemberCount":2,"defaultRoomImageType":1,"roomImageUri":null,"lastChatId":1,"lastActiveTime":"2023-02-13T16:03:23.8916109","lastChatContent":"안녕"},{"roomId":2,"roomName":"이펙티브 코틀린 부수는 방","roomSid":"secret2","roomMemberCount":2,"defaultRoomImageType":1,"roomImageUri":null,"lastChatId":2,"lastActiveTime":"2023-02-13T16:03:23.8916109","lastChatContent":"잘가"},{"roomId":3,"roomName":"토비의 스프링 부수는 방","roomSid":"secret3","roomMemberCount":2,"defaultRoomImageType":1,"roomImageUri":null,"lastChatId":3,"lastActiveTime":"2023-02-13T16:03:23.8916109","lastChatContent":"이거 모르겠음"}],"cursorMeta":{"sliceSize":3,"contentSize":3,"hasContent":true,"hasNext":true,"nextCursorId":3,"last":false,"first":true}}</code></pre>
 </div>
 </div>
 </div>
@@ -4823,6 +4824,98 @@ Content-Length: 514
 {"roomHost":{"id":1,"nickname":"마스터","profileImageUrl":"test@s3.com","defaultProfileImageType":1},"roomSubHostList":[{"id":2,"nickname":"서브 마스터1","profileImageUrl":null,"defaultProfileImageType":2},{"id":3,"nickname":"서브 마스터2","profileImageUrl":"subHost@s3.com","defaultProfileImageType":3}],"roomGuestList":[{"id":4,"nickname":"게스트1","profileImageUrl":null,"defaultProfileImageType":4},{"id":5,"nickname":"게스트2","profileImageUrl":"guest@s3.com","defaultProfileImageType":1}]}</code></pre>
 </div>
 </div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_방장의_참여자_권한_관리">방장의 참여자 권한 관리</h3>
+<div class="paragraph">
+<p><code>Request Header</code></p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Authorization</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Bearer [JWT token]</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><code>Request</code></p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 18. /v1/api/chatrooms/{roomId}/participants/{userId}</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>roomId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Room Id</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>userId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">User Id</p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Parameter</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>participantStatus</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>false</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">[HOST | SUBHOST | GUEST]</p></td>
+</tr>
+</tbody>
+</table>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">PATCH /v1/api/chatrooms/1/participants/2?participantStatus=SUBHOST HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwicHJvdmlkZXIiOiJnb29nbGUiLCJuYW1lIjoiZ29vZ2xlMTIzIiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSJ9.LKub56oLOIJFlTzNiwxqH0V4SubOOBiIZESje9yJDco
+Host: bookchat.link</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>Response</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+Strict-Transport-Security: max-age=31536000 ; includeSubDomains
+X-Frame-Options: DENY</code></pre>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -4856,7 +4949,7 @@ Content-Length: 514
 <p><code>Request</code></p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 18. /v1/api/chatrooms/{roomId}/chats</caption>
+<caption class="title">Table 19. /v1/api/chatrooms/{roomId}/chats</caption>
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -5010,9 +5103,9 @@ Pragma: no-cache
 Expires: 0
 Strict-Transport-Security: max-age=31536000 ; includeSubDomains
 X-Frame-Options: DENY
-Content-Length: 694
+Content-Length: 703
 
-{"chatResponseList":[{"chatId":1,"senderId":1,"senderNickname":"AUser","senderProfileImageUrl":null,"senderDefaultProfileImageType":1,"message":"first chat","dispatchTime":"2023-02-08T22:15:49.079627"},{"chatId":2,"senderId":2,"senderNickname":"BUser","senderProfileImageUrl":"bUser@s3.com","senderDefaultProfileImageType":1,"message":"second chat","dispatchTime":"2023-02-08T22:15:49.080101"},{"chatId":3,"senderId":1,"senderNickname":"AUser","senderProfileImageUrl":null,"senderDefaultProfileImageType":1,"message":"welcome","dispatchTime":"2023-02-08T22:15:49.080110"}],"cursorMeta":{"sliceSize":3,"contentSize":3,"hasContent":true,"hasNext":true,"nextCursorId":3,"first":true,"last":false}}</code></pre>
+{"chatResponseList":[{"chatId":1,"senderId":1,"senderNickname":"AUser","senderProfileImageUrl":null,"senderDefaultProfileImageType":1,"message":"first chat","dispatchTime":"2023-02-13T16:03:22.645684400"},{"chatId":2,"senderId":2,"senderNickname":"BUser","senderProfileImageUrl":"bUser@s3.com","senderDefaultProfileImageType":1,"message":"second chat","dispatchTime":"2023-02-13T16:03:22.645684400"},{"chatId":3,"senderId":1,"senderNickname":"AUser","senderProfileImageUrl":null,"senderDefaultProfileImageType":1,"message":"welcome","dispatchTime":"2023-02-13T16:03:22.645684400"}],"cursorMeta":{"sliceSize":3,"contentSize":3,"hasContent":true,"hasNext":true,"nextCursorId":3,"last":false,"first":true}}</code></pre>
 </div>
 </div>
 </div>
@@ -5161,14 +5254,14 @@ Content-Length: 694
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2023-02-08 22:13:37 +0900
+Last updated 2023-02-13 16:05:06 +0900
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>
 <script>
 if (!hljs.initHighlighting.called) {
   hljs.initHighlighting.called = true
-  ;[].slice.call(document.querySelectorAll('pre.highlight > code')).forEach(function (el) { hljs.highlightBlock(el) })
+  ;[].slice.call(document.querySelectorAll('pre.highlight > code[data-lang]')).forEach(function (el) { hljs.highlightBlock(el) })
 }
 </script>
 </body>

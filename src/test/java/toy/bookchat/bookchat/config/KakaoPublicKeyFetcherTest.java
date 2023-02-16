@@ -5,11 +5,17 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import java.math.BigInteger;
 import java.security.Key;
 import java.security.KeyFactory;
+import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -20,17 +26,17 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.util.Base64Utils;
 import toy.bookchat.bookchat.config.token.OAuth2Properties;
-import toy.bookchat.bookchat.config.token.openid.OpenIdTokenConfig;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
+import toy.bookchat.bookchat.security.token.openid.keys.KakaoPublicKeyFetcher;
 
-@RestClientTest(OpenIdTokenConfig.class)
+@RestClientTest(KakaoPublicKeyFetcher.class)
 @ExtendWith(MockitoExtension.class)
-class OpenIdTokenConfigTest {
+class KakaoPublicKeyFetcherTest {
 
     @MockBean
     OAuth2Properties oAuth2Properties;
     @Autowired
-    OpenIdTokenConfig openIdTokenConfig;
+    KakaoPublicKeyFetcher kakaoPublickeyFetcher;
     @Autowired
     private MockRestServiceServer mockServer;
 
@@ -47,15 +53,33 @@ class OpenIdTokenConfigTest {
         mockServer.expect(requestTo(apiUri))
             .andRespond(withSuccess(result, MediaType.APPLICATION_JSON));
 
-        Key kakaoPublicKey = openIdTokenConfig.getPublicKey(kid, OAuth2Provider.KAKAO);
-
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         BigInteger modulus = new BigInteger(1,
             Base64Utils.decodeFromUrlSafeString(n));
         BigInteger exponent = new BigInteger(1,
             Base64Utils.decodeFromUrlSafeString(e));
         PublicKey publicKey = keyFactory.generatePublic(new RSAPublicKeySpec(modulus, exponent));
+        PrivateKey privateKey = keyFactory.generatePrivate(
+            new RSAPrivateKeySpec(modulus, exponent));
+
+        Key kakaoPublicKey = kakaoPublickeyFetcher.getPublicKey(getMockOpenIdToken(privateKey),
+            OAuth2Provider.KAKAO,
+            oAuth2Properties.getKakaoUri());
 
         assertThat(kakaoPublicKey).isEqualTo(publicKey);
+    }
+
+    private String getMockOpenIdToken(PrivateKey privateKey) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("sub", "1234");
+        claims.put("iss", "https://kauth.kakao.com");
+        claims.put("email", "test@naver.com");
+
+        String token = Jwts.builder()
+            .setHeaderParam("kid", kid)
+            .setClaims(claims)
+            .signWith(SignatureAlgorithm.RS256, privateKey)
+            .compact();
+        return token;
     }
 }

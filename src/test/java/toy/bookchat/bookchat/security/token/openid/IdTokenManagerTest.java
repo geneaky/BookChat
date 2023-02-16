@@ -25,18 +25,23 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.util.Base64Utils;
-import toy.bookchat.bookchat.config.token.openid.OpenIdTokenConfig;
+import toy.bookchat.bookchat.config.token.OAuth2Properties;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
+import toy.bookchat.bookchat.security.token.openid.keys.KakaoPublicKeyFetcher;
 
 @ExtendWith(MockitoExtension.class)
-class OpenIdTokenManagerTest {
+class IdTokenManagerTest {
 
     @Mock
-    OpenIdTokenConfig openIdTokenConfig;
+    KakaoPublicKeyFetcher kakaoPublickeyFetcher;
+    @Mock
+    OAuth2Properties oAuth2Properties;
     @InjectMocks
-    OpenIdTokenManagerImpl openIdTokenManager;
+    IdTokenManagerImpl openIdTokenManager;
 
     OpenIdTestUtil openIdTestUtil;
+
+    private String appKey = "testAppKey";
 
     @BeforeEach
     public void init() throws FileNotFoundException {
@@ -82,10 +87,11 @@ class OpenIdTokenManagerTest {
 
         String token = getMockOpenIdToken(privateKey);
 
-        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
+        when(oAuth2Properties.getKakaoAppKey()).thenReturn(appKey);
+        when(kakaoPublickeyFetcher.getPublicKey(any(), any(), any())).thenReturn(publicKey);
 
         assertThat(
-            openIdTokenManager.getOAuth2MemberNumberFromToken(token,
+            openIdTokenManager.getOAuth2MemberNumberFromIdToken(token,
                 OAuth2Provider.KAKAO)).isEqualTo(
             "1234kakao");
     }
@@ -97,11 +103,11 @@ class OpenIdTokenManagerTest {
 
         String token = getMockOpenIdToken(privateKey);
 
-        when(openIdTokenConfig.getPublicKey(any(), any())).thenReturn(publicKey);
+        when(oAuth2Properties.getKakaoAppKey()).thenReturn(appKey);
+        when(kakaoPublickeyFetcher.getPublicKey(any(), any(), any())).thenReturn(publicKey);
 
         assertThat(
-            openIdTokenManager.getUserEmailFromToken(token,
-                OAuth2Provider.KAKAO)).isEqualTo(
+            openIdTokenManager.getUserEmailFromToken(token, OAuth2Provider.KAKAO)).isEqualTo(
             "test@naver.com");
     }
 
@@ -110,6 +116,7 @@ class OpenIdTokenManagerTest {
         claims.put("sub", "1234");
         claims.put("iss", "https://kauth.kakao.com");
         claims.put("email", "test@naver.com");
+        claims.put("aud", appKey);
 
         String token = Jwts.builder()
             .setHeaderParam(KEY_ID, "abcdedf")

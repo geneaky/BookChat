@@ -21,7 +21,6 @@ public class BaseEntity {
     @CreatedDate
     private LocalDateTime createdAt;
 
-    @Column(updatable = false)
     @LastModifiedDate
     private LocalDateTime updatedAt;
 

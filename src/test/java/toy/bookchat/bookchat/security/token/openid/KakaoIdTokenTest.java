@@ -26,17 +26,21 @@ import org.springframework.util.Base64Utils;
 import toy.bookchat.bookchat.exception.security.DenidedTokenException;
 import toy.bookchat.bookchat.exception.security.ExpiredTokenException;
 import toy.bookchat.bookchat.exception.security.IllegalStandardTokenException;
+import toy.bookchat.bookchat.exception.security.NotSupportedOAuth2ProviderException;
 
 @ExtendWith(MockitoExtension.class)
-class OpenIdTokenTest {
+class KakaoIdTokenTest {
 
     OpenIdTestUtil openIdTestUtil;
 
-    private static Map<String, Object> getClaims() {
+    private String appKey = "testAppKey";
+
+    private Map<String, Object> getClaims() {
         Map<String, Object> claims = new HashMap<>();
         claims.put("sub", "1234");
         claims.put("iss", "https://kauth.kakao.com");
         claims.put("email", "test@naver.com");
+        claims.put("aud", appKey);
         return claims;
     }
 
@@ -77,7 +81,7 @@ class OpenIdTokenTest {
         return keyFactory.generatePrivate(privateKeySpec);
     }
 
-    private String getMockOpenIdToken(PrivateKey privateKey) {
+    private String getMockIdToken(PrivateKey privateKey) {
         Map<String, Object> claims = getClaims();
 
         String token = Jwts.builder()
@@ -97,14 +101,15 @@ class OpenIdTokenTest {
             .setSubject("1234")
             .setHeaderParam(KEY_ID, "abcdedf")
             .setIssuer("https://kauth.kakao.com")
+            .setAudience(appKey)
             .setExpiration(new Date(0))
             .signWith(SignatureAlgorithm.RS256, privateKey)
             .compact();
 
-        OpenIdToken openIdToken = OpenIdToken.of(token);
+        KakaoIdToken kakaoIdToken = KakaoIdToken.of(token);
 
         assertThatThrownBy(() -> {
-            openIdToken.getOAuth2MemberNumber(publicKey);
+            kakaoIdToken.getOAuth2MemberNumber(publicKey, appKey);
         }).isInstanceOf(ExpiredTokenException.class);
     }
 
@@ -113,12 +118,12 @@ class OpenIdTokenTest {
         PrivateKey privateKey = getPrivateKey();
         PublicKey publicKey = getPublicKey();
 
-        String token = getMockOpenIdToken(privateKey);
+        String token = getMockIdToken(privateKey);
 
-        OpenIdToken openIdToken = OpenIdToken.of(token + "test");
+        KakaoIdToken kakaoIdToken = KakaoIdToken.of(token + "test");
 
         assertThatThrownBy(() -> {
-            openIdToken.getOAuth2MemberNumber(publicKey);
+            kakaoIdToken.getOAuth2MemberNumber(publicKey, appKey);
         }).isInstanceOf(DenidedTokenException.class);
     }
 
@@ -129,14 +134,15 @@ class OpenIdTokenTest {
 
         String token = Jwts.builder()
             .setSubject("1234")
+            .setAudience(appKey)
             .setHeaderParam(KEY_ID, "abcdedf")
             .signWith(SignatureAlgorithm.RS256, privateKey)
             .compact();
 
-        OpenIdToken openIdToken = OpenIdToken.of(token);
+        KakaoIdToken kakaoIdToken = KakaoIdToken.of(token);
 
         assertThatThrownBy(() -> {
-            openIdToken.getOAuth2MemberNumber(publicKey);
+            kakaoIdToken.getOAuth2MemberNumber(publicKey, appKey);
         }).isInstanceOf(IllegalStandardTokenException.class);
     }
 
@@ -153,9 +159,9 @@ class OpenIdTokenTest {
             .signWith(SignatureAlgorithm.RS256, privateKey)
             .compact();
 
-        OpenIdToken openIdToken = OpenIdToken.of(token);
+        KakaoIdToken kakaoIdToken = KakaoIdToken.of(token);
 
-        String memberNumberWithProviderType = openIdToken.getOAuth2MemberNumber(publicKey);
+        String memberNumberWithProviderType = kakaoIdToken.getOAuth2MemberNumber(publicKey, appKey);
 
         assertThat(memberNumberWithProviderType).isEqualTo("1234kakao");
     }
@@ -169,6 +175,7 @@ class OpenIdTokenTest {
         claims.put("sub", "1234");
         claims.put("iss", "notsupportedprovider");
         claims.put("email", "test@naver.com");
+        claims.put("aud", appKey);
 
         String token = Jwts.builder()
             .setHeaderParam(KEY_ID, "abcdedf")
@@ -176,11 +183,11 @@ class OpenIdTokenTest {
             .signWith(SignatureAlgorithm.RS256, privateKey)
             .compact();
 
-        OpenIdToken openIdToken = OpenIdToken.of(token);
+        KakaoIdToken kakaoIdToken = KakaoIdToken.of(token);
 
         assertThatThrownBy(() -> {
-            openIdToken.getOAuth2MemberNumber(publicKey);
-        }).isInstanceOf(DenidedTokenException.class);
+            kakaoIdToken.getOAuth2MemberNumber(publicKey, appKey);
+        }).isInstanceOf(NotSupportedOAuth2ProviderException.class);
     }
 
     @Test
@@ -196,9 +203,9 @@ class OpenIdTokenTest {
             .signWith(SignatureAlgorithm.RS256, privateKey)
             .compact();
 
-        OpenIdToken openIdToken = OpenIdToken.of(token);
+        KakaoIdToken kakaoIdToken = KakaoIdToken.of(token);
 
-        String email = openIdToken.getEmail(publicKey);
+        String email = kakaoIdToken.getEmail(publicKey, appKey);
 
         assertThat(email).isEqualTo("test@naver.com");
     }
@@ -211,6 +218,7 @@ class OpenIdTokenTest {
         Map<String, Object> claims = new HashMap<>();
         claims.put("sub", "1234");
         claims.put("iss", "https://kauth.kakao.com");
+        claims.put("aud", appKey);
 
         String token = Jwts.builder()
             .setHeaderParam(KEY_ID, "abcdedf")
@@ -218,10 +226,10 @@ class OpenIdTokenTest {
             .signWith(SignatureAlgorithm.RS256, privateKey)
             .compact();
 
-        OpenIdToken openIdToken = OpenIdToken.of(token);
+        KakaoIdToken kakaoIdToken = KakaoIdToken.of(token);
 
         assertThatThrownBy(() -> {
-            openIdToken.getEmail(publicKey);
+            kakaoIdToken.getEmail(publicKey, appKey);
         }).isInstanceOf(IllegalStandardTokenException.class);
     }
 
@@ -233,6 +241,7 @@ class OpenIdTokenTest {
         Map<String, Object> claims = new HashMap<>();
         claims.put("iss", "https://kauth.kakao.com");
         claims.put("email", "test@naver.com");
+        claims.put("aud", appKey);
 
         String token = Jwts.builder()
             .setHeaderParam(KEY_ID, "abcdedf")
@@ -240,75 +249,10 @@ class OpenIdTokenTest {
             .signWith(SignatureAlgorithm.RS256, privateKey)
             .compact();
 
-        OpenIdToken openIdToken = OpenIdToken.of(token);
+        KakaoIdToken kakaoIdToken = KakaoIdToken.of(token);
 
         assertThatThrownBy(() -> {
-            openIdToken.getOAuth2MemberNumber(publicKey);
-        }).isInstanceOf(IllegalStandardTokenException.class);
-    }
-
-    @Test
-    void openidtoken에서_keyid_정보_없을시_예외발생() throws Exception {
-        PrivateKey privateKey = getPrivateKey();
-
-        Map<String, Object> claims = getClaims();
-
-        String token = Jwts.builder()
-            .setClaims(claims)
-            .signWith(SignatureAlgorithm.RS256, privateKey)
-            .compact();
-
-        OpenIdToken openIdToken = OpenIdToken.of(token);
-
-        assertThatThrownBy(() -> {
-            openIdToken.getKeyId();
-        }).isInstanceOf(IllegalStandardTokenException.class);
-    }
-
-    @Test
-    void openidtoken_만료된토큰으로_keyid조회시_예외발생() throws Exception {
-        PrivateKey privateKey = getPrivateKey();
-
-        Map<String, Object> claims = getClaims();
-
-        String token = Jwts.builder()
-            .setHeaderParam(KEY_ID, "abcdedf")
-            .setClaims(claims)
-            .setExpiration(new Date(0))
-            .signWith(SignatureAlgorithm.RS256, privateKey)
-            .compact();
-
-        OpenIdToken openIdToken = OpenIdToken.of(token);
-
-        assertThatThrownBy(() -> {
-            openIdToken.getKeyId();
-        }).isInstanceOf(ExpiredTokenException.class);
-    }
-
-    @Test
-    void 토큰_포맷_검증으로_header_payload_signature로_작성되었는지_확인() throws Exception {
-        PrivateKey privateKey = getPrivateKey();
-
-        String token = Jwts.builder()
-            .setHeaderParam(KEY_ID, "abcdedf")
-            .setSubject("test")
-            .signWith(SignatureAlgorithm.RS256, privateKey)
-            .compact();
-
-        StringBuilder stringBuilder = new StringBuilder();
-
-        String[] split = token.split("\\.");
-
-        stringBuilder.append(split[0]);
-        stringBuilder.append(".");
-        stringBuilder.append(split[2]);
-        stringBuilder.append(".");
-
-        String informalToken = stringBuilder.toString();
-
-        OpenIdToken openIdToken = OpenIdToken.of(informalToken);
-        assertThatThrownBy(() -> {
-            openIdToken.getKeyId();
+            kakaoIdToken.getOAuth2MemberNumber(publicKey, appKey);
         }).isInstanceOf(IllegalStandardTokenException.class);
     }
 }
