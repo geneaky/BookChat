@@ -19,6 +19,7 @@ public class RefreshToken extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(unique = true)
     private Long userId;
     @Column(columnDefinition = "TEXT")
     private String refreshToken;
