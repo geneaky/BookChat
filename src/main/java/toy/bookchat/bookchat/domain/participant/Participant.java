@@ -62,6 +62,14 @@ public class Participant {
         return this.participantStatus == SUBHOST;
     }
 
+    public boolean isHost() {
+        return this.participantStatus == HOST;
+    }
+
+    public boolean isGuest() {
+        return this.participantStatus == GUEST;
+    }
+
     public void toGuest() {
         this.participantStatus = GUEST;
     }
@@ -73,4 +81,5 @@ public class Participant {
     public void toSubHost() {
         this.participantStatus = SUBHOST;
     }
+
 }
