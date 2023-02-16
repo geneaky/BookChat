@@ -52,6 +52,8 @@ public class ChatService {
             throw new AlreadyParticipatedException();
         });
 
+        /* TODO: 2023-02-16 entityManager native query로 chat insert
+         */
         Chat chat = Chat.builder()
             .chatRoom(chatRoom)
             .user(user)

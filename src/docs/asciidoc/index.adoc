@@ -701,6 +701,23 @@ include::{snippets}/patch-participant-right/http-request.adoc[]
 
 include::{snippets}/patch-participant-right/http-response.adoc[]
 
+---
+
+=== 방장,부방장의 게스트 강퇴
+
+`Request Header`
+
+include::{snippets}/delete-participant/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/delete-participant/path-parameters.adoc[]
+include::{snippets}/delete-participant/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/delete-participant/http-response.adoc[]
+
 == 채팅
 
 === 채팅내역 조회

@@ -28,6 +28,10 @@ public class ChatCacheService {
         this.participantRepository = participantRepository;
     }
 
+    /* TODO: 2023-02-16 entity말고 entity id를 캐시하는 방식으로 변경
+        entity 직접 캐시는 hibernate 2차 캐시를 지원하는 ehcache, infinispan만 가능
+        복잡성에 비해 조회 쿼리만 활용한 캐시는 필요없음
+     */
 
     @Cacheable(cacheNames = "user")
     public User findUserByUserId(Long userId) {
