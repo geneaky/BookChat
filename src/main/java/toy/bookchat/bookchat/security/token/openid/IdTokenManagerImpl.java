@@ -38,14 +38,15 @@ public class IdTokenManagerImpl implements IdTokenManager {
 
     @Override
     public String getOAuth2MemberNumberFromIdToken(String token, OAuth2Provider oAuth2Provider) {
+        String idToken = getIdToken(token);
         if (oAuth2Provider == KAKAO) {
-            return KakaoIdToken.of(getIdToken(token)).getOAuth2MemberNumber(
-                kakaoPublickeyFetcher.getPublicKey(getIdToken(token),
+            return KakaoIdToken.of(idToken).getOAuth2MemberNumber(
+                kakaoPublickeyFetcher.getPublicKey(idToken,
                     oAuth2Properties.getKakaoUri()), oAuth2Properties.getKakaoAppKey());
         }
 
         if (oAuth2Provider == GOOGLE) {
-            return googleIdTokenReaderTemplate(getIdToken(token),
+            return googleIdTokenReaderTemplate(idToken,
                 googleIdToken -> googleIdToken.getPayload().getSubject()) + GOOGLE.getValue();
         }
 
@@ -54,14 +55,16 @@ public class IdTokenManagerImpl implements IdTokenManager {
 
     @Override
     public String getUserEmailFromToken(String token, OAuth2Provider oAuth2Provider) {
+        String idToken = getIdToken(token);
         if (oAuth2Provider == KAKAO) {
-            return KakaoIdToken.of(getIdToken(token))
-                .getEmail(kakaoPublickeyFetcher.getPublicKey(token, oAuth2Properties.getKakaoUri()),
+            return KakaoIdToken.of(idToken)
+                .getEmail(
+                    kakaoPublickeyFetcher.getPublicKey(idToken, oAuth2Properties.getKakaoUri()),
                     oAuth2Properties.getKakaoAppKey());
         }
 
         if (oAuth2Provider == GOOGLE) {
-            return googleIdTokenReaderTemplate(getIdToken(token),
+            return googleIdTokenReaderTemplate(idToken,
                 googleIdToken -> googleIdToken.getPayload().getEmail());
         }
 
