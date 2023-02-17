@@ -80,7 +80,12 @@ public class BookShelf extends BaseEntity {
     }
 
     public List<String> getBookAuthors() {
+        loadBookAuthors();
         return this.book.getAuthors();
+    }
+
+    private void loadBookAuthors() {
+        this.book.getAuthors().size();
     }
 
     public String getBookPublisher() {
