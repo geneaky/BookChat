@@ -33,6 +33,12 @@ public class ParticipantService {
         this.participantRepository = participantRepository;
     }
 
+    private static void validateIsHost(User user, ChatRoom chatRoom) {
+        if (chatRoom.getHost() != user) {
+            throw new NotHostException();
+        }
+    }
+
     @Transactional(readOnly = true)
     public ChatRoomParticipantsResponse getChatRoomUsers(Long roomId, Long userId) {
         return ChatRoomParticipantsResponse.from(
@@ -71,12 +77,6 @@ public class ParticipantService {
         }
     }
 
-    private static void validateIsHost(User user, ChatRoom chatRoom) {
-        if (chatRoom.getHost() != user) {
-            throw new NotHostException();
-        }
-    }
-
     @Transactional
     public void deleteParticipant(Long roomId, Long userId, Long adminId) {
         User requester = userRepository.findById(adminId).orElseThrow(UserNotFoundException::new);
@@ -93,9 +93,11 @@ public class ParticipantService {
             participantRepository.delete(targetParticipant);
 
         }
-        
+
         if (admin.isSubHost() && targetParticipant.isGuest()) {
             participantRepository.delete(targetParticipant);
         }
+
+
     }
 }

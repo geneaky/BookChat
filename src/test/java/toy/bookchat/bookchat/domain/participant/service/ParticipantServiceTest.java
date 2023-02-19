@@ -304,4 +304,9 @@ class ParticipantServiceTest {
             }
         );
     }
+
+    @Test
+    void 방장의_부방장_강퇴_성공() throws Exception {
+        
+    }
 }
