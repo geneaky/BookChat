@@ -25,6 +25,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.util.Base64Utils;
+import org.springframework.web.reactive.function.client.WebClient;
 import toy.bookchat.bookchat.config.token.OAuth2Properties;
 import toy.bookchat.bookchat.security.token.openid.keys.KakaoPublicKeyFetcher;
 
@@ -34,6 +35,8 @@ class KakaoPublicKeyFetcherTest {
 
     @MockBean
     OAuth2Properties oAuth2Properties;
+    @MockBean
+    WebClient webClient;
     @Autowired
     KakaoPublicKeyFetcher kakaoPublickeyFetcher;
     @Autowired

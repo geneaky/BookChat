@@ -20,7 +20,6 @@ import lombok.Builder;
 import lombok.Getter;
 import toy.bookchat.bookchat.domain.BaseEntity;
 import toy.bookchat.bookchat.domain.book.Book;
-import toy.bookchat.bookchat.domain.bookreport.BookReport;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.exception.bookshelf.BookReportNotFoundException;
 

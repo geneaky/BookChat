@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import org.springframework.data.domain.Slice;
-import toy.bookchat.bookchat.domain.agonyrecord.AgonyRecord;
+import toy.bookchat.bookchat.domain.agony.AgonyRecord;
 import toy.bookchat.bookchat.domain.common.CursorMeta;
 
 @Getter
