@@ -307,6 +307,121 @@ class ParticipantServiceTest {
 
     @Test
     void 방장의_부방장_강퇴_성공() throws Exception {
-        
+        User host = User.builder()
+            .id(1L)
+            .build();
+        User subHost = User.builder()
+            .id(2L)
+            .build();
+        ChatRoom chatRoom = ChatRoom.builder()
+            .id(1L)
+            .host(host)
+            .build();
+
+        Participant participant1 = Participant.builder()
+            .id(1L)
+            .user(host)
+            .participantStatus(HOST)
+            .chatRoom(chatRoom)
+            .build();
+        Participant participant2 = Participant.builder()
+            .id(2L)
+            .user(subHost)
+            .participantStatus(SUBHOST)
+            .chatRoom(chatRoom)
+            .build();
+
+        when(userRepository.findById(host.getId())).thenReturn(Optional.of(host));
+        when(userRepository.findById(subHost.getId())).thenReturn(Optional.of(subHost));
+        when(chatRoomRepository.findById(chatRoom.getId())).thenReturn(Optional.of(chatRoom));
+        when(participantRepository.findByUserAndChatRoom(host, chatRoom)).thenReturn(
+            Optional.ofNullable(participant1));
+        when(participantRepository.findByUserAndChatRoom(subHost, chatRoom)).thenReturn(
+            Optional.ofNullable(participant2));
+
+        participantService.deleteParticipant(chatRoom.getId(), subHost.getId(), host.getId());
+
+        verify(participantRepository).delete(participant2);
+    }
+
+    @Test
+    void 방장의_게스트_강퇴_성공() throws Exception {
+        User host = User.builder()
+            .id(1L)
+            .build();
+        User guest = User.builder()
+            .id(2L)
+            .build();
+        ChatRoom chatRoom = ChatRoom.builder()
+            .id(1L)
+            .host(host)
+            .build();
+
+        Participant participant1 = Participant.builder()
+            .id(1L)
+            .user(host)
+            .participantStatus(HOST)
+            .chatRoom(chatRoom)
+            .build();
+        Participant participant2 = Participant.builder()
+            .id(2L)
+            .user(guest)
+            .participantStatus(GUEST)
+            .chatRoom(chatRoom)
+            .build();
+
+        when(userRepository.findById(host.getId())).thenReturn(Optional.of(host));
+        when(userRepository.findById(guest.getId())).thenReturn(Optional.of(guest));
+        when(chatRoomRepository.findById(chatRoom.getId())).thenReturn(Optional.of(chatRoom));
+        when(participantRepository.findByUserAndChatRoom(host, chatRoom)).thenReturn(
+            Optional.ofNullable(participant1));
+        when(participantRepository.findByUserAndChatRoom(guest, chatRoom)).thenReturn(
+            Optional.ofNullable(participant2));
+
+        participantService.deleteParticipant(chatRoom.getId(), guest.getId(), host.getId());
+
+        verify(participantRepository).delete(participant2);
+    }
+
+    @Test
+    void 부방장의_게스트_강퇴_성공() throws Exception {
+        User host = User.builder()
+            .id(1L)
+            .build();
+        User subHost = User.builder()
+            .id(2L)
+            .build();
+        User guest = User.builder()
+            .id(3L)
+            .build();
+        ChatRoom chatRoom = ChatRoom.builder()
+            .id(1L)
+            .host(host)
+            .build();
+
+        Participant participant1 = Participant.builder()
+            .id(1L)
+            .user(subHost)
+            .participantStatus(SUBHOST)
+            .chatRoom(chatRoom)
+            .build();
+        Participant participant2 = Participant.builder()
+            .id(2L)
+            .user(guest)
+            .participantStatus(GUEST)
+            .chatRoom(chatRoom)
+            .build();
+
+        when(userRepository.findById(subHost.getId())).thenReturn(Optional.of(subHost));
+        when(userRepository.findById(guest.getId())).thenReturn(Optional.of(guest));
+        when(chatRoomRepository.findById(chatRoom.getId())).thenReturn(Optional.of(chatRoom));
+        when(participantRepository.findByUserAndChatRoom(subHost, chatRoom)).thenReturn(
+            Optional.ofNullable(participant1));
+        when(participantRepository.findByUserAndChatRoom(guest, chatRoom)).thenReturn(
+            Optional.ofNullable(participant2));
+
+        participantService.deleteParticipant(chatRoom.getId(), guest.getId(), subHost.getId());
+
+        verify(participantRepository).delete(participant2);
     }
 }
