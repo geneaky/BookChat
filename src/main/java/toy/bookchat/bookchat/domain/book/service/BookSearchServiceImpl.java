@@ -41,20 +41,22 @@ public class BookSearchServiceImpl implements BookSearchService {
 
 
     private BookSearchResponse fetchBooks(BookSearchRequest bookSearchRequest) {
-        UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder
+        URI uri = UriComponentsBuilder
             .fromUri(URI.create(apiUri))
             .queryParam(QUERY, bookSearchRequest.getQuery())
             .queryParamIfPresent(PAGE, bookSearchRequest.getPage())
             .queryParamIfPresent(SIZE, bookSearchRequest.getSize())
-            .queryParamIfPresent(SORT, bookSearchRequest.getSort());
+            .queryParamIfPresent(SORT, bookSearchRequest.getSort())
+            .encode(StandardCharsets.UTF_8)
+            .build()
+            .toUri();
 
         Map<String, String> headerMap = new HashMap<>(3);
         headerMap.put(AUTHORIZATION, header);
         headerMap.put(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
         headerMap.put(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 
-        KakaoBook kakaoBook = webClient.get().uri(uriComponentsBuilder.build().encode(
-                StandardCharsets.UTF_8).toUri())
+        KakaoBook kakaoBook = webClient.get().uri(uri)
             .headers(httpHeaders -> httpHeaders.setAll(headerMap))
             .retrieve()
             .bodyToMono(KakaoBook.class).block();

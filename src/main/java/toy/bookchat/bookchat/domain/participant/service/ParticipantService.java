@@ -91,7 +91,6 @@ public class ParticipantService {
 
         if (admin.isHost()) {
             participantRepository.delete(targetParticipant);
-
         }
 
         if (admin.isSubHost() && targetParticipant.isGuest()) {
