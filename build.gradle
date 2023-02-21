@@ -93,7 +93,6 @@ dependencies {
 
 jacocoTestCoverageVerification {
     def Qdomains = []
-
     for (qPattern in '*.QA'..'*.QZ') { // qPattern = '*.QA', '*.QB', ... '*.QZ'
         Qdomains.add(qPattern + '*')
     }
@@ -127,6 +126,17 @@ jacocoTestReport {
     reports {
         xml.enabled true
     }
+
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                    "**/config/*",
+                    "**/exception/*",
+                    "**/dto/*"
+            ])
+        }))
+    }
+
     finalizedBy 'jacocoTestCoverageVerification'
 }
 

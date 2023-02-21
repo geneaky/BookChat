@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.config;
+package toy.bookchat.bookchat.security.token.openid.keys;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -23,8 +23,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.util.Base64Utils;
 import org.springframework.web.reactive.function.client.WebClient;
-import toy.bookchat.bookchat.security.token.openid.keys.KakaoPublicKeyFetcher;
-import toy.bookchat.bookchat.security.token.openid.keys.KakaoPublicKeys;
 
 @ExtendWith(MockitoExtension.class)
 class KakaoPublicKeyFetcherTest {
