@@ -12,7 +12,9 @@ import toy.bookchat.bookchat.domain.chat.service.cache.ChatRoomCache;
 import toy.bookchat.bookchat.domain.chat.service.cache.ParticipantCache;
 import toy.bookchat.bookchat.domain.chat.service.cache.UserCache;
 import toy.bookchat.bookchat.domain.chat.service.dto.response.ChatRoomChatsResponse;
+import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomBlockedUserRepository;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
+import toy.bookchat.bookchat.exception.chatroom.BlockedUserInChatRoomException;
 import toy.bookchat.bookchat.exception.participant.AlreadyParticipatedException;
 
 @Service
@@ -21,14 +23,17 @@ public class ChatService {
     public static final String DESTINATION_PREFIX = "/topic/";
     private final ChatRepository chatRepository;
     private final ParticipantRepository participantRepository;
+    private final ChatRoomBlockedUserRepository chatRoomBlockedUserRepository;
     private final SimpMessagingTemplate messagingTemplate;
     private final ChatCacheService chatCacheService;
 
 
     public ChatService(ChatRepository chatRepository, ParticipantRepository participantRepository,
+        ChatRoomBlockedUserRepository chatRoomBlockedUserRepository,
         SimpMessagingTemplate messagingTemplate, ChatCacheService chatCacheService) {
         this.chatRepository = chatRepository;
         this.participantRepository = participantRepository;
+        this.chatRoomBlockedUserRepository = chatRoomBlockedUserRepository;
         this.messagingTemplate = messagingTemplate;
         this.chatCacheService = chatCacheService;
     }
@@ -42,10 +47,15 @@ public class ChatService {
         UserCache userCache = chatCacheService.findUserByUserId(userId);
         ChatRoomCache chatRoomCache = chatCacheService.findChatRoomByRoomSid(roomSid);
 
-        /* TODO: 2023-02-08 채팅방 인원수 초과시 입장 불가 처리 - 동시성 제어 named lock */
+        /* TODO: 2023-02-08 채팅방 인원수 초과시 입장 불가 처리 - 동시성 제어 pessimistic lock */
         participantRepository.findByUserIdAndChatRoomId(userCache.getUserId(),
             chatRoomCache.getChatRoomId()).ifPresent(p -> {
             throw new AlreadyParticipatedException();
+        });
+
+        chatRoomBlockedUserRepository.findByUserIdAndChatRoomId(userCache.getUserId(),
+            chatRoomCache.getChatRoomId()).ifPresent(b -> {
+            throw new BlockedUserInChatRoomException();
         });
 
         participantRepository.insertParticipantNativeQuery(userCache.getUserId(),

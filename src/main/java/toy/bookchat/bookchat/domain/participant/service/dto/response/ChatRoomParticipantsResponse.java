@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.domain.participant.service.dto;
+package toy.bookchat.bookchat.domain.participant.service.dto.response;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import toy.bookchat.bookchat.domain.participant.Participant;
+import toy.bookchat.bookchat.domain.participant.service.dto.RoomGuest;
+import toy.bookchat.bookchat.domain.participant.service.dto.RoomHost;
+import toy.bookchat.bookchat.domain.participant.service.dto.RoomSubHost;
 import toy.bookchat.bookchat.domain.user.User;
 
 @Getter

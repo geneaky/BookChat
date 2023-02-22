@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import toy.bookchat.bookchat.domain.participant.ParticipantStatus;
 import toy.bookchat.bookchat.domain.participant.service.ParticipantService;
-import toy.bookchat.bookchat.domain.participant.service.dto.ChatRoomParticipantsResponse;
+import toy.bookchat.bookchat.domain.participant.service.dto.response.ChatRoomParticipantsResponse;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPayload;
 

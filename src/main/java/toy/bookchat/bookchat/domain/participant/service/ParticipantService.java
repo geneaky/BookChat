@@ -1,17 +1,23 @@
 package toy.bookchat.bookchat.domain.participant.service;
 
+import static toy.bookchat.bookchat.config.rabbitmq.RabbitMQProperties.CACHE_CLEAR_EXCHANGE_NAME;
+import static toy.bookchat.bookchat.config.rabbitmq.RabbitMQProperties.CACHE_CLEAR_ROUTING_KEY;
 import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.GUEST;
 import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.HOST;
 import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.SUBHOST;
 
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
+import toy.bookchat.bookchat.domain.chatroom.ChatRoomBlockedUser;
+import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomBlockedUserRepository;
 import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomRepository;
 import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.participant.ParticipantStatus;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
-import toy.bookchat.bookchat.domain.participant.service.dto.ChatRoomParticipantsResponse;
+import toy.bookchat.bookchat.domain.participant.service.dto.CacheClearMessage;
+import toy.bookchat.bookchat.domain.participant.service.dto.response.ChatRoomParticipantsResponse;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.exception.chatroom.ChatRoomNotFoundException;
@@ -25,12 +31,18 @@ public class ParticipantService {
     private final UserRepository userRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final ParticipantRepository participantRepository;
+    private final ChatRoomBlockedUserRepository chatRoomBlockedUserRepository;
+    private final RabbitTemplate rabbitTemplate;
 
     public ParticipantService(UserRepository userRepository,
-        ChatRoomRepository chatRoomRepository, ParticipantRepository participantRepository) {
+        ChatRoomRepository chatRoomRepository, ParticipantRepository participantRepository,
+        ChatRoomBlockedUserRepository chatRoomBlockedUserRepository,
+        RabbitTemplate rabbitTemplate) {
         this.userRepository = userRepository;
         this.chatRoomRepository = chatRoomRepository;
         this.participantRepository = participantRepository;
+        this.chatRoomBlockedUserRepository = chatRoomBlockedUserRepository;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     private static void validateIsHost(User user, ChatRoom chatRoom) {
@@ -79,24 +91,59 @@ public class ParticipantService {
 
     @Transactional
     public void deleteParticipant(Long roomId, Long userId, Long adminId) {
-        User requester = userRepository.findById(adminId).orElseThrow(UserNotFoundException::new);
+        User admin = userRepository.findById(adminId).orElseThrow(UserNotFoundException::new);
         User target = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
             .orElseThrow(ChatRoomNotFoundException::new);
-        Participant admin = participantRepository.findByUserAndChatRoom(requester, chatRoom)
+        Participant adminParticipant = participantRepository.findByUserAndChatRoom(admin, chatRoom)
             .orElseThrow(ParticipantNotFoundException::new);
         Participant targetParticipant = participantRepository.findByUserAndChatRoom(target,
                 chatRoom)
             .orElseThrow(ParticipantNotFoundException::new);
 
-        if (admin.isHost()) {
+        ChatRoomBlockedUser blockedUser = ChatRoomBlockedUser.builder()
+            .user(target)
+            .chatRoom(chatRoom).build();
+
+        hostDeleteParticipant(chatRoom, adminParticipant, targetParticipant, blockedUser);
+        subHostDeleteParticipant(chatRoom, adminParticipant, targetParticipant, blockedUser);
+    }
+
+    private void subHostDeleteParticipant(ChatRoom chatRoom, Participant adminParticipant,
+        Participant targetParticipant, ChatRoomBlockedUser blockedUser) {
+        if (adminParticipant.isSubHost() && targetParticipant.isGuest()) {
             participantRepository.delete(targetParticipant);
-        }
+            chatRoomBlockedUserRepository.save(blockedUser);
 
-        if (admin.isSubHost() && targetParticipant.isGuest()) {
+            CacheClearMessage message = CacheClearMessage.builder()
+                .blockedUserNickname(targetParticipant.getUserNickname())
+                .adminId(adminParticipant.getId())
+                .userId(targetParticipant.getUserId())
+                .chatRoomId(chatRoom.getId())
+                .roomSid(chatRoom.getRoomSid())
+                .build();
+
+            rabbitTemplate.convertAndSend(CACHE_CLEAR_EXCHANGE_NAME.getValue(),
+                CACHE_CLEAR_ROUTING_KEY.getValue(), message);
+        }
+    }
+
+    private void hostDeleteParticipant(ChatRoom chatRoom, Participant adminParticipant,
+        Participant targetParticipant, ChatRoomBlockedUser blockedUser) {
+        if (adminParticipant.isHost()) {
             participantRepository.delete(targetParticipant);
+            chatRoomBlockedUserRepository.save(blockedUser);
+
+            CacheClearMessage message = CacheClearMessage.builder()
+                .blockedUserNickname(targetParticipant.getUserNickname())
+                .adminId(adminParticipant.getId())
+                .userId(targetParticipant.getUserId())
+                .chatRoomId(chatRoom.getId())
+                .roomSid(chatRoom.getRoomSid())
+                .build();
+
+            rabbitTemplate.convertAndSend(CACHE_CLEAR_EXCHANGE_NAME.getValue(),
+                CACHE_CLEAR_ROUTING_KEY.getValue(), message);
         }
-
-
     }
 }

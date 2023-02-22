@@ -28,10 +28,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
 import toy.bookchat.bookchat.domain.participant.service.ParticipantService;
-import toy.bookchat.bookchat.domain.participant.service.dto.ChatRoomParticipantsResponse;
 import toy.bookchat.bookchat.domain.participant.service.dto.RoomGuest;
 import toy.bookchat.bookchat.domain.participant.service.dto.RoomHost;
 import toy.bookchat.bookchat.domain.participant.service.dto.RoomSubHost;
+import toy.bookchat.bookchat.domain.participant.service.dto.response.ChatRoomParticipantsResponse;
 
 @ParticipantPresentationTest
 class ParticipantControllerTest extends ControllerTestExtension {

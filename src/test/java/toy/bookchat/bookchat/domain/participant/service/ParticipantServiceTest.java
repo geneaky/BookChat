@@ -21,7 +21,7 @@ import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
 import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomRepository;
 import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
-import toy.bookchat.bookchat.domain.participant.service.dto.ChatRoomParticipantsResponse;
+import toy.bookchat.bookchat.domain.participant.service.dto.response.ChatRoomParticipantsResponse;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.exception.participant.NotHostException;
