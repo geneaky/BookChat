@@ -7,6 +7,7 @@ import static toy.bookchat.bookchat.domain.user.QUser.user;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Repository;
 import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.participant.QParticipant;
@@ -33,5 +34,16 @@ public class ParticipantQueryRepositoryImpl implements ParticipantQueryRepositor
                 .where(subParticipant.chatRoom.id.eq(roomId)
                     .and(subParticipant.user.id.eq(userId)))))
             .fetch();
+    }
+
+    @Override
+    public Optional<Participant> findByUserIdAndChatRoomId(Long userId, Long chatRoomId) {
+        return Optional.ofNullable(
+            queryFactory.select(participant)
+                .from(participant)
+                .where(participant.user.id.eq(userId)
+                    .and(participant.chatRoom.id.eq(chatRoomId)))
+                .fetchOne()
+        );
     }
 }

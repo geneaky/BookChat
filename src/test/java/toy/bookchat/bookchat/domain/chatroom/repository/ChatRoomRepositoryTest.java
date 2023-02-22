@@ -71,10 +71,18 @@ class ChatRoomRepositoryTest {
         chatRoomRepository.save(chatRoom2);
         chatRoomRepository.save(chatRoom3);
 
-        Chat chat1 = Chat.builder().user(user1).message("a").chatRoom(chatRoom1).build();
-        Chat chat2 = Chat.builder().user(user1).message("b").chatRoom(chatRoom2).build();
-        Chat chat3 = Chat.builder().user(user1).message("c").chatRoom(chatRoom3).build();
-        Chat chat4 = Chat.builder().user(user2).message("d").chatRoom(chatRoom3).build();
+        Chat chat1 = Chat.builder().userIdForeignKey(user1.getId()).message("a")
+            .chatRoomIdForeignKey(chatRoom1.getId())
+            .build();
+        Chat chat2 = Chat.builder().userIdForeignKey(user1.getId()).message("b")
+            .chatRoomIdForeignKey(chatRoom2.getId())
+            .build();
+        Chat chat3 = Chat.builder().userIdForeignKey(user1.getId()).message("c")
+            .chatRoomIdForeignKey(chatRoom3.getId())
+            .build();
+        Chat chat4 = Chat.builder().userIdForeignKey(user2.getId()).message("d")
+            .chatRoomIdForeignKey(chatRoom3.getId())
+            .build();
         chatRepository.save(chat1);
         chatRepository.save(chat2);
         chatRepository.save(chat3);
@@ -135,10 +143,18 @@ class ChatRoomRepositoryTest {
         chatRoomRepository.save(chatRoom2);
         chatRoomRepository.save(chatRoom3);
 
-        Chat chat1 = Chat.builder().user(user1).message("a").chatRoom(chatRoom1).build();
-        Chat chat2 = Chat.builder().user(user1).message("b").chatRoom(chatRoom2).build();
-        Chat chat3 = Chat.builder().user(user2).message("c").chatRoom(chatRoom3).build();
-        Chat chat4 = Chat.builder().user(user1).message("d").chatRoom(chatRoom3).build();
+        Chat chat1 = Chat.builder().userIdForeignKey(user1.getId()).message("a")
+            .chatRoomIdForeignKey(chatRoom1.getId())
+            .build();
+        Chat chat2 = Chat.builder().userIdForeignKey(user1.getId()).message("b")
+            .chatRoomIdForeignKey(chatRoom2.getId())
+            .build();
+        Chat chat3 = Chat.builder().userIdForeignKey(user2.getId()).message("c")
+            .chatRoomIdForeignKey(chatRoom3.getId())
+            .build();
+        Chat chat4 = Chat.builder().userIdForeignKey(user1.getId()).message("d")
+            .chatRoomIdForeignKey(chatRoom3.getId())
+            .build();
         chatRepository.save(chat1);
         chatRepository.save(chat2);
         chatRepository.save(chat3);

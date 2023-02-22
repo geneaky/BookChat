@@ -90,68 +90,39 @@ class ChatCacheServiceTest {
     }
 
     @Test
-    void 참가자_캐시_등록_성공() throws Exception {
-        User user = mock(User.class);
-        ChatRoom chatRoom = mock(ChatRoom.class);
-        Participant participant = mock(Participant.class);
-
-        when(user.getId()).thenReturn(1L);
-        when(chatRoom.getId()).thenReturn(1L);
-        cacheService.saveParticipantCache(user, chatRoom, participant);
-        cacheService.saveParticipantCache(user, chatRoom, participant);
-        when(user.getId()).thenReturn(2L);
-        when(chatRoom.getId()).thenReturn(2L);
-        cacheService.saveParticipantCache(user, chatRoom, participant);
-        cacheService.saveParticipantCache(user, chatRoom, participant);
-
-        ConcurrentMap<Object, Object> caches = ((CaffeineCache) cacheManager.getCache(
-            "participant")).getNativeCache().asMap();
-
-        assertThat(caches).hasSize(2);
-    }
-
-    @Test
     void 참가자_캐시되어있지_않으면_조회동작_성공() throws Exception {
-        User user = mock(User.class);
-        ChatRoom chatRoom = mock(ChatRoom.class);
         Participant participant = mock(Participant.class);
 
-        when(participantRepository.findByUserAndChatRoom(any(), any())).thenReturn(
+        when(participantRepository.findByUserIdAndChatRoomId(any(), any())).thenReturn(
             Optional.of(participant));
 
-        cacheService.findParticipantByUserAndChatRoom(user, chatRoom);
+        cacheService.findParticipantByUserIdAndChatRoomId(1L, 1L);
 
-        verify(participantRepository).findByUserAndChatRoom(any(), any());
+        verify(participantRepository).findByUserIdAndChatRoomId(any(), any());
     }
 
     @Test
     void 참가자_캐시되어있으면_조회없이_반환_성공() throws Exception {
-        User user = mock(User.class);
-        ChatRoom chatRoom = mock(ChatRoom.class);
         Participant participant = mock(Participant.class);
 
-        when(participantRepository.findByUserAndChatRoom(any(), any())).thenReturn(
+        when(participantRepository.findByUserIdAndChatRoomId(any(), any())).thenReturn(
             Optional.of(participant));
 
-        cacheService.findParticipantByUserAndChatRoom(user, chatRoom);
-        cacheService.findParticipantByUserAndChatRoom(user, chatRoom);
+        cacheService.findParticipantByUserIdAndChatRoomId(1L, 1L);
+        cacheService.findParticipantByUserIdAndChatRoomId(1L, 1L);
 
-        verify(participantRepository).findByUserAndChatRoom(any(), any());
+        verify(participantRepository).findByUserIdAndChatRoomId(any(), any());
     }
 
     @Test
     void 참가자_캐시_삭제_성공() throws Exception {
-        User user = mock(User.class);
-        ChatRoom chatRoom = mock(ChatRoom.class);
         Participant participant = mock(Participant.class);
 
-        when(user.getId()).thenReturn(1L);
-        when(chatRoom.getId()).thenReturn(1L);
-        when(participantRepository.findByUserAndChatRoom(any(), any())).thenReturn(
+        when(participantRepository.findByUserIdAndChatRoomId(any(), any())).thenReturn(
             Optional.of(participant));
 
-        cacheService.findParticipantByUserAndChatRoom(user, chatRoom);
-        cacheService.deleteParticipantCache(user, chatRoom);
+        cacheService.findParticipantByUserIdAndChatRoomId(1L, 1l);
+        cacheService.deleteParticipantCache(1L, 1L);
 
         ConcurrentMap<Object, Object> caches = ((CaffeineCache) cacheManager.getCache(
             "participant")).getNativeCache().asMap();

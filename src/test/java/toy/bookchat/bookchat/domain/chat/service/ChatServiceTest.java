@@ -22,6 +22,11 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import toy.bookchat.bookchat.domain.chat.Chat;
 import toy.bookchat.bookchat.domain.chat.api.dto.ChatDto;
 import toy.bookchat.bookchat.domain.chat.repository.ChatRepository;
+import toy.bookchat.bookchat.domain.chat.service.cache.ChatRoomCache;
+import toy.bookchat.bookchat.domain.chat.service.cache.ParticipantCache;
+import toy.bookchat.bookchat.domain.chat.service.cache.UserCache;
+import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
+import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
 import toy.bookchat.bookchat.domain.user.User;
 
@@ -42,27 +47,69 @@ class ChatServiceTest {
 
     @Test
     void 채팅방_입장_성공() throws Exception {
-        User user = mock(User.class);
+        User user = User.builder()
+            .id(1L)
+            .nickname("testNick")
+            .profileImageUrl("testImage")
+            .defaultProfileImageType(1)
+            .build();
 
-        when(user.getNickname()).thenReturn("testNick");
-        when(chatCacheService.findUserByUserId(any())).thenReturn(user);
-        chatService.enterChatRoom(1L, "testRoomSid");
+        ChatRoom chatRoom = ChatRoom.builder()
+            .id(1L)
+            .roomSid("testRoomSid")
+            .build();
 
-        verify(participantRepository).save(any());
-        verify(chatCacheService).saveParticipantCache(any(), any(), any());
+        Chat chat = Chat.builder()
+            .user(user)
+            .chatRoom(chatRoom)
+            .message("test")
+            .build();
+        chat.setCreatedAt(LocalDateTime.now());
+
+        when(chatCacheService.findUserByUserId(any())).thenReturn(UserCache.of(user));
+        when(chatCacheService.findChatRoomByRoomSid(any())).thenReturn(ChatRoomCache.of(chatRoom));
+        when(chatRepository.save(any())).thenReturn(chat);
+        chatService.enterChatRoom(user.getId(), chatRoom.getRoomSid());
+
+        verify(participantRepository).insertParticipantNativeQuery(any(), any());
         verify(chatRepository).save(any());
         verify(messagingTemplate).convertAndSend(anyString(), any(ChatDto.class));
     }
 
     @Test
     void 채팅방_퇴장_성공() throws Exception {
-        User user = mock(User.class);
+        User user = User.builder()
+            .id(1L)
+            .nickname("testNick")
+            .profileImageUrl("testImage")
+            .defaultProfileImageType(1)
+            .build();
 
-        when(user.getNickname()).thenReturn("testNick");
-        when(chatCacheService.findUserByUserId(any())).thenReturn(user);
-        chatService.leaveChatRoom(1L, "testRoomSid");
+        ChatRoom chatRoom = ChatRoom.builder()
+            .id(1L)
+            .roomSid("testRoomSid")
+            .build();
 
-        verify(participantRepository).delete(any());
+        Participant participant = Participant.builder()
+            .id(1L)
+            .build();
+
+        Chat chat = Chat.builder()
+            .id(1L)
+            .userIdForeignKey(user.getId())
+            .chatRoomIdForeignKey(chatRoom.getId())
+            .message("퇴장")
+            .build();
+        chat.setCreatedAt(LocalDateTime.now());
+
+        when(chatCacheService.findUserByUserId(any())).thenReturn(UserCache.of(user));
+        when(chatCacheService.findChatRoomByRoomSid(any())).thenReturn(ChatRoomCache.of(chatRoom));
+        when(chatCacheService.findParticipantByUserIdAndChatRoomId(any(), any())).thenReturn(
+            ParticipantCache.of(participant));
+        when(chatRepository.save(any())).thenReturn(chat);
+        chatService.leaveChatRoom(user.getId(), chatRoom.getRoomSid());
+
+        verify(participantRepository).deleteById(any());
         verify(chatCacheService).deleteParticipantCache(any(), any());
         verify(chatRepository).save(any());
         verify(messagingTemplate).convertAndSend(anyString(), any(ChatDto.class));
@@ -70,8 +117,37 @@ class ChatServiceTest {
 
     @Test
     void 메시지_전송_성공() throws Exception {
+        User user = User.builder()
+            .id(1L)
+            .nickname("testNick")
+            .profileImageUrl("testImage")
+            .defaultProfileImageType(1)
+            .build();
+
+        ChatRoom chatRoom = ChatRoom.builder()
+            .id(1L)
+            .roomSid("testRoomSid")
+            .build();
+
+        Participant participant = Participant.builder()
+            .id(1L)
+            .build();
+
+        Chat chat = Chat.builder()
+            .id(1L)
+            .userIdForeignKey(user.getId())
+            .chatRoomIdForeignKey(chatRoom.getId())
+            .message("test message")
+            .build();
+        chat.setCreatedAt(LocalDateTime.now());
+
+        when(chatCacheService.findUserByUserId(any())).thenReturn(UserCache.of(user));
+        when(chatCacheService.findChatRoomByRoomSid(any())).thenReturn(ChatRoomCache.of(chatRoom));
+        when(chatCacheService.findParticipantByUserIdAndChatRoomId(any(), any())).thenReturn(
+            ParticipantCache.of(participant));
+        when(chatRepository.save(any())).thenReturn(chat);
         ChatDto chatDto = mock(ChatDto.class);
-        chatService.sendMessage(1L, "testRoomSid", chatDto);
+        chatService.sendMessage(user.getId(), chatRoom.getRoomSid(), chatDto);
 
         verify(chatRepository).save(any());
         verify(messagingTemplate).convertAndSend(anyString(), any(ChatDto.class));

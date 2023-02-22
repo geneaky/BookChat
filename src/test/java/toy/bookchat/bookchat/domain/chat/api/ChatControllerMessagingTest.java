@@ -2,7 +2,6 @@ package toy.bookchat.bookchat.domain.chat.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -10,6 +9,7 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static toy.bookchat.bookchat.exception.ExceptionResponse.BAD_REQUEST;
 
 import java.lang.reflect.Type;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
@@ -33,6 +33,7 @@ import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 import toy.bookchat.bookchat.domain.StompTestExtension;
+import toy.bookchat.bookchat.domain.chat.Chat;
 import toy.bookchat.bookchat.domain.chat.api.dto.ChatDto;
 import toy.bookchat.bookchat.domain.chat.repository.ChatRepository;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
@@ -122,21 +123,38 @@ class ChatControllerMessagingTest extends StompTestExtension {
 
     @Test
     void 채팅방_입장_메시지_수신_성공() throws Exception {
-
         StompHeaders subscribeHeader = stompSubscribeHeaders("/topic/heho");
         StompHeaders enterHeader = stompSendHeaders("/subscriptions/enter/chatrooms/heho");
 
+        ChatRoom chatRoom = ChatRoom.builder()
+            .id(1L)
+            .build();
+
+        Chat chat = Chat.builder()
+            .id(1L)
+            .message(getUserNickname() + "님이 입장하셨습니다.")
+            .userIdForeignKey(getUserId())
+            .chatRoomIdForeignKey(chatRoom.getId())
+            .build();
+        chat.setCreatedAt(LocalDateTime.now());
+
         ChatDto dto = ChatDto.builder()
-            .message(getUser().getNickname() + "님이 입장하셨습니다.")
+            .senderId(getUserId())
+            .senderNickname(getUserNickname())
+            .senderProfileImageUrl(getUserProfileImageUrl())
+            .senderDefaultProfileImageType(getUserDefaultProfileImageType())
+            .chatId(chat.getId())
+            .dispatchTime(chat.getDispatchTime())
+            .message(chat.getMessage())
             .build();
 
         Runnable[] chatActions = {
             () -> this.stompSession.send(enterHeader, null),
         };
 
-        ChatRoom chatRoom = mock(ChatRoom.class);
         when(userRepository.findById(any())).thenReturn(Optional.ofNullable(getUser()));
         when(chatRoomRepository.findByRoomSid(any())).thenReturn(Optional.of(chatRoom));
+        when(chatRepository.save(any())).thenReturn(chat);
 
         CountDownLatch chatAttemptCountLatch = new CountDownLatch(chatActions.length);
         this.stompSession.subscribe(subscribeHeader,
@@ -146,7 +164,7 @@ class ChatControllerMessagingTest extends StompTestExtension {
 
         assertThat(blockingQueue).containsExactlyInAnyOrder(dto);
         verify(chatRepository).save(any());
-        verify(participantRepository).save(any());
+        verify(participantRepository).insertParticipantNativeQuery(any(), any());
     }
 
     @Test
@@ -154,14 +172,66 @@ class ChatControllerMessagingTest extends StompTestExtension {
         StompHeaders subscribeHeader = stompSubscribeHeaders("/topic/heho");
         StompHeaders sendHeader = stompSendHeaders("/subscriptions/send/chatrooms/heho");
 
-        ChatDto dto1 = ChatDto.builder()
+        ChatRoom chatRoom = ChatRoom.builder()
+            .id(1L)
+            .build();
+
+        Chat chat1 = Chat.builder()
+            .id(1L)
             .message("test")
+            .userIdForeignKey(getUserId())
+            .chatRoomIdForeignKey(chatRoom.getId())
             .build();
-        ChatDto dto2 = ChatDto.builder()
+        chat1.setCreatedAt(LocalDateTime.now());
+
+        Chat chat2 = Chat.builder()
+            .id(2L)
             .message("test test")
+            .userIdForeignKey(getUserId())
+            .chatRoomIdForeignKey(chatRoom.getId())
             .build();
-        ChatDto dto3 = ChatDto.builder()
+        chat2.setCreatedAt(LocalDateTime.now());
+
+        Chat chat3 = Chat.builder()
+            .id(3L)
             .message("test test test")
+            .userIdForeignKey(getUserId())
+            .chatRoomIdForeignKey(chatRoom.getId())
+            .build();
+        chat3.setCreatedAt(LocalDateTime.now());
+
+        Participant participant = Participant.builder()
+            .id(1L)
+            .build();
+
+        ChatDto dto1 = ChatDto.builder()
+            .senderId(getUserId())
+            .senderNickname(getUserNickname())
+            .senderProfileImageUrl(getUserProfileImageUrl())
+            .senderDefaultProfileImageType(getUserDefaultProfileImageType())
+            .chatId(chat1.getId())
+            .dispatchTime(chat1.getDispatchTime())
+            .message(chat1.getMessage())
+            .build();
+
+        ChatDto dto2 = ChatDto.builder()
+            .senderId(getUserId())
+            .senderNickname(getUserNickname())
+            .senderProfileImageUrl(getUserProfileImageUrl())
+            .senderDefaultProfileImageType(getUserDefaultProfileImageType())
+            .chatId(chat2.getId())
+            .dispatchTime(chat2.getDispatchTime())
+            .message(chat2.getMessage())
+            .build();
+
+        ChatDto dto3 = ChatDto.builder()
+            .senderId(getUserId())
+            .senderNickname(getUserNickname())
+            .senderProfileImageUrl(getUserProfileImageUrl())
+            .senderDefaultProfileImageType(getUserDefaultProfileImageType())
+            .chatId(chat3.getId())
+            .dispatchTime(chat3.getDispatchTime())
+            .message(chat3.getMessage())
             .build();
 
         Runnable[] chatActions = {
@@ -170,12 +240,11 @@ class ChatControllerMessagingTest extends StompTestExtension {
             () -> this.stompSession.send(sendHeader, dto3)
         };
 
-        ChatRoom chatRoom = mock(ChatRoom.class);
-        Participant participant = mock(Participant.class);
         when(userRepository.findById(any())).thenReturn(Optional.ofNullable(getUser()));
         when(chatRoomRepository.findByRoomSid(any())).thenReturn(Optional.of(chatRoom));
-        when(participantRepository.findByUserAndChatRoom(any(), any())).thenReturn(
+        when(participantRepository.findByUserIdAndChatRoomId(any(), any())).thenReturn(
             Optional.ofNullable(participant));
+        when(chatRepository.save(any())).thenReturn(chat1, chat2, chat3);
 
         CountDownLatch chatAttemptCountLatch = new CountDownLatch(chatActions.length);
 
@@ -195,20 +264,41 @@ class ChatControllerMessagingTest extends StompTestExtension {
         StompHeaders subscribeHeader = stompSubscribeHeaders("/topic/heho");
         StompHeaders leaveHeader = stompSendHeaders("/subscriptions/leave/chatrooms/heho");
 
+        ChatRoom chatRoom = ChatRoom.builder()
+            .id(1L)
+            .build();
+
+        Chat chat = Chat.builder()
+            .id(1L)
+            .message(getUserNickname() + "님이 퇴장하셨습니다.")
+            .userIdForeignKey(getUserId())
+            .chatRoomIdForeignKey(chatRoom.getId())
+            .build();
+        chat.setCreatedAt(LocalDateTime.now());
+
+        Participant participant = Participant.builder()
+            .id(1L)
+            .build();
+
         ChatDto dto = ChatDto.builder()
-            .message(getUser().getNickname() + "님이 퇴장하셨습니다.")
+            .senderId(getUserId())
+            .senderNickname(getUserNickname())
+            .senderProfileImageUrl(getUserProfileImageUrl())
+            .senderDefaultProfileImageType(getUserDefaultProfileImageType())
+            .chatId(chat.getId())
+            .dispatchTime(chat.getDispatchTime())
+            .message(chat.getMessage())
             .build();
 
         Runnable[] chatActions = {
             () -> this.stompSession.send(leaveHeader, null)
         };
 
-        ChatRoom chatRoom = mock(ChatRoom.class);
-        Participant participant = mock(Participant.class);
         when(userRepository.findById(any())).thenReturn(Optional.ofNullable(getUser()));
         when(chatRoomRepository.findByRoomSid(any())).thenReturn(Optional.of(chatRoom));
-        when(participantRepository.findByUserAndChatRoom(any(), any())).thenReturn(
+        when(participantRepository.findByUserIdAndChatRoomId(any(), any())).thenReturn(
             Optional.ofNullable(participant));
+        when(chatRepository.save(any())).thenReturn(chat);
 
         CountDownLatch chatAttemptCountLatch = new CountDownLatch(chatActions.length);
         this.stompSession.subscribe(subscribeHeader,
@@ -217,7 +307,7 @@ class ChatControllerMessagingTest extends StompTestExtension {
         chatAttemptCountLatch.await();
 
         assertThat(blockingQueue).containsExactlyInAnyOrder(dto);
-        verify(participantRepository).delete(any());
+        verify(participantRepository).deleteById(any());
         verify(chatRepository).save(any());
     }
 

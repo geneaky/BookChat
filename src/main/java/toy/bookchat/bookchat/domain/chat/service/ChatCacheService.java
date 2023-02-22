@@ -1,14 +1,13 @@
 package toy.bookchat.bookchat.domain.chat.service;
 
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
+import toy.bookchat.bookchat.domain.chat.service.cache.ChatRoomCache;
+import toy.bookchat.bookchat.domain.chat.service.cache.ParticipantCache;
+import toy.bookchat.bookchat.domain.chat.service.cache.UserCache;
 import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomRepository;
-import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
-import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.exception.chatroom.ChatRoomNotFoundException;
 import toy.bookchat.bookchat.exception.participant.NotParticipatedException;
@@ -34,28 +33,25 @@ public class ChatCacheService {
      */
 
     @Cacheable(cacheNames = "user")
-    public User findUserByUserId(Long userId) {
-        return userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+    public UserCache findUserByUserId(Long userId) {
+        return UserCache.of(
+            userRepository.findById(userId).orElseThrow(UserNotFoundException::new));
     }
 
     @Cacheable(cacheNames = "chatroom")
-    public ChatRoom findChatRoomByRoomSid(String roomSid) {
-        return chatRoomRepository.findByRoomSid(roomSid).orElseThrow(
-            ChatRoomNotFoundException::new);
+    public ChatRoomCache findChatRoomByRoomSid(String roomSid) {
+        return ChatRoomCache.of(chatRoomRepository.findByRoomSid(roomSid).orElseThrow(
+            ChatRoomNotFoundException::new));
     }
 
-    @CachePut(cacheNames = "participant", key = "'U' + #user.id + 'CR' + #chatRoom.id")
-    public Participant saveParticipantCache(User user, ChatRoom chatRoom, Participant participant) {
-        return participant;
+    @Cacheable(cacheNames = "participant", key = "'U' + #userId + 'CR' + #chatRoomId")
+    public ParticipantCache findParticipantByUserIdAndChatRoomId(Long userId, Long chatRoomId) {
+        return ParticipantCache.of(
+            participantRepository.findByUserIdAndChatRoomId(userId, chatRoomId)
+                .orElseThrow(NotParticipatedException::new));
     }
 
-    @Cacheable(cacheNames = "participant", key = "'U' + #user.id + 'CR' + #chatRoom.id")
-    public Participant findParticipantByUserAndChatRoom(User user, ChatRoom chatRoom) {
-        return participantRepository.findByUserAndChatRoom(user, chatRoom).orElseThrow(
-            NotParticipatedException::new);
-    }
-
-    @CacheEvict(cacheNames = "participant", key = "'U' + #user.id + 'CR' + #chatRoom.id")
-    public void deleteParticipantCache(User user, ChatRoom chatRoom) {
+    @CacheEvict(cacheNames = "participant", key = "'U' + #userId + 'CR' + #chatRoomId")
+    public void deleteParticipantCache(Long userId, Long chatRoomId) {
     }
 }

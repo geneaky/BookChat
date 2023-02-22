@@ -1,7 +1,5 @@
 package toy.bookchat.bookchat.domain.chat.service;
 
-import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.GUEST;
-
 import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -10,11 +8,11 @@ import org.springframework.transaction.annotation.Transactional;
 import toy.bookchat.bookchat.domain.chat.Chat;
 import toy.bookchat.bookchat.domain.chat.api.dto.ChatDto;
 import toy.bookchat.bookchat.domain.chat.repository.ChatRepository;
+import toy.bookchat.bookchat.domain.chat.service.cache.ChatRoomCache;
+import toy.bookchat.bookchat.domain.chat.service.cache.ParticipantCache;
+import toy.bookchat.bookchat.domain.chat.service.cache.UserCache;
 import toy.bookchat.bookchat.domain.chat.service.dto.response.ChatRoomChatsResponse;
-import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
-import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
-import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.exception.participant.AlreadyParticipatedException;
 
 @Service
@@ -35,91 +33,74 @@ public class ChatService {
         this.chatCacheService = chatCacheService;
     }
 
-    private static String getDestination(String roomSid) {
+    private String getDestination(String roomSid) {
         return DESTINATION_PREFIX + roomSid;
-    }
-
-    private static String getSendOffMessage(User user) {
-        return user.getNickname() + "님이 퇴장하셨습니다.";
     }
 
     @Transactional
     public void enterChatRoom(Long userId, String roomSid) {
-        User user = chatCacheService.findUserByUserId(userId);
-        ChatRoom chatRoom = chatCacheService.findChatRoomByRoomSid(roomSid);
+        UserCache userCache = chatCacheService.findUserByUserId(userId);
+        ChatRoomCache chatRoomCache = chatCacheService.findChatRoomByRoomSid(roomSid);
+
         /* TODO: 2023-02-08 채팅방 인원수 초과시 입장 불가 처리 - 동시성 제어 named lock */
-        participantRepository.findByUserAndChatRoom(user, chatRoom).ifPresent(p -> {
+        participantRepository.findByUserIdAndChatRoomId(userCache.getUserId(),
+            chatRoomCache.getChatRoomId()).ifPresent(p -> {
             throw new AlreadyParticipatedException();
         });
 
-        /* TODO: 2023-02-16 entityManager native query로 chat insert
-         */
-        Chat chat = Chat.builder()
-            .chatRoom(chatRoom)
-            .user(user)
-            .message(getWelcomeMessage(user))
-            .build();
+        participantRepository.insertParticipantNativeQuery(userCache.getUserId(),
+            chatRoomCache.getChatRoomId());
 
-        Participant participant = Participant.builder()
-            .participantStatus(GUEST)
-            .chatRoom(chatRoom)
-            .user(user)
-            .build();
+        Chat chat = chatRepository.save(Chat.builder()
+            .userIdForeignKey(userCache.getUserId())
+            .chatRoomIdForeignKey(chatRoomCache.getChatRoomId())
+            .message(getWelcomeMessage(userCache))
+            .build());
 
-        ChatDto chatDto = ChatDto.builder()
-            .message(chat.getMessage())
-            .build();
-
-        participantRepository.save(participant);
-        chatCacheService.saveParticipantCache(user, chatRoom, participant);
-        chatRepository.save(chat);
-        messagingTemplate.convertAndSend(getDestination(roomSid),
-            chatDto);
+        messagingTemplate.convertAndSend(getDestination(roomSid), ChatDto.from(userCache, chat));
     }
 
-    private String getWelcomeMessage(User user) {
-        return user.getNickname() + "님이 입장하셨습니다.";
+    private String getWelcomeMessage(UserCache userCache) {
+        return userCache.getUserNickname() + "님이 입장하셨습니다.";
     }
 
     @Transactional
     public void leaveChatRoom(Long userId, String roomSid) {
-        User user = chatCacheService.findUserByUserId(userId);
-        ChatRoom chatRoom = chatCacheService.findChatRoomByRoomSid(roomSid);
+        UserCache userCache = chatCacheService.findUserByUserId(userId);
+        ChatRoomCache chatRoomCache = chatCacheService.findChatRoomByRoomSid(roomSid);
         /* TODO: 2023-02-09 나가는 사람이 방장일 경우 처리 */
-        Participant participant = chatCacheService.findParticipantByUserAndChatRoom(user, chatRoom);
+        ParticipantCache participantCache = chatCacheService.findParticipantByUserIdAndChatRoomId(
+            userId, chatRoomCache.getChatRoomId());
 
-        Chat chat = Chat.builder()
-            .chatRoom(chatRoom)
-            .user(user)
-            .message(getSendOffMessage(user))
-            .build();
+        Chat chat = chatRepository.save(Chat.builder()
+            .userIdForeignKey(userCache.getUserId())
+            .chatRoomIdForeignKey(chatRoomCache.getChatRoomId())
+            .message(getSendOffMessage(userCache))
+            .build());
 
-        ChatDto chatDto = ChatDto.builder()
-            .message(chat.getMessage())
-            .build();
+        participantRepository.deleteById(participantCache.getParticipantId());
+        chatCacheService.deleteParticipantCache(userId, chatRoomCache.getChatRoomId());
+        messagingTemplate.convertAndSend(getDestination(roomSid), ChatDto.from(userCache, chat));
+    }
 
-        participantRepository.delete(participant);
-        chatCacheService.deleteParticipantCache(user, chatRoom);
-        chatRepository.save(chat);
-        messagingTemplate.convertAndSend(getDestination(roomSid),
-            chatDto);
+    private String getSendOffMessage(UserCache userCache) {
+        return userCache.getUserNickname() + "님이 퇴장하셨습니다.";
     }
 
     @Transactional
     public void sendMessage(Long userId, String roomSid, ChatDto chatDto) {
-        User user = chatCacheService.findUserByUserId(userId);
-        ChatRoom chatRoom = chatCacheService.findChatRoomByRoomSid(roomSid);
-        chatCacheService.findParticipantByUserAndChatRoom(user, chatRoom);
+        UserCache userCache = chatCacheService.findUserByUserId(userId);
+        ChatRoomCache chatRoomCache = chatCacheService.findChatRoomByRoomSid(roomSid);
+        chatCacheService.findParticipantByUserIdAndChatRoomId(userCache.getUserId(),
+            chatRoomCache.getChatRoomId());
 
-        Chat chat = Chat.builder()
-            .chatRoom(chatRoom)
-            .user(user)
+        Chat chat = chatRepository.save(Chat.builder()
+            .userIdForeignKey(userCache.getUserId())
+            .chatRoomIdForeignKey(chatRoomCache.getChatRoomId())
             .message(chatDto.getMessage())
-            .build();
+            .build());
 
-        chatRepository.save(chat);
-        messagingTemplate.convertAndSend(getDestination(roomSid),
-            chatDto);
+        messagingTemplate.convertAndSend(getDestination(roomSid), ChatDto.from(userCache, chat));
     }
 
     @Transactional(readOnly = true)

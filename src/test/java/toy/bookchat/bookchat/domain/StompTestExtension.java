@@ -25,6 +25,19 @@ import toy.bookchat.bookchat.security.user.TokenPayload;
 @Testcontainers
 public class StompTestExtension {
 
+    private User testUser = User.builder()
+        .id(1L)
+        .email("test@gmail.com")
+        .nickname("nickname")
+        .role(USER)
+        .name("testUser")
+        .profileImageUrl("somethingImageUrl@naver.com")
+        .defaultProfileImageType(1)
+        .provider(OAuth2Provider.KAKAO)
+        .readingTastes(List.of(ReadingTaste.DEVELOPMENT, ReadingTaste.ART))
+        .build();
+
+
     @Container
     static RabbitMQContainer rabbitMQContainer;
 
@@ -45,18 +58,29 @@ public class StompTestExtension {
     }
 
     protected User getUser() {
-        return User.builder()
-            .id(1L)
-            .email("test@gmail.com")
-            .nickname("nickname")
-            .role(USER)
-            .name("testUser")
-            .profileImageUrl("somethingImageUrl@naver.com")
-            .defaultProfileImageType(1)
-            .provider(OAuth2Provider.KAKAO)
-            .readingTastes(List.of(ReadingTaste.DEVELOPMENT, ReadingTaste.ART))
-            .build();
+        return this.testUser;
     }
+
+    protected Long getUserId() {
+        return this.testUser.getId();
+    }
+
+    protected String getUserName() {
+        return this.testUser.getName();
+    }
+
+    protected String getUserNickname() {
+        return this.testUser.getNickname();
+    }
+
+    protected String getUserProfileImageUrl() {
+        return this.testUser.getProfileImageUrl();
+    }
+
+    protected Integer getUserDefaultProfileImageType() {
+        return this.testUser.getDefaultProfileImageType();
+    }
+
 
     private TokenPayload getTokenPayload(User user) {
         return TokenPayload.of(user.getId(), user.getName(),

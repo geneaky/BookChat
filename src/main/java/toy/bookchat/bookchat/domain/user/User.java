@@ -13,6 +13,7 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 import toy.bookchat.bookchat.domain.BaseEntity;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
@@ -23,6 +24,7 @@ import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
     )
 })
 @Getter
+@ToString
 public class User extends BaseEntity {
 
     @Id

@@ -29,9 +29,6 @@ public class ChatRoom extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private User host;
 
-    protected ChatRoom() {
-    }
-
     @Builder
     private ChatRoom(Long id, String roomName, String roomSid, Integer roomSize,
         Integer defaultRoomImageType, String roomImageUri, Book book, User host) {
@@ -43,6 +40,9 @@ public class ChatRoom extends BaseEntity {
         this.roomImageUri = roomImageUri;
         this.book = book;
         this.host = host;
+    }
+
+    protected ChatRoom() {
     }
 
     public void changeHost(User user) {
