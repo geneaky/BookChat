@@ -18,6 +18,7 @@ import toy.bookchat.bookchat.domain.chat.Chat;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
 import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomRepository;
 import toy.bookchat.bookchat.domain.participant.Participant;
+import toy.bookchat.bookchat.domain.participant.ParticipantStatus;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
@@ -71,8 +72,11 @@ class ChatRepositoryTest {
         chatRepository.save(chat3);
         chatRepository.save(chat4);
 
-        Participant participant1 = Participant.builder().user(user1).chatRoom(chatRoom).build();
-        Participant participant2 = Participant.builder().user(user2).chatRoom(chatRoom).build();
+        Participant participant1 = Participant.builder().user(user1).chatRoom(chatRoom)
+            .participantStatus(
+                ParticipantStatus.HOST).build();
+        Participant participant2 = Participant.builder().user(user2).chatRoom(chatRoom)
+            .participantStatus(ParticipantStatus.GUEST).build();
         participantRepository.save(participant1);
         participantRepository.save(participant2);
 

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.GUEST;
@@ -17,10 +18,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
+import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomBlockedUserRepository;
 import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomRepository;
 import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
+import toy.bookchat.bookchat.domain.participant.service.dto.CacheClearMessage;
 import toy.bookchat.bookchat.domain.participant.service.dto.response.ChatRoomParticipantsResponse;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
@@ -36,6 +40,10 @@ class ParticipantServiceTest {
     private ChatRoomRepository chatRoomRepository;
     @Mock
     private ParticipantRepository participantRepository;
+    @Mock
+    private ChatRoomBlockedUserRepository chatRoomBlockedUserRepository;
+    @Mock
+    private RabbitTemplate rabbitTemplate;
     @InjectMocks
     private ParticipantService participantService;
 
@@ -342,6 +350,9 @@ class ParticipantServiceTest {
         participantService.deleteParticipant(chatRoom.getId(), subHost.getId(), host.getId());
 
         verify(participantRepository).delete(participant2);
+        verify(chatRoomBlockedUserRepository).save(any());
+        verify(rabbitTemplate).convertAndSend(anyString(), anyString(),
+            any(CacheClearMessage.class));
     }
 
     @Test
@@ -381,6 +392,9 @@ class ParticipantServiceTest {
         participantService.deleteParticipant(chatRoom.getId(), guest.getId(), host.getId());
 
         verify(participantRepository).delete(participant2);
+        verify(chatRoomBlockedUserRepository).save(any());
+        verify(rabbitTemplate).convertAndSend(anyString(), anyString(),
+            any(CacheClearMessage.class));
     }
 
     @Test
@@ -423,5 +437,8 @@ class ParticipantServiceTest {
         participantService.deleteParticipant(chatRoom.getId(), guest.getId(), subHost.getId());
 
         verify(participantRepository).delete(participant2);
+        verify(chatRoomBlockedUserRepository).save(any());
+        verify(rabbitTemplate).convertAndSend(anyString(), anyString(),
+            any(CacheClearMessage.class));
     }
 }

@@ -13,7 +13,7 @@ import org.springframework.messaging.handler.invocation.HandlerMethodArgumentRes
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import toy.bookchat.bookchat.exception.security.DenidedTokenException;
+import toy.bookchat.bookchat.exception.security.DeniedTokenException;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenManager;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPayload;
@@ -25,6 +25,10 @@ public class MessageAuthenticationArgumentResolver implements HandlerMethodArgum
 
     public MessageAuthenticationArgumentResolver(JwtTokenManager jwtTokenManager) {
         this.jwtTokenManager = jwtTokenManager;
+    }
+
+    private static String getBearerTokenFromNativeHeader(StompHeaderAccessor accessor) {
+        return Objects.requireNonNull(accessor.getNativeHeader(AUTHORIZATION)).get(0);
     }
 
     @Override
@@ -53,10 +57,6 @@ public class MessageAuthenticationArgumentResolver implements HandlerMethodArgum
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER)) {
             return bearerToken.substring(BEGIN_INDEX);
         }
-        throw new DenidedTokenException();
-    }
-
-    private static String getBearerTokenFromNativeHeader(StompHeaderAccessor accessor) {
-        return Objects.requireNonNull(accessor.getNativeHeader(AUTHORIZATION)).get(0);
+        throw new DeniedTokenException();
     }
 }

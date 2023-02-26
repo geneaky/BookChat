@@ -2,6 +2,9 @@ package toy.bookchat.bookchat.domain.chatroom.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static toy.bookchat.bookchat.domain.common.RepositorySupport.toSlice;
+import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.GUEST;
+import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.HOST;
+import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.SUBHOST;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -88,10 +91,14 @@ class ChatRoomRepositoryTest {
         chatRepository.save(chat3);
         chatRepository.save(chat4);
 
-        Participant participant1 = Participant.builder().user(user1).chatRoom(chatRoom1).build();
-        Participant participant2 = Participant.builder().user(user1).chatRoom(chatRoom2).build();
-        Participant participant3 = Participant.builder().user(user1).chatRoom(chatRoom3).build();
-        Participant participant4 = Participant.builder().user(user2).chatRoom(chatRoom3).build();
+        Participant participant1 = Participant.builder().user(user1).chatRoom(chatRoom1)
+            .participantStatus(HOST).build();
+        Participant participant2 = Participant.builder().user(user1).chatRoom(chatRoom2)
+            .participantStatus(SUBHOST).build();
+        Participant participant3 = Participant.builder().user(user1).chatRoom(chatRoom3)
+            .participantStatus(GUEST).build();
+        Participant participant4 = Participant.builder().user(user2).chatRoom(chatRoom3)
+            .participantStatus(GUEST).build();
         participantRepository.save(participant1);
         participantRepository.save(participant2);
         participantRepository.save(participant3);
@@ -160,10 +167,14 @@ class ChatRoomRepositoryTest {
         chatRepository.save(chat3);
         chatRepository.save(chat4);
 
-        Participant participant1 = Participant.builder().user(user1).chatRoom(chatRoom1).build();
-        Participant participant2 = Participant.builder().user(user1).chatRoom(chatRoom2).build();
-        Participant participant3 = Participant.builder().user(user1).chatRoom(chatRoom3).build();
-        Participant participant4 = Participant.builder().user(user2).chatRoom(chatRoom3).build();
+        Participant participant1 = Participant.builder().user(user1).chatRoom(chatRoom1)
+            .participantStatus(HOST).build();
+        Participant participant2 = Participant.builder().user(user1).chatRoom(chatRoom2)
+            .participantStatus(GUEST).build();
+        Participant participant3 = Participant.builder().user(user1).chatRoom(chatRoom3)
+            .participantStatus(SUBHOST).build();
+        Participant participant4 = Participant.builder().user(user2).chatRoom(chatRoom3)
+            .participantStatus(GUEST).build();
         participantRepository.save(participant1);
         participantRepository.save(participant2);
         participantRepository.save(participant3);

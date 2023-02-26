@@ -16,7 +16,8 @@ decorator:
 rabbit:
   host: localhost
   virtual-host: /
-  port: 61613
+  stomp-port: 61613
+  amqp-port: 5672
   login: guest
   passcode: guest
 

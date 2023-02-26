@@ -1,8 +1,10 @@
-package toy.bookchat.bookchat.security.token.openid;
+package toy.bookchat.bookchat.security.token.openid.kakao;
 
 import static io.jsonwebtoken.JwsHeader.KEY_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -21,28 +23,29 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.util.Base64Utils;
-import toy.bookchat.bookchat.exception.security.DenidedTokenException;
+import toy.bookchat.bookchat.config.token.OAuth2Properties;
+import toy.bookchat.bookchat.exception.security.DeniedTokenException;
 import toy.bookchat.bookchat.exception.security.ExpiredTokenException;
 import toy.bookchat.bookchat.exception.security.IllegalStandardTokenException;
 import toy.bookchat.bookchat.exception.security.NotSupportedOAuth2ProviderException;
+import toy.bookchat.bookchat.security.token.openid.KakaoIdToken;
+import toy.bookchat.bookchat.security.token.openid.OpenIdTestUtil;
 
 @ExtendWith(MockitoExtension.class)
-class KakaoIdTokenTest {
+class KakaoIdTokenFetcherTest {
 
+    @InjectMocks
+    KakaoIdTokenFetcherImpl kakaoIdTokenFetcher;
     OpenIdTestUtil openIdTestUtil;
-
+    @Mock
+    private OAuth2Properties oAuth2Properties;
+    @Mock
+    private KakaoPublicKeyFetcher kakaoPublicKeyFetcher;
     private String appKey = "testAppKey";
-
-    private Map<String, Object> getClaims() {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("sub", "1234");
-        claims.put("iss", "https://kauth.kakao.com");
-        claims.put("email", "test@naver.com");
-        claims.put("aud", appKey);
-        return claims;
-    }
 
     @BeforeEach
     public void init() throws FileNotFoundException {
@@ -81,15 +84,37 @@ class KakaoIdTokenTest {
         return keyFactory.generatePrivate(privateKeySpec);
     }
 
-    private String getMockIdToken(PrivateKey privateKey) {
-        Map<String, Object> claims = getClaims();
-
+    private String getMockOpenIdToken(PrivateKey privateKey) {
         String token = Jwts.builder()
             .setHeaderParam(KEY_ID, "abcdedf")
-            .setClaims(claims)
+            .setClaims(getClaims())
             .signWith(SignatureAlgorithm.RS256, privateKey)
             .compact();
         return token;
+    }
+
+    private Map<String, Object> getClaims() {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("sub", "1234");
+        claims.put("iss", "https://kauth.kakao.com");
+        claims.put("email", "test@naver.com");
+        claims.put("aud", appKey);
+        return claims;
+    }
+
+    @Test
+    void idToken으로_kakaoIdToken_생성_성공() throws Exception {
+        PrivateKey privateKey = getPrivateKey();
+        PublicKey publicKey = getPublicKey();
+
+        String token = getMockOpenIdToken(privateKey);
+        KakaoIdToken realKakaoIdToken = KakaoIdToken.from("1234", "test@naver.com");
+        when(oAuth2Properties.getKakaoAppKey()).thenReturn(appKey);
+        when(kakaoPublicKeyFetcher.getPublicKey(any(), any())).thenReturn(
+            publicKey);
+        KakaoIdToken expectKakaoIdToken = kakaoIdTokenFetcher.fetchKakaoIdToken(token);
+
+        assertThat(expectKakaoIdToken).isEqualTo(realKakaoIdToken);
     }
 
     @Test
@@ -106,10 +131,11 @@ class KakaoIdTokenTest {
             .signWith(SignatureAlgorithm.RS256, privateKey)
             .compact();
 
-        KakaoIdToken kakaoIdToken = KakaoIdToken.of(token);
+        when(kakaoPublicKeyFetcher.getPublicKey(any(), any())).thenReturn(
+            publicKey);
 
         assertThatThrownBy(() -> {
-            kakaoIdToken.getOAuth2MemberNumber(publicKey, appKey);
+            kakaoIdTokenFetcher.fetchKakaoIdToken(token);
         }).isInstanceOf(ExpiredTokenException.class);
     }
 
@@ -118,52 +144,19 @@ class KakaoIdTokenTest {
         PrivateKey privateKey = getPrivateKey();
         PublicKey publicKey = getPublicKey();
 
-        String token = getMockIdToken(privateKey);
-
-        KakaoIdToken kakaoIdToken = KakaoIdToken.of(token + "test");
-
-        assertThatThrownBy(() -> {
-            kakaoIdToken.getOAuth2MemberNumber(publicKey, appKey);
-        }).isInstanceOf(DenidedTokenException.class);
-    }
-
-    @Test
-    void 발급_인증기관_정보_없을시_예외발생() throws Exception {
-        PrivateKey privateKey = getPrivateKey();
-        PublicKey publicKey = getPublicKey();
-
-        String token = Jwts.builder()
-            .setSubject("1234")
-            .setAudience(appKey)
-            .setHeaderParam(KEY_ID, "abcdedf")
-            .signWith(SignatureAlgorithm.RS256, privateKey)
-            .compact();
-
-        KakaoIdToken kakaoIdToken = KakaoIdToken.of(token);
-
-        assertThatThrownBy(() -> {
-            kakaoIdToken.getOAuth2MemberNumber(publicKey, appKey);
-        }).isInstanceOf(IllegalStandardTokenException.class);
-    }
-
-    @Test
-    void 발급기관_kakao일때_회원번호kakao반환() throws Exception {
-        PrivateKey privateKey = getPrivateKey();
-        PublicKey publicKey = getPublicKey();
-
         Map<String, Object> claims = getClaims();
-
         String token = Jwts.builder()
             .setHeaderParam(KEY_ID, "abcdedf")
             .setClaims(claims)
             .signWith(SignatureAlgorithm.RS256, privateKey)
             .compact();
 
-        KakaoIdToken kakaoIdToken = KakaoIdToken.of(token);
+        when(kakaoPublicKeyFetcher.getPublicKey(any(), any())).thenReturn(
+            publicKey);
 
-        String memberNumberWithProviderType = kakaoIdToken.getOAuth2MemberNumber(publicKey, appKey);
-
-        assertThat(memberNumberWithProviderType).isEqualTo("1234kakao");
+        assertThatThrownBy(() -> {
+            kakaoIdTokenFetcher.fetchKakaoIdToken(token + "test");
+        }).isInstanceOf(DeniedTokenException.class);
     }
 
     @Test
@@ -183,35 +176,17 @@ class KakaoIdTokenTest {
             .signWith(SignatureAlgorithm.RS256, privateKey)
             .compact();
 
-        KakaoIdToken kakaoIdToken = KakaoIdToken.of(token);
+        when(oAuth2Properties.getKakaoAppKey()).thenReturn(appKey);
+        when(kakaoPublicKeyFetcher.getPublicKey(any(), any())).thenReturn(
+            publicKey);
 
         assertThatThrownBy(() -> {
-            kakaoIdToken.getOAuth2MemberNumber(publicKey, appKey);
+            kakaoIdTokenFetcher.fetchKakaoIdToken(token);
         }).isInstanceOf(NotSupportedOAuth2ProviderException.class);
     }
 
     @Test
-    void openidtoken에서_이메일_추출_성공() throws Exception {
-        PrivateKey privateKey = getPrivateKey();
-        PublicKey publicKey = getPublicKey();
-
-        Map<String, Object> claims = getClaims();
-
-        String token = Jwts.builder()
-            .setHeaderParam(KEY_ID, "abcdedf")
-            .setClaims(claims)
-            .signWith(SignatureAlgorithm.RS256, privateKey)
-            .compact();
-
-        KakaoIdToken kakaoIdToken = KakaoIdToken.of(token);
-
-        String email = kakaoIdToken.getEmail(publicKey, appKey);
-
-        assertThat(email).isEqualTo("test@naver.com");
-    }
-
-    @Test
-    void openidtoken에서_이메일_없을시_예외발생() throws Exception {
+    void idToken에서_이메일_없을시_예외발생() throws Exception {
         PrivateKey privateKey = getPrivateKey();
         PublicKey publicKey = getPublicKey();
 
@@ -226,15 +201,16 @@ class KakaoIdTokenTest {
             .signWith(SignatureAlgorithm.RS256, privateKey)
             .compact();
 
-        KakaoIdToken kakaoIdToken = KakaoIdToken.of(token);
+        when(kakaoPublicKeyFetcher.getPublicKey(any(), any())).thenReturn(
+            publicKey);
 
         assertThatThrownBy(() -> {
-            kakaoIdToken.getEmail(publicKey, appKey);
+            kakaoIdTokenFetcher.fetchKakaoIdToken(token);
         }).isInstanceOf(IllegalStandardTokenException.class);
     }
 
     @Test
-    void openidtoken에서_sub_정보_없을시_예외발생() throws Exception {
+    void idToken에서_sub_정보_없을시_예외발생() throws Exception {
         PrivateKey privateKey = getPrivateKey();
         PublicKey publicKey = getPublicKey();
 
@@ -249,10 +225,11 @@ class KakaoIdTokenTest {
             .signWith(SignatureAlgorithm.RS256, privateKey)
             .compact();
 
-        KakaoIdToken kakaoIdToken = KakaoIdToken.of(token);
+        when(kakaoPublicKeyFetcher.getPublicKey(any(), any())).thenReturn(
+            publicKey);
 
         assertThatThrownBy(() -> {
-            kakaoIdToken.getOAuth2MemberNumber(publicKey, appKey);
+            kakaoIdTokenFetcher.fetchKakaoIdToken(token);
         }).isInstanceOf(IllegalStandardTokenException.class);
     }
 }

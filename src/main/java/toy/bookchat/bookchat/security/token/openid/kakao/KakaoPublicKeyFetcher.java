@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.security.token.openid.keys;
+package toy.bookchat.bookchat.security.token.openid.kakao;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Header;
@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
-import toy.bookchat.bookchat.exception.security.DenidedTokenException;
+import toy.bookchat.bookchat.exception.security.DeniedTokenException;
 import toy.bookchat.bookchat.exception.security.ExpiredTokenException;
 import toy.bookchat.bookchat.exception.security.IllegalStandardTokenException;
 
@@ -33,7 +33,8 @@ public class KakaoPublicKeyFetcher {
     }
 
     public Key getPublicKey(String token, String kakaoUri) {
-        return fetchKakaoPublicKey(kakaoUri).getKey(getKeyId(token), this.keyFactory);
+        return fetchKakaoPublicKey(kakaoUri).getKey(getKeyId(token),
+            this.keyFactory);
     }
 
     private KeyFactory createKeyFactory() {
@@ -68,7 +69,7 @@ public class KakaoPublicKeyFetcher {
             log.info("Token Is Expired :: {}", token);
             throw new ExpiredTokenException(exception.getMessage());
         } catch (Exception exception) {
-            throw new DenidedTokenException();
+            throw new DeniedTokenException();
         }
     }
 

@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.security.token.openid.keys;
+package toy.bookchat.bookchat.security.token.openid.kakao;
 
 import java.math.BigInteger;
 import java.security.Key;

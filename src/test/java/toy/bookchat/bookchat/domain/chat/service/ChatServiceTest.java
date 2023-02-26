@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,9 +27,12 @@ import toy.bookchat.bookchat.domain.chat.service.cache.ChatRoomCache;
 import toy.bookchat.bookchat.domain.chat.service.cache.ParticipantCache;
 import toy.bookchat.bookchat.domain.chat.service.cache.UserCache;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
+import toy.bookchat.bookchat.domain.chatroom.ChatRoomBlockedUser;
+import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomBlockedUserRepository;
 import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
 import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.exception.chatroom.BlockedUserInChatRoomException;
 
 @ExtendWith(MockitoExtension.class)
 class ChatServiceTest {
@@ -38,12 +42,32 @@ class ChatServiceTest {
     @Mock
     private ParticipantRepository participantRepository;
     @Mock
+    private ChatRoomBlockedUserRepository chatRoomBlockedUserRepository;
+    @Mock
     private SimpMessagingTemplate messagingTemplate;
     @Mock
     private ChatCacheService chatCacheService;
 
     @InjectMocks
     private ChatService chatService;
+
+    @Test
+    void 차단된_사용자가_입장시도시_예외발생() throws Exception {
+        UserCache userCache = mock(UserCache.class);
+        ChatRoomCache chatRoomCache = mock(ChatRoomCache.class);
+        ChatRoomBlockedUser blockedUser = mock(ChatRoomBlockedUser.class);
+
+        when(userCache.getUserId()).thenReturn(69L);
+        when(chatRoomCache.getChatRoomId()).thenReturn(775L);
+        when(chatCacheService.findUserByUserId(any())).thenReturn(userCache);
+        when(chatCacheService.findChatRoomByRoomSid(any())).thenReturn(chatRoomCache);
+        when(chatRoomBlockedUserRepository.findByUserIdAndChatRoomId(any(), any())).thenReturn(
+            Optional.ofNullable(blockedUser));
+
+        Assertions.assertThatThrownBy(() -> {
+            chatService.enterChatRoom(69L, "O1RY53K");
+        }).isInstanceOf(BlockedUserInChatRoomException.class);
+    }
 
     @Test
     void 채팅방_입장_성공() throws Exception {

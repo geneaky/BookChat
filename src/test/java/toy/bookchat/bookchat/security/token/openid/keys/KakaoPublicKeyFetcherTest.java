@@ -23,6 +23,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.util.Base64Utils;
 import org.springframework.web.reactive.function.client.WebClient;
+import toy.bookchat.bookchat.security.token.openid.kakao.KakaoPublicKeyFetcher;
+import toy.bookchat.bookchat.security.token.openid.kakao.KakaoPublicKeys;
 
 @ExtendWith(MockitoExtension.class)
 class KakaoPublicKeyFetcherTest {

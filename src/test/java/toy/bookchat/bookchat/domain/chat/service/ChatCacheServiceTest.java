@@ -2,6 +2,7 @@ package toy.bookchat.bookchat.domain.chat.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -118,7 +119,7 @@ class ChatCacheServiceTest {
     void 참가자_캐시_삭제_성공() throws Exception {
         Participant participant = mock(Participant.class);
 
-        when(participantRepository.findByUserIdAndChatRoomId(any(), any())).thenReturn(
+        when(participantRepository.findByUserIdAndChatRoomId(anyLong(), anyLong())).thenReturn(
             Optional.of(participant));
 
         cacheService.findParticipantByUserIdAndChatRoomId(1L, 1l);

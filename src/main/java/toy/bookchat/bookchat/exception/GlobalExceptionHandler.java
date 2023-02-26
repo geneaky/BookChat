@@ -23,7 +23,7 @@ import toy.bookchat.bookchat.domain.chat.api.dto.ChatDto;
 import toy.bookchat.bookchat.exception.book.BookNotFoundException;
 import toy.bookchat.bookchat.exception.bookshelf.BookReportNotFoundException;
 import toy.bookchat.bookchat.exception.common.RateOverLimitException;
-import toy.bookchat.bookchat.exception.security.DenidedTokenException;
+import toy.bookchat.bookchat.exception.security.DeniedTokenException;
 import toy.bookchat.bookchat.exception.security.ExpiredPublicKeyCachedException;
 import toy.bookchat.bookchat.exception.security.ExpiredTokenException;
 import toy.bookchat.bookchat.exception.security.NotSupportedOAuth2ProviderException;
@@ -82,9 +82,9 @@ public class GlobalExceptionHandler {
         return NOT_VERIFIED_TOKEN.getValue();
     }
 
-    @ExceptionHandler(DenidedTokenException.class)
+    @ExceptionHandler(DeniedTokenException.class)
     public final ResponseEntity<String> handleDeniedTokenException(
-        DenidedTokenException exception) {
+        DeniedTokenException exception) {
         log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
         return NOT_VERIFIED_TOKEN.getValue();
     }

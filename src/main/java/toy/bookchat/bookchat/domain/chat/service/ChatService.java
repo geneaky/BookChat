@@ -15,7 +15,6 @@ import toy.bookchat.bookchat.domain.chat.service.dto.response.ChatRoomChatsRespo
 import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomBlockedUserRepository;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
 import toy.bookchat.bookchat.exception.chatroom.BlockedUserInChatRoomException;
-import toy.bookchat.bookchat.exception.participant.AlreadyParticipatedException;
 
 @Service
 public class ChatService {
@@ -48,11 +47,6 @@ public class ChatService {
         ChatRoomCache chatRoomCache = chatCacheService.findChatRoomByRoomSid(roomSid);
 
         /* TODO: 2023-02-08 채팅방 인원수 초과시 입장 불가 처리 - 동시성 제어 pessimistic lock */
-        participantRepository.findByUserIdAndChatRoomId(userCache.getUserId(),
-            chatRoomCache.getChatRoomId()).ifPresent(p -> {
-            throw new AlreadyParticipatedException();
-        });
-
         chatRoomBlockedUserRepository.findByUserIdAndChatRoomId(userCache.getUserId(),
             chatRoomCache.getChatRoomId()).ifPresent(b -> {
             throw new BlockedUserInChatRoomException();

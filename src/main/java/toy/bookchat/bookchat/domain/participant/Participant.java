@@ -4,6 +4,7 @@ import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.GUEST;
 import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.HOST;
 import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.SUBHOST;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -32,6 +33,7 @@ public class Participant {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private ParticipantStatus participantStatus;
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;

@@ -29,7 +29,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
 import toy.bookchat.bookchat.domain.user.api.dto.Token;
-import toy.bookchat.bookchat.exception.security.DenidedTokenException;
+import toy.bookchat.bookchat.exception.security.DeniedTokenException;
 import toy.bookchat.bookchat.exception.security.ExpiredTokenException;
 import toy.bookchat.bookchat.security.SecurityConfig;
 import toy.bookchat.bookchat.security.token.dto.RefreshTokenRequest;
@@ -116,7 +116,7 @@ class TokenControllerTest extends ControllerTestExtension {
             .refreshToken(token.getRefreshToken() + "invalid")
             .build();
 
-        doThrow(DenidedTokenException.class).when(tokenService)
+        doThrow(DeniedTokenException.class).when(tokenService)
             .generateToken(any());
 
         mockMvc.perform(post("/v1/api/auth/token").contentType(MediaType.APPLICATION_JSON)

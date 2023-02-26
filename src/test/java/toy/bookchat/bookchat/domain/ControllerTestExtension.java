@@ -23,7 +23,7 @@ import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenManager;
 import toy.bookchat.bookchat.security.token.openid.IdTokenManager;
-import toy.bookchat.bookchat.security.token.openid.keys.KakaoPublicKeyFetcher;
+import toy.bookchat.bookchat.security.token.openid.kakao.KakaoPublicKeyFetcher;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 

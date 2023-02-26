@@ -19,7 +19,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import toy.bookchat.bookchat.domain.user.ROLE;
-import toy.bookchat.bookchat.exception.security.DenidedTokenException;
+import toy.bookchat.bookchat.exception.security.DeniedTokenException;
 import toy.bookchat.bookchat.exception.security.ExpiredTokenException;
 import toy.bookchat.bookchat.exception.security.IllegalStandardTokenException;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
@@ -61,7 +61,7 @@ public class JwtToken {
             throw new ExpiredTokenException(exception.getMessage());
         } catch (IllegalArgumentException | JwtException exception) {
             log.info("Token Is Denied :: {}", this.token);
-            throw new DenidedTokenException(exception.getMessage());
+            throw new DeniedTokenException(exception.getMessage());
         }
     }
 

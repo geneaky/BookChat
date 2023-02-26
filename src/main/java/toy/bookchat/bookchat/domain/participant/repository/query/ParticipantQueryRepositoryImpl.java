@@ -13,7 +13,8 @@ import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.participant.QParticipant;
 
 @Repository
-public class ParticipantQueryRepositoryImpl implements ParticipantQueryRepository {
+public class
+ParticipantQueryRepositoryImpl implements ParticipantQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
