@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.utils;
+package toy.bookchat.bookchat.domain.storage;
 
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

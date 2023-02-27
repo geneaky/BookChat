@@ -28,6 +28,9 @@ public final class CursorMeta<T, R> {
     }
 
     private R getNextCursorId(List<T> content, Function<T, R> getId) {
-        return content.stream().map(getId).reduce((id1, id2) -> id2).orElse(null);
+        if (content.isEmpty()) {
+            return null;
+        }
+        return content.stream().reduce((c1, c2) -> c2).map(getId).orElse(null);
     }
 }
