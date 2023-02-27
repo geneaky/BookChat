@@ -1,10 +1,16 @@
 package toy.bookchat.bookchat.domain.chat.service;
 
+import static toy.bookchat.bookchat.config.cache.CacheType.PARTICIPANT;
 import static toy.bookchat.bookchat.domain.chat.service.ChatService.DESTINATION_PREFIX;
 
+import javax.validation.Valid;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.cache.CacheManager;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import toy.bookchat.bookchat.domain.chat.Chat;
 import toy.bookchat.bookchat.domain.chat.repository.ChatRepository;
 import toy.bookchat.bookchat.domain.participant.service.dto.CacheClearMessage;
@@ -13,30 +19,34 @@ import toy.bookchat.bookchat.domain.participant.service.dto.CacheClearMessage;
 public class ChatCacheClearListener {
 
     private final SimpMessagingTemplate messagingTemplate;
-    private final ChatCacheService chatCacheService;
     private final ChatRepository chatRepository;
+    private final CacheManager cacheManager;
 
 
     public ChatCacheClearListener(SimpMessagingTemplate messagingTemplate,
-        ChatCacheService chatCacheService, ChatRepository chatRepository) {
+        ChatRepository chatRepository, CacheManager cacheManager) {
         this.messagingTemplate = messagingTemplate;
-        this.chatCacheService = chatCacheService;
         this.chatRepository = chatRepository;
+        this.cacheManager = cacheManager;
     }
 
+    @Transactional
     @RabbitListener(queues = "cache.queue")
-    public void clear(CacheClearMessage message) {
-        /* TODO: 2023-02-22 at least once or timeout / cache 짧게 유지
-         */
-        chatCacheService.deleteParticipantCache(message.getUserId(), message.getChatRoomId());
+    @Retryable(value = {Exception.class}, maxAttempts = 10, backoff = @Backoff(delay = 1000))
+    // participant cache 유효시간이 10초니까 실패하면 1초간격으로 10번 시도
+    // 10번 모두 실패한 경우 강퇴된 사용자는 채팅 불가능
+    public void clear(@Valid CacheClearMessage message) {
+        String key = "U" + message.getUserId() + "CR" + message.getChatRoomId();
+        if (cacheManager.getCache(PARTICIPANT.getCacheName()).evictIfPresent(key)) {
+            Chat chat = chatRepository.save(Chat.builder()
+                .userIdForeignKey(message.getAdminId())
+                .chatRoomIdForeignKey(message.getChatRoomId())
+                .message(message.blockingComment())
+                .build());
 
-        Chat chat = chatRepository.save(Chat.builder()
-            .userIdForeignKey(message.getAdminId())
-            .chatRoomIdForeignKey(message.getChatRoomId())
-            .message(message.blockingComment())
-            .build());
-
-        messagingTemplate.convertAndSend(getDestination(message.getRoomSid()), chat.getMessage());
+            messagingTemplate.convertAndSend(getDestination(message.getRoomSid()),
+                chat.getMessage());
+        }
     }
 
     private String getDestination(String roomSid) {

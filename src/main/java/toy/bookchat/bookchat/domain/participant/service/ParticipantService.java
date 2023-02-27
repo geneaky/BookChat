@@ -103,47 +103,38 @@ public class ParticipantService {
 
         ChatRoomBlockedUser blockedUser = ChatRoomBlockedUser.builder()
             .user(target)
-            .chatRoom(chatRoom).build();
+            .chatRoom(chatRoom)
+            .build();
 
         hostDeleteParticipant(chatRoom, adminParticipant, targetParticipant, blockedUser);
-        subHostDeleteParticipant(chatRoom, adminParticipant, targetParticipant, blockedUser);
-    }
-
-    private void subHostDeleteParticipant(ChatRoom chatRoom, Participant adminParticipant,
-        Participant targetParticipant, ChatRoomBlockedUser blockedUser) {
-        if (adminParticipant.isSubHost() && targetParticipant.isGuest()) {
-            participantRepository.delete(targetParticipant);
-            chatRoomBlockedUserRepository.save(blockedUser);
-
-            CacheClearMessage message = CacheClearMessage.builder()
-                .blockedUserNickname(targetParticipant.getUserNickname())
-                .adminId(adminParticipant.getId())
-                .userId(targetParticipant.getUserId())
-                .chatRoomId(chatRoom.getId())
-                .roomSid(chatRoom.getRoomSid())
-                .build();
-
-            rabbitTemplate.convertAndSend(CACHE_CLEAR_EXCHANGE_NAME.getValue(),
-                CACHE_CLEAR_ROUTING_KEY.getValue(), message);
-        }
     }
 
     private void hostDeleteParticipant(ChatRoom chatRoom, Participant adminParticipant,
         Participant targetParticipant, ChatRoomBlockedUser blockedUser) {
-        if (adminParticipant.isHost()) {
-            participantRepository.delete(targetParticipant);
-            chatRoomBlockedUserRepository.save(blockedUser);
-
-            CacheClearMessage message = CacheClearMessage.builder()
-                .blockedUserNickname(targetParticipant.getUserNickname())
-                .adminId(adminParticipant.getId())
-                .userId(targetParticipant.getUserId())
-                .chatRoomId(chatRoom.getId())
-                .roomSid(chatRoom.getRoomSid())
-                .build();
-
-            rabbitTemplate.convertAndSend(CACHE_CLEAR_EXCHANGE_NAME.getValue(),
-                CACHE_CLEAR_ROUTING_KEY.getValue(), message);
+        if (adminParticipant.isSubHost() && targetParticipant.isGuest()) {
+            kickParticipant(chatRoom, adminParticipant, targetParticipant, blockedUser);
         }
+        if (adminParticipant.isHost() && targetParticipant.isNotHost()) {
+            kickParticipant(chatRoom, adminParticipant, targetParticipant, blockedUser);
+        }
+
+        throw new NotHostException();
+    }
+
+    private void kickParticipant(ChatRoom chatRoom, Participant adminParticipant,
+        Participant targetParticipant, ChatRoomBlockedUser blockedUser) {
+        participantRepository.delete(targetParticipant);
+        chatRoomBlockedUserRepository.save(blockedUser);
+
+        CacheClearMessage message = CacheClearMessage.builder()
+            .blockedUserNickname(targetParticipant.getUserNickname())
+            .adminId(adminParticipant.getId())
+            .userId(targetParticipant.getUserId())
+            .chatRoomId(chatRoom.getId())
+            .roomSid(chatRoom.getRoomSid())
+            .build();
+
+        rabbitTemplate.convertAndSend(CACHE_CLEAR_EXCHANGE_NAME.getValue(),
+            CACHE_CLEAR_ROUTING_KEY.getValue(), message);
     }
 }

@@ -76,6 +76,10 @@ public class Participant {
         return this.participantStatus == HOST;
     }
 
+    public boolean isNotHost() {
+        return this.participantStatus != HOST;
+    }
+
     public boolean isGuest() {
         return this.participantStatus == GUEST;
     }

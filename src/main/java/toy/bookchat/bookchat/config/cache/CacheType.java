@@ -9,7 +9,7 @@ public enum CacheType {
     GOOGLE_PUBLIC_KEY("google", 259_200, 1),
     CHAT_USER("user", 30, 10000),
     CHAT_ROOM("chatroom", 30, 10000),
-    PARTICIPANT("participant", 30, 10000);
+    PARTICIPANT("participant", 10, 10000);
 
     private final String cacheName;
     private final int expiredAfterWrite;

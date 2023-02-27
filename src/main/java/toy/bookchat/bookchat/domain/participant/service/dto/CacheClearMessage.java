@@ -1,6 +1,8 @@
 package toy.bookchat.bookchat.domain.participant.service.dto;
 
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,10 +12,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CacheClearMessage {
 
+    @NotBlank
     private String blockedUserNickname;
+    @NotNull
     private Long adminId;
+    @NotNull
     private Long userId;
+    @NotNull
     private Long chatRoomId;
+    @NotBlank
     private String roomSid;
 
     @Builder
