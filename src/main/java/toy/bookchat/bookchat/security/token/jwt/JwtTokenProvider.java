@@ -1,15 +1,5 @@
 package toy.bookchat.bookchat.security.token.jwt;
 
-import static toy.bookchat.bookchat.security.token.TokenConstants.DEFAULT_PROFILE_IMAGE_TYPE;
-import static toy.bookchat.bookchat.security.token.TokenConstants.EMAIL;
-import static toy.bookchat.bookchat.security.token.TokenConstants.PROVIDER;
-import static toy.bookchat.bookchat.security.token.TokenConstants.SUB;
-import static toy.bookchat.bookchat.security.token.TokenConstants.USER_ID;
-import static toy.bookchat.bookchat.security.token.TokenConstants.USER_NAME;
-import static toy.bookchat.bookchat.security.token.TokenConstants.USER_NICKNAME;
-import static toy.bookchat.bookchat.security.token.TokenConstants.USER_PROFILE_IMAGE_URI;
-import static toy.bookchat.bookchat.security.token.TokenConstants.USER_ROLE;
-
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.util.Date;
@@ -24,6 +14,16 @@ import toy.bookchat.bookchat.domain.user.api.dto.Token;
 @Slf4j
 @Component
 public class JwtTokenProvider {
+
+    private final String USER_NAME = "userName";
+    private final String USER_ID = "userId";
+    private final String EMAIL = "email";
+    private final String USER_NICKNAME = "userNickname";
+    private final String USER_PROFILE_IMAGE_URI = "userProfileImageUri";
+    private final String DEFAULT_PROFILE_IMAGE_TYPE = "defaultProfileImageType";
+    private final String USER_ROLE = "userRole";
+    private final String SUB = "sub";
+    private final String PROVIDER = "provider";
 
     private final JwtTokenProperties jwtTokenProperties;
 

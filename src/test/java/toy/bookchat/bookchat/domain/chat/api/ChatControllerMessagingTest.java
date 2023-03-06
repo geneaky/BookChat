@@ -67,6 +67,19 @@ class ChatControllerMessagingTest extends StompTestExtension {
         this.webSocketStompClient.setMessageConverter(new MappingJackson2MessageConverter());
     }
 
+    private StompSession stompSession()
+        throws InterruptedException, ExecutionException, TimeoutException {
+        StompHeaders stompHeaders = new StompHeaders();
+        stompHeaders.set(AUTHORIZATION, getTestToken());
+        ListenableFuture<StompSession> connect = this.webSocketStompClient.connect(
+            getStompConnectionEndPointUrl(), new WebSocketHttpHeaders(), stompHeaders,
+            new StompSessionHandlerAdapter() {
+            });
+        StompSession stompSession = connect.get(60, TimeUnit.SECONDS);
+        stompSession.setAutoReceipt(true);
+        return stompSession;
+    }
+
     private String getStompConnectionEndPointUrl() {
         return "ws://localhost:" + port + "/stomp-connection";
     }
@@ -86,19 +99,6 @@ class ChatControllerMessagingTest extends StompTestExtension {
                 latch.countDown();
             }
         };
-    }
-
-    private StompSession stompSession()
-        throws InterruptedException, ExecutionException, TimeoutException {
-        StompHeaders stompHeaders = new StompHeaders();
-        stompHeaders.set(AUTHORIZATION, getTestToken());
-        ListenableFuture<StompSession> connect = this.webSocketStompClient.connect(
-            getStompConnectionEndPointUrl(), new WebSocketHttpHeaders(), stompHeaders,
-            new StompSessionHandlerAdapter() {
-            });
-        StompSession stompSession = connect.get(60, TimeUnit.SECONDS);
-        stompSession.setAutoReceipt(true);
-        return stompSession;
     }
 
     private StompHeaders stompSubscribeHeaders(String destination) {
@@ -124,17 +124,19 @@ class ChatControllerMessagingTest extends StompTestExtension {
     @Test
     void 채팅방_입장_메시지_수신_성공() throws Exception {
         StompHeaders subscribeHeader = stompSubscribeHeaders("/topic/heho");
-        StompHeaders enterHeader = stompSendHeaders("/subscriptions/enter/chatrooms/heho");
+        StompHeaders enterHeader = stompSendHeaders("/subscriptions/enter/chatrooms/1");
 
         ChatRoom chatRoom = ChatRoom.builder()
             .id(1L)
+            .roomSid("heho")
+            .roomSize(3)
             .build();
 
         Chat chat = Chat.builder()
             .id(1L)
             .message(getUserNickname() + "님이 입장하셨습니다.")
-            .userIdForeignKey(getUserId())
-            .chatRoomIdForeignKey(chatRoom.getId())
+            .user(getUser())
+            .chatRoom(chatRoom)
             .build();
         chat.setCreatedAt(LocalDateTime.now());
 
@@ -153,7 +155,9 @@ class ChatControllerMessagingTest extends StompTestExtension {
         };
 
         when(userRepository.findById(any())).thenReturn(Optional.ofNullable(getUser()));
-        when(chatRoomRepository.findByRoomSid(any())).thenReturn(Optional.of(chatRoom));
+        when(chatRoomRepository.findWithPessimisticLockById(any())).thenReturn(
+            Optional.of(chatRoom));
+//        when(participantRepository.)
         when(chatRepository.save(any())).thenReturn(chat);
 
         CountDownLatch chatAttemptCountLatch = new CountDownLatch(chatActions.length);
@@ -164,43 +168,47 @@ class ChatControllerMessagingTest extends StompTestExtension {
 
         assertThat(blockingQueue).containsExactlyInAnyOrder(dto);
         verify(chatRepository).save(any());
-        verify(participantRepository).insertParticipantNativeQuery(any(), any());
+        verify(participantRepository).save(any());
     }
 
     @Test
     void 서로다른_세션_메시지_송신_수신_성공() throws Exception {
         StompHeaders subscribeHeader = stompSubscribeHeaders("/topic/heho");
-        StompHeaders sendHeader = stompSendHeaders("/subscriptions/send/chatrooms/heho");
+        StompHeaders sendHeader = stompSendHeaders("/subscriptions/send/chatrooms/1");
 
         ChatRoom chatRoom = ChatRoom.builder()
             .id(1L)
+            .roomSize(3)
+            .roomSid("heho")
             .build();
 
         Chat chat1 = Chat.builder()
             .id(1L)
             .message("test")
-            .userIdForeignKey(getUserId())
-            .chatRoomIdForeignKey(chatRoom.getId())
+            .user(getUser())
+            .chatRoom(chatRoom)
             .build();
         chat1.setCreatedAt(LocalDateTime.now());
 
         Chat chat2 = Chat.builder()
             .id(2L)
             .message("test test")
-            .userIdForeignKey(getUserId())
-            .chatRoomIdForeignKey(chatRoom.getId())
+            .user(getUser())
+            .chatRoom(chatRoom)
             .build();
         chat2.setCreatedAt(LocalDateTime.now());
 
         Chat chat3 = Chat.builder()
             .id(3L)
             .message("test test test")
-            .userIdForeignKey(getUserId())
-            .chatRoomIdForeignKey(chatRoom.getId())
+            .user(getUser())
+            .chatRoom(chatRoom)
             .build();
         chat3.setCreatedAt(LocalDateTime.now());
 
         Participant participant = Participant.builder()
+            .chatRoom(chatRoom)
+            .user(getUser())
             .id(1L)
             .build();
 
@@ -240,8 +248,6 @@ class ChatControllerMessagingTest extends StompTestExtension {
             () -> this.stompSession.send(sendHeader, dto3)
         };
 
-        when(userRepository.findById(any())).thenReturn(Optional.ofNullable(getUser()));
-        when(chatRoomRepository.findByRoomSid(any())).thenReturn(Optional.of(chatRoom));
         when(participantRepository.findByUserIdAndChatRoomId(any(), any())).thenReturn(
             Optional.ofNullable(participant));
         when(chatRepository.save(any())).thenReturn(chat1, chat2, chat3);
@@ -262,23 +268,27 @@ class ChatControllerMessagingTest extends StompTestExtension {
     @Test
     void 채팅방_퇴장_메시지_수신_성공() throws Exception {
         StompHeaders subscribeHeader = stompSubscribeHeaders("/topic/heho");
-        StompHeaders leaveHeader = stompSendHeaders("/subscriptions/leave/chatrooms/heho");
+        StompHeaders leaveHeader = stompSendHeaders("/subscriptions/leave/chatrooms/1");
 
         ChatRoom chatRoom = ChatRoom.builder()
             .id(1L)
+            .roomSize(3)
+            .roomSid("heho")
+            .build();
+
+        Participant participant = Participant.builder()
+            .id(1L)
+            .user(getUser())
+            .chatRoom(chatRoom)
             .build();
 
         Chat chat = Chat.builder()
             .id(1L)
             .message(getUserNickname() + "님이 퇴장하셨습니다.")
-            .userIdForeignKey(getUserId())
-            .chatRoomIdForeignKey(chatRoom.getId())
+            .user(getUser())
+            .chatRoom(chatRoom)
             .build();
         chat.setCreatedAt(LocalDateTime.now());
-
-        Participant participant = Participant.builder()
-            .id(1L)
-            .build();
 
         ChatDto dto = ChatDto.builder()
             .senderId(getUserId())
@@ -294,8 +304,6 @@ class ChatControllerMessagingTest extends StompTestExtension {
             () -> this.stompSession.send(leaveHeader, null)
         };
 
-        when(userRepository.findById(any())).thenReturn(Optional.ofNullable(getUser()));
-        when(chatRoomRepository.findByRoomSid(any())).thenReturn(Optional.of(chatRoom));
         when(participantRepository.findByUserIdAndChatRoomId(any(), any())).thenReturn(
             Optional.ofNullable(participant));
         when(chatRepository.save(any())).thenReturn(chat);
@@ -307,7 +315,7 @@ class ChatControllerMessagingTest extends StompTestExtension {
         chatAttemptCountLatch.await();
 
         assertThat(blockingQueue).containsExactlyInAnyOrder(dto);
-        verify(participantRepository).deleteById(any());
+        verify(participantRepository).delete(any());
         verify(chatRepository).save(any());
     }
 
@@ -315,7 +323,7 @@ class ChatControllerMessagingTest extends StompTestExtension {
     void 메시지_예외_테스트() throws Exception {
         StompHeaders subscribeHeader = stompSubscribeHeaders("/topic/heho");
         StompHeaders subscribeError = stompSubscribeHeaders("/user/exchange/amq.direct/error");
-        StompHeaders enterHeader = stompSendHeaders("/subscriptions/enter/chatrooms/heho");
+        StompHeaders enterHeader = stompSendHeaders("/subscriptions/enter/chatrooms/123");
 
         ChatDto dto = ChatDto.builder()
             .message(BAD_REQUEST.getValue().toString())

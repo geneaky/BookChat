@@ -3,7 +3,6 @@ package toy.bookchat.bookchat.domain;
 import static io.jsonwebtoken.SignatureAlgorithm.HS256;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
-import static toy.bookchat.bookchat.domain.common.AuthConstants.BEARER;
 import static toy.bookchat.bookchat.domain.user.ROLE.USER;
 import static toy.bookchat.bookchat.security.oauth.OAuth2Provider.GOOGLE;
 
@@ -25,19 +24,6 @@ import toy.bookchat.bookchat.security.user.TokenPayload;
 @Testcontainers
 public class StompTestExtension {
 
-    private User testUser = User.builder()
-        .id(1L)
-        .email("test@gmail.com")
-        .nickname("nickname")
-        .role(USER)
-        .name("testUser")
-        .profileImageUrl("somethingImageUrl@naver.com")
-        .defaultProfileImageType(1)
-        .provider(OAuth2Provider.KAKAO)
-        .readingTastes(List.of(ReadingTaste.DEVELOPMENT, ReadingTaste.ART))
-        .build();
-
-
     @Container
     static RabbitMQContainer rabbitMQContainer;
 
@@ -51,6 +37,17 @@ public class StompTestExtension {
 
     @MockBean
     JwtTokenManager jwtTokenManager;
+    private User testUser = User.builder()
+        .id(1L)
+        .email("test@gmail.com")
+        .nickname("nickname")
+        .role(USER)
+        .name("testUser")
+        .profileImageUrl("somethingImageUrl@naver.com")
+        .defaultProfileImageType(1)
+        .provider(OAuth2Provider.KAKAO)
+        .readingTastes(List.of(ReadingTaste.DEVELOPMENT, ReadingTaste.ART))
+        .build();
 
     @BeforeEach
     public void setUp() {
@@ -96,7 +93,7 @@ public class StompTestExtension {
         claims.put("provider", GOOGLE);
         claims.put("email", "test@gmail.com");
 
-        return BEARER + Jwts.builder()
+        return "Bearer " + Jwts.builder()
             .setClaims(claims)
             .signWith(HS256, "test")
             .compact();

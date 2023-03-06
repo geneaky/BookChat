@@ -128,7 +128,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
         Chat chat1 = Chat.builder()
             .id(1L)
             .message("안녕")
-            .chatRoomIdForeignKey(chatRoom1.getId())
+            .chatRoom(chatRoom1)
             .build();
         chat1.setCreatedAt(LocalDateTime.now());
         ChatRoom chatRoom2 = ChatRoom.builder()
@@ -143,7 +143,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
         Chat chat2 = Chat.builder()
             .id(2L)
             .message("잘가")
-            .chatRoomIdForeignKey(chatRoom2.getId())
+            .chatRoom(chatRoom2)
             .build();
         chat2.setCreatedAt(LocalDateTime.now());
         ChatRoom chatRoom3 = ChatRoom.builder()
@@ -158,7 +158,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
         Chat chat3 = Chat.builder()
             .id(3L)
             .message("이거 모르겠음")
-            .chatRoomIdForeignKey(chatRoom3.getId())
+            .chatRoom(chatRoom3)
             .build();
         chat3.setCreatedAt(LocalDateTime.now());
         ChatRoomResponse chatRoomResponse1 = getChatRoomResponse(chatRoom1, chat1);

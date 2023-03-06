@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import toy.bookchat.bookchat.domain.chat.Chat;
-import toy.bookchat.bookchat.domain.chat.service.cache.UserCache;
+import toy.bookchat.bookchat.domain.user.User;
 
 @Getter
 @EqualsAndHashCode
@@ -36,17 +36,12 @@ public class ChatDto {
         this.message = message;
     }
 
-    @Builder
-    private ChatDto(String message) {
-        this.message = message;
-    }
-
-    public static ChatDto from(UserCache userCache, Chat chat) {
+    public static ChatDto from(User user, Chat chat) {
         return ChatDto.builder()
-            .senderId(userCache.getUserId())
-            .senderNickname(userCache.getUserNickname())
-            .senderProfileImageUrl(userCache.getProfileImageUrl())
-            .senderDefaultProfileImageType(userCache.getDefaultProfileImageType())
+            .senderId(user.getId())
+            .senderNickname(user.getNickname())
+            .senderProfileImageUrl(user.getProfileImageUrl())
+            .senderDefaultProfileImageType(user.getDefaultProfileImageType())
             .chatId(chat.getId())
             .dispatchTime(chat.getCreatedAt().toString())
             .message(chat.getMessage())

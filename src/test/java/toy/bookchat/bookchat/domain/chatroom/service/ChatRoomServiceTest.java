@@ -116,7 +116,7 @@ class ChatRoomServiceTest {
         Chat chat1 = Chat.builder()
             .id(1L)
             .message("안녕")
-            .chatRoomIdForeignKey(chatRoom1.getId())
+            .chatRoom(chatRoom1)
             .build();
         chat1.setCreatedAt(LocalDateTime.now());
         ChatRoomResponse chatRoomResponse = ChatRoomResponse.builder()

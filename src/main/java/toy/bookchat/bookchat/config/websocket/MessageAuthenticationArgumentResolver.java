@@ -1,8 +1,6 @@
 package toy.bookchat.bookchat.config.websocket;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static toy.bookchat.bookchat.domain.common.AuthConstants.BEARER;
-import static toy.bookchat.bookchat.domain.common.AuthConstants.BEGIN_INDEX;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -21,6 +19,8 @@ import toy.bookchat.bookchat.security.user.UserPayload;
 @Component
 public class MessageAuthenticationArgumentResolver implements HandlerMethodArgumentResolver {
 
+    private final String BEARER = "Bearer ";
+    private final int BEGIN_INDEX = 7;
     private final JwtTokenManager jwtTokenManager;
 
     public MessageAuthenticationArgumentResolver(JwtTokenManager jwtTokenManager) {

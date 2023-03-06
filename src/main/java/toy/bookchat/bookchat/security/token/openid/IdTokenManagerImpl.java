@@ -1,6 +1,5 @@
 package toy.bookchat.bookchat.security.token.openid;
 
-import static toy.bookchat.bookchat.domain.common.AuthConstants.BEGIN_INDEX;
 import static toy.bookchat.bookchat.security.oauth.OAuth2Provider.GOOGLE;
 import static toy.bookchat.bookchat.security.oauth.OAuth2Provider.KAKAO;
 
@@ -14,6 +13,8 @@ import toy.bookchat.bookchat.security.token.openid.kakao.KakaoIdTokenFetcher;
 @Slf4j
 @Component
 public class IdTokenManagerImpl implements IdTokenManager {
+
+    private final int BEGIN_INDEX = 7;
 
     private final KakaoIdTokenFetcher kakaoIdTokenFetcher;
     private final GoogleIdTokenFetcher googleIdTokenFetcher;

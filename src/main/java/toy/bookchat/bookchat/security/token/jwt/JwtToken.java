@@ -1,14 +1,5 @@
 package toy.bookchat.bookchat.security.token.jwt;
 
-import static toy.bookchat.bookchat.security.token.TokenConstants.DEFAULT_PROFILE_IMAGE_TYPE;
-import static toy.bookchat.bookchat.security.token.TokenConstants.EMAIL;
-import static toy.bookchat.bookchat.security.token.TokenConstants.PROVIDER;
-import static toy.bookchat.bookchat.security.token.TokenConstants.USER_ID;
-import static toy.bookchat.bookchat.security.token.TokenConstants.USER_NAME;
-import static toy.bookchat.bookchat.security.token.TokenConstants.USER_NICKNAME;
-import static toy.bookchat.bookchat.security.token.TokenConstants.USER_PROFILE_IMAGE_URI;
-import static toy.bookchat.bookchat.security.token.TokenConstants.USER_ROLE;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -22,12 +13,19 @@ import toy.bookchat.bookchat.domain.user.ROLE;
 import toy.bookchat.bookchat.exception.security.DeniedTokenException;
 import toy.bookchat.bookchat.exception.security.ExpiredTokenException;
 import toy.bookchat.bookchat.exception.security.IllegalStandardTokenException;
-import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 
 @Slf4j
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class JwtToken {
+
+    private final String USER_NAME = "userName";
+    private final String USER_ID = "userId";
+    private final String EMAIL = "email";
+    private final String USER_NICKNAME = "userNickname";
+    private final String USER_PROFILE_IMAGE_URI = "userProfileImageUri";
+    private final String DEFAULT_PROFILE_IMAGE_TYPE = "defaultProfileImageType";
+    private final String USER_ROLE = "userRole";
 
     private String token;
 
@@ -63,11 +61,6 @@ public class JwtToken {
             log.info("Token Is Denied :: {}", this.token);
             throw new DeniedTokenException(exception.getMessage());
         }
-    }
-
-    public OAuth2Provider getOAuth2Provider(String secret) {
-        return OAuth2Provider.from((String) Optional.ofNullable(getBody(secret).get(PROVIDER))
-            .orElseThrow(IllegalStandardTokenException::new));
     }
 
     public boolean hasNotRemainingTime(String secret, long reissuePeriod) {

@@ -1,8 +1,10 @@
 package toy.bookchat.bookchat.exception;
 
 import static toy.bookchat.bookchat.exception.ExceptionResponse.BAD_REQUEST;
+import static toy.bookchat.bookchat.exception.ExceptionResponse.BLOCKED_USER;
 import static toy.bookchat.bookchat.exception.ExceptionResponse.BOOK_NOT_FOUND;
 import static toy.bookchat.bookchat.exception.ExceptionResponse.BOOK_REPORT_NOT_FOUND;
+import static toy.bookchat.bookchat.exception.ExceptionResponse.CHAT_ROOM_IS_FULL;
 import static toy.bookchat.bookchat.exception.ExceptionResponse.EXPIRED_PUBLIC_KEY;
 import static toy.bookchat.bookchat.exception.ExceptionResponse.IMAGE_PROCESSING_FAIL;
 import static toy.bookchat.bookchat.exception.ExceptionResponse.IMAGE_UPLOAD_FAIL;
@@ -22,6 +24,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import toy.bookchat.bookchat.domain.chat.api.dto.ChatDto;
 import toy.bookchat.bookchat.exception.book.BookNotFoundException;
 import toy.bookchat.bookchat.exception.bookshelf.BookReportNotFoundException;
+import toy.bookchat.bookchat.exception.chatroom.BlockedUserInChatRoomException;
+import toy.bookchat.bookchat.exception.chatroom.ChatRoomIsFullException;
 import toy.bookchat.bookchat.exception.common.RateOverLimitException;
 import toy.bookchat.bookchat.exception.security.DeniedTokenException;
 import toy.bookchat.bookchat.exception.security.ExpiredPublicKeyCachedException;
@@ -129,6 +133,25 @@ public class GlobalExceptionHandler {
         RateOverLimitException exception) {
         log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
         return TOO_MANY_REQUESTS.getValue();
+    }
+
+    @MessageExceptionHandler(ChatRoomIsFullException.class)
+    @SendToUser(value = "/exchange/amq.direct/error", broadcast = false)
+    public final ChatDto handleChatRoomIsFullException(ChatRoomIsFullException exception) {
+        log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
+        return ChatDto.builder()
+            .message(CHAT_ROOM_IS_FULL.getValue().toString())
+            .build();
+    }
+
+    @MessageExceptionHandler(BlockedUserInChatRoomException.class)
+    @SendToUser(value = "/exchange/amq.direct/error", broadcast = false)
+    public final ChatDto handleBlockedUserInChatRoomException(
+        BlockedUserInChatRoomException exception) {
+        log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
+        return ChatDto.builder()
+            .message(BLOCKED_USER.getValue().toString())
+            .build();
     }
 
     @MessageExceptionHandler(Exception.class)

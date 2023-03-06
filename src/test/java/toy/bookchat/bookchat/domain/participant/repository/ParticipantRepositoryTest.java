@@ -45,6 +45,9 @@ class ParticipantRepositoryTest {
 
         ChatRoom chatRoom = ChatRoom.builder()
             .host(aUser)
+            .roomSid("cES1Cn4N")
+            .roomSize(275)
+            .defaultRoomImageType(2)
             .build();
         chatRoomRepository.save(chatRoom);
 
@@ -82,6 +85,9 @@ class ParticipantRepositoryTest {
 
         ChatRoom chatRoom = ChatRoom.builder()
             .host(user)
+            .roomSid("KUor")
+            .roomSize(655)
+            .defaultRoomImageType(1)
             .build();
         chatRoomRepository.save(chatRoom);
 

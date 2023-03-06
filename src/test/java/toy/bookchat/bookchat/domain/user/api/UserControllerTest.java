@@ -32,8 +32,6 @@ import static org.springframework.restdocs.request.RequestDocumentation.requestP
 import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static toy.bookchat.bookchat.domain.common.AuthConstants.BEARER;
-import static toy.bookchat.bookchat.domain.common.AuthConstants.OIDC;
 import static toy.bookchat.bookchat.domain.user.ReadingTaste.ART;
 import static toy.bookchat.bookchat.domain.user.ReadingTaste.DEVELOPMENT;
 import static toy.bookchat.bookchat.domain.user.ReadingTaste.SCIENCE;
@@ -80,6 +78,10 @@ import toy.bookchat.bookchat.security.token.openid.OpenIdTestUtil;
 class UserControllerTest extends ControllerTestExtension {
 
     public final String JWT_TOKEN = getTestToken();
+    private final String OIDC = "OIDC";
+    private final String BEARER = "Bearer ";
+
+
     @MockBean
     UserService userService;
     @MockBean

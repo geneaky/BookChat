@@ -52,20 +52,26 @@ class ChatRepositoryTest {
             .build();
         bookRepository.save(book);
 
-        ChatRoom chatRoom = ChatRoom.builder().book(book).host(user1).build();
+        ChatRoom chatRoom = ChatRoom.builder()
+            .book(book)
+            .host(user1)
+            .roomSize(348)
+            .roomSid("XKewmLwG")
+            .defaultRoomImageType(1)
+            .build();
         chatRoomRepository.save(chatRoom);
 
-        Chat chat1 = Chat.builder().userIdForeignKey(user1.getId()).message("a")
-            .chatRoomIdForeignKey(chatRoom.getId())
+        Chat chat1 = Chat.builder().user(user1).message("a")
+            .chatRoom(chatRoom)
             .build();
-        Chat chat2 = Chat.builder().userIdForeignKey(user1.getId()).message("b")
-            .chatRoomIdForeignKey(chatRoom.getId())
+        Chat chat2 = Chat.builder().user(user1).message("b")
+            .chatRoom(chatRoom)
             .build();
-        Chat chat3 = Chat.builder().userIdForeignKey(user2.getId()).message("c")
-            .chatRoomIdForeignKey(chatRoom.getId())
+        Chat chat3 = Chat.builder().user(user2).message("c")
+            .chatRoom(chatRoom)
             .build();
-        Chat chat4 = Chat.builder().userIdForeignKey(user1.getId()).message("d")
-            .chatRoomIdForeignKey(chatRoom.getId())
+        Chat chat4 = Chat.builder().user(user1).message("d")
+            .chatRoom(chatRoom)
             .build();
         chatRepository.save(chat1);
         chatRepository.save(chat2);
@@ -102,13 +108,19 @@ class ChatRepositoryTest {
             .build();
         bookRepository.save(book);
 
-        ChatRoom chatRoom = ChatRoom.builder().book(book).host(user1).build();
+        ChatRoom chatRoom = ChatRoom.builder()
+            .book(book)
+            .host(user1)
+            .roomSid("yg3O4")
+            .roomSize(377)
+            .defaultRoomImageType(1)
+            .build();
         chatRoomRepository.save(chatRoom);
 
         Chat chat = Chat.builder()
             .message("test message")
-            .userIdForeignKey(user1.getId())
-            .chatRoomIdForeignKey(chatRoom.getId())
+            .user(user1)
+            .chatRoom(chatRoom)
             .build();
 
         chatRepository.save(chat);
@@ -118,13 +130,11 @@ class ChatRepositoryTest {
 
         Chat findChat = chatRepository.findById(chat.getId()).get();
         findChat.getUser().changeUserNickname("changed Nickname");
-//        findChat.getUserIdForeignKey();
 
         em.flush();
         em.clear();
 
         User user = userRepository.findById(user1.getId()).get();
         assertThat(findChat.getUser().getNickname()).isEqualTo(user.getNickname());
-        assertThat(findChat.getUserIdForeignKey()).isEqualTo(user.getId());
     }
 }

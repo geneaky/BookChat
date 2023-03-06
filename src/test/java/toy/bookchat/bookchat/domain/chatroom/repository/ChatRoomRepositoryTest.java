@@ -47,6 +47,7 @@ class ChatRoomRepositoryTest {
             .roomName("test room")
             .roomSize(5)
             .roomSid("test sid")
+            .defaultRoomImageType(1)
             .build();
 
         ChatRoom findChatRoom = chatRoomRepository.save(chatRoom);
@@ -67,24 +68,42 @@ class ChatRoomRepositoryTest {
             .build();
         bookRepository.save(book);
 
-        ChatRoom chatRoom1 = ChatRoom.builder().book(book).host(user1).build();
-        ChatRoom chatRoom2 = ChatRoom.builder().book(book).host(user1).build();
-        ChatRoom chatRoom3 = ChatRoom.builder().book(book).host(user2).build();
+        ChatRoom chatRoom1 = ChatRoom.builder()
+            .book(book)
+            .host(user1)
+            .roomSid("KlV8")
+            .roomSize(576)
+            .defaultRoomImageType(1)
+            .build();
+        ChatRoom chatRoom2 = ChatRoom.builder()
+            .book(book)
+            .host(user1)
+            .roomSid("IwZrRxR5")
+            .roomSize(110)
+            .defaultRoomImageType(2)
+            .build();
+        ChatRoom chatRoom3 = ChatRoom.builder()
+            .book(book)
+            .host(user2)
+            .roomSid("Gmw9yDI4")
+            .roomSize(591)
+            .defaultRoomImageType(3)
+            .build();
         chatRoomRepository.save(chatRoom1);
         chatRoomRepository.save(chatRoom2);
         chatRoomRepository.save(chatRoom3);
 
-        Chat chat1 = Chat.builder().userIdForeignKey(user1.getId()).message("a")
-            .chatRoomIdForeignKey(chatRoom1.getId())
+        Chat chat1 = Chat.builder().user(user1).message("a")
+            .chatRoom(chatRoom1)
             .build();
-        Chat chat2 = Chat.builder().userIdForeignKey(user1.getId()).message("b")
-            .chatRoomIdForeignKey(chatRoom2.getId())
+        Chat chat2 = Chat.builder().user(user1).message("b")
+            .chatRoom(chatRoom2)
             .build();
-        Chat chat3 = Chat.builder().userIdForeignKey(user1.getId()).message("c")
-            .chatRoomIdForeignKey(chatRoom3.getId())
+        Chat chat3 = Chat.builder().user(user1).message("c")
+            .chatRoom(chatRoom3)
             .build();
-        Chat chat4 = Chat.builder().userIdForeignKey(user2.getId()).message("d")
-            .chatRoomIdForeignKey(chatRoom3.getId())
+        Chat chat4 = Chat.builder().user(user2).message("d")
+            .chatRoom(chatRoom3)
             .build();
         chatRepository.save(chat1);
         chatRepository.save(chat2);
@@ -106,6 +125,8 @@ class ChatRoomRepositoryTest {
 
         ChatRoomResponse chatRoomResponse1 = ChatRoomResponse.builder()
             .roomId(chatRoom3.getId())
+            .defaultRoomImageType(chatRoom3.getDefaultRoomImageType())
+            .roomSid(chatRoom3.getRoomSid())
             .roomMemberCount(2L)
             .lastChatId(chat4.getId())
             .lastChatContent(chat4.getMessage())
@@ -114,6 +135,8 @@ class ChatRoomRepositoryTest {
 
         ChatRoomResponse chatRoomResponse2 = ChatRoomResponse.builder()
             .roomId(chatRoom2.getId())
+            .defaultRoomImageType(chatRoom2.getDefaultRoomImageType())
+            .roomSid(chatRoom2.getRoomSid())
             .roomMemberCount(1L)
             .lastChatId(chat2.getId())
             .lastChatContent(chat2.getMessage())
@@ -143,24 +166,42 @@ class ChatRoomRepositoryTest {
             .build();
         bookRepository.save(book);
 
-        ChatRoom chatRoom1 = ChatRoom.builder().book(book).host(user1).build();
-        ChatRoom chatRoom2 = ChatRoom.builder().book(book).host(user1).build();
-        ChatRoom chatRoom3 = ChatRoom.builder().book(book).host(user2).build();
+        ChatRoom chatRoom1 = ChatRoom.builder()
+            .book(book)
+            .host(user1)
+            .roomSid("4SyVX")
+            .roomSize(77)
+            .defaultRoomImageType(1)
+            .build();
+        ChatRoom chatRoom2 = ChatRoom.builder()
+            .book(book)
+            .host(user1)
+            .roomSid("1Y2j9RlN")
+            .roomSize(573)
+            .defaultRoomImageType(2)
+            .build();
+        ChatRoom chatRoom3 = ChatRoom.builder()
+            .book(book)
+            .host(user2)
+            .roomSid("r7xr")
+            .roomSize(38)
+            .defaultRoomImageType(3)
+            .build();
         chatRoomRepository.save(chatRoom1);
         chatRoomRepository.save(chatRoom2);
         chatRoomRepository.save(chatRoom3);
 
-        Chat chat1 = Chat.builder().userIdForeignKey(user1.getId()).message("a")
-            .chatRoomIdForeignKey(chatRoom1.getId())
+        Chat chat1 = Chat.builder().user(user1).message("a")
+            .chatRoom(chatRoom1)
             .build();
-        Chat chat2 = Chat.builder().userIdForeignKey(user1.getId()).message("b")
-            .chatRoomIdForeignKey(chatRoom2.getId())
+        Chat chat2 = Chat.builder().user(user1).message("b")
+            .chatRoom(chatRoom2)
             .build();
-        Chat chat3 = Chat.builder().userIdForeignKey(user2.getId()).message("c")
-            .chatRoomIdForeignKey(chatRoom3.getId())
+        Chat chat3 = Chat.builder().user(user2).message("c")
+            .chatRoom(chatRoom3)
             .build();
-        Chat chat4 = Chat.builder().userIdForeignKey(user1.getId()).message("d")
-            .chatRoomIdForeignKey(chatRoom3.getId())
+        Chat chat4 = Chat.builder().user(user1).message("d")
+            .chatRoom(chatRoom3)
             .build();
         chatRepository.save(chat1);
         chatRepository.save(chat2);
@@ -182,6 +223,8 @@ class ChatRoomRepositoryTest {
 
         ChatRoomResponse chatRoomResponse1 = ChatRoomResponse.builder()
             .roomId(chatRoom1.getId())
+            .roomSid(chatRoom1.getRoomSid())
+            .defaultRoomImageType(chatRoom1.getDefaultRoomImageType())
             .roomMemberCount(1L)
             .lastChatId(chat1.getId())
             .lastChatContent(chat1.getMessage())
@@ -190,6 +233,8 @@ class ChatRoomRepositoryTest {
 
         ChatRoomResponse chatRoomResponse2 = ChatRoomResponse.builder()
             .roomId(chatRoom2.getId())
+            .roomSid(chatRoom2.getRoomSid())
+            .defaultRoomImageType(chatRoom2.getDefaultRoomImageType())
             .roomMemberCount(1L)
             .lastChatId(chat2.getId())
             .lastChatContent(chat2.getMessage())
@@ -197,11 +242,10 @@ class ChatRoomRepositoryTest {
             .build();
 
         PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("id").ascending());
-        Slice<ChatRoomResponse> result = toSlice(
-            List.of(chatRoomResponse2, chatRoomResponse1), pageRequest);
+        Slice<ChatRoomResponse> result = toSlice(List.of(chatRoomResponse2, chatRoomResponse1),
+            pageRequest);
         Slice<ChatRoomResponse> slice = chatRoomRepository.findUserChatRoomsWithLastChat(
-            pageRequest,
-            Optional.of(chat4.getId()), user1.getId());
+            pageRequest, Optional.of(chat4.getId()), user1.getId());
 
         assertThat(slice.getContent()).usingRecursiveComparison()
             .ignoringFieldsOfTypes(LocalDateTime.class)

@@ -42,6 +42,8 @@ ParticipantQueryRepositoryImpl implements ParticipantQueryRepository {
         return Optional.ofNullable(
             queryFactory.select(participant)
                 .from(participant)
+                .join(participant.user, user).fetchJoin()
+                .join(participant.chatRoom, chatRoom).fetchJoin()
                 .where(participant.user.id.eq(userId)
                     .and(participant.chatRoom.id.eq(chatRoomId)))
                 .fetchOne()

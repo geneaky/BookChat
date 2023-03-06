@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.GUEST;
@@ -18,16 +17,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
 import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomBlockedUserRepository;
-import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomRepository;
 import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
-import toy.bookchat.bookchat.domain.participant.service.dto.CacheClearMessage;
 import toy.bookchat.bookchat.domain.participant.service.dto.response.ChatRoomParticipantsResponse;
 import toy.bookchat.bookchat.domain.user.User;
-import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.exception.participant.NotHostException;
 import toy.bookchat.bookchat.exception.participant.ParticipantNotFoundException;
 
@@ -35,15 +30,9 @@ import toy.bookchat.bookchat.exception.participant.ParticipantNotFoundException;
 class ParticipantServiceTest {
 
     @Mock
-    private UserRepository userRepository;
-    @Mock
-    private ChatRoomRepository chatRoomRepository;
-    @Mock
     private ParticipantRepository participantRepository;
     @Mock
     private ChatRoomBlockedUserRepository chatRoomBlockedUserRepository;
-    @Mock
-    private RabbitTemplate rabbitTemplate;
     @InjectMocks
     private ParticipantService participantService;
 
@@ -109,8 +98,6 @@ class ParticipantServiceTest {
             .host(user)
             .build();
 
-        when(userRepository.findById(2L)).thenReturn(Optional.ofNullable(guest));
-        when(chatRoomRepository.findById(any())).thenReturn(Optional.ofNullable(chatRoom));
         assertThatThrownBy(() -> {
             participantService.changeParticipantRights(chatRoom.getId(), guest.getId(), SUBHOST,
                 guest.getId());
@@ -119,7 +106,6 @@ class ParticipantServiceTest {
 
     @Test
     void 권한변경_지정한_참여자가_채팅방_참여자가_아닐경우_예외발생() throws Exception {
-
         User user = User.builder()
             .id(1L)
             .build();
@@ -131,9 +117,14 @@ class ParticipantServiceTest {
             .host(user)
             .build();
 
-        when(userRepository.findById(1L)).thenReturn(Optional.ofNullable(user));
-        when(userRepository.findById(2L)).thenReturn(Optional.ofNullable(guest));
-        when(chatRoomRepository.findById(any())).thenReturn(Optional.ofNullable(chatRoom));
+        Participant participant = Participant.builder()
+            .user(user)
+            .chatRoom(chatRoom)
+            .build();
+
+        when(participantRepository.findByUserIdAndChatRoomId(user.getId(),
+            chatRoom.getId())).thenReturn(
+            Optional.ofNullable(participant));
 
         assertThatThrownBy(() -> {
             participantService.changeParticipantRights(chatRoom.getId(), guest.getId(), SUBHOST,
@@ -167,13 +158,10 @@ class ParticipantServiceTest {
             .chatRoom(chatRoom)
             .build();
 
-        when(userRepository.findById(1L)).thenReturn(Optional.ofNullable(host));
-        when(userRepository.findById(2L)).thenReturn(Optional.ofNullable(guest));
-        when(chatRoomRepository.findById(any())).thenReturn(Optional.ofNullable(chatRoom));
-        when(participantRepository.findByUserAndChatRoom(host, chatRoom)).thenReturn(
-            Optional.ofNullable(participant1));
-        when(participantRepository.findByUserAndChatRoom(guest, chatRoom)).thenReturn(
-            Optional.ofNullable(participant2));
+        when(participantRepository.findByUserIdAndChatRoomId(host.getId(),
+            chatRoom.getId())).thenReturn(Optional.ofNullable(participant1));
+        when(participantRepository.findByUserIdAndChatRoomId(guest.getId(),
+            chatRoom.getId())).thenReturn(Optional.ofNullable(participant2));
         participantService.changeParticipantRights(1L, guest.getId(), SUBHOST, host.getId());
 
         assertThat(participant2.getParticipantStatus()).isEqualTo(SUBHOST);
@@ -205,13 +193,10 @@ class ParticipantServiceTest {
             .chatRoom(chatRoom)
             .build();
 
-        when(userRepository.findById(1L)).thenReturn(Optional.ofNullable(host));
-        when(userRepository.findById(2L)).thenReturn(Optional.ofNullable(subHost));
-        when(chatRoomRepository.findById(any())).thenReturn(Optional.ofNullable(chatRoom));
-        when(participantRepository.findByUserAndChatRoom(host, chatRoom)).thenReturn(
-            Optional.ofNullable(participant1));
-        when(participantRepository.findByUserAndChatRoom(subHost, chatRoom)).thenReturn(
-            Optional.ofNullable(participant2));
+        when(participantRepository.findByUserIdAndChatRoomId(host.getId(),
+            chatRoom.getId())).thenReturn(Optional.ofNullable(participant1));
+        when(participantRepository.findByUserIdAndChatRoomId(subHost.getId(),
+            chatRoom.getId())).thenReturn(Optional.ofNullable(participant2));
         participantService.changeParticipantRights(1L, subHost.getId(), GUEST, host.getId());
 
         assertThat(participant2.getParticipantStatus()).isEqualTo(GUEST);
@@ -243,13 +228,10 @@ class ParticipantServiceTest {
             .chatRoom(chatRoom)
             .build();
 
-        when(userRepository.findById(1L)).thenReturn(Optional.ofNullable(host));
-        when(userRepository.findById(2L)).thenReturn(Optional.ofNullable(subHost));
-        when(chatRoomRepository.findById(any())).thenReturn(Optional.ofNullable(chatRoom));
-        when(participantRepository.findByUserAndChatRoom(host, chatRoom)).thenReturn(
-            Optional.ofNullable(participant1));
-        when(participantRepository.findByUserAndChatRoom(subHost, chatRoom)).thenReturn(
-            Optional.ofNullable(participant2));
+        when(participantRepository.findByUserIdAndChatRoomId(host.getId(),
+            chatRoom.getId())).thenReturn(Optional.ofNullable(participant1));
+        when(participantRepository.findByUserIdAndChatRoomId(subHost.getId(),
+            chatRoom.getId())).thenReturn(Optional.ofNullable(participant2));
         participantService.changeParticipantRights(1L, subHost.getId(), HOST, host.getId());
 
         assertAll(
@@ -291,13 +273,10 @@ class ParticipantServiceTest {
             .chatRoom(chatRoom)
             .build();
 
-        when(userRepository.findById(1L)).thenReturn(Optional.ofNullable(host));
-        when(userRepository.findById(2L)).thenReturn(Optional.ofNullable(guest));
-        when(chatRoomRepository.findById(any())).thenReturn(Optional.ofNullable(chatRoom));
-        when(participantRepository.findByUserAndChatRoom(host, chatRoom)).thenReturn(
-            Optional.ofNullable(participant1));
-        when(participantRepository.findByUserAndChatRoom(guest, chatRoom)).thenReturn(
-            Optional.ofNullable(participant2));
+        when(participantRepository.findByUserIdAndChatRoomId(host.getId(),
+            chatRoom.getId())).thenReturn(Optional.ofNullable(participant1));
+        when(participantRepository.findByUserIdAndChatRoomId(guest.getId(),
+            chatRoom.getId())).thenReturn(Optional.ofNullable(participant2));
         participantService.changeParticipantRights(1L, guest.getId(), HOST, host.getId());
 
         assertAll(
@@ -339,20 +318,15 @@ class ParticipantServiceTest {
             .chatRoom(chatRoom)
             .build();
 
-        when(userRepository.findById(host.getId())).thenReturn(Optional.of(host));
-        when(userRepository.findById(subHost.getId())).thenReturn(Optional.of(subHost));
-        when(chatRoomRepository.findById(chatRoom.getId())).thenReturn(Optional.of(chatRoom));
-        when(participantRepository.findByUserAndChatRoom(host, chatRoom)).thenReturn(
-            Optional.ofNullable(participant1));
-        when(participantRepository.findByUserAndChatRoom(subHost, chatRoom)).thenReturn(
-            Optional.ofNullable(participant2));
+        when(participantRepository.findByUserIdAndChatRoomId(host.getId(),
+            chatRoom.getId())).thenReturn(Optional.ofNullable(participant1));
+        when(participantRepository.findByUserIdAndChatRoomId(subHost.getId(),
+            chatRoom.getId())).thenReturn(Optional.ofNullable(participant2));
 
         participantService.deleteParticipant(chatRoom.getId(), subHost.getId(), host.getId());
 
         verify(participantRepository).delete(participant2);
         verify(chatRoomBlockedUserRepository).save(any());
-        verify(rabbitTemplate).convertAndSend(anyString(), anyString(),
-            any(CacheClearMessage.class));
     }
 
     @Test
@@ -381,20 +355,15 @@ class ParticipantServiceTest {
             .chatRoom(chatRoom)
             .build();
 
-        when(userRepository.findById(host.getId())).thenReturn(Optional.of(host));
-        when(userRepository.findById(guest.getId())).thenReturn(Optional.of(guest));
-        when(chatRoomRepository.findById(chatRoom.getId())).thenReturn(Optional.of(chatRoom));
-        when(participantRepository.findByUserAndChatRoom(host, chatRoom)).thenReturn(
+        when(participantRepository.findByUserIdAndChatRoomId(1L, 1L)).thenReturn(
             Optional.ofNullable(participant1));
-        when(participantRepository.findByUserAndChatRoom(guest, chatRoom)).thenReturn(
+        when(participantRepository.findByUserIdAndChatRoomId(2L, 1L)).thenReturn(
             Optional.ofNullable(participant2));
 
         participantService.deleteParticipant(chatRoom.getId(), guest.getId(), host.getId());
 
         verify(participantRepository).delete(participant2);
         verify(chatRoomBlockedUserRepository).save(any());
-        verify(rabbitTemplate).convertAndSend(anyString(), anyString(),
-            any(CacheClearMessage.class));
     }
 
     @Test
@@ -426,19 +395,14 @@ class ParticipantServiceTest {
             .chatRoom(chatRoom)
             .build();
 
-        when(userRepository.findById(subHost.getId())).thenReturn(Optional.of(subHost));
-        when(userRepository.findById(guest.getId())).thenReturn(Optional.of(guest));
-        when(chatRoomRepository.findById(chatRoom.getId())).thenReturn(Optional.of(chatRoom));
-        when(participantRepository.findByUserAndChatRoom(subHost, chatRoom)).thenReturn(
-            Optional.ofNullable(participant1));
-        when(participantRepository.findByUserAndChatRoom(guest, chatRoom)).thenReturn(
-            Optional.ofNullable(participant2));
+        when(participantRepository.findByUserIdAndChatRoomId(subHost.getId(),
+            chatRoom.getId())).thenReturn(Optional.ofNullable(participant1));
+        when(participantRepository.findByUserIdAndChatRoomId(guest.getId(),
+            chatRoom.getId())).thenReturn(Optional.ofNullable(participant2));
 
         participantService.deleteParticipant(chatRoom.getId(), guest.getId(), subHost.getId());
 
         verify(participantRepository).delete(participant2);
         verify(chatRoomBlockedUserRepository).save(any());
-        verify(rabbitTemplate).convertAndSend(anyString(), anyString(),
-            any(CacheClearMessage.class));
     }
 }

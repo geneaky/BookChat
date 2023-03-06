@@ -96,4 +96,7 @@ public class Participant {
         this.participantStatus = SUBHOST;
     }
 
+    public String getChatRoomSid() {
+        return this.chatRoom.getRoomSid();
+    }
 }
