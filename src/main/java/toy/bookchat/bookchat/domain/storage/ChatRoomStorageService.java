@@ -13,8 +13,11 @@ import toy.bookchat.bookchat.exception.storage.ImageUploadToStorageException;
 @Service
 public class ChatRoomStorageService implements StorageService {
 
-    public static final int WIDTH_LIMIT = 200;
-    public static final int HEIGHT_LIMIT = 200;
+    // TODO: 2023/03/08 앞단에서 정확한 이미지 사이즈 제한을 지정하기전까지는 일시적으로 제한을 해제한다.
+    private static final int WIDTH_LIMIT = Integer.MAX_VALUE / 2;
+    //    private static final int WIDTH_LIMIT = 200;
+    private static final int HEIGHT_LIMIT = Integer.MAX_VALUE / 2;
+    //    private static final int HEIGHT_LIMIT = 200;
 
     private final AmazonS3Client amazonS3Client;
     private final StorageProperties storageProperties;
