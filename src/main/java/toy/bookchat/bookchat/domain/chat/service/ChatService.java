@@ -2,6 +2,7 @@ package toy.bookchat.bookchat.domain.chat.service;
 
 import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.GUEST;
 
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -53,12 +54,10 @@ public class ChatService {
         return DESTINATION_PREFIX + roomSid;
     }
 
-
-    // TODO: 2023/03/06 동시성 테스트
     @Transactional
     public void enterChatRoom(Long userId, Long roomId) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        ChatRoom chatRoom = chatRoomRepository.findWithPessimisticLockById(roomId)
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
             .orElseThrow(ChatRoomNotFoundException::new);
 
         checkIsBlockedUser(user, chatRoom);
@@ -81,9 +80,10 @@ public class ChatService {
     }
 
     private void checkIsFullChatRoom(ChatRoom chatRoom) {
-        Long currentNumberOfParticipants = participantRepository.countByChatRoom(chatRoom);
-        Integer roomSize = chatRoom.getRoomSize();
-        if (roomSize.longValue() <= currentNumberOfParticipants) {
+        List<Participant> participants = participantRepository.findWithPessimisticLockByChatRoom(
+            chatRoom);
+
+        if (chatRoom.getRoomSize() <= participants.size()) {
             throw new ChatRoomIsFullException();
         }
     }

@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -60,8 +61,7 @@ class ChatServiceTest {
         ChatRoomBlockedUser blockedUser = mock(ChatRoomBlockedUser.class);
 
         when(userRepository.findById(any())).thenReturn(Optional.ofNullable(user));
-        when(chatRoomRepository.findWithPessimisticLockById(any())).thenReturn(
-            Optional.ofNullable(chatRoom));
+        when(chatRoomRepository.findById(any())).thenReturn(Optional.ofNullable(chatRoom));
         when(chatRoomBlockedUserRepository.findByUserIdAndChatRoomId(any(), any())).thenReturn(
             Optional.ofNullable(blockedUser));
 
@@ -93,9 +93,9 @@ class ChatServiceTest {
         chat.setCreatedAt(LocalDateTime.now());
 
         when(userRepository.findById(any())).thenReturn(Optional.ofNullable(user));
-        when(chatRoomRepository.findWithPessimisticLockById(any())).thenReturn(
-            Optional.ofNullable(chatRoom));
-        when(participantRepository.countByChatRoom(any())).thenReturn(3L);
+        when(chatRoomRepository.findById(any())).thenReturn(Optional.ofNullable(chatRoom));
+        when(participantRepository.findWithPessimisticLockByChatRoom(any())).thenReturn(
+            List.of(mock(Participant.class), mock(Participant.class), mock(Participant.class)));
         assertThatThrownBy(() -> {
             chatService.enterChatRoom(user.getId(), chatRoom.getId());
         }).isInstanceOf(ChatRoomIsFullException.class);
@@ -124,9 +124,9 @@ class ChatServiceTest {
         chat.setCreatedAt(LocalDateTime.now());
 
         when(userRepository.findById(any())).thenReturn(Optional.ofNullable(user));
-        when(chatRoomRepository.findWithPessimisticLockById(any())).thenReturn(
-            Optional.ofNullable(chatRoom));
-        when(participantRepository.countByChatRoom(any())).thenReturn(2L);
+        when(chatRoomRepository.findById(any())).thenReturn(Optional.ofNullable(chatRoom));
+        when(participantRepository.findWithPessimisticLockByChatRoom(any())).thenReturn(
+            new ArrayList<>());
         when(chatRepository.save(any())).thenReturn(chat);
         chatService.enterChatRoom(user.getId(), chatRoom.getId());
 

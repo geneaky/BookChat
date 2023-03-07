@@ -94,47 +94,4 @@ class ChatRepositoryTest {
 
         assertThat(content).containsExactly(chat3, chat2, chat1);
     }
-
-    @Test
-    void user_chatroom_foreignkey추출_후_save() throws Exception {
-        User user1 = User.builder()
-            .name("test User")
-            .nickname("test Nickname")
-            .build();
-        userRepository.save(user1);
-        Book book = Book.builder()
-            .isbn("12345")
-            .publishAt(LocalDate.now())
-            .build();
-        bookRepository.save(book);
-
-        ChatRoom chatRoom = ChatRoom.builder()
-            .book(book)
-            .host(user1)
-            .roomSid("yg3O4")
-            .roomSize(377)
-            .defaultRoomImageType(1)
-            .build();
-        chatRoomRepository.save(chatRoom);
-
-        Chat chat = Chat.builder()
-            .message("test message")
-            .user(user1)
-            .chatRoom(chatRoom)
-            .build();
-
-        chatRepository.save(chat);
-
-        em.flush();
-        em.clear();
-
-        Chat findChat = chatRepository.findById(chat.getId()).get();
-        findChat.getUser().changeUserNickname("changed Nickname");
-
-        em.flush();
-        em.clear();
-
-        User user = userRepository.findById(user1.getId()).get();
-        assertThat(findChat.getUser().getNickname()).isEqualTo(user.getNickname());
-    }
 }

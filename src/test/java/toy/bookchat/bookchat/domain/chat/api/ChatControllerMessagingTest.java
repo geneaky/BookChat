@@ -155,9 +155,8 @@ class ChatControllerMessagingTest extends StompTestExtension {
         };
 
         when(userRepository.findById(any())).thenReturn(Optional.ofNullable(getUser()));
-        when(chatRoomRepository.findWithPessimisticLockById(any())).thenReturn(
+        when(chatRoomRepository.findById(any())).thenReturn(
             Optional.of(chatRoom));
-//        when(participantRepository.)
         when(chatRepository.save(any())).thenReturn(chat);
 
         CountDownLatch chatAttemptCountLatch = new CountDownLatch(chatActions.length);
