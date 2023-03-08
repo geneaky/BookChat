@@ -20,7 +20,6 @@ import lombok.Builder;
 import lombok.Getter;
 import toy.bookchat.bookchat.domain.BaseEntity;
 import toy.bookchat.bookchat.domain.book.Book;
-import toy.bookchat.bookchat.domain.bookreport.BookReport;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.exception.bookshelf.BookReportNotFoundException;
 
@@ -80,7 +79,12 @@ public class BookShelf extends BaseEntity {
     }
 
     public List<String> getBookAuthors() {
+        loadBookAuthors();
         return this.book.getAuthors();
+    }
+
+    private void loadBookAuthors() {
+        this.book.getAuthors().size();
     }
 
     public String getBookPublisher() {

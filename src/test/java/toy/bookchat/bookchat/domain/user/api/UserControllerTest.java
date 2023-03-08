@@ -32,8 +32,6 @@ import static org.springframework.restdocs.request.RequestDocumentation.requestP
 import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static toy.bookchat.bookchat.domain.common.AuthConstants.BEARER;
-import static toy.bookchat.bookchat.domain.common.AuthConstants.OIDC;
 import static toy.bookchat.bookchat.domain.user.ReadingTaste.ART;
 import static toy.bookchat.bookchat.domain.user.ReadingTaste.DEVELOPMENT;
 import static toy.bookchat.bookchat.domain.user.ReadingTaste.SCIENCE;
@@ -80,6 +78,10 @@ import toy.bookchat.bookchat.security.token.openid.OpenIdTestUtil;
 class UserControllerTest extends ControllerTestExtension {
 
     public final String JWT_TOKEN = getTestToken();
+    private final String OIDC = "OIDC";
+    private final String BEARER = "Bearer ";
+
+
     @MockBean
     UserService userService;
     @MockBean
@@ -234,7 +236,8 @@ class UserControllerTest extends ControllerTestExtension {
             .setClaims(claims)
             .signWith(RS256, privateKey).compact();
 
-        when(getOpenIdTokenConfig().getPublicKey(any(), any())).thenReturn(publicKey);
+        when(getOpenIdTokenConfig().getPublicKey(any(), any())).thenReturn(
+            publicKey);
         doThrow(ExpiredTokenException.class).when(getOpenIdTokenManager())
             .getOAuth2MemberNumberFromIdToken(any(), any());
 
@@ -253,7 +256,8 @@ class UserControllerTest extends ControllerTestExtension {
         PrivateKey privateKey = getPrivateKey();
         PublicKey publicKey = getPublicKey();
 
-        when(getOpenIdTokenConfig().getPublicKey(any(), any())).thenReturn(publicKey);
+        when(getOpenIdTokenConfig().getPublicKey(any(), any())).thenReturn(
+            publicKey);
         when(getOpenIdTokenManager().getOAuth2MemberNumberFromIdToken(any(), any())).thenReturn(
             "testkakao");
         when(getOpenIdTokenManager().getUserEmailFromToken(any(), any())).thenReturn(
@@ -352,7 +356,8 @@ class UserControllerTest extends ControllerTestExtension {
         PrivateKey privateKey = getPrivateKey();
         PublicKey publicKey = getPublicKey();
 
-        when(getOpenIdTokenConfig().getPublicKey(any(), any())).thenReturn(publicKey);
+        when(getOpenIdTokenConfig().getPublicKey(any(), any())).thenReturn(
+            publicKey);
 
         String testToken = Jwts.builder()
             .setHeaderParam("kid", "abcedf")
@@ -415,7 +420,8 @@ class UserControllerTest extends ControllerTestExtension {
         PrivateKey privateKey = getPrivateKey();
         PublicKey publicKey = getPublicKey();
 
-        when(getOpenIdTokenConfig().getPublicKey(any(), any())).thenReturn(publicKey);
+        when(getOpenIdTokenConfig().getPublicKey(any(), any())).thenReturn(
+            publicKey);
 
         String testToken = Jwts.builder()
             .setHeaderParam("kid", "abcedf")
@@ -434,7 +440,8 @@ class UserControllerTest extends ControllerTestExtension {
         PrivateKey privateKey = getPrivateKey();
         PublicKey publicKey = getPublicKey();
 
-        when(getOpenIdTokenConfig().getPublicKey(any(), any())).thenReturn(publicKey);
+        when(getOpenIdTokenConfig().getPublicKey(any(), any())).thenReturn(
+            publicKey);
 
         Claims claims = Jwts.claims().setIssuer("https://kauth.kakao.com")
             .setSubject("test").setExpiration(new Date(0));

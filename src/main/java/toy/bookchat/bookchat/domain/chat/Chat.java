@@ -3,6 +3,7 @@ package toy.bookchat.bookchat.domain.chat;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import lombok.Builder;
@@ -16,7 +17,7 @@ import toy.bookchat.bookchat.domain.user.User;
 public class Chat extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String message;
     @ManyToOne(fetch = FetchType.LAZY)
@@ -28,8 +29,7 @@ public class Chat extends BaseEntity {
     }
 
     @Builder
-    private Chat(Long id, String message, User user,
-        ChatRoom chatRoom) {
+    private Chat(Long id, String message, User user, ChatRoom chatRoom) {
         this.id = id;
         this.message = message;
         this.user = user;

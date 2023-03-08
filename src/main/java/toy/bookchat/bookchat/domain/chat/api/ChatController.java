@@ -26,22 +26,22 @@ public class ChatController {
         this.chatService = chatService;
     }
 
-    @MessageMapping("/enter/chatrooms/{roomSid}")
+    @MessageMapping("/enter/chatrooms/{roomId}")
     public void enterChatRoom(@UserPayload TokenPayload tokenPayload,
-        @DestinationVariable String roomSid) {
-        chatService.enterChatRoom(tokenPayload.getUserId(), roomSid);
+        @DestinationVariable Long roomId) {
+        chatService.enterChatRoom(tokenPayload.getUserId(), roomId);
     }
 
-    @MessageMapping("/leave/chatrooms/{roomSid}")
+    @MessageMapping("/leave/chatrooms/{roomId}")
     public void leaveChatRoom(@UserPayload TokenPayload tokenPayload,
-        @DestinationVariable String roomSid) {
-        chatService.leaveChatRoom(tokenPayload.getUserId(), roomSid);
+        @DestinationVariable Long roomId) {
+        chatService.leaveChatRoom(tokenPayload.getUserId(), roomId);
     }
 
-    @MessageMapping("/send/chatrooms/{roomSid}")
+    @MessageMapping("/send/chatrooms/{roomId}")
     public void sendMessage(@Valid ChatDto chat, @UserPayload TokenPayload tokenPayload,
-        @DestinationVariable String roomSid) {
-        chatService.sendMessage(tokenPayload.getUserId(), roomSid, chat);
+        @DestinationVariable Long roomId) {
+        chatService.sendMessage(tokenPayload.getUserId(), roomId, chat);
     }
 
     @GetMapping("/v1/api/chatrooms/{roomId}/chats")

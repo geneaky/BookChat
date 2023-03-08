@@ -1,5 +1,6 @@
 package toy.bookchat.bookchat.domain.chatroom;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -20,17 +21,17 @@ public class ChatRoom extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String roomName;
+    @Column(unique = true)
     private String roomSid;
+    @Column(nullable = false)
     private Integer roomSize;
+    @Column(nullable = false)
     private Integer defaultRoomImageType;
     private String roomImageUri;
     @ManyToOne(fetch = FetchType.LAZY)
     private Book book;
     @ManyToOne(fetch = FetchType.LAZY)
     private User host;
-
-    protected ChatRoom() {
-    }
 
     @Builder
     private ChatRoom(Long id, String roomName, String roomSid, Integer roomSize,
@@ -43,6 +44,9 @@ public class ChatRoom extends BaseEntity {
         this.roomImageUri = roomImageUri;
         this.book = book;
         this.host = host;
+    }
+
+    protected ChatRoom() {
     }
 
     public void changeHost(User user) {

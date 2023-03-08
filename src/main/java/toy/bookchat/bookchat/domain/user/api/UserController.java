@@ -1,7 +1,5 @@
 package toy.bookchat.bookchat.domain.user.api;
 
-import static toy.bookchat.bookchat.domain.common.AuthConstants.OIDC;
-
 import java.util.Optional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -37,6 +35,8 @@ import toy.bookchat.bookchat.security.user.UserPayload;
 @RestController
 @RequestMapping("/v1/api")
 public class UserController {
+
+    private final String OIDC = "OIDC";
 
     private final UserService userService;
     private final IdTokenManager idTokenManager;

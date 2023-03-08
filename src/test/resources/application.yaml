@@ -1,12 +1,18 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:test
+#    url: jdbc:mysql://localhost:3306/test?allowPublicKeyRetrieval=true&useSSL=false&useUnicode=true&serverTimezone=Asia/Seoul
+#    username: root
+#    password: root
+    url: jdbc:h2:mem:test;MODE=MySQL
     username: sa
     password:
-
-  jackson:
-    parser:
-      allow-unquoted-control-chars: true
+  jpa:
+    hibernate:
+      ddl-auto: create
+      properties:
+      hibernate:
+        default_batch_fetch_size: 100
+    open-in-view: false
 
 decorator:
   datasource:
@@ -16,7 +22,8 @@ decorator:
 rabbit:
   host: localhost
   virtual-host: /
-  port: 61613
+  stomp-port: 61613
+  amqp-port: 5672
   login: guest
   passcode: guest
 

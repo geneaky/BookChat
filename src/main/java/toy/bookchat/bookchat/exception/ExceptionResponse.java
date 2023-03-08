@@ -19,6 +19,8 @@ public enum ExceptionResponse {
     WRONG_KEY_SPEC(ResponseEntity.status(HttpStatus.BAD_REQUEST).body("잘 못된 키 생성 형식")),
     TOO_MANY_REQUESTS(
         ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body("현재 요청이 많습니다, 잠시후 다시 시도해주세요.")),
+    CHAT_ROOM_IS_FULL(ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("채팅방 인원이 전부 찼습니다.")),
+    BLOCKED_USER(ResponseEntity.status(HttpStatus.FORBIDDEN).body("채팅방 관리자에 의해 차단되었습니다.")),
     BAD_REQUEST(ResponseEntity.status(HttpStatus.BAD_REQUEST).body("올바르지 않은 요청 형식입니다"));
 
     private final ResponseEntity<String> value;

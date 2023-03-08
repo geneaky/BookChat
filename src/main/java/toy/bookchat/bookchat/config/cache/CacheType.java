@@ -6,10 +6,7 @@ import lombok.Getter;
 public enum CacheType {
 
     KAKAO_PUBLIC_KEY("kakao", 259_200, 1),
-    GOOGLE_PUBLIC_KEY("google", 259_200, 1),
-    CHAT_USER("user", 30, 10000),
-    CHAT_ROOM("chatroom", 30, 10000),
-    PARTICIPANT("participant", 30, 10000);
+    GOOGLE_PUBLIC_KEY("google", 259_200, 1);
 
     private final String cacheName;
     private final int expiredAfterWrite;

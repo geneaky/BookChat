@@ -24,14 +24,13 @@ import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.book.repository.BookRepository;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookRequest;
 import toy.bookchat.bookchat.domain.chat.Chat;
-import toy.bookchat.bookchat.domain.chat.repository.ChatRepository;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
+import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomHashTagRepository;
 import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomRepository;
+import toy.bookchat.bookchat.domain.chatroom.repository.HashTagRepository;
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomResponse;
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomsResponseSlice;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.CreateChatRoomRequest;
-import toy.bookchat.bookchat.domain.chatroomhashtag.repository.ChatRoomHashTagRepository;
-import toy.bookchat.bookchat.domain.hashtag.repository.HashTagRepository;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
@@ -42,10 +41,6 @@ class ChatRoomServiceTest {
     @Mock
     ChatRoomRepository chatRoomRepository;
     @Mock
-    ChatRepository chatRepository;
-    @Mock
-    ParticipantRepository participantRepository;
-    @Mock
     HashTagRepository hashTagRepository;
     @Mock
     ChatRoomHashTagRepository chatRoomHashTagRepository;
@@ -53,6 +48,8 @@ class ChatRoomServiceTest {
     BookRepository bookRepository;
     @Mock
     UserRepository userRepository;
+    @Mock
+    ParticipantRepository participantRepository;
     @InjectMocks
     ChatRoomService chatRoomService;
 

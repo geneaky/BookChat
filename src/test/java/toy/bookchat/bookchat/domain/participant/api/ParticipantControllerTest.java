@@ -7,6 +7,7 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
@@ -27,10 +28,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
 import toy.bookchat.bookchat.domain.participant.service.ParticipantService;
-import toy.bookchat.bookchat.domain.participant.service.dto.ChatRoomParticipantsResponse;
 import toy.bookchat.bookchat.domain.participant.service.dto.RoomGuest;
 import toy.bookchat.bookchat.domain.participant.service.dto.RoomHost;
 import toy.bookchat.bookchat.domain.participant.service.dto.RoomSubHost;
+import toy.bookchat.bookchat.domain.participant.service.dto.response.ChatRoomParticipantsResponse;
 
 @ParticipantPresentationTest
 class ParticipantControllerTest extends ControllerTestExtension {
@@ -142,5 +143,24 @@ class ParticipantControllerTest extends ControllerTestExtension {
             ));
 
         verify(participantService).changeParticipantRights(any(), any(), any(), any());
+    }
+
+    @Test
+    void 방장_부방장이_채팅방_게스트_강퇴_성공() throws Exception {
+
+        mockMvc.perform(delete("/v1/api/chatrooms/{roomId}/participants/{userId}", 1L, 1L)
+                .header(AUTHORIZATION, JWT_TOKEN)
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isOk())
+            .andDo(document("delete-participant",
+                requestHeaders(
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
+                ),
+                pathParameters(
+                    parameterWithName("roomId").description("Room Id"),
+                    parameterWithName("userId").description("User Id")
+                )));
+
+        verify(participantService).deleteParticipant(any(), any(), any());
     }
 }

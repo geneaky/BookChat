@@ -15,7 +15,7 @@ import toy.bookchat.bookchat.config.token.JwtTokenProperties;
 import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.api.dto.Token;
-import toy.bookchat.bookchat.exception.security.DenidedTokenException;
+import toy.bookchat.bookchat.exception.security.DeniedTokenException;
 import toy.bookchat.bookchat.exception.security.ExpiredTokenException;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.user.TokenPayload;
@@ -73,7 +73,7 @@ class JwtTokenTest {
         assertThatThrownBy(() -> {
             JwtToken jwtToken = JwtToken.of(token.getAccessToken() + "bug");
             jwtToken.getOAuth2MemberNumber(jwtTokenProperties.getSecret());
-        }).isInstanceOf(DenidedTokenException.class);
+        }).isInstanceOf(DeniedTokenException.class);
     }
 
     @Test
@@ -85,7 +85,7 @@ class JwtTokenTest {
         assertThatThrownBy(() -> {
             JwtToken jwtToken = JwtToken.of(token.getAccessToken());
             jwtToken.getOAuth2MemberNumber("bug");
-        }).isInstanceOf(DenidedTokenException.class);
+        }).isInstanceOf(DeniedTokenException.class);
     }
 
     @Test

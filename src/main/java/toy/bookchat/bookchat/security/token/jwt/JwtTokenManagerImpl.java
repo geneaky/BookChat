@@ -2,7 +2,6 @@ package toy.bookchat.bookchat.security.token.jwt;
 
 import org.springframework.stereotype.Component;
 import toy.bookchat.bookchat.config.token.JwtTokenProperties;
-import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 
 @Component
@@ -30,12 +29,6 @@ public class JwtTokenManagerImpl implements JwtTokenManager {
     public String getUserEmailFromToken(String token) {
         JwtToken jwtToken = JwtToken.of(token);
         return jwtToken.getEmail(jwtTokenProperties.getSecret());
-    }
-
-    @Override
-    public OAuth2Provider getOAuth2ProviderFromToken(String token) {
-        JwtToken jwtToken = JwtToken.of(token);
-        return jwtToken.getOAuth2Provider(jwtTokenProperties.getSecret());
     }
 
     @Override

@@ -3,6 +3,7 @@ package toy.bookchat.bookchat.domain.book.service.dto.request;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import toy.bookchat.bookchat.domain.book.service.dto.response.BookResponse;
@@ -10,6 +11,7 @@ import toy.bookchat.bookchat.domain.book.service.dto.response.BookSearchResponse
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
+@EqualsAndHashCode
 public class KakaoBook {
 
     private List<Document> documents;

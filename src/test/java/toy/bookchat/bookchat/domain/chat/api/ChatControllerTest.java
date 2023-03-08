@@ -17,7 +17,6 @@ import static org.springframework.restdocs.request.RequestDocumentation.requestP
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -39,8 +38,6 @@ class ChatControllerTest extends ControllerTestExtension {
     public final String JWT_TOKEN = getTestToken();
     @MockBean
     private ChatService chatService;
-    @Autowired
-    private ObjectMapper objectMapper;
     @Autowired
     private MockMvc mockMvc;
 

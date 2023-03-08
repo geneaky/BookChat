@@ -1,8 +1,5 @@
 package toy.bookchat.bookchat.security.token.jwt;
 
-import static toy.bookchat.bookchat.domain.common.AuthConstants.BEARER;
-import static toy.bookchat.bookchat.domain.common.AuthConstants.BEGIN_INDEX;
-
 import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -13,11 +10,14 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
-import toy.bookchat.bookchat.exception.security.DenidedTokenException;
+import toy.bookchat.bookchat.exception.security.DeniedTokenException;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    private final String BEARER = "Bearer ";
+    private final int BEGIN_INDEX = 7;
 
     private final JwtTokenManager jwtTokenManager;
 
@@ -51,7 +51,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER)) {
             return bearerToken.substring(BEGIN_INDEX);
         }
-        throw new DenidedTokenException();
+        throw new DeniedTokenException();
     }
 
     private void registerUserAuthenticationOnSecurityContext(TokenPayload tokenPayload) {

@@ -45,6 +45,9 @@ class ParticipantRepositoryTest {
 
         ChatRoom chatRoom = ChatRoom.builder()
             .host(aUser)
+            .roomSid("cES1Cn4N")
+            .roomSize(275)
+            .defaultRoomImageType(2)
             .build();
         chatRoomRepository.save(chatRoom);
 
@@ -71,4 +74,34 @@ class ParticipantRepositoryTest {
         assertThat(chatRoomUsers).containsExactly(participant1, participant2, participant3);
     }
 
+    @Test
+    void 사용자Id와_채팅방Id로_참여자_조회_성공() throws Exception {
+        User user = User.builder()
+            .nickname("AUser")
+            .defaultProfileImageType(1)
+            .build();
+
+        userRepository.save(user);
+
+        ChatRoom chatRoom = ChatRoom.builder()
+            .host(user)
+            .roomSid("KUor")
+            .roomSize(655)
+            .defaultRoomImageType(1)
+            .build();
+        chatRoomRepository.save(chatRoom);
+
+        Participant participant = Participant.builder()
+            .user(user)
+            .participantStatus(HOST)
+            .chatRoom(chatRoom)
+            .build();
+
+        participantRepository.save(participant);
+
+        Participant findParticipant = participantRepository.findByUserIdAndChatRoomId(user.getId(),
+            chatRoom.getId()).get();
+
+        assertThat(findParticipant).isEqualTo(participant);
+    }
 }

@@ -1,6 +1,7 @@
 package toy.bookchat.bookchat.security.token;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -93,6 +94,22 @@ class TokenServiceTest {
         Token token = tokenService.generateToken(refreshTokenRequest);
 
         assertThat(refreshToken).isNotEqualTo(token.getRefreshToken());
+    }
+
+    @Test
+    void 리프레시토큰_갱신시도시_해당토큰이_저장되어있지_않다면_예외발생() throws Exception {
+        String refreshToken = getRefreshToken();
+
+        RefreshTokenRequest refreshTokenRequest = RefreshTokenRequest.builder()
+            .refreshToken(refreshToken)
+            .build();
+
+        when(userRepository.findById(any())).thenReturn(Optional.of(getUser()));
+        when(jwtTokenManager.shouldRefreshTokenBeRenew(any())).thenReturn(true);
+
+        assertThatThrownBy(() -> {
+            tokenService.generateToken(refreshTokenRequest);
+        }).isInstanceOf(IllegalStateException.class);
     }
 
     private String getRefreshToken() {

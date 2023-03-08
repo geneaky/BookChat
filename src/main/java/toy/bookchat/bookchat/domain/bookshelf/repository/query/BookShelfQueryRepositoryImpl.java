@@ -1,7 +1,7 @@
 package toy.bookchat.bookchat.domain.bookshelf.repository.query;
 
 import static toy.bookchat.bookchat.domain.book.QBook.book;
-import static toy.bookchat.bookchat.domain.bookreport.QBookReport.bookReport;
+import static toy.bookchat.bookchat.domain.bookshelf.QBookReport.bookReport;
 import static toy.bookchat.bookchat.domain.bookshelf.QBookShelf.bookShelf;
 import static toy.bookchat.bookchat.domain.common.RepositorySupport.extractOrderSpecifierFrom;
 
@@ -32,7 +32,6 @@ public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
 
         JPAQuery<BookShelf> jpaQuery = queryFactory.select(bookShelf)
             .from(bookShelf).join(bookShelf.book, book).fetchJoin()
-            .join(book.authors).fetchJoin()
             .where(bookShelf.readingStatus.eq(readingStatus)
                 .and(bookShelf.user.id.eq(userId)));
 

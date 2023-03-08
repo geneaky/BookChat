@@ -54,7 +54,7 @@ public class WebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBro
         registry.enableStompBrokerRelay("/topic", "/exchange")
             .setRelayHost(externalBrokerProperties.getHost())
             .setVirtualHost(externalBrokerProperties.getVirtualHost())
-            .setRelayPort(externalBrokerProperties.getPort())
+            .setRelayPort(externalBrokerProperties.getStompPort())
             .setClientLogin(externalBrokerProperties.getLogin())
             .setClientPasscode(externalBrokerProperties.getPasscode());
     }

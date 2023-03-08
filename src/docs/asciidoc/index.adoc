@@ -701,6 +701,23 @@ include::{snippets}/patch-participant-right/http-request.adoc[]
 
 include::{snippets}/patch-participant-right/http-response.adoc[]
 
+---
+
+=== 방장,부방장의 게스트 강퇴
+
+`Request Header`
+
+include::{snippets}/delete-participant/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/delete-participant/path-parameters.adoc[]
+include::{snippets}/delete-participant/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/delete-participant/http-response.adoc[]
+
 == 채팅
 
 === 채팅내역 조회
@@ -720,7 +737,7 @@ include::{snippets}/get-chatroom-chats/http-request.adoc[]
 include::{snippets}/get-chatroom-chats/response-fields.adoc[]
 include::{snippets}/get-chatroom-chats/http-response.adoc[]
 
-=== 채팅방 Connection 수립
+=== Stomp Connection 수립
 
 ```stomp
     CONNECT
@@ -760,14 +777,14 @@ include::{snippets}/get-chatroom-chats/http-response.adoc[]
 
 [cols="1,1"]
 |===
-|roomSid|/enter/chatrooms/{roomSid}
-|UUID   |/enter/chatrooms/heho
+|roomId|/enter/chatrooms/{roomId}
+|Long   |/enter/chatrooms/123
 |===
 
 ```stomp
     SEND
     Authorizaiton: Bearer [JWT Token]
-    host: wss://bookchat.link/subscriptions/enter/chatrooms/[heho]
+    host: wss://bookchat.link/subscriptions/enter/chatrooms/[123]
 
     ^@
 ```
@@ -776,14 +793,14 @@ include::{snippets}/get-chatroom-chats/http-response.adoc[]
 
 [cols="1,1"]
 |===
-|roomSid|/leave/chatrooms/{roomSid}
-|UUID   |/leave/chatrooms/heho
+|roomId|/leave/chatrooms/{roomId}
+|Long   |/leave/chatrooms/123
 |===
 
 ```stomp
     SEND
     Authorizaiton: Bearer [JWT Token]
-    host: wss://bookchat.link/subscriptions/leave/chatrooms/[heho]
+    host: wss://bookchat.link/subscriptions/leave/chatrooms/[123]
 
     ^@
 ```
@@ -792,14 +809,14 @@ include::{snippets}/get-chatroom-chats/http-response.adoc[]
 
 [cols="1,1"]
 |===
-|roomSid|/subscriptions/send/chatrooms/{roomSid}
-|UUID   |/subscriptions/send/chatrooms/heho
+|roomId|/subscriptions/send/chatrooms/{roomId}
+|Long   |/subscriptions/send/chatrooms/123
 |===
 
 ```stomp
     SEND
     Authorizaiton: Bearer [JWT Token]
-    host: wss://bookchat.link/subscriptions/send/chatrooms/[heho]
+    host: wss://bookchat.link/subscriptions/send/chatrooms/[123]
 
     {
         message: "hi hi"

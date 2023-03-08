@@ -5,7 +5,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import toy.bookchat.bookchat.domain.agony.Agony;
-import toy.bookchat.bookchat.domain.agonyrecord.AgonyRecord;
+import toy.bookchat.bookchat.domain.agony.AgonyRecord;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -16,16 +16,16 @@ public class CreateAgonyRecordRequest {
 
     private String content;
 
+    public CreateAgonyRecordRequest(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
+
     public AgonyRecord generateAgonyRecord(Agony agony) {
         return AgonyRecord.builder()
             .title(this.title)
             .content(this.content)
             .agony(agony)
             .build();
-    }
-
-    public CreateAgonyRecordRequest(String title, String content) {
-        this.title = title;
-        this.content = content;
     }
 }

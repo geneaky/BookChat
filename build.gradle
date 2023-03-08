@@ -84,6 +84,7 @@ dependencies {
     testImplementation 'org.testcontainers:testcontainers:1.17.6'
     testImplementation 'org.testcontainers:junit-jupiter:1.17.6'
     testImplementation "org.testcontainers:rabbitmq:1.17.6"
+    testImplementation "org.testcontainers:mysql:1.17.6"
     testImplementation 'org.springframework.amqp:spring-rabbit-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
@@ -93,7 +94,6 @@ dependencies {
 
 jacocoTestCoverageVerification {
     def Qdomains = []
-
     for (qPattern in '*.QA'..'*.QZ') { // qPattern = '*.QA', '*.QB', ... '*.QZ'
         Qdomains.add(qPattern + '*')
     }
@@ -127,6 +127,17 @@ jacocoTestReport {
     reports {
         xml.enabled true
     }
+
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                    "**/config/*",
+                    "**/exception/*",
+                    "**/dto/*"
+            ])
+        }))
+    }
+
     finalizedBy 'jacocoTestCoverageVerification'
 }
 

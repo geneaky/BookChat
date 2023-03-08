@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -16,6 +18,7 @@ import toy.bookchat.bookchat.domain.chat.Chat;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
 import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomRepository;
 import toy.bookchat.bookchat.domain.participant.Participant;
+import toy.bookchat.bookchat.domain.participant.ParticipantStatus;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
@@ -33,7 +36,8 @@ class ChatRepositoryTest {
     BookRepository bookRepository;
     @Autowired
     UserRepository userRepository;
-
+    @PersistenceContext
+    EntityManager em;
 
     @Test
     void 채팅_내역_조회_성공() throws Exception {
@@ -48,20 +52,37 @@ class ChatRepositoryTest {
             .build();
         bookRepository.save(book);
 
-        ChatRoom chatRoom = ChatRoom.builder().book(book).host(user1).build();
+        ChatRoom chatRoom = ChatRoom.builder()
+            .book(book)
+            .host(user1)
+            .roomSize(348)
+            .roomSid("XKewmLwG")
+            .defaultRoomImageType(1)
+            .build();
         chatRoomRepository.save(chatRoom);
 
-        Chat chat1 = Chat.builder().user(user1).message("a").chatRoom(chatRoom).build();
-        Chat chat2 = Chat.builder().user(user1).message("b").chatRoom(chatRoom).build();
-        Chat chat3 = Chat.builder().user(user2).message("c").chatRoom(chatRoom).build();
-        Chat chat4 = Chat.builder().user(user1).message("d").chatRoom(chatRoom).build();
+        Chat chat1 = Chat.builder().user(user1).message("a")
+            .chatRoom(chatRoom)
+            .build();
+        Chat chat2 = Chat.builder().user(user1).message("b")
+            .chatRoom(chatRoom)
+            .build();
+        Chat chat3 = Chat.builder().user(user2).message("c")
+            .chatRoom(chatRoom)
+            .build();
+        Chat chat4 = Chat.builder().user(user1).message("d")
+            .chatRoom(chatRoom)
+            .build();
         chatRepository.save(chat1);
         chatRepository.save(chat2);
         chatRepository.save(chat3);
         chatRepository.save(chat4);
 
-        Participant participant1 = Participant.builder().user(user1).chatRoom(chatRoom).build();
-        Participant participant2 = Participant.builder().user(user2).chatRoom(chatRoom).build();
+        Participant participant1 = Participant.builder().user(user1).chatRoom(chatRoom)
+            .participantStatus(
+                ParticipantStatus.HOST).build();
+        Participant participant2 = Participant.builder().user(user2).chatRoom(chatRoom)
+            .participantStatus(ParticipantStatus.GUEST).build();
         participantRepository.save(participant1);
         participantRepository.save(participant2);
 

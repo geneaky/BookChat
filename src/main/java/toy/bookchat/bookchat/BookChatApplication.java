@@ -6,11 +6,12 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import toy.bookchat.bookchat.config.aws.StorageProperties;
 import toy.bookchat.bookchat.config.token.JwtTokenProperties;
 import toy.bookchat.bookchat.config.token.OAuth2Properties;
+import toy.bookchat.bookchat.config.web.BookSearchProperties;
 import toy.bookchat.bookchat.config.websocket.ExternalBrokerProperties;
 
 @SpringBootApplication
 @EnableConfigurationProperties({JwtTokenProperties.class, OAuth2Properties.class,
-    StorageProperties.class, ExternalBrokerProperties.class})
+    StorageProperties.class, ExternalBrokerProperties.class, BookSearchProperties.class})
 public class BookChatApplication {
 
     public static void main(String[] args) {
