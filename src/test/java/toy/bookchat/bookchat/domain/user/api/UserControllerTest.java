@@ -18,7 +18,6 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.multipart;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
@@ -471,25 +470,32 @@ class UserControllerTest extends ControllerTestExtension {
     }
 
     @Test
-    void 사용자_닉네임_변경성공() throws Exception {
+    void 사용자_닉네임과_프로필이미지_변경성공() throws Exception {
         ChangeUserNicknameRequest changeUserNicknameRequest = new ChangeUserNicknameRequest(
             "newNickname");
+        MockMultipartFile userProfileImage = new MockMultipartFile("userProfileImage",
+            "test".getBytes());
 
-        mockMvc.perform(patch("/v1/api/user")
+        mockMvc.perform(multipart("/v1/api/users/profile")
+                .file(userProfileImage)
+                .file(new MockMultipartFile("changeUserNicknameRequest", "", APPLICATION_JSON_VALUE,
+                    objectMapper.writeValueAsString(changeUserNicknameRequest)
+                        .getBytes(UTF_8)))
                 .header(AUTHORIZATION, JWT_TOKEN)
-                .with(user(getUserPrincipal()))
-                .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(changeUserNicknameRequest)))
+                .with(user(getUserPrincipal())))
             .andExpect(status().isOk())
-            .andDo(document("patch-user-nickname",
+            .andDo(document("post-update-user-profile",
                 requestHeaders(
                     headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
-                requestFields(
+                requestParts(
+                    partWithName("userProfileImage").description("프로필 이미지 [200 x 200].webp"),
+                    partWithName("changeUserNicknameRequest").description("변경할 닉네임")
+                ),
+                requestPartFields("changeUserNicknameRequest",
                     fieldWithPath("nickname").type(STRING).description("변경할 닉네임")
-                )
-            ));
+                )));
 
-        verify(userService).changeUserNickname(any(), any());
+        verify(userService).updateUserProfile(any(), any(), any());
     }
 }

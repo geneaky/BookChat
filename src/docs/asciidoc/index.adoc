@@ -70,20 +70,24 @@ include::{snippets}/user-nickname-error/http-response.adoc[]
 
 ---
 
-=== 사용자 닉네임 변경
+=== 사용자 프로필 변경
 
 `Request Header`
 
-include::{snippets}/patch-user-nickname/request-headers.adoc[]
+include::{snippets}/post-update-user-profile/request-headers.adoc[]
 
 `Requset`
 
-include::{snippets}/patch-user-nickname/request-fields.adoc[]
-include::{snippets}/patch-user-nickname/http-request.adoc[]
+****
+include::{snippets}/post-update-user-profile/request-parts.adoc[]
+`changeUserNicknameRequest`
+include::{snippets}/post-update-user-profile/request-part-changeUserNicknameRequest-fields.adoc[]
+****
+include::{snippets}/post-update-user-profile/http-request.adoc[]
 
 `Response`
 
-include::{snippets}/patch-user-nickname/http-response.adoc[]
+include::{snippets}/post-update-user-profile/http-response.adoc[]
 
 ---
 
@@ -100,7 +104,6 @@ include::{snippets}/user-signup/request-parts.adoc[]
 `userSignUpRequest`
 include::{snippets}/user-signup/request-part-userSignUpRequest-fields.adoc[]
 ****
-
 include::{snippets}/user-signup/http-request.adoc[]
 
 `Response`

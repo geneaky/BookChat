@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -66,11 +65,13 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/user")
-    public void changeUserNickName(
-        @Valid @RequestBody ChangeUserNicknameRequest changeUserNicknameRequest,
+    @PostMapping("/users/profile")
+    public void updateUserProfile(
+        @Valid @RequestPart ChangeUserNicknameRequest changeUserNicknameRequest,
+        @RequestPart Optional<MultipartFile> userProfileImage,
         @UserPayload TokenPayload tokenPayload) {
-        userService.changeUserNickname(changeUserNicknameRequest, tokenPayload.getUserId());
+        userService.updateUserProfile(changeUserNicknameRequest, userProfileImage,
+            tokenPayload.getUserId());
     }
 
     @PostMapping("/users/signup")
