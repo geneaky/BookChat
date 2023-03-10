@@ -84,7 +84,20 @@ public class UserService {
         ChangeUserNicknameRequest changeUserNicknameRequest,
         Optional<MultipartFile> userProfileImage, Long userId) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        user.changeUserNickname(changeUserNicknameRequest.getNickname());
+        userProfileImage.ifPresentOrElse(updateImage(user, changeUserNicknameRequest.getNickname()),
+            () -> user.changeUserNickname(changeUserNicknameRequest.getNickname()));
+    }
+
+    private Consumer<MultipartFile> updateImage(User user, String nickname) {
+        return image -> {
+            String prefixedUUIDFileName = storageService.createFileName(
+                image, UUID.randomUUID().toString(),
+                new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+            String prefixedUUIDFileUrl = storageService.getFileUrl(prefixedUUIDFileName);
+            user.changeUserNickname(nickname);
+            user.changeProfileImageUrl(prefixedUUIDFileUrl);
+            storageService.upload(image, prefixedUUIDFileName);
+        };
     }
 
     private void saveUser(UserSignUpRequest userSignUpRequest, String userName,

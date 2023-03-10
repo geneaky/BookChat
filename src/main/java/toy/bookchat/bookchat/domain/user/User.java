@@ -73,4 +73,8 @@ public class User extends BaseEntity {
     public String getRoleName() {
         return this.role.getAuthority();
     }
+
+    public void changeProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
+    }
 }
