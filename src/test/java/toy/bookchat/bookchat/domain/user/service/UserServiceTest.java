@@ -119,8 +119,12 @@ class UserServiceTest {
         ChangeUserNicknameRequest changeUserNicknameRequest = new ChangeUserNicknameRequest(
             "user2");
 
+        MultipartFile multipartFile = mock(MultipartFile.class);
+
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-        userService.changeUserNickname(changeUserNicknameRequest, user.getId());
+        userService.updateUserProfile(changeUserNicknameRequest,
+            Optional.ofNullable(multipartFile),
+            user.getId());
 
         String nickname = user.getNickname();
         assertThat(nickname).isEqualTo("user2");

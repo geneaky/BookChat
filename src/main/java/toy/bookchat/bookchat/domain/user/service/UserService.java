@@ -80,8 +80,9 @@ public class UserService {
     }
 
     @Transactional
-    public void changeUserNickname(ChangeUserNicknameRequest changeUserNicknameRequest,
-        Long userId) {
+    public void updateUserProfile(
+        ChangeUserNicknameRequest changeUserNicknameRequest,
+        Optional<MultipartFile> userProfileImage, Long userId) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         user.changeUserNickname(changeUserNicknameRequest.getNickname());
     }
