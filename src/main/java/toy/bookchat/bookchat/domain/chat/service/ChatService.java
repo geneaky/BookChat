@@ -29,7 +29,7 @@ import toy.bookchat.bookchat.exception.user.UserNotFoundException;
 @Service
 public class ChatService {
 
-    public static final String DESTINATION_PREFIX = "/topic/";
+    public final String DESTINATION_PREFIX = "/topic/";
     private final ChatRepository chatRepository;
     private final UserRepository userRepository;
     private final ChatRoomRepository chatRoomRepository;
