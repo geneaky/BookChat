@@ -170,7 +170,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
         Slice<ChatRoomResponse> slice = new SliceImpl<>(result, pageRequest, true);
         ChatRoomsResponseSlice response = ChatRoomsResponseSlice.of(slice);
         when(chatRoomService.getUserChatRooms(any(), any(), any())).thenReturn(response);
-        mockMvc.perform(get("/v1/api/chatrooms")
+        mockMvc.perform(get("/v1/api/users/chatrooms")
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
                 .param("postCursorId", "0")
