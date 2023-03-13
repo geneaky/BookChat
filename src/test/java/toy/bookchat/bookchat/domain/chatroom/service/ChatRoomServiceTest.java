@@ -28,8 +28,8 @@ import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
 import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomHashTagRepository;
 import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomRepository;
 import toy.bookchat.bookchat.domain.chatroom.repository.HashTagRepository;
-import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomResponse;
-import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomsResponseSlice;
+import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.UserChatRoomResponse;
+import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.UserChatRoomsResponseSlice;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.CreateChatRoomRequest;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
 import toy.bookchat.bookchat.domain.user.User;
@@ -119,7 +119,7 @@ class ChatRoomServiceTest {
             .chatRoom(chatRoom1)
             .build();
         chat1.setCreatedAt(LocalDateTime.now());
-        ChatRoomResponse chatRoomResponse = ChatRoomResponse.builder()
+        UserChatRoomResponse userChatRoomResponse = UserChatRoomResponse.builder()
             .roomId(chatRoom1.getId())
             .roomSid(chatRoom1.getRoomSid())
             .roomName(chatRoom1.getRoomName())
@@ -129,16 +129,17 @@ class ChatRoomServiceTest {
             .lastActiveTime(chat1.getCreatedAt())
             .lastChatContent(chat1.getMessage())
             .build();
-        List<ChatRoomResponse> result = List.of(chatRoomResponse);
+        List<UserChatRoomResponse> result = List.of(userChatRoomResponse);
         PageRequest pageRequest = PageRequest.of(0, 1, Sort.by("id").descending());
-        Slice<ChatRoomResponse> slice = new SliceImpl<>(result, pageRequest, true);
+        Slice<UserChatRoomResponse> slice = new SliceImpl<>(result, pageRequest, true);
         when(chatRoomRepository.findUserChatRoomsWithLastChat(any(), any(), any())).thenReturn(
             slice);
-        ChatRoomsResponseSlice chatRoomsResponseSlice = chatRoomService.getUserChatRooms(any(),
+        UserChatRoomsResponseSlice userChatRoomsResponseSlice = chatRoomService.getUserChatRooms(
+            any(),
             any(),
             any());
 
-        Assertions.assertThat(chatRoomsResponseSlice).usingRecursiveComparison()
-            .isEqualTo(ChatRoomsResponseSlice.of(slice));
+        Assertions.assertThat(userChatRoomsResponseSlice).usingRecursiveComparison()
+            .isEqualTo(UserChatRoomsResponseSlice.of(slice));
     }
 }

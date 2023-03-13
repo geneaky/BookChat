@@ -652,7 +652,7 @@ include::{snippets}/post-chatroom/http-request.adoc[]
 
 include::{snippets}/post-chatroom/http-response.adoc[]
 
-=== 채팅방 조회
+=== 사용자 채팅방 조회
 
 `Request Header`
 
@@ -667,6 +667,24 @@ include::{snippets}/get-user-chatrooms/http-request.adoc[]
 
 include::{snippets}/get-user-chatrooms/response-fields.adoc[]
 include::{snippets}/get-user-chatrooms/http-response.adoc[]
+
+---
+
+=== 전체 채팅방 조회
+
+`Request Header`
+
+include::{snippets}/get-chatrooms/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/get-chatrooms/request-parameters.adoc[]
+include::{snippets}/get-chatrooms/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/get-chatrooms/response-fields.adoc[]
+include::{snippets}/get-chatrooms/http-response.adoc[]
 
 == 참여자
 

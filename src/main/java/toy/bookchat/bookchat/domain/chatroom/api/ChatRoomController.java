@@ -4,13 +4,16 @@ import java.util.Optional;
 import javax.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomsResponseSlice;
+import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.UserChatRoomsResponseSlice;
 import toy.bookchat.bookchat.domain.chatroom.service.ChatRoomService;
+import toy.bookchat.bookchat.domain.chatroom.service.dto.request.ChatRoomRequest;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.CreateChatRoomRequest;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPayload;
@@ -35,9 +38,17 @@ public class ChatRoomController {
     }
 
     @GetMapping("/users/chatrooms")
-    public ChatRoomsResponseSlice getUserChatRooms(Optional<Long> postCursorId,
+    public UserChatRoomsResponseSlice getUserChatRooms(Optional<Long> postCursorId,
         Pageable pageable, @UserPayload TokenPayload tokenPayload) {
         return chatRoomService.getUserChatRooms(postCursorId, pageable,
             tokenPayload.getUserId());
+    }
+
+    @GetMapping("/chatrooms")
+    public ChatRoomsResponseSlice getChatRooms(@ModelAttribute ChatRoomRequest chatRoomRequest,
+        Pageable pageable,
+        @UserPayload TokenPayload tokenPayload) {
+        chatRoomRequest.validate();
+        return chatRoomService.getChatRooms(chatRoomRequest, pageable, tokenPayload.getUserId());
     }
 }

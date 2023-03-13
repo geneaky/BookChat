@@ -15,7 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
 import toy.bookchat.bookchat.domain.chat.QChat;
-import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomResponse;
+import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.UserChatRoomResponse;
 import toy.bookchat.bookchat.domain.participant.QParticipant;
 
 @Repository
@@ -27,15 +27,15 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
         this.queryFactory = queryFactory;
     }
 
-    public Slice<ChatRoomResponse> findUserChatRoomsWithLastChat(Pageable pageable,
+    public Slice<UserChatRoomResponse> findUserChatRoomsWithLastChat(Pageable pageable,
         Optional<Long> postCursorId,
         Long userId) {
         QChat subChat = new QChat("subChat");
         QParticipant subParticipant1 = new QParticipant("subParticipant1");
         QParticipant subParticipant2 = new QParticipant("subParticipant2");
 
-        List<ChatRoomResponse> contents = queryFactory.select(
-                Projections.constructor(ChatRoomResponse.class,
+        List<UserChatRoomResponse> contents = queryFactory.select(
+                Projections.constructor(UserChatRoomResponse.class,
                     chatRoom.id,
                     chatRoom.roomName,
                     chatRoom.roomSid,
@@ -65,7 +65,7 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
 
         return toSlice(contents, pageable);
     }
-    
+
     private BooleanExpression afterPostCursorId(Optional<Long> postCursorId) {
         return postCursorId.map(chat.id::lt).orElse(null);
     }

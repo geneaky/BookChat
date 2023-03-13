@@ -21,7 +21,7 @@ import toy.bookchat.bookchat.domain.book.repository.BookRepository;
 import toy.bookchat.bookchat.domain.chat.Chat;
 import toy.bookchat.bookchat.domain.chat.repository.ChatRepository;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
-import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomResponse;
+import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.UserChatRoomResponse;
 import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
 import toy.bookchat.bookchat.domain.user.User;
@@ -123,7 +123,7 @@ class ChatRoomRepositoryTest {
         participantRepository.save(participant3);
         participantRepository.save(participant4);
 
-        ChatRoomResponse chatRoomResponse1 = ChatRoomResponse.builder()
+        UserChatRoomResponse userChatRoomResponse1 = UserChatRoomResponse.builder()
             .roomId(chatRoom3.getId())
             .defaultRoomImageType(chatRoom3.getDefaultRoomImageType())
             .roomSid(chatRoom3.getRoomSid())
@@ -133,7 +133,7 @@ class ChatRoomRepositoryTest {
             .lastActiveTime(chat4.getCreatedAt())
             .build();
 
-        ChatRoomResponse chatRoomResponse2 = ChatRoomResponse.builder()
+        UserChatRoomResponse userChatRoomResponse2 = UserChatRoomResponse.builder()
             .roomId(chatRoom2.getId())
             .defaultRoomImageType(chatRoom2.getDefaultRoomImageType())
             .roomSid(chatRoom2.getRoomSid())
@@ -144,9 +144,9 @@ class ChatRoomRepositoryTest {
             .build();
 
         PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("id").descending());
-        List<ChatRoomResponse> contents = List.of(chatRoomResponse1, chatRoomResponse2);
-        Slice<ChatRoomResponse> result = toSlice(contents, pageRequest);
-        Slice<ChatRoomResponse> slice = chatRoomRepository.findUserChatRoomsWithLastChat(
+        List<UserChatRoomResponse> contents = List.of(userChatRoomResponse1, userChatRoomResponse2);
+        Slice<UserChatRoomResponse> result = toSlice(contents, pageRequest);
+        Slice<UserChatRoomResponse> slice = chatRoomRepository.findUserChatRoomsWithLastChat(
             pageRequest, Optional.empty(), user1.getId());
         assertThat(slice.getContent()).usingRecursiveComparison()
             .ignoringFieldsOfTypes(LocalDateTime.class)
@@ -221,7 +221,7 @@ class ChatRoomRepositoryTest {
         participantRepository.save(participant3);
         participantRepository.save(participant4);
 
-        ChatRoomResponse chatRoomResponse1 = ChatRoomResponse.builder()
+        UserChatRoomResponse userChatRoomResponse1 = UserChatRoomResponse.builder()
             .roomId(chatRoom1.getId())
             .roomSid(chatRoom1.getRoomSid())
             .defaultRoomImageType(chatRoom1.getDefaultRoomImageType())
@@ -231,7 +231,7 @@ class ChatRoomRepositoryTest {
             .lastActiveTime(chat1.getCreatedAt())
             .build();
 
-        ChatRoomResponse chatRoomResponse2 = ChatRoomResponse.builder()
+        UserChatRoomResponse userChatRoomResponse2 = UserChatRoomResponse.builder()
             .roomId(chatRoom2.getId())
             .roomSid(chatRoom2.getRoomSid())
             .defaultRoomImageType(chatRoom2.getDefaultRoomImageType())
@@ -242,9 +242,10 @@ class ChatRoomRepositoryTest {
             .build();
 
         PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("id").ascending());
-        Slice<ChatRoomResponse> result = toSlice(List.of(chatRoomResponse2, chatRoomResponse1),
+        Slice<UserChatRoomResponse> result = toSlice(List.of(userChatRoomResponse2,
+                userChatRoomResponse1),
             pageRequest);
-        Slice<ChatRoomResponse> slice = chatRoomRepository.findUserChatRoomsWithLastChat(
+        Slice<UserChatRoomResponse> slice = chatRoomRepository.findUserChatRoomsWithLastChat(
             pageRequest, Optional.of(chat4.getId()), user1.getId());
 
         assertThat(slice.getContent()).usingRecursiveComparison()
