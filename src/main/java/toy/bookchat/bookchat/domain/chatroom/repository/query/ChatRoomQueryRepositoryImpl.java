@@ -15,7 +15,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
 import toy.bookchat.bookchat.domain.chat.QChat;
+import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomResponse;
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.UserChatRoomResponse;
+import toy.bookchat.bookchat.domain.chatroom.service.dto.request.ChatRoomRequest;
 import toy.bookchat.bookchat.domain.participant.QParticipant;
 
 @Repository
@@ -64,6 +66,12 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
             .fetch();
 
         return toSlice(contents, pageable);
+    }
+
+    @Override
+    public Slice<ChatRoomResponse> findChatRooms(ChatRoomRequest chatRoomRequest, Pageable pageable,
+        Long userId) {
+        return null;
     }
 
     private BooleanExpression afterPostCursorId(Optional<Long> postCursorId) {

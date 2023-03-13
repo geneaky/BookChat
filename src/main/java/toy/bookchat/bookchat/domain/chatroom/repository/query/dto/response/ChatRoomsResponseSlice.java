@@ -1,11 +1,13 @@
 package toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response;
 
 import java.util.List;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.springframework.data.domain.Slice;
 import toy.bookchat.bookchat.domain.common.CursorMeta;
 
 @Getter
+@EqualsAndHashCode(of = "chatRoomResponseList")
 public class ChatRoomsResponseSlice {
 
     private List<ChatRoomResponse> chatRoomResponseList;
