@@ -24,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
-import org.springframework.test.annotation.Rollback;
 import toy.bookchat.bookchat.domain.RepositoryTest;
 import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.book.repository.BookRepository;
@@ -275,7 +274,6 @@ class ChatRoomRepositoryTest {
     }
 
     @Test
-    @Rollback(value = false)
     void 채팅방_조회_성공() throws Exception {
         User user1 = User.builder().build();
         User user2 = User.builder().build();
@@ -285,7 +283,7 @@ class ChatRoomRepositoryTest {
         userRepository.save(user3);
 
         Book book = Book.builder()
-            .isbn("12345")
+            .isbn("773898468")
             .publishAt(LocalDate.now())
             .build();
         bookRepository.save(book);
