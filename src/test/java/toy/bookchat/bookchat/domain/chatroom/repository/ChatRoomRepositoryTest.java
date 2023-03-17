@@ -181,7 +181,7 @@ class ChatRoomRepositoryTest {
         userRepository.save(user2);
 
         Book book = Book.builder()
-            .isbn("12345")
+            .isbn("12329763345")
             .publishAt(LocalDate.now())
             .build();
         bookRepository.save(book);
