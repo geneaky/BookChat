@@ -2,6 +2,8 @@ package toy.bookchat.bookchat.domain.chatroom.repository.query;
 
 import static toy.bookchat.bookchat.domain.chat.QChat.chat;
 import static toy.bookchat.bookchat.domain.chatroom.QChatRoom.chatRoom;
+import static toy.bookchat.bookchat.domain.chatroom.QChatRoomHashTag.chatRoomHashTag;
+import static toy.bookchat.bookchat.domain.chatroom.QHashTag.hashTag;
 import static toy.bookchat.bookchat.domain.common.RepositorySupport.toSlice;
 import static toy.bookchat.bookchat.domain.participant.QParticipant.participant;
 
@@ -59,7 +61,7 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
                         .and(subParticipant2.user.id.eq(userId)))
                     .groupBy(subParticipant2.chatRoom.id)).and(chat.chatRoom.id.eq(chatRoom.id)))
             .fetchJoin()
-            .groupBy(chatRoom.id)
+            .groupBy(chatRoom.id, chat.id)
             .where(afterPostCursorId(postCursorId))
             .limit(pageable.getPageSize())
             .orderBy(chat.id.desc(), chatRoom.id.desc())
@@ -69,9 +71,40 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
     }
 
     @Override
-    public Slice<ChatRoomResponse> findChatRooms(ChatRoomRequest chatRoomRequest, Pageable pageable,
-        Long userId) {
-        return null;
+    public Slice<ChatRoomResponse> findChatRooms(ChatRoomRequest chatRoomRequest,
+        Pageable pageable) {
+        QChat subChat = new QChat("subChat");
+
+        List<ChatRoomResponse> contents = queryFactory.select(
+                Projections.constructor(ChatRoomResponse.class,
+                    chatRoom.id,
+                    chatRoom.roomName,
+                    chatRoom.roomSid,
+                    participant.count(),
+                    chatRoom.defaultRoomImageType,
+                    chatRoom.roomImageUri,
+                    Projections.list(JPAExpressions.select(hashTag.tagName)
+                        .from(hashTag)
+                        .join(chatRoomHashTag)
+                        .where(chatRoomHashTag.chatRoom.id.eq(chatRoom.id)))
+                    ,
+                    chat.id,
+                    chat.createdAt
+                ))
+            .from(chatRoom)
+            .join(participant)
+            .join(chatRoomHashTag)
+            .join(chatRoomHashTag.hashTag, hashTag)
+            .leftJoin(chat).on(chat.id.in(
+                JPAExpressions.select(subChat.id.max())
+                    .from(subChat)
+                    .groupBy(subChat.chatRoom)
+                    .having(subChat.chatRoom.id.eq(chatRoom.id))
+            ))
+            .groupBy(chatRoom.id, chatRoom.roomName)
+            .fetch();
+
+        return toSlice(contents, pageable);
     }
 
     private BooleanExpression afterPostCursorId(Optional<Long> postCursorId) {

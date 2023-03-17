@@ -13,6 +13,5 @@ public interface ChatRoomQueryRepository {
     Slice<UserChatRoomResponse> findUserChatRoomsWithLastChat(Pageable pageable,
         Optional<Long> postCursorId, Long userId);
 
-    Slice<ChatRoomResponse> findChatRooms(ChatRoomRequest chatRoomRequest, Pageable pageable,
-        Long userId);
+    Slice<ChatRoomResponse> findChatRooms(ChatRoomRequest chatRoomRequest, Pageable pageable);
 }

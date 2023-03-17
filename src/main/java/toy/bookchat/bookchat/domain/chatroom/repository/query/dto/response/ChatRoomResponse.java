@@ -13,7 +13,7 @@ public class ChatRoomResponse {
     private Long roomId;
     private String roomName;
     private String roomSid;
-    private Integer roomMemberCount;
+    private Long roomMemberCount;
     private Integer defaultRoomImageType;
     private String roomImageUri;
     private List<String> tags;
@@ -21,8 +21,8 @@ public class ChatRoomResponse {
     private LocalDateTime lastActiveTime;
 
     @Builder
-    private ChatRoomResponse(Long roomId, String roomName, String roomSid,
-        Integer roomMemberCount, Integer defaultRoomImageType,
+    public ChatRoomResponse(Long roomId, String roomName, String roomSid,
+        Long roomMemberCount, Integer defaultRoomImageType,
         String roomImageUri, List<String> tags, Long lastChatId, LocalDateTime lastActiveTime) {
         this.roomId = roomId;
         this.roomName = roomName;

@@ -14,11 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.book.repository.BookRepository;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
@@ -30,19 +25,8 @@ import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
 @Slf4j
-@Testcontainers
 @SpringBootTest
 public class ChatServiceConcurrentTest {
-
-    @Container
-    private static MySQLContainer mySQLContainer = new MySQLContainer("mysql:8.0.24");
-
-    static {
-        mySQLContainer.withDatabaseName("test")
-            .withUsername("root")
-            .withPassword("root")
-            .start();
-    }
 
     @Autowired
     private UserRepository userRepository;
@@ -56,13 +40,6 @@ public class ChatServiceConcurrentTest {
     private ChatService chatService;
     @MockBean
     private SimpMessagingTemplate simpMessagingTemplate;
-
-    @DynamicPropertySource
-    public static void properties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", mySQLContainer::getJdbcUrl);
-        registry.add("spring.datasource.username", mySQLContainer::getUsername);
-        registry.add("spring.datasource.password", mySQLContainer::getPassword);
-    }
 
     @Test
     void 제한된_인원수_채팅방_입장_동시성_테스트_성공() throws Exception {

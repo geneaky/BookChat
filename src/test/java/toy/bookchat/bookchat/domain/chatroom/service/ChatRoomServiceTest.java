@@ -151,7 +151,7 @@ class ChatRoomServiceTest {
             .roomId(1L)
             .roomSid("Dhb")
             .roomName("WLMRXZ")
-            .roomMemberCount(3)
+            .roomMemberCount(3L)
             .roomImageUri("n8QpVmc")
             .defaultRoomImageType(1)
             .lastChatId(1L)
@@ -163,7 +163,7 @@ class ChatRoomServiceTest {
             .roomSid("1vaaPp")
             .roomName("R501")
             .roomImageUri("7jutu0i0")
-            .roomMemberCount(100)
+            .roomMemberCount(100L)
             .defaultRoomImageType(3)
             .lastChatId(2L)
             .tags(List.of("tag4", "tag2", "tag3"))
@@ -173,7 +173,7 @@ class ChatRoomServiceTest {
             .roomId(3L)
             .roomSid("3YzLGXR7")
             .roomName("86H8735E")
-            .roomMemberCount(1000)
+            .roomMemberCount(1000L)
             .roomImageUri("sUzZNOV")
             .defaultRoomImageType(2)
             .lastChatId(4L)
@@ -187,9 +187,9 @@ class ChatRoomServiceTest {
         Pageable pageable = PageRequest.of(0, 3);
 
         Slice<ChatRoomResponse> chatRoomResponses = new SliceImpl<>(contents, pageable, true);
-        when(chatRoomRepository.findChatRooms(any(), any(), any())).thenReturn(chatRoomResponses);
+        when(chatRoomRepository.findChatRooms(any(), any())).thenReturn(chatRoomResponses);
         ChatRoomsResponseSlice result = chatRoomService.getChatRooms(mock(ChatRoomRequest.class),
-            mock(Pageable.class), 1L);
+            mock(Pageable.class));
 
         assertThat(result).isEqualTo(ChatRoomsResponseSlice.of(chatRoomResponses));
     }

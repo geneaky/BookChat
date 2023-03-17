@@ -46,9 +46,8 @@ public class ChatRoomController {
 
     @GetMapping("/chatrooms")
     public ChatRoomsResponseSlice getChatRooms(@ModelAttribute ChatRoomRequest chatRoomRequest,
-        Pageable pageable,
-        @UserPayload TokenPayload tokenPayload) {
+        Pageable pageable) {
         chatRoomRequest.validate();
-        return chatRoomService.getChatRooms(chatRoomRequest, pageable, tokenPayload.getUserId());
+        return chatRoomService.getChatRooms(chatRoomRequest, pageable);
     }
 }

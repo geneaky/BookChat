@@ -125,9 +125,8 @@ public class ChatRoomService {
     }
 
     @Transactional(readOnly = true)
-    public ChatRoomsResponseSlice getChatRooms(ChatRoomRequest chatRoomRequest, Pageable pageable,
-        Long userId) {
+    public ChatRoomsResponseSlice getChatRooms(ChatRoomRequest chatRoomRequest, Pageable pageable) {
         return ChatRoomsResponseSlice.of(
-            chatRoomRepository.findChatRooms(chatRoomRequest, pageable, userId));
+            chatRoomRepository.findChatRooms(chatRoomRequest, pageable));
     }
 }
