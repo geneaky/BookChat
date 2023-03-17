@@ -3,15 +3,13 @@ package toy.bookchat.bookchat.domain.book.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.util.ErrorHandler;
 import toy.bookchat.bookchat.domain.RepositoryTest;
 import toy.bookchat.bookchat.domain.book.Book;
 
@@ -23,53 +21,29 @@ class BookRepositoryTest {
 
     @Test
     void 동시에_같은_책_입력_시도시_예외발생() throws Exception {
-        int maxSize = 3;
-        CountDownLatch countDownLatch = new CountDownLatch(maxSize);
+        int count = 50;
+        CountDownLatch countDownLatch = new CountDownLatch(count);
         Book book = Book.builder()
             .isbn("1234")
             .publishAt(LocalDate.now())
             .build();
 
         AtomicReference<Throwable> exception = new AtomicReference<>();
-        ErrorHandler errorHandler = t -> {
-            exception.set(t);
-            countDownLatch.countDown();
-        };
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
 
-        List<BookRepositoryTestWorker> workers = Stream.generate(
-                () -> new BookRepositoryTestWorker(countDownLatch, errorHandler, book))
-            .limit(maxSize)
-            .collect(Collectors.toList());
-
-        workers.forEach(worker -> new Thread(worker).start());
+        for (int i = 0; i < count; i++) {
+            executorService.execute(() -> {
+                try {
+                    bookRepository.saveAndFlush(book);
+                } catch (Exception e) {
+                    exception.set(e);
+                }
+                countDownLatch.countDown();
+            });
+        }
         countDownLatch.await();
 
         assertThat(exception.get()).isInstanceOf(DataIntegrityViolationException.class);
-    }
-
-    private class BookRepositoryTestWorker implements Runnable {
-
-        private final CountDownLatch countDownLatch;
-        private final ErrorHandler errorHandler;
-
-        private final Book book;
-
-        private BookRepositoryTestWorker(CountDownLatch countDownLatch,
-            ErrorHandler errorHandler, Book book) {
-            this.countDownLatch = countDownLatch;
-            this.errorHandler = errorHandler;
-            this.book = book;
-        }
-
-        @Override
-        public void run() {
-            try {
-                bookRepository.saveAndFlush(this.book);
-                this.countDownLatch.countDown();
-            } catch (Exception e) {
-                errorHandler.handleError(e);
-            }
-        }
     }
 
     @Test
@@ -87,5 +61,4 @@ class BookRepositoryTest {
 
         assertThat(findBook).isEqualTo(book);
     }
-
 }
