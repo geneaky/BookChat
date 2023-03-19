@@ -155,7 +155,7 @@ class ChatRoomServiceTest {
             .roomImageUri("n8QpVmc")
             .defaultRoomImageType(1)
             .lastChatId(1L)
-            .tags(List.of("tag1", "tag2", "tag3"))
+            .tags("tag1,tag2,tag3")
             .lastActiveTime(LocalDateTime.now())
             .build();
         ChatRoomResponse chatRoomResponse2 = ChatRoomResponse.builder()
@@ -166,7 +166,7 @@ class ChatRoomServiceTest {
             .roomMemberCount(100L)
             .defaultRoomImageType(3)
             .lastChatId(2L)
-            .tags(List.of("tag4", "tag2", "tag3"))
+            .tags("tag4,tag2,tag3")
             .lastActiveTime(LocalDateTime.now())
             .build();
         ChatRoomResponse chatRoomResponse3 = ChatRoomResponse.builder()
@@ -177,7 +177,7 @@ class ChatRoomServiceTest {
             .roomImageUri("sUzZNOV")
             .defaultRoomImageType(2)
             .lastChatId(4L)
-            .tags(List.of("tag1", "tag5", "tag6"))
+            .tags("tag1,tag5,tag6")
             .lastActiveTime(LocalDateTime.now())
             .build();
 

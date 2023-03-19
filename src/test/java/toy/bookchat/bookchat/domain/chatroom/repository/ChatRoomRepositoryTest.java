@@ -1,19 +1,11 @@
 package toy.bookchat.bookchat.domain.chatroom.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static toy.bookchat.bookchat.domain.chat.QChat.chat;
-import static toy.bookchat.bookchat.domain.chatroom.QChatRoom.chatRoom;
-import static toy.bookchat.bookchat.domain.chatroom.QChatRoomHashTag.chatRoomHashTag;
-import static toy.bookchat.bookchat.domain.chatroom.QHashTag.hashTag;
 import static toy.bookchat.bookchat.domain.common.RepositorySupport.toSlice;
 import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.GUEST;
 import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.HOST;
 import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.SUBHOST;
-import static toy.bookchat.bookchat.domain.participant.QParticipant.participant;
 
-import com.querydsl.core.Tuple;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -28,13 +20,13 @@ import toy.bookchat.bookchat.domain.RepositoryTest;
 import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.book.repository.BookRepository;
 import toy.bookchat.bookchat.domain.chat.Chat;
-import toy.bookchat.bookchat.domain.chat.QChat;
 import toy.bookchat.bookchat.domain.chat.repository.ChatRepository;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoomHashTag;
 import toy.bookchat.bookchat.domain.chatroom.HashTag;
-import toy.bookchat.bookchat.domain.chatroom.QHashTag;
+import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomResponse;
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.UserChatRoomResponse;
+import toy.bookchat.bookchat.domain.chatroom.service.dto.request.ChatRoomRequest;
 import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
 import toy.bookchat.bookchat.domain.user.User;
@@ -283,6 +275,7 @@ class ChatRoomRepositoryTest {
         userRepository.save(user3);
 
         Book book = Book.builder()
+            .title("가나다 라마 바사")
             .isbn("773898468")
             .publishAt(LocalDate.now())
             .build();
@@ -291,6 +284,7 @@ class ChatRoomRepositoryTest {
         ChatRoom chatRoom1 = ChatRoom.builder()
             .book(book)
             .host(user1)
+            .roomName("chatRoom1")
             .roomSid("chatRoom1")
             .roomSize(77)
             .defaultRoomImageType(1)
@@ -299,6 +293,7 @@ class ChatRoomRepositoryTest {
         ChatRoom chatRoom2 = ChatRoom.builder()
             .book(book)
             .host(user2)
+            .roomName("chatRoom2")
             .roomSid("chatRoom2")
             .roomSize(77)
             .defaultRoomImageType(1)
@@ -357,43 +352,30 @@ class ChatRoomRepositoryTest {
         chatRepository.save(chat4);
         chatRepository.save(chat5);
 
-        //chat room 1
-        //chat room hash tag N
-        //has tag 1
-        //chat N
-        //participant N
+        PageRequest pageable = PageRequest.of(0, 1);
+        ChatRoomRequest chatRoomRequest = ChatRoomRequest.builder()
+            .postCursorId(Optional.of(chatRoom2.getId()))
+            .title(Optional.empty())
+            .isbn(Optional.empty())
+            .roomName(Optional.empty())
+            .tags(List.of("hashTag1"))
+            .build();
 
-        QChat subChat = new QChat("subChat");
-        QHashTag subHashTag = new QHashTag("subHashTag");
+        Slice<ChatRoomResponse> result = chatRoomRepository.findChatRooms(
+            chatRoomRequest, pageable);
 
-        List<Tuple> fetch = queryFactory.select(
-                chatRoom.id,
-                chatRoom.roomName,
-                chatRoom.roomSid,
-                participant.count(),
-                chatRoom.defaultRoomImageType,
-                chatRoom.roomImageUri,
-                Expressions.stringTemplate("group_concat({0})", hashTag.tagName),
-                chat.id,
-                chat.createdAt
-            )
-            .from(chatRoom)
-            .join(participant).on(participant.chatRoom.id.eq(chatRoom.id))
-            .join(hashTag).on(hashTag.id.in(
-                JPAExpressions.select(subHashTag.id)
-                    .from(subHashTag)
-                    .join(chatRoomHashTag).on(chatRoomHashTag.hashTag.id.eq(hashTag.id)
-                        .and(chatRoomHashTag.chatRoom.id.eq(chatRoom.id)))))
-            .leftJoin(chat).on(chat.id.in(
-                JPAExpressions.select(subChat.id.max())
-                    .from(subChat)
-                    .groupBy(subChat.chatRoom)
-                    .having(subChat.chatRoom.id.eq(chatRoom.id))
-            ))
-            .where(chat.chatRoom.id.eq(chatRoom.id))
-            .groupBy(chatRoom.id, chat.id)
-            .fetch();
+        ChatRoomResponse expect = ChatRoomResponse.builder()
+            .roomId(chatRoom1.getId())
+            .roomName(chatRoom1.getRoomName())
+            .roomSid(chatRoom1.getRoomSid())
+            .roomImageUri(chatRoom1.getRoomImageUri())
+            .roomMemberCount(2L)
+            .defaultRoomImageType(chatRoom1.getDefaultRoomImageType())
+            .tags("hashTag1,hashTag3")
+            .lastChatId(chat5.getId())
+            .lastActiveTime(chat5.getCreatedAt())
+            .build();
 
-        System.out.println(fetch);
+        assertThat(result.getContent()).isEqualTo(List.of(expect));
     }
 }

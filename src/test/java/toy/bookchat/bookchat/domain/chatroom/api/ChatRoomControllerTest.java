@@ -221,7 +221,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .roomImageUri("n8QpVmc")
             .defaultRoomImageType(1)
             .lastChatId(1L)
-            .tags(List.of("tag1", "tag2", "tag3"))
+            .tags("tag1,tag2,tag3")
             .lastActiveTime(LocalDateTime.now())
             .build();
         ChatRoomResponse chatRoomResponse2 = ChatRoomResponse.builder()
@@ -232,7 +232,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .roomMemberCount(100L)
             .defaultRoomImageType(3)
             .lastChatId(2L)
-            .tags(List.of("tag4", "tag2", "tag3"))
+            .tags("tag4,tag2,tag3")
             .lastActiveTime(LocalDateTime.now())
             .build();
         ChatRoomResponse chatRoomResponse3 = ChatRoomResponse.builder()
@@ -243,7 +243,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .roomImageUri("sUzZNOV")
             .defaultRoomImageType(2)
             .lastChatId(4L)
-            .tags(List.of("tag1", "tag5", "tag6"))
+            .tags("tag1,tag5,tag6")
             .lastActiveTime(LocalDateTime.now())
             .build();
 
@@ -292,7 +292,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                         .description("기본 이미지 타입 번호"),
                     fieldWithPath("chatRoomResponseList[].roomImageUri").optional().type(STRING)
                         .description("채팅방 이미지 URI"),
-                    fieldWithPath("chatRoomResponseList[].tags[]").optional().type(ARRAY)
+                    fieldWithPath("chatRoomResponseList[].tags").optional().type(STRING)
                         .description("채팅방 TAG"),
                     fieldWithPath("chatRoomResponseList[].lastChatId").type(NUMBER)
                         .description("마지막 채팅 ID"),

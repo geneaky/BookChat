@@ -1,5 +1,6 @@
 package toy.bookchat.bookchat.domain.chatroom.repository.query;
 
+import static toy.bookchat.bookchat.domain.book.QBook.book;
 import static toy.bookchat.bookchat.domain.chat.QChat.chat;
 import static toy.bookchat.bookchat.domain.chatroom.QChatRoom.chatRoom;
 import static toy.bookchat.bookchat.domain.chatroom.QChatRoomHashTag.chatRoomHashTag;
@@ -9,6 +10,7 @@ import static toy.bookchat.bookchat.domain.participant.QParticipant.participant;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
@@ -17,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
 import toy.bookchat.bookchat.domain.chat.QChat;
+import toy.bookchat.bookchat.domain.chatroom.QChatRoomHashTag;
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomResponse;
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.UserChatRoomResponse;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.ChatRoomRequest;
@@ -31,6 +34,26 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
         this.queryFactory = queryFactory;
     }
 
+    private static BooleanExpression inTags(ChatRoomRequest chatRoomRequest) {
+        if (chatRoomRequest.getTags().isEmpty()) {
+            return null;
+        }
+        return hashTag.tagName.in(chatRoomRequest.getTags());
+    }
+
+    private static BooleanExpression eqIsbn(ChatRoomRequest chatRoomRequest) {
+        return chatRoomRequest.getIsbn().map(book.isbn::eq).orElse(null);
+    }
+
+    private static BooleanExpression containsTitle(ChatRoomRequest chatRoomRequest) {
+        return chatRoomRequest.getTitle().map(book.title::contains).orElse(null);
+    }
+
+    private static BooleanExpression containsRoomName(ChatRoomRequest chatRoomRequest) {
+        return chatRoomRequest.getRoomName().map(chatRoom.roomName::contains).orElse(null);
+    }
+
+    @Override
     public Slice<UserChatRoomResponse> findUserChatRoomsWithLastChat(Pageable pageable,
         Optional<Long> postCursorId,
         Long userId) {
@@ -74,34 +97,43 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
     public Slice<ChatRoomResponse> findChatRooms(ChatRoomRequest chatRoomRequest,
         Pageable pageable) {
         QChat subChat = new QChat("subChat");
+        QChatRoomHashTag subChatRoomHashTag = new QChatRoomHashTag("subChatRoomHashTag");
 
         List<ChatRoomResponse> contents = queryFactory.select(
                 Projections.constructor(ChatRoomResponse.class,
                     chatRoom.id,
                     chatRoom.roomName,
                     chatRoom.roomSid,
-                    participant.count(),
+                    // TODO: 2023/03/19 scalar subquery 성능 문제가 있다면 대체 방법 고려
+                    JPAExpressions.select(participant.count()).from(participant)
+                        .where(participant.chatRoom.id.eq(chatRoom.id)),
                     chatRoom.defaultRoomImageType,
                     chatRoom.roomImageUri,
-                    Projections.list(JPAExpressions.select(hashTag.tagName)
-                        .from(hashTag)
-                        .join(chatRoomHashTag)
-                        .where(chatRoomHashTag.chatRoom.id.eq(chatRoom.id)))
-                    ,
+                    Expressions.stringTemplate("group_concat({0})", hashTag.tagName),
                     chat.id,
-                    chat.createdAt
-                ))
+                    chat.createdAt))
             .from(chatRoom)
-            .join(participant)
-            .join(chatRoomHashTag)
-            .join(chatRoomHashTag.hashTag, hashTag)
+            .join(chatRoomHashTag).on(chatRoomHashTag.chatRoom.id.in(
+                JPAExpressions.select(subChatRoomHashTag.chatRoom.id)
+                    .from(subChatRoomHashTag)
+                    .where(subChatRoomHashTag.chatRoom.id.eq(chatRoom.id),
+                        inTags(chatRoomRequest))))
+            .join(hashTag).on(hashTag.id.eq(chatRoomHashTag.hashTag.id))
             .leftJoin(chat).on(chat.id.in(
                 JPAExpressions.select(subChat.id.max())
                     .from(subChat)
                     .groupBy(subChat.chatRoom)
-                    .having(subChat.chatRoom.id.eq(chatRoom.id))
-            ))
-            .groupBy(chatRoom.id, chatRoom.roomName)
+                    .having(subChat.chatRoom.id.eq(chatRoom.id))))
+            .leftJoin(book).on(book.id.eq(chatRoom.book.id))
+            .groupBy(chatRoom.id, chat.id)
+            .where(chat.chatRoom.id.eq(chatRoom.id),
+                chatRoomRequest.getPostCursorId().map(chatRoom.id::lt).orElse(null),
+                eqIsbn(chatRoomRequest),
+                containsTitle(chatRoomRequest),
+                containsRoomName(chatRoomRequest)
+            )
+            .limit(pageable.getPageSize())
+            .orderBy(chat.id.desc(), chatRoom.id.desc())
             .fetch();
 
         return toSlice(contents, pageable);
