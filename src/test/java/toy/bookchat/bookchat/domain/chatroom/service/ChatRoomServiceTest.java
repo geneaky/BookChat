@@ -1,5 +1,6 @@
 package toy.bookchat.bookchat.domain.chatroom.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -10,13 +11,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
@@ -30,6 +31,9 @@ import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomRepository;
 import toy.bookchat.bookchat.domain.chatroom.repository.HashTagRepository;
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomResponse;
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomsResponseSlice;
+import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.UserChatRoomResponse;
+import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.UserChatRoomsResponseSlice;
+import toy.bookchat.bookchat.domain.chatroom.service.dto.request.ChatRoomRequest;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.CreateChatRoomRequest;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
 import toy.bookchat.bookchat.domain.user.User;
@@ -119,7 +123,7 @@ class ChatRoomServiceTest {
             .chatRoom(chatRoom1)
             .build();
         chat1.setCreatedAt(LocalDateTime.now());
-        ChatRoomResponse chatRoomResponse = ChatRoomResponse.builder()
+        UserChatRoomResponse userChatRoomResponse = UserChatRoomResponse.builder()
             .roomId(chatRoom1.getId())
             .roomSid(chatRoom1.getRoomSid())
             .roomName(chatRoom1.getRoomName())
@@ -129,16 +133,64 @@ class ChatRoomServiceTest {
             .lastActiveTime(chat1.getCreatedAt())
             .lastChatContent(chat1.getMessage())
             .build();
-        List<ChatRoomResponse> result = List.of(chatRoomResponse);
+        List<UserChatRoomResponse> result = List.of(userChatRoomResponse);
         PageRequest pageRequest = PageRequest.of(0, 1, Sort.by("id").descending());
-        Slice<ChatRoomResponse> slice = new SliceImpl<>(result, pageRequest, true);
+        Slice<UserChatRoomResponse> slice = new SliceImpl<>(result, pageRequest, true);
         when(chatRoomRepository.findUserChatRoomsWithLastChat(any(), any(), any())).thenReturn(
             slice);
-        ChatRoomsResponseSlice chatRoomsResponseSlice = chatRoomService.getUserChatRooms(any(),
-            any(),
-            any());
+        UserChatRoomsResponseSlice userChatRoomsResponseSlice = chatRoomService.getUserChatRooms(
+            any(), any(), any());
 
-        Assertions.assertThat(chatRoomsResponseSlice).usingRecursiveComparison()
-            .isEqualTo(ChatRoomsResponseSlice.of(slice));
+        assertThat(userChatRoomsResponseSlice).usingRecursiveComparison()
+            .isEqualTo(UserChatRoomsResponseSlice.of(slice));
+    }
+
+    @Test
+    void 채팅방_조회_성공() throws Exception {
+        ChatRoomResponse chatRoomResponse1 = ChatRoomResponse.builder()
+            .roomId(1L)
+            .roomSid("Dhb")
+            .roomName("WLMRXZ")
+            .roomMemberCount(3L)
+            .roomImageUri("n8QpVmc")
+            .defaultRoomImageType(1)
+            .lastChatId(1L)
+            .tags("tag1,tag2,tag3")
+            .lastActiveTime(LocalDateTime.now())
+            .build();
+        ChatRoomResponse chatRoomResponse2 = ChatRoomResponse.builder()
+            .roomId(2L)
+            .roomSid("1vaaPp")
+            .roomName("R501")
+            .roomImageUri("7jutu0i0")
+            .roomMemberCount(100L)
+            .defaultRoomImageType(3)
+            .lastChatId(2L)
+            .tags("tag4,tag2,tag3")
+            .lastActiveTime(LocalDateTime.now())
+            .build();
+        ChatRoomResponse chatRoomResponse3 = ChatRoomResponse.builder()
+            .roomId(3L)
+            .roomSid("3YzLGXR7")
+            .roomName("86H8735E")
+            .roomMemberCount(1000L)
+            .roomImageUri("sUzZNOV")
+            .defaultRoomImageType(2)
+            .lastChatId(4L)
+            .tags("tag1,tag5,tag6")
+            .lastActiveTime(LocalDateTime.now())
+            .build();
+
+        List<ChatRoomResponse> contents = List.of(chatRoomResponse1, chatRoomResponse2,
+            chatRoomResponse3);
+
+        Pageable pageable = PageRequest.of(0, 3);
+
+        Slice<ChatRoomResponse> chatRoomResponses = new SliceImpl<>(contents, pageable, true);
+        when(chatRoomRepository.findChatRooms(any(), any())).thenReturn(chatRoomResponses);
+        ChatRoomsResponseSlice result = chatRoomService.getChatRooms(mock(ChatRoomRequest.class),
+            mock(Pageable.class));
+
+        assertThat(result).isEqualTo(ChatRoomsResponseSlice.of(chatRoomResponses));
     }
 }

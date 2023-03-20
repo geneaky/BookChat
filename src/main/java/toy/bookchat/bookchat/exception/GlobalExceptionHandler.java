@@ -42,7 +42,7 @@ import toy.bookchat.bookchat.exception.user.UserNotFoundException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static final String LOG_FORMAT = "Class :: {}, Message :: {}";
+    private final String LOG_FORMAT = "Class :: {}, Message :: {}";
 
     @ExceptionHandler(NotVerifiedIdTokenException.class)
     public final ResponseEntity<String> handleNotVerifiedIdTokenException(

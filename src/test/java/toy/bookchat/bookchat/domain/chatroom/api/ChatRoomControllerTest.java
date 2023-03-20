@@ -32,6 +32,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
@@ -43,6 +44,8 @@ import toy.bookchat.bookchat.domain.chat.Chat;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomResponse;
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomsResponseSlice;
+import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.UserChatRoomResponse;
+import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.UserChatRoomsResponseSlice;
 import toy.bookchat.bookchat.domain.chatroom.service.ChatRoomService;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.CreateChatRoomRequest;
 
@@ -161,16 +164,16 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .chatRoom(chatRoom3)
             .build();
         chat3.setCreatedAt(LocalDateTime.now());
-        ChatRoomResponse chatRoomResponse1 = getChatRoomResponse(chatRoom1, chat1);
-        ChatRoomResponse chatRoomResponse2 = getChatRoomResponse(chatRoom2, chat2);
-        ChatRoomResponse chatRoomResponse3 = getChatRoomResponse(chatRoom3, chat3);
-        List<ChatRoomResponse> result = List.of(chatRoomResponse1, chatRoomResponse2,
-            chatRoomResponse3);
+        UserChatRoomResponse userChatRoomResponse1 = getChatRoomResponse(chatRoom1, chat1);
+        UserChatRoomResponse userChatRoomResponse2 = getChatRoomResponse(chatRoom2, chat2);
+        UserChatRoomResponse userChatRoomResponse3 = getChatRoomResponse(chatRoom3, chat3);
+        List<UserChatRoomResponse> result = List.of(userChatRoomResponse1, userChatRoomResponse2,
+            userChatRoomResponse3);
         PageRequest pageRequest = PageRequest.of(0, 3, Sort.by("id").descending());
-        Slice<ChatRoomResponse> slice = new SliceImpl<>(result, pageRequest, true);
-        ChatRoomsResponseSlice response = ChatRoomsResponseSlice.of(slice);
+        Slice<UserChatRoomResponse> slice = new SliceImpl<>(result, pageRequest, true);
+        UserChatRoomsResponseSlice response = UserChatRoomsResponseSlice.of(slice);
         when(chatRoomService.getUserChatRooms(any(), any(), any())).thenReturn(response);
-        mockMvc.perform(get("/v1/api/chatrooms")
+        mockMvc.perform(get("/v1/api/users/chatrooms")
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
                 .param("postCursorId", "0")
@@ -186,6 +189,97 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                     parameterWithName("size").optional().description("페이지 사이즈")
                 ),
                 responseFields(
+                    fieldWithPath("userChatRoomResponseList[].roomId").type(NUMBER)
+                        .description("채팅방 ID"),
+                    fieldWithPath("userChatRoomResponseList[].roomName").type(STRING)
+                        .description("채팅방 이름"),
+                    fieldWithPath("userChatRoomResponseList[].roomSid").type(STRING)
+                        .description("채팅방 SID"),
+                    fieldWithPath("userChatRoomResponseList[].roomMemberCount").type(NUMBER)
+                        .description("채팅방 현재 인원수"),
+                    fieldWithPath("userChatRoomResponseList[].defaultRoomImageType").type(NUMBER)
+                        .description("기본 이미지 타입 번호"),
+                    fieldWithPath("userChatRoomResponseList[].roomImageUri").optional().type(STRING)
+                        .description("채팅방 이미지 URI"),
+                    fieldWithPath("userChatRoomResponseList[].lastChatId").type(NUMBER)
+                        .description("마지막 채팅 ID"),
+                    fieldWithPath("userChatRoomResponseList[].lastActiveTime").type(STRING)
+                        .description("마지막 채팅 활성 시간"),
+                    fieldWithPath("userChatRoomResponseList[].lastChatContent").type(STRING)
+                        .description("마지막 채팅 내용")
+                ).and(getCursorField())));
+    }
+
+    @Test
+    void 전체_채팅방_목록에서_검색_성공() throws Exception {
+
+        ChatRoomResponse chatRoomResponse1 = ChatRoomResponse.builder()
+            .roomId(1L)
+            .roomSid("Dhb")
+            .roomName("WLMRXZ")
+            .roomMemberCount(3L)
+            .roomImageUri("n8QpVmc")
+            .defaultRoomImageType(1)
+            .lastChatId(1L)
+            .tags("tag1,tag2,tag3")
+            .lastActiveTime(LocalDateTime.now())
+            .build();
+        ChatRoomResponse chatRoomResponse2 = ChatRoomResponse.builder()
+            .roomId(2L)
+            .roomSid("1vaaPp")
+            .roomName("R501")
+            .roomImageUri("7jutu0i0")
+            .roomMemberCount(100L)
+            .defaultRoomImageType(3)
+            .lastChatId(2L)
+            .tags("tag4,tag2,tag3")
+            .lastActiveTime(LocalDateTime.now())
+            .build();
+        ChatRoomResponse chatRoomResponse3 = ChatRoomResponse.builder()
+            .roomId(3L)
+            .roomSid("3YzLGXR7")
+            .roomName("86H8735E")
+            .roomMemberCount(1000L)
+            .roomImageUri("sUzZNOV")
+            .defaultRoomImageType(2)
+            .lastChatId(4L)
+            .tags("tag1,tag5,tag6")
+            .lastActiveTime(LocalDateTime.now())
+            .build();
+
+        List<ChatRoomResponse> contents = List.of(chatRoomResponse1, chatRoomResponse2,
+            chatRoomResponse3);
+
+        Pageable pageable = PageRequest.of(0, 3);
+
+        Slice<ChatRoomResponse> chatRoomResponses = new SliceImpl<>(contents, pageable, true);
+
+        ChatRoomsResponseSlice response = ChatRoomsResponseSlice.of(chatRoomResponses);
+        when(chatRoomService.getChatRooms(any(), any())).thenReturn(response);
+
+        mockMvc.perform(get("/v1/api/chatrooms")
+                .header(AUTHORIZATION, JWT_TOKEN)
+                .with(user(getUserPrincipal()))
+                .queryParam("postCursorId", "0")
+                .queryParam("size", "3")
+                .queryParam("roomName", "effective")
+                .queryParam("title", "effectiveJava")
+                .queryParam("isbn", "12314-12414")
+                .queryParam("tags", "test1,test2,test3"))
+            .andExpect(status().isOk())
+            .andDo(document("get-chatrooms",
+                requestHeaders(
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
+                ),
+                requestParameters(
+                    parameterWithName("postCursorId").optional().description("마지막 커서 ID"),
+                    parameterWithName("size").optional().description("페이지 사이즈"),
+                    parameterWithName("roomName").optional().description("채팅방 이름"),
+                    parameterWithName("title").optional().description("책 제목"),
+                    parameterWithName("isbn").optional().description("책 ISBN"),
+                    parameterWithName("tags").optional().description("채팅방 TAG")
+                ),
+                responseFields(
                     fieldWithPath("chatRoomResponseList[].roomId").type(NUMBER)
                         .description("채팅방 ID"),
                     fieldWithPath("chatRoomResponseList[].roomName").type(STRING)
@@ -198,17 +292,17 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                         .description("기본 이미지 타입 번호"),
                     fieldWithPath("chatRoomResponseList[].roomImageUri").optional().type(STRING)
                         .description("채팅방 이미지 URI"),
+                    fieldWithPath("chatRoomResponseList[].tags").optional().type(STRING)
+                        .description("채팅방 TAG"),
                     fieldWithPath("chatRoomResponseList[].lastChatId").type(NUMBER)
                         .description("마지막 채팅 ID"),
                     fieldWithPath("chatRoomResponseList[].lastActiveTime").type(STRING)
-                        .description("마지막 채팅 활성 시간"),
-                    fieldWithPath("chatRoomResponseList[].lastChatContent").type(STRING)
-                        .description("마지막 채팅 내용")
+                        .description("마지막 채팅 활성 시간")
                 ).and(getCursorField())));
     }
 
-    private ChatRoomResponse getChatRoomResponse(ChatRoom chatRoom, Chat chat) {
-        return ChatRoomResponse.builder()
+    private UserChatRoomResponse getChatRoomResponse(ChatRoom chatRoom, Chat chat) {
+        return UserChatRoomResponse.builder()
             .roomId(chatRoom.getId())
             .roomSid(chatRoom.getRoomSid())
             .roomName(chatRoom.getRoomName())
