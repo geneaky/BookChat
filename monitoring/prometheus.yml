@@ -7,4 +7,8 @@ scrape_configs:
     metrics_path: '/actuator/prometheus'
     static_configs:
       - targets: ['172.31.41.87:8080']
-#      - targets: ['host.docker.internal:8080']
+  #      - targets: ['host.docker.internal:8080']
+
+  - job_name: 'rabbitmq-prometheus'
+    static_configs:
+      - targets: ['172.31.36.181:15692']
