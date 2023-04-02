@@ -35,4 +35,4 @@ services:
     volumes:
       - ./logs:/var/log
       - ./monitoring/promtail/promtail-config.yml:/etc/promtail/config.yml
-    command: -config.file=/etc/promtail/promtail-config.yml
+#    command: -config.file=/etc/promtail/promtail-config.yml
