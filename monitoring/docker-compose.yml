@@ -17,3 +17,12 @@ services:
     ports:
       - 3000:3000
     restart: always
+
+  loki:
+    image: grafana/loki
+    container_name: loki
+    volumes:
+      - ./loki-config.yml:/etc/loki/local-config.yml
+    ports:
+      - 3100:3100
+    restart: always
