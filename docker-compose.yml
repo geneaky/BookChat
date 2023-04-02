@@ -24,3 +24,13 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
     restart: always
+
+  promtail:
+    image: grafana/promtail
+    depends_on:
+      - nginx
+    container_name: promtail
+    volumes:
+      - ./logs:/var/log
+      - ./monitoring/promtail:/mnt/config
+    command: -config.file=/mnt/config/promtail-config.yml
