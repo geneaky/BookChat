@@ -8,7 +8,7 @@ build/
 !**/src/test/**/build/
 src/main/resources/*
 !src/main/resources/.gitkeep
-!src/main/resources/db/**
+!src/main/resources/db
 logs/
 !src/main/resources/log4j2-spring-production.xml
 spy.log
