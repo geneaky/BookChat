@@ -9,8 +9,6 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
@@ -18,11 +16,6 @@ import toy.bookchat.bookchat.domain.BaseEntity;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
 @Entity
-@Table(uniqueConstraints = {
-    @UniqueConstraint(
-        columnNames = {"nickname"}
-    )
-})
 @Getter
 @ToString
 public class User extends BaseEntity {

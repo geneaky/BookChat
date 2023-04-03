@@ -6,29 +6,21 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 import lombok.Builder;
 import lombok.Getter;
 import toy.bookchat.bookchat.domain.user.User;
 
 @Entity
 @Getter
-@Table(
-    uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"user_id", "chat_room_id"})
-    }
-)
 public class ChatRoomBlockedUser {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     User user;
     @ManyToOne(fetch = FetchType.LAZY)
     ChatRoom chatRoom;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     protected ChatRoomBlockedUser() {
     }

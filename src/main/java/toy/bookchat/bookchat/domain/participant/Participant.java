@@ -13,19 +13,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 import lombok.Builder;
 import lombok.Getter;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
 import toy.bookchat.bookchat.domain.user.User;
 
 @Entity
-@Table(uniqueConstraints = {
-    @UniqueConstraint(
-        columnNames = {"user_id", "chat_room_id"}
-    )
-})
 @Getter
 public class Participant {
 

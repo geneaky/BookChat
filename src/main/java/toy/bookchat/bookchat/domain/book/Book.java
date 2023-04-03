@@ -3,36 +3,26 @@ package toy.bookchat.bookchat.domain.book;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 import lombok.Builder;
 import lombok.Getter;
 import toy.bookchat.bookchat.domain.BaseEntity;
 
 @Entity
-@Table(uniqueConstraints = {
-    @UniqueConstraint(
-        columnNames = {"isbn", "publishAt"}
-    )
-})
 @Getter
 public class Book extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false)
     private String isbn;
     private String title;
     private String publisher;
     private String bookCoverImageUrl;
-    @Column(nullable = false)
     private LocalDate publishAt;
     @ElementCollection
     private List<String> authors = new ArrayList<>();

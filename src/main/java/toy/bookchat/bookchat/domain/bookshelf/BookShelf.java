@@ -14,8 +14,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 import lombok.Builder;
 import lombok.Getter;
 import toy.bookchat.bookchat.domain.BaseEntity;
@@ -24,11 +22,6 @@ import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.exception.bookshelf.BookReportNotFoundException;
 
 @Entity
-@Table(uniqueConstraints = {
-    @UniqueConstraint(
-        columnNames = {"user_id", "book_id"}
-    )
-})
 @Getter
 public class BookShelf extends BaseEntity {
 

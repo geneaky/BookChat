@@ -5,16 +5,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 import toy.bookchat.bookchat.domain.BaseEntity;
 
 @Entity
-@Table(uniqueConstraints = {
-    @UniqueConstraint(
-        columnNames = {"chat_room_id", "hash_tag_id"}
-    )
-})
 public class ChatRoomHashTag extends BaseEntity {
 
     @Id
