@@ -1,5 +1,6 @@
 package toy.bookchat.bookchat.security.token.jwt;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -19,6 +20,7 @@ public class RefreshToken extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long userId;
+    @Column(columnDefinition = "TEXT")
     private String refreshToken;
 
     @Builder
