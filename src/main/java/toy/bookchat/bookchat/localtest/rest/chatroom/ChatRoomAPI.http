@@ -24,6 +24,11 @@ Content-Disposition: form-data; name="createChatRoomRequest"; filename="createCh
 
 --WebAppBoundary
 
-### 채팅방 조회
-GET localhost:8080/v1/api/chatrooms?size=1
+### 사용자 채팅방 조회
+GET localhost:8080/v1/api/users/chatrooms?size=1
+Authorization: {{jwt_token}}
+
+
+### 전체 채팅방 조회
+GET localhost:8080/v1/api/chatrooms?isbn=1234567890
 Authorization: {{jwt_token}}

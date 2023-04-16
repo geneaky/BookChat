@@ -114,13 +114,12 @@ class UserRepositoryTest {
             .nickname("user2")
             .build();
 
-        userRepository.save(user1);
+        userRepository.saveAndFlush(user1);
         userRepository.save(user2);
-
         user2.changeUserNickname("user1");
 
         assertThatThrownBy(() -> {
-            userRepository.saveAndFlush(user2);
+            userRepository.flush();
         }).isInstanceOf(DataIntegrityViolationException.class);
     }
 }

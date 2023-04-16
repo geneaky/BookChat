@@ -21,7 +21,7 @@ import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import toy.bookchat.bookchat.domain.chat.api.dto.ChatDto;
+import toy.bookchat.bookchat.domain.chat.service.dto.request.ChatDto;
 import toy.bookchat.bookchat.exception.book.BookNotFoundException;
 import toy.bookchat.bookchat.exception.bookshelf.BookReportNotFoundException;
 import toy.bookchat.bookchat.exception.chatroom.BlockedUserInChatRoomException;

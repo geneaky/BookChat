@@ -22,8 +22,8 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import toy.bookchat.bookchat.domain.chat.Chat;
-import toy.bookchat.bookchat.domain.chat.api.dto.ChatDto;
 import toy.bookchat.bookchat.domain.chat.repository.ChatRepository;
+import toy.bookchat.bookchat.domain.chat.service.dto.request.ChatDto;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoomBlockedUser;
 import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomBlockedUserRepository;
@@ -230,8 +230,7 @@ class ChatServiceTest {
         when(participantRepository.findByUserIdAndChatRoomId(any(), any())).thenReturn(
             Optional.ofNullable(participant));
         when(chatRepository.save(any())).thenReturn(chat);
-        ChatDto chatDto = mock(ChatDto.class);
-        chatService.sendMessage(user.getId(), chatRoom.getId(), chatDto);
+        chatService.sendMessage(user.getId(), chatRoom.getId(), "iM0Xf");
 
         verify(chatRepository).save(any());
         verify(messagingTemplate).convertAndSend(anyString(), any(ChatDto.class));

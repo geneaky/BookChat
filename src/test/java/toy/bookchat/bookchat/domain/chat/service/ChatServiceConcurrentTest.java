@@ -9,7 +9,12 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import lombok.extern.slf4j.Slf4j;
+import org.flywaydb.core.Flyway;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -26,6 +31,7 @@ import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
 @Slf4j
 @SpringBootTest
+@TestInstance(Lifecycle.PER_CLASS)
 public class ChatServiceConcurrentTest {
 
     @Autowired
@@ -38,8 +44,22 @@ public class ChatServiceConcurrentTest {
     private ParticipantRepository participantRepository;
     @Autowired
     private ChatService chatService;
+    @Autowired
+    private Flyway flyway;
     @MockBean
     private SimpMessagingTemplate simpMessagingTemplate;
+
+    @BeforeAll
+    public void tearUp() {
+        flyway.clean();
+        flyway.migrate();
+    }
+
+    @AfterAll
+    public void tearDown() {
+        flyway.clean();
+        flyway.migrate();
+    }
 
     @Test
     void 제한된_인원수_채팅방_입장_동시성_테스트_성공() throws Exception {
@@ -49,7 +69,7 @@ public class ChatServiceConcurrentTest {
 
         ExecutorService executorService = Executors.newFixedThreadPool(10);
 
-        List<User> users = new ArrayList<>();
+        List<User> userList = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             User user = User.builder()
                 .nickname(i + "nickname")
@@ -59,18 +79,18 @@ public class ChatServiceConcurrentTest {
                 .name(i + "name")
                 .build();
 
-            userRepository.save(user);
-            users.add(user);
+            userList.add(user);
         }
+        userRepository.saveAll(userList);
 
         Book book = Book.builder()
-            .isbn("12345")
+            .isbn("4640485366")
             .publishAt(LocalDate.now())
             .build();
         bookRepository.save(book);
 
         ChatRoom chatRoom = ChatRoom.builder()
-            .host(users.get(0))
+            .host(userList.get(0))
             .book(book)
             .defaultRoomImageType(1)
             .roomSize(roomSize)
@@ -79,10 +99,10 @@ public class ChatServiceConcurrentTest {
             .build();
         chatRoomRepository.save(chatRoom);
 
-        for (int i = 0; i < count; i++) {
-            User user = users.get(i);
+        for (User user : userList) {
             executorService.execute(() -> {
                 try {
+                    log.info(user.getId().toString());
                     chatService.enterChatRoom(user.getId(), chatRoom.getId());
                 } catch (Exception exception) {
                     log.info(exception.getMessage());

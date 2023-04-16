@@ -219,6 +219,12 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .roomName("WLMRXZ")
             .roomMemberCount(3L)
             .roomImageUri("n8QpVmc")
+            .bookTitle("book1")
+            .bookAuthors("author1,author2,author3")
+            .bookCoverImageUri("book1CoverImage@s3")
+            .hostName("host1")
+            .hostDefaultProfileImageType(1)
+            .hostProfileImageUri("host1ProfileImage@s3")
             .defaultRoomImageType(1)
             .lastChatId(1L)
             .tags("tag1,tag2,tag3")
@@ -229,6 +235,12 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .roomSid("1vaaPp")
             .roomName("R501")
             .roomImageUri("7jutu0i0")
+            .bookTitle("book2")
+            .bookAuthors("author4,author5,author6")
+            .bookCoverImageUri("book2CoverImage@s3")
+            .hostName("host2")
+            .hostDefaultProfileImageType(2)
+            .hostProfileImageUri("host2ProfileImage@s3")
             .roomMemberCount(100L)
             .defaultRoomImageType(3)
             .lastChatId(2L)
@@ -241,6 +253,12 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .roomName("86H8735E")
             .roomMemberCount(1000L)
             .roomImageUri("sUzZNOV")
+            .bookTitle("book3")
+            .bookAuthors("author7,author8,author9")
+            .bookCoverImageUri("book3CoverImage@s3")
+            .hostName("host3")
+            .hostDefaultProfileImageType(3)
+            .hostProfileImageUri("host3ProfileImage@s3")
             .defaultRoomImageType(2)
             .lastChatId(4L)
             .tags("tag1,tag5,tag6")
@@ -286,6 +304,18 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                         .description("채팅방 이름"),
                     fieldWithPath("chatRoomResponseList[].roomSid").type(STRING)
                         .description("채팅방 SID"),
+                    fieldWithPath("chatRoomResponseList[].bookTitle").type(STRING)
+                        .description("책 제목"),
+                    fieldWithPath("chatRoomResponseList[].bookCoverImageUri").type(STRING)
+                        .description("책 커버 이미지 URI"),
+                    fieldWithPath("chatRoomResponseList[].bookAuthors").type(STRING)
+                        .description("책 저자"),
+                    fieldWithPath("chatRoomResponseList[].hostName").type(STRING)
+                        .description("방장 닉네임"),
+                    fieldWithPath("chatRoomResponseList[].hostDefaultProfileImageType").type(NUMBER)
+                        .description("방장 기본 프로필이미지 타입"),
+                    fieldWithPath("chatRoomResponseList[].hostProfileImageUri").type(STRING)
+                        .description("방장 프로필이미지"),
                     fieldWithPath("chatRoomResponseList[].roomMemberCount").type(NUMBER)
                         .description("채팅방 현재 인원수"),
                     fieldWithPath("chatRoomResponseList[].defaultRoomImageType").type(NUMBER)
