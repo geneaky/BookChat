@@ -9,8 +9,8 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import toy.bookchat.bookchat.domain.chat.Chat;
-import toy.bookchat.bookchat.domain.chat.api.dto.ChatDto;
 import toy.bookchat.bookchat.domain.chat.repository.ChatRepository;
+import toy.bookchat.bookchat.domain.chat.service.dto.request.ChatDto;
 import toy.bookchat.bookchat.domain.chat.service.dto.response.ChatRoomChatsResponse;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
 import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomBlockedUserRepository;
@@ -131,14 +131,14 @@ public class ChatService {
     }
 
     @Transactional
-    public void sendMessage(Long userId, Long roomId, ChatDto chatDto) {
+    public void sendMessage(Long userId, Long roomId, String message) {
         Participant participant = participantRepository.findByUserIdAndChatRoomId(userId, roomId)
             .orElseThrow(NotParticipatedException::new);
 
         Chat chat = chatRepository.save(Chat.builder()
             .user(participant.getUser())
             .chatRoom(participant.getChatRoom())
-            .message(chatDto.getMessage())
+            .message(message)
             .build());
 
         messagingTemplate.convertAndSend(getDestination(participant.getChatRoomSid()),

@@ -267,8 +267,16 @@ class ChatRoomRepositoryTest {
 
     @Test
     void 채팅방_조회_성공() throws Exception {
-        User user1 = User.builder().build();
-        User user2 = User.builder().build();
+        User user1 = User.builder()
+            .nickname("nickname1")
+            .profileImageUrl("profileImageUrl1")
+            .defaultProfileImageType(1)
+            .build();
+        User user2 = User.builder()
+            .nickname("nickname2")
+            .profileImageUrl("profileImageUrl2")
+            .defaultProfileImageType(2)
+            .build();
         User user3 = User.builder().build();
         userRepository.save(user1);
         userRepository.save(user2);
@@ -277,6 +285,8 @@ class ChatRoomRepositoryTest {
         Book book = Book.builder()
             .title("가나다 라마 바사")
             .isbn("773898468")
+            .authors(List.of("author1", "author2"))
+            .bookCoverImageUrl("bookCoverImage")
             .publishAt(LocalDate.now())
             .build();
         bookRepository.save(book);
@@ -354,7 +364,7 @@ class ChatRoomRepositoryTest {
 
         PageRequest pageable = PageRequest.of(0, 1);
         ChatRoomRequest chatRoomRequest = ChatRoomRequest.builder()
-            .postCursorId(Optional.of(chatRoom2.getId()))
+            .postCursorId(Optional.of(500L))
             .title(Optional.empty())
             .isbn(Optional.empty())
             .roomName(Optional.empty())
@@ -371,6 +381,12 @@ class ChatRoomRepositoryTest {
             .roomImageUri(chatRoom1.getRoomImageUri())
             .roomMemberCount(2L)
             .defaultRoomImageType(chatRoom1.getDefaultRoomImageType())
+            .bookTitle(book.getTitle())
+            .bookCoverImageUri(book.getBookCoverImageUrl())
+            .bookAuthors(String.join(",", book.getAuthors()))
+            .hostName(user1.getNickname())
+            .hostDefaultProfileImageType(user1.getDefaultProfileImageType())
+            .hostProfileImageUri(user1.getProfileImageUrl())
             .tags("hashTag1,hashTag3")
             .lastChatId(chat5.getId())
             .lastActiveTime(chat5.getCreatedAt())

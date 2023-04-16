@@ -1,5 +1,6 @@
 package toy.bookchat.bookchat.domain.chatroom;
 
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -47,5 +48,9 @@ public class ChatRoom extends BaseEntity {
 
     public void changeHost(User user) {
         this.host = user;
+    }
+
+    public List<String> getAuthors() {
+        return this.book.getAuthors();
     }
 }

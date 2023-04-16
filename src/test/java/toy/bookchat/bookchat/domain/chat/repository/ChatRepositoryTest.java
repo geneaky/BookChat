@@ -5,8 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -36,8 +34,6 @@ class ChatRepositoryTest {
     BookRepository bookRepository;
     @Autowired
     UserRepository userRepository;
-    @PersistenceContext
-    EntityManager em;
 
     @Test
     void 채팅_내역_조회_성공() throws Exception {

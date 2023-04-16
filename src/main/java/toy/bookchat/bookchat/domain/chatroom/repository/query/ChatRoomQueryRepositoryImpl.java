@@ -1,5 +1,7 @@
 package toy.bookchat.bookchat.domain.chatroom.repository.query;
 
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static toy.bookchat.bookchat.domain.book.QBook.book;
 import static toy.bookchat.bookchat.domain.chat.QChat.chat;
 import static toy.bookchat.bookchat.domain.chatroom.QChatRoom.chatRoom;
@@ -7,6 +9,7 @@ import static toy.bookchat.bookchat.domain.chatroom.QChatRoomHashTag.chatRoomHas
 import static toy.bookchat.bookchat.domain.chatroom.QHashTag.hashTag;
 import static toy.bookchat.bookchat.domain.common.RepositorySupport.toSlice;
 import static toy.bookchat.bookchat.domain.participant.QParticipant.participant;
+import static toy.bookchat.bookchat.domain.user.QUser.user;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -14,11 +17,13 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
 import toy.bookchat.bookchat.domain.chat.QChat;
+import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
 import toy.bookchat.bookchat.domain.chatroom.QChatRoomHashTag;
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomResponse;
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.UserChatRoomResponse;
@@ -83,7 +88,6 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
                     .on(subChat.chatRoom.id.eq(subParticipant2.chatRoom.id)
                         .and(subParticipant2.user.id.eq(userId)))
                     .groupBy(subParticipant2.chatRoom.id)).and(chat.chatRoom.id.eq(chatRoom.id)))
-            .fetchJoin()
             .groupBy(chatRoom.id, chat.id)
             .where(afterPostCursorId(postCursorId))
             .limit(pageable.getPageSize())
@@ -104,6 +108,11 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
                     chatRoom.id,
                     chatRoom.roomName,
                     chatRoom.roomSid,
+                    book.title,
+                    book.bookCoverImageUrl,
+                    chatRoom.host.nickname,
+                    chatRoom.host.defaultProfileImageType,
+                    chatRoom.host.profileImageUrl,
                     // TODO: 2023/03/19 scalar subquery 성능 문제가 있다면 대체 방법 고려
                     JPAExpressions.select(participant.count()).from(participant)
                         .where(participant.chatRoom.id.eq(chatRoom.id)),
@@ -113,6 +122,8 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
                     chat.id,
                     chat.createdAt))
             .from(chatRoom)
+            .join(user).on(chatRoom.host.id.eq(user.id))
+            .join(book).on(chatRoom.book.id.eq(book.id))
             .join(chatRoomHashTag).on(chatRoomHashTag.chatRoom.id.in(
                 JPAExpressions.select(subChatRoomHashTag.chatRoom.id)
                     .from(subChatRoomHashTag)
@@ -124,7 +135,6 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
                     .from(subChat)
                     .groupBy(subChat.chatRoom)
                     .having(subChat.chatRoom.id.eq(chatRoom.id))))
-            .leftJoin(book).on(book.id.eq(chatRoom.book.id))
             .groupBy(chatRoom.id, chat.id)
             .where(chat.chatRoom.id.eq(chatRoom.id),
                 chatRoomRequest.getPostCursorId().map(chatRoom.id::lt).orElse(null),
@@ -135,6 +145,19 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
             .limit(pageable.getPageSize())
             .orderBy(chat.id.desc(), chatRoom.id.desc())
             .fetch();
+
+        List<Long> chatRoomIds = contents.stream().map(ChatRoomResponse::getRoomId)
+            .collect(toList());
+
+        List<ChatRoom> chatRooms = queryFactory.select(chatRoom)
+            .from(chatRoom)
+            .join(chatRoom.book, book).fetchJoin()
+            .where(chatRoom.id.in(chatRoomIds))
+            .fetch();
+
+        Map<Long, String> authorsMap = chatRooms.stream()
+            .collect(toMap(ChatRoom::getId, chatRoom -> String.join(",", chatRoom.getAuthors())));
+        contents.forEach(c -> c.setBookAuthors(authorsMap.get(c.getRoomId())));
 
         return toSlice(contents, pageable);
     }

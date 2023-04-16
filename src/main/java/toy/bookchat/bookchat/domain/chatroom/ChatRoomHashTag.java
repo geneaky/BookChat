@@ -5,9 +5,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import lombok.Getter;
 import toy.bookchat.bookchat.domain.BaseEntity;
 
 @Entity
+@Getter
 public class ChatRoomHashTag extends BaseEntity {
 
     @Id
