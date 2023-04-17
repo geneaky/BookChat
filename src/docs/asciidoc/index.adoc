@@ -648,6 +648,10 @@ include::{snippets}/post-chatroom/request-part-createChatRoomRequest-fields.adoc
 
 include::{snippets}/post-chatroom/http-request.adoc[]
 
+`Response Header`
+
+include::{snippets}/post-chatroom/response-headers.adoc[]
+
 `Resposne`
 
 include::{snippets}/post-chatroom/http-response.adoc[]

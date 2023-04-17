@@ -1,8 +1,11 @@
 package toy.bookchat.bookchat.domain.chatroom.api;
 
+import java.net.URI;
 import java.util.Optional;
 import javax.validation.Valid;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +18,7 @@ import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.UserC
 import toy.bookchat.bookchat.domain.chatroom.service.ChatRoomService;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.ChatRoomRequest;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.CreateChatRoomRequest;
+import toy.bookchat.bookchat.domain.chatroom.service.dto.response.CreatedChatRoomDto;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPayload;
 
@@ -30,11 +34,18 @@ public class ChatRoomController {
     }
 
     @PostMapping("/chatrooms")
-    public void createChatRoom(@Valid @RequestPart CreateChatRoomRequest createChatRoomRequest,
+    public ResponseEntity<Void> createChatRoom(
+        @Valid @RequestPart CreateChatRoomRequest createChatRoomRequest,
         @RequestPart Optional<MultipartFile> chatRoomImage,
         @UserPayload TokenPayload tokenPayload) {
-        chatRoomService.createChatRoom(createChatRoomRequest, chatRoomImage,
-            tokenPayload.getUserId());
+        CreatedChatRoomDto createdChatRoomDto = chatRoomService.createChatRoom(
+            createChatRoomRequest,
+            chatRoomImage, tokenPayload.getUserId());
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .headers(hs -> hs.setLocation(URI.create("/topic/" + createdChatRoomDto.getRoomSid())))
+            .headers(hs -> hs.set("RoomId", createdChatRoomDto.getRoomId()))
+            .build();
     }
 
     @GetMapping("/users/chatrooms")

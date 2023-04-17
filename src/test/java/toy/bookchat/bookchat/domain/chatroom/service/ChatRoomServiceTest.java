@@ -21,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
+import org.springframework.web.multipart.MultipartFile;
 import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.book.repository.BookRepository;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookRequest;
@@ -36,6 +37,7 @@ import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.UserC
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.ChatRoomRequest;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.CreateChatRoomRequest;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
+import toy.bookchat.bookchat.domain.storage.ChatRoomStorageService;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 
@@ -54,6 +56,8 @@ class ChatRoomServiceTest {
     UserRepository userRepository;
     @Mock
     ParticipantRepository participantRepository;
+    @Mock
+    ChatRoomStorageService storageService;
     @InjectMocks
     ChatRoomService chatRoomService;
 
@@ -76,7 +80,7 @@ class ChatRoomServiceTest {
     }
 
     @Test
-    void 채팅방_생성_성공() throws Exception {
+    void 채팅방_이미지가_없을시_채팅방_생성_성공() throws Exception {
         BookRequest bookRequest = getBookRequest();
         CreateChatRoomRequest createChatRoomRequest = getCreateChatRoomRequest(bookRequest);
 
@@ -89,6 +93,26 @@ class ChatRoomServiceTest {
         verify(chatRoomRepository).save(any());
         verify(hashTagRepository, times(2)).save(any());
         verify(chatRoomHashTagRepository, times(2)).save(any());
+    }
+
+    @Test
+    void 채팅방_이미지가_있을시_채팅방_생성_성공() throws Exception {
+        BookRequest bookRequest = getBookRequest();
+        CreateChatRoomRequest createChatRoomRequest = getCreateChatRoomRequest(bookRequest);
+        MultipartFile image = mock(MultipartFile.class);
+        Optional<MultipartFile> chatRoomImage = Optional.of(image);
+
+        when(bookRepository.findByIsbnAndPublishAt(any(), any())).thenReturn(
+            Optional.ofNullable(mock(Book.class)));
+        when(userRepository.findById(any())).thenReturn(Optional.of(mock(User.class)));
+
+        chatRoomService.createChatRoom(createChatRoomRequest, chatRoomImage, 1L);
+
+        verify(chatRoomRepository).save(any());
+        verify(hashTagRepository, times(2)).save(any());
+        verify(chatRoomHashTagRepository, times(2)).save(any());
+        verify(storageService).upload(any(), any());
+
     }
 
     @Test

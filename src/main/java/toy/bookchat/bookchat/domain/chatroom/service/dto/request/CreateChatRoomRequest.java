@@ -43,8 +43,7 @@ public class CreateChatRoomRequest {
         this.bookRequest = bookRequest;
     }
 
-    public ChatRoom makeChatRoom(Book book,
-        User host, String fileUrl) {
+    public ChatRoom makeChatRoom(Book book, User host, String fileUrl) {
         return ChatRoom.builder()
             .book(book)
             .roomSid(UUID.randomUUID().toString())
