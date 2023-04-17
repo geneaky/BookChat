@@ -51,6 +51,7 @@ import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.UserC
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.UserChatRoomsResponseSlice;
 import toy.bookchat.bookchat.domain.chatroom.service.ChatRoomService;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.CreateChatRoomRequest;
+import toy.bookchat.bookchat.domain.chatroom.service.dto.response.CreatedChatRoomDto;
 
 @ChatRoomPresentationTest
 class ChatRoomControllerTest extends ControllerTestExtension {
@@ -89,8 +90,12 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             "", APPLICATION_JSON_VALUE,
             objectMapper.writeValueAsString(createChatRoomRequest).getBytes(UTF_8));
 
-        when(chatRoomService.createChatRoom(any(), any(), any())).thenReturn(
-            UUID.randomUUID().toString());
+        CreatedChatRoomDto createdChatRoomDto = CreatedChatRoomDto.builder()
+            .roomId(1L)
+            .roomSid(UUID.randomUUID().toString())
+            .build();
+
+        when(chatRoomService.createChatRoom(any(), any(), any())).thenReturn(createdChatRoomDto);
 
         mockMvc.perform(multipart("/v1/api/chatrooms")
                 .file(chatRoomImagePart)
@@ -120,7 +125,8 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                     fieldWithPath("bookRequest.publishAt").type(STRING).description("출판일")
                 ),
                 responseHeaders(
-                    headerWithName(LOCATION).description("채팅방 접속 Connection Url")
+                    headerWithName(LOCATION).description("채팅방 접속 Connection Url"),
+                    headerWithName("RoomId").description("채팅방 Id")
                 )));
 
         verify(chatRoomService).createChatRoom(any(), any(), any());
