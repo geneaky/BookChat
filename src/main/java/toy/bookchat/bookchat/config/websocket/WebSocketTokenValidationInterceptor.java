@@ -6,7 +6,6 @@ import static org.springframework.messaging.simp.stomp.StompCommand.SEND;
 import static org.springframework.messaging.simp.stomp.StompCommand.SUBSCRIBE;
 
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageDeliveryException;
@@ -18,7 +17,6 @@ import toy.bookchat.bookchat.exception.security.DeniedTokenException;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenManager;
 
 @Component
-@Slf4j
 public class WebSocketTokenValidationInterceptor implements ChannelInterceptor {
 
     private final String BEARER = "Bearer ";
@@ -40,7 +38,6 @@ public class WebSocketTokenValidationInterceptor implements ChannelInterceptor {
                 String token = getJwtTokenFromMessage(accessor);
                 jwtTokenManager.getTokenPayloadFromToken(token);
             } catch (Exception exception) {
-                log.info(exception.getMessage());
                 throw new MessageDeliveryException("Access Denied");
             }
         }

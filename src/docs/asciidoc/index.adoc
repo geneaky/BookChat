@@ -766,7 +766,7 @@ include::{snippets}/get-chatroom-chats/http-response.adoc[]
 
 ```stomp
     CONNECT
-    Authorizaiton: Bearer [JWT Token]
+    Authorization: Bearer [JWT Token]
     host: wss://bookchat.link/stomp-connection
 
     ^@
@@ -782,7 +782,7 @@ include::{snippets}/get-chatroom-chats/http-response.adoc[]
 
 ```stomp
     SUBSCRIBE
-    Authorizaiton: Bearer [JWT Token]
+    Authorization: Bearer [JWT Token]
     host: wss://bookchat.link/topic/[heho]
 
     ^@
@@ -792,7 +792,7 @@ include::{snippets}/get-chatroom-chats/http-response.adoc[]
 
 ```stomp
     SUBSCRIBE
-    Authorizaiton: Bearer [JWT Token]
+    Authorization: Bearer [JWT Token]
     host: wss://bookchat.link/user/exchange/amq.direct/error
 
     ^@
@@ -808,7 +808,7 @@ include::{snippets}/get-chatroom-chats/http-response.adoc[]
 
 ```stomp
     SEND
-    Authorizaiton: Bearer [JWT Token]
+    Authorization: Bearer [JWT Token]
     host: wss://bookchat.link/subscriptions/enter/chatrooms/[123]
 
     ^@
@@ -824,7 +824,7 @@ include::{snippets}/get-chatroom-chats/http-response.adoc[]
 
 ```stomp
     SEND
-    Authorizaiton: Bearer [JWT Token]
+    Authorization: Bearer [JWT Token]
     host: wss://bookchat.link/subscriptions/leave/chatrooms/[123]
 
     ^@
@@ -840,7 +840,7 @@ include::{snippets}/get-chatroom-chats/http-response.adoc[]
 
 ```stomp
     SEND
-    Authorizaiton: Bearer [JWT Token]
+    Authorization: Bearer [JWT Token]
     host: wss://bookchat.link/subscriptions/send/chatrooms/[123]
 
     {
