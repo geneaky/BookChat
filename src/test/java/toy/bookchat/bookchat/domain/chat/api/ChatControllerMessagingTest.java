@@ -141,10 +141,6 @@ class ChatControllerMessagingTest extends StompTestExtension {
         chat.setCreatedAt(LocalDateTime.now());
 
         ChatDto dto = ChatDto.builder()
-            .senderId(getUserId())
-            .senderNickname(getUserNickname())
-            .senderProfileImageUrl(getUserProfileImageUrl())
-            .senderDefaultProfileImageType(getUserDefaultProfileImageType())
             .chatId(chat.getId())
             .dispatchTime(chat.getDispatchTime())
             .message(chat.getMessage())
@@ -290,10 +286,6 @@ class ChatControllerMessagingTest extends StompTestExtension {
         chat.setCreatedAt(LocalDateTime.now());
 
         ChatDto dto = ChatDto.builder()
-            .senderId(getUserId())
-            .senderNickname(getUserNickname())
-            .senderProfileImageUrl(getUserProfileImageUrl())
-            .senderDefaultProfileImageType(getUserDefaultProfileImageType())
             .chatId(chat.getId())
             .dispatchTime(chat.getDispatchTime())
             .message(chat.getMessage())

@@ -70,13 +70,12 @@ public class ChatService {
             .build());
 
         Chat chat = chatRepository.save(Chat.builder()
-            .user(user)
             .chatRoom(chatRoom)
             .message(getWelcomeMessage(user.getNickname()))
             .build());
 
         messagingTemplate.convertAndSend(getDestination(chatRoom.getRoomSid()),
-            ChatDto.from(user, chat));
+            ChatDto.announcement(chat));
     }
 
     private void checkIsFullChatRoom(ChatRoom chatRoom) {
@@ -116,14 +115,13 @@ public class ChatService {
         }
 
         Chat chat = chatRepository.save(Chat.builder()
-            .user(user)
             .chatRoom(chatRoom)
             .message(getSendOffMessage(user.getNickname()))
             .build());
 
         participantRepository.delete(participant);
         messagingTemplate.convertAndSend(getDestination(chatRoom.getRoomSid()),
-            ChatDto.from(user, chat));
+            ChatDto.announcement(chat));
     }
 
     private String getSendOffMessage(String userNickname) {
