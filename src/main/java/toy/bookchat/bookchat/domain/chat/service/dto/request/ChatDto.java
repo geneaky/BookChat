@@ -43,8 +43,16 @@ public class ChatDto {
             .senderProfileImageUrl(user.getProfileImageUrl())
             .senderDefaultProfileImageType(user.getDefaultProfileImageType())
             .chatId(chat.getId())
-            .dispatchTime(chat.getCreatedAt().toString())
+            .dispatchTime(chat.getDispatchTime())
             .message(chat.getMessage())
+            .build();
+    }
+
+    public static ChatDto announcement(Chat chat) {
+        return ChatDto.builder()
+            .chatId(chat.getId())
+            .message(chat.getMessage())
+            .dispatchTime(chat.getDispatchTime())
             .build();
     }
 }
