@@ -6,7 +6,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Consumer;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -95,27 +94,6 @@ public class ChatRoomService {
         chatRoom = saveChatRoom(createChatRoomRequest, book, host, prefixedUUIDFileUrl);
         registerHashTagOnChatRoom(createChatRoomRequest, chatRoom);
         return chatRoom;
-    }
-
-    private Runnable saveChatRoomAndHashTagWithoutImage(String roomSid,
-        CreateChatRoomRequest createChatRoomRequest,
-        Book book, User host) {
-        return () -> registerHashTagOnChatRoom(createChatRoomRequest,
-            saveChatRoom(createChatRoomRequest, book, host, null));
-    }
-
-    private Consumer<MultipartFile> saveChatRoomAndHashTagWithImage(
-        CreateChatRoomRequest createChatRoomRequest, Book book, User host) {
-        return image -> {
-            String prefixedUUIDFileName = storageService.createFileName(
-                image, UUID.randomUUID().toString(),
-                new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
-            String prefixedUUIDFileUrl = storageService.getFileUrl(prefixedUUIDFileName);
-            ChatRoom chatRoom = saveChatRoom(createChatRoomRequest, book, host,
-                prefixedUUIDFileUrl);
-            registerHashTagOnChatRoom(createChatRoomRequest, chatRoom);
-            storageService.upload(image, prefixedUUIDFileName);
-        };
     }
 
     private ChatRoom saveChatRoom(CreateChatRoomRequest createChatRoomRequest,
