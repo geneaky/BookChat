@@ -5,9 +5,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpHeaders.LOCATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.headers.HeaderDocumentation.responseHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.multipart;
@@ -28,6 +30,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -86,12 +89,15 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             "", APPLICATION_JSON_VALUE,
             objectMapper.writeValueAsString(createChatRoomRequest).getBytes(UTF_8));
 
+        when(chatRoomService.createChatRoom(any(), any(), any())).thenReturn(
+            UUID.randomUUID().toString());
+
         mockMvc.perform(multipart("/v1/api/chatrooms")
                 .file(chatRoomImagePart)
                 .file(createChatRoomRequestPart)
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal())))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated())
             .andDo(document("post-chatroom",
                 requestHeaders(
                     headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
@@ -112,6 +118,9 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                         .description("책 표지 이미지 url"),
                     fieldWithPath("bookRequest.authors").type(ARRAY).description("저자 목록"),
                     fieldWithPath("bookRequest.publishAt").type(STRING).description("출판일")
+                ),
+                responseHeaders(
+                    headerWithName(LOCATION).description("채팅방 접속 Connection Url")
                 )));
 
         verify(chatRoomService).createChatRoom(any(), any(), any());

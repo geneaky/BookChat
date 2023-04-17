@@ -60,40 +60,45 @@ public class ChatRoomService {
     }
 
     @Transactional
-    public void createChatRoom(CreateChatRoomRequest createChatRoomRequest,
+    public String createChatRoom(CreateChatRoomRequest createChatRoomRequest,
         Optional<MultipartFile> chatRoomImage, Long userId) {
         Book book = bookRepository.findByIsbnAndPublishAt(createChatRoomRequest.getIsbn(),
                 createChatRoomRequest.getPublishAt())
             .orElseGet(() -> bookRepository.save(createChatRoomRequest.createBook()));
         User host = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+
+        String roomSid = UUID.randomUUID().toString();
         chatRoomImage.ifPresentOrElse(
-            saveChatRoomAndHashTagWithImage(createChatRoomRequest, book, host),
-            saveChatRoomAndHashTagWithoutImage(createChatRoomRequest, book, host));
+            saveChatRoomAndHashTagWithImage(roomSid, createChatRoomRequest, book, host),
+            saveChatRoomAndHashTagWithoutImage(roomSid, createChatRoomRequest, book, host));
+
+        return roomSid;
     }
 
-    private Runnable saveChatRoomAndHashTagWithoutImage(CreateChatRoomRequest createChatRoomRequest,
+    private Runnable saveChatRoomAndHashTagWithoutImage(String roomSid,
+        CreateChatRoomRequest createChatRoomRequest,
         Book book, User host) {
         return () -> registerHashTagOnChatRoom(createChatRoomRequest,
-            saveChatRoom(createChatRoomRequest, book, host, null));
+            saveChatRoom(roomSid, createChatRoomRequest, book, host, null));
     }
 
     private Consumer<MultipartFile> saveChatRoomAndHashTagWithImage(
-        CreateChatRoomRequest createChatRoomRequest, Book book, User host) {
+        String roomSid, CreateChatRoomRequest createChatRoomRequest, Book book, User host) {
         return image -> {
             String prefixedUUIDFileName = storageService.createFileName(
                 image, UUID.randomUUID().toString(),
                 new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
             String prefixedUUIDFileUrl = storageService.getFileUrl(prefixedUUIDFileName);
-            ChatRoom chatRoom = saveChatRoom(createChatRoomRequest, book, host,
+            ChatRoom chatRoom = saveChatRoom(roomSid, createChatRoomRequest, book, host,
                 prefixedUUIDFileUrl);
-            storageService.upload(image, prefixedUUIDFileName);
             registerHashTagOnChatRoom(createChatRoomRequest, chatRoom);
+            storageService.upload(image, prefixedUUIDFileName);
         };
     }
 
-    private ChatRoom saveChatRoom(CreateChatRoomRequest createChatRoomRequest, Book book,
-        User host, String fileUrl) {
-        ChatRoom chatRoom = createChatRoomRequest.makeChatRoom(book, host, fileUrl);
+    private ChatRoom saveChatRoom(String roomSid, CreateChatRoomRequest createChatRoomRequest,
+        Book book, User host, String fileUrl) {
+        ChatRoom chatRoom = createChatRoomRequest.makeChatRoom(book, host, fileUrl, roomSid);
         chatRoomRepository.save(chatRoom);
         saveParticipantWithRoomHostAndRoom(host, chatRoom);
         return chatRoom;
