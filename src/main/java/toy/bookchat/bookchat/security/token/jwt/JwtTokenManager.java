@@ -4,6 +4,8 @@ import toy.bookchat.bookchat.security.user.TokenPayload;
 
 public interface JwtTokenManager {
 
+    String extractTokenFromAuthorizationHeader(String header);
+
     Long getUserIdFromToken(String token);
 
     String getOAuth2MemberNumberFromToken(String token);

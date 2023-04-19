@@ -1,16 +1,29 @@
 package toy.bookchat.bookchat.security.token.jwt;
 
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import toy.bookchat.bookchat.config.token.JwtTokenProperties;
+import toy.bookchat.bookchat.exception.security.DeniedTokenException;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 
 @Component
 public class JwtTokenManagerImpl implements JwtTokenManager {
 
+    private final String BEARER = "Bearer ";
+    private final int BEGIN_INDEX = 7;
     private final JwtTokenProperties jwtTokenProperties;
 
     public JwtTokenManagerImpl(JwtTokenProperties jwtTokenProperties) {
         this.jwtTokenProperties = jwtTokenProperties;
+    }
+
+    @Override
+    public String extractTokenFromAuthorizationHeader(String authorizationHeader) {
+        if (StringUtils.hasText(authorizationHeader) && authorizationHeader.startsWith(BEARER)) {
+            return authorizationHeader.substring(BEGIN_INDEX);
+        }
+
+        throw new DeniedTokenException("Token is Empty");
     }
 
     @Override

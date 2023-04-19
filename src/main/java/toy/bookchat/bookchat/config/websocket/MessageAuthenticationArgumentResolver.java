@@ -3,15 +3,13 @@ package toy.bookchat.bookchat.config.websocket;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 import java.util.Arrays;
-import java.util.Objects;
+import java.util.List;
 import org.springframework.core.MethodParameter;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageDeliveryException;
 import org.springframework.messaging.handler.invocation.HandlerMethodArgumentResolver;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
-import toy.bookchat.bookchat.exception.security.DeniedTokenException;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenManager;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPayload;
@@ -19,16 +17,10 @@ import toy.bookchat.bookchat.security.user.UserPayload;
 @Component
 public class MessageAuthenticationArgumentResolver implements HandlerMethodArgumentResolver {
 
-    private final String BEARER = "Bearer ";
-    private final int BEGIN_INDEX = 7;
     private final JwtTokenManager jwtTokenManager;
 
     public MessageAuthenticationArgumentResolver(JwtTokenManager jwtTokenManager) {
         this.jwtTokenManager = jwtTokenManager;
-    }
-
-    private static String getBearerTokenFromNativeHeader(StompHeaderAccessor accessor) {
-        return Objects.requireNonNull(accessor.getNativeHeader(AUTHORIZATION)).get(0);
     }
 
     @Override
@@ -45,18 +37,19 @@ public class MessageAuthenticationArgumentResolver implements HandlerMethodArgum
 
     private TokenPayload resolveTokenPayloadFromAccessor(StompHeaderAccessor accessor) {
         try {
-            String token = getJwtTokenFromMessage(accessor);
-            return jwtTokenManager.getTokenPayloadFromToken(token);
+            String bearerToken = jwtTokenManager.extractTokenFromAuthorizationHeader(
+                getAuthorizationHeader(accessor));
+            return jwtTokenManager.getTokenPayloadFromToken(bearerToken);
         } catch (Exception exception) {
             throw new MessageDeliveryException("Access Denied");
         }
     }
 
-    private String getJwtTokenFromMessage(StompHeaderAccessor accessor) {
-        String bearerToken = getBearerTokenFromNativeHeader(accessor);
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER)) {
-            return bearerToken.substring(BEGIN_INDEX);
+    private String getAuthorizationHeader(StompHeaderAccessor accessor) {
+        List<String> nativeHeader = accessor.getNativeHeader(AUTHORIZATION);
+        if (nativeHeader != null) {
+            return nativeHeader.get(0);
         }
-        throw new DeniedTokenException();
+        return null;
     }
 }

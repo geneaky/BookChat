@@ -33,9 +33,9 @@ import toy.bookchat.bookchat.security.user.UserPrincipal;
 public abstract class ControllerTestExtension {
 
     @MockBean
-    IdTokenManager idTokenManager;
-    @MockBean
     JwtTokenManager jwtTokenManager;
+    @MockBean
+    IdTokenManager idTokenManager;
     @MockBean
     KakaoPublicKeyFetcher kakaoPublickeyFetcher;
 
@@ -65,12 +65,16 @@ public abstract class ControllerTestExtension {
         doReturn(getTokenPayload(getUser())).when(jwtTokenManager).getTokenPayloadFromToken(any());
     }
 
-    public KakaoPublicKeyFetcher getOpenIdTokenConfig() {
+    public KakaoPublicKeyFetcher getPublicKeyFetcher() {
         return this.kakaoPublickeyFetcher;
     }
 
-    public IdTokenManager getOpenIdTokenManager() {
+    public IdTokenManager getIdTokenManager() {
         return this.idTokenManager;
+    }
+
+    public JwtTokenManager getJwtTokenManager() {
+        return this.jwtTokenManager;
     }
 
     public List<FieldDescriptor> getPageField() {

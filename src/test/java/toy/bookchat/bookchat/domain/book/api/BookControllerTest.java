@@ -60,6 +60,7 @@ class BookControllerTest extends ControllerTestExtension {
 
     @Test
     void 로그인하지_않은_사용자_요청_401() throws Exception {
+        when(getJwtTokenManager().getTokenPayloadFromToken(any())).thenReturn(null);
         mockMvc.perform(get("/v1/api/books")
                 .param("isbn", "234134"))
             .andExpect(status().isUnauthorized());

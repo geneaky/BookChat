@@ -64,9 +64,7 @@ public class TokenService {
             getUserFromRefreshToken(refreshTokenRequest));
 
         refreshTokenRepository.findByUserId(jwtTokenManager.getUserIdFromToken(refreshToken))
-            .orElseThrow(() -> {
-                throw new IllegalStateException();
-            })
+            .orElseThrow(IllegalStateException::new)
             .changeRefreshToken(refreshToken);
 
         return refreshToken;

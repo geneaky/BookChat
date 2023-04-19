@@ -8,16 +8,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
-import toy.bookchat.bookchat.exception.security.DeniedTokenException;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-
-    private final String BEARER = "Bearer ";
-    private final int BEGIN_INDEX = 7;
 
     private final JwtTokenManager jwtTokenManager;
 
@@ -32,26 +27,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             authentication(request);
         } catch (RuntimeException exception) {
             SecurityContextHolder.clearContext();
-//            SecurityContextHolder.getContext().setAuthentication(null);
         }
 
         filterChain.doFilter(request, response);
     }
 
     private void authentication(HttpServletRequest request) {
-
-        TokenPayload tokenPayload = jwtTokenManager.getTokenPayloadFromToken(
-            getJwtTokenFromRequest(request));
+        String bearerToken = jwtTokenManager.extractTokenFromAuthorizationHeader(
+            request.getHeader(HttpHeaders.AUTHORIZATION));
+        TokenPayload tokenPayload = jwtTokenManager.getTokenPayloadFromToken(bearerToken);
 
         registerUserAuthenticationOnSecurityContext(tokenPayload);
-    }
-
-    private String getJwtTokenFromRequest(HttpServletRequest request) {
-        String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER)) {
-            return bearerToken.substring(BEGIN_INDEX);
-        }
-        throw new DeniedTokenException();
     }
 
     private void registerUserAuthenticationOnSecurityContext(TokenPayload tokenPayload) {

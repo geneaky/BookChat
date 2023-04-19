@@ -12,15 +12,10 @@ import org.springframework.messaging.MessageDeliveryException;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
-import toy.bookchat.bookchat.exception.security.DeniedTokenException;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenManager;
 
 @Component
 public class WebSocketTokenValidationInterceptor implements ChannelInterceptor {
-
-    private final String BEARER = "Bearer ";
-    private final int BEGIN_INDEX = 7;
 
     private final JwtTokenManager jwtTokenManager;
 
@@ -35,8 +30,9 @@ public class WebSocketTokenValidationInterceptor implements ChannelInterceptor {
         if (CONNECT.equals(accessor.getCommand()) || SUBSCRIBE.equals(
             accessor.getCommand()) || SEND.equals(accessor.getCommand())) {
             try {
-                String token = getJwtTokenFromMessage(accessor);
-                jwtTokenManager.getTokenPayloadFromToken(token);
+                String bearerToken = jwtTokenManager.extractTokenFromAuthorizationHeader(
+                    getAuthorizationHeader(accessor));
+                jwtTokenManager.getTokenPayloadFromToken(bearerToken);
             } catch (Exception exception) {
                 throw new MessageDeliveryException("Access Denied");
             }
@@ -44,12 +40,11 @@ public class WebSocketTokenValidationInterceptor implements ChannelInterceptor {
         return message;
     }
 
-    private String getJwtTokenFromMessage(StompHeaderAccessor accessor) {
+    private String getAuthorizationHeader(StompHeaderAccessor accessor) {
         List<String> nativeHeader = accessor.getNativeHeader(AUTHORIZATION);
-        String bearerToken = nativeHeader.get(0);
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER)) {
-            return bearerToken.substring(BEGIN_INDEX);
+        if (nativeHeader != null) {
+            return nativeHeader.get(0);
         }
-        throw new DeniedTokenException();
+        return null;
     }
 }

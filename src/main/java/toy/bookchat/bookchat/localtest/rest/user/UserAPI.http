@@ -41,7 +41,7 @@ Content-Type: application/json
 
 ### 사용자 프로필 정보 받기
 GET localhost:8080/v1/api/users/profile
-Authorization: {{jwt_token}}
+Authorization: Bearer abcd
 
 > {%
   client.test("Request executed successfully", function () {

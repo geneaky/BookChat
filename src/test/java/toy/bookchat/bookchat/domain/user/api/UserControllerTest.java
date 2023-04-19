@@ -110,6 +110,7 @@ class UserControllerTest extends ControllerTestExtension {
 
     @Test
     void 인증받지_않은_사용자_요청_401응답() throws Exception {
+        when(getJwtTokenManager().getTokenPayloadFromToken(any())).thenReturn(null);
         mockMvc.perform(get("/v1/api/users/profile"))
             .andExpect(status().isUnauthorized())
             .andDo(document("user-profile-error"));
@@ -235,9 +236,9 @@ class UserControllerTest extends ControllerTestExtension {
             .setClaims(claims)
             .signWith(RS256, privateKey).compact();
 
-        when(getOpenIdTokenConfig().getPublicKey(any(), any())).thenReturn(
+        when(getPublicKeyFetcher().getPublicKey(any(), any())).thenReturn(
             publicKey);
-        doThrow(ExpiredTokenException.class).when(getOpenIdTokenManager())
+        doThrow(ExpiredTokenException.class).when(getIdTokenManager())
             .getOAuth2MemberNumberFromIdToken(any(), any());
 
         mockMvc.perform(multipart("/v1/api/users/signup")
@@ -255,11 +256,11 @@ class UserControllerTest extends ControllerTestExtension {
         PrivateKey privateKey = getPrivateKey();
         PublicKey publicKey = getPublicKey();
 
-        when(getOpenIdTokenConfig().getPublicKey(any(), any())).thenReturn(
+        when(getPublicKeyFetcher().getPublicKey(any(), any())).thenReturn(
             publicKey);
-        when(getOpenIdTokenManager().getOAuth2MemberNumberFromIdToken(any(), any())).thenReturn(
+        when(getIdTokenManager().getOAuth2MemberNumberFromIdToken(any(), any())).thenReturn(
             "testkakao");
-        when(getOpenIdTokenManager().getUserEmailFromToken(any(), any())).thenReturn(
+        when(getIdTokenManager().getUserEmailFromToken(any(), any())).thenReturn(
             "test@gmail.com");
 
         String testToken = Jwts.builder()
@@ -355,7 +356,7 @@ class UserControllerTest extends ControllerTestExtension {
         PrivateKey privateKey = getPrivateKey();
         PublicKey publicKey = getPublicKey();
 
-        when(getOpenIdTokenConfig().getPublicKey(any(), any())).thenReturn(
+        when(getPublicKeyFetcher().getPublicKey(any(), any())).thenReturn(
             publicKey);
 
         String testToken = Jwts.builder()
@@ -419,7 +420,7 @@ class UserControllerTest extends ControllerTestExtension {
         PrivateKey privateKey = getPrivateKey();
         PublicKey publicKey = getPublicKey();
 
-        when(getOpenIdTokenConfig().getPublicKey(any(), any())).thenReturn(
+        when(getPublicKeyFetcher().getPublicKey(any(), any())).thenReturn(
             publicKey);
 
         String testToken = Jwts.builder()
@@ -437,10 +438,9 @@ class UserControllerTest extends ControllerTestExtension {
     @Test
     void 만료된_토큰으로_요청시_401_예외발생() throws Exception {
         PrivateKey privateKey = getPrivateKey();
-        PublicKey publicKey = getPublicKey();
 
-        when(getOpenIdTokenConfig().getPublicKey(any(), any())).thenReturn(
-            publicKey);
+        doThrow(ExpiredTokenException.class).when(getIdTokenManager())
+            .getOAuth2MemberNumberFromIdToken(any(), any());
 
         Claims claims = Jwts.claims().setIssuer("https://kauth.kakao.com")
             .setSubject("test").setExpiration(new Date(0));
@@ -449,7 +449,10 @@ class UserControllerTest extends ControllerTestExtension {
             .setClaims(claims)
             .signWith(RS256, privateKey).compact();
 
-        mockMvc.perform(post("/v1/api/users/siginin")
+        mockMvc.perform(post("/v1/api/users/signin")
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(
+                    UserSignInRequest.builder().oauth2Provider(KAKAO).build()))
                 .header(OIDC, BEARER + testToken))
             .andExpect(status().isUnauthorized())
             .andDo(document("user-signin-error4"));

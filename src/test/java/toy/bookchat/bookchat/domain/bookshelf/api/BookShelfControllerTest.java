@@ -94,6 +94,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
 
     @Test
     void 로그인하지_않은_사용자_요청_401() throws Exception {
+        when(getJwtTokenManager().getTokenPayloadFromToken(any())).thenReturn(null);
         mockMvc.perform(post("/v1/api/bookshelves")
                 .content(objectMapper.writeValueAsString(getBookShelfRequest(READING)))
                 .contentType(APPLICATION_JSON))
