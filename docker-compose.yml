@@ -4,6 +4,8 @@ services:
   app:
     container_name: spring
     image: openjdk:11-jdk
+    environment:
+      TZ: "Asia/Seoul"
     ports:
       - 8080:8080
     working_dir: /app
@@ -19,6 +21,8 @@ services:
       - app
     container_name: nginx
     image: geneaky/nginx
+    environment:
+      TZ: "Asia/Seoul"
     ports:
       - 80:80
     volumes:
@@ -26,10 +30,12 @@ services:
     restart: always
 
   promtail:
-    image: grafana/promtail
     depends_on:
       - nginx
     container_name: promtail
+    image: grafana/promtail
+    environment:
+      TZ: "Asia/Seoul"
     ports:
       - 1514:1514
     volumes:
