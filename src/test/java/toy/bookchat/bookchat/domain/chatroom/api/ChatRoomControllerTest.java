@@ -91,8 +91,9 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             objectMapper.writeValueAsString(createChatRoomRequest).getBytes(UTF_8));
 
         CreatedChatRoomDto createdChatRoomDto = CreatedChatRoomDto.builder()
-            .roomId(1L)
+            .roomId("1")
             .roomSid(UUID.randomUUID().toString())
+            .roomImageUri("roomImage@s3.com")
             .build();
 
         when(chatRoomService.createChatRoom(any(), any(), any())).thenReturn(createdChatRoomDto);
@@ -126,7 +127,8 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                 ),
                 responseHeaders(
                     headerWithName(LOCATION).description("채팅방 접속 Connection Url"),
-                    headerWithName("RoomId").description("채팅방 Id")
+                    headerWithName("RoomId").description("채팅방 Id"),
+                    headerWithName("RoomImageUri").description("채팅방 이미지 uri")
                 )));
 
         verify(chatRoomService).createChatRoom(any(), any(), any());

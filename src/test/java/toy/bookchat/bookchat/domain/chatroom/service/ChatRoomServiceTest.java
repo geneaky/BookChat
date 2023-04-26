@@ -84,9 +84,16 @@ class ChatRoomServiceTest {
         BookRequest bookRequest = getBookRequest();
         CreateChatRoomRequest createChatRoomRequest = getCreateChatRoomRequest(bookRequest);
 
+        ChatRoom chatRoom = ChatRoom.builder()
+            .id(1L)
+            .roomSid("7D6")
+            .roomImageUri("3wVp")
+            .build();
+
         when(bookRepository.findByIsbnAndPublishAt(any(), any())).thenReturn(
             Optional.ofNullable(mock(Book.class)));
         when(userRepository.findById(any())).thenReturn(Optional.of(mock(User.class)));
+        when(chatRoomRepository.save(any())).thenReturn(chatRoom);
 
         chatRoomService.createChatRoom(createChatRoomRequest, Optional.empty(), 1L);
 
@@ -102,9 +109,16 @@ class ChatRoomServiceTest {
         MultipartFile image = mock(MultipartFile.class);
         Optional<MultipartFile> chatRoomImage = Optional.of(image);
 
+        ChatRoom chatRoom = ChatRoom.builder()
+            .id(1L)
+            .roomSid("7D6")
+            .roomImageUri("3wVp")
+            .build();
+
         when(bookRepository.findByIsbnAndPublishAt(any(), any())).thenReturn(
             Optional.ofNullable(mock(Book.class)));
         when(userRepository.findById(any())).thenReturn(Optional.of(mock(User.class)));
+        when(chatRoomRepository.save(any())).thenReturn(chatRoom);
 
         chatRoomService.createChatRoom(createChatRoomRequest, chatRoomImage, 1L);
 
@@ -120,7 +134,14 @@ class ChatRoomServiceTest {
         BookRequest bookRequest = getBookRequest();
         CreateChatRoomRequest createChatRoomRequest = getCreateChatRoomRequest(bookRequest);
 
+        ChatRoom chatRoom = ChatRoom.builder()
+            .id(1L)
+            .roomSid("7D6")
+            .roomImageUri("3wVp")
+            .build();
+
         when(userRepository.findById(any())).thenReturn(Optional.of(mock(User.class)));
+        when(chatRoomRepository.save(any())).thenReturn(chatRoom);
 
         chatRoomService.createChatRoom(createChatRoomRequest, Optional.empty(), 1L);
 

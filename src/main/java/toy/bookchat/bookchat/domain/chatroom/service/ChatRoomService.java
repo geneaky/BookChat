@@ -81,10 +81,7 @@ public class ChatRoomService {
             chatRoom = registerChatRoom(createChatRoomRequest, book, host, null);
         }
 
-        return CreatedChatRoomDto.builder()
-            .roomId(chatRoom.getId())
-            .roomSid(chatRoom.getRoomSid())
-            .build();
+        return CreatedChatRoomDto.of(chatRoom);
     }
 
     private ChatRoom registerChatRoom(CreateChatRoomRequest createChatRoomRequest, Book book,
@@ -98,8 +95,8 @@ public class ChatRoomService {
 
     private ChatRoom saveChatRoom(CreateChatRoomRequest createChatRoomRequest,
         Book book, User host, String fileUrl) {
-        ChatRoom chatRoom = createChatRoomRequest.makeChatRoom(book, host, fileUrl);
-        chatRoomRepository.save(chatRoom);
+        ChatRoom chatRoom = chatRoomRepository.save(
+            createChatRoomRequest.makeChatRoom(book, host, fileUrl));
         saveParticipantWithRoomHostAndRoom(host, chatRoom);
         return chatRoom;
     }
