@@ -8,6 +8,7 @@ import toy.bookchat.bookchat.security.user.TokenPayload;
 @Builder
 public class UserProfileResponse {
 
+    private Long userId;
     private String userNickname;
     private String userEmail;
     private String userProfileImageUri;
@@ -15,6 +16,7 @@ public class UserProfileResponse {
 
     public static UserProfileResponse of(TokenPayload tokenPayload) {
         return UserProfileResponse.builder()
+            .userId(tokenPayload.getUserId())
             .userNickname(tokenPayload.getUserNickname())
             .userEmail(tokenPayload.getUserEmail())
             .userProfileImageUri(tokenPayload.getUserProfileImageUri())
