@@ -57,6 +57,9 @@ class ChatRepositoryTest {
             .build();
         chatRoomRepository.save(chatRoom);
 
+        Chat chat0 = Chat.builder().message("enter")
+            .chatRoom(chatRoom)
+            .build();
         Chat chat1 = Chat.builder().user(user1).message("a")
             .chatRoom(chatRoom)
             .build();
@@ -69,6 +72,8 @@ class ChatRepositoryTest {
         Chat chat4 = Chat.builder().user(user1).message("d")
             .chatRoom(chatRoom)
             .build();
+
+        chatRepository.save(chat0);
         chatRepository.save(chat1);
         chatRepository.save(chat2);
         chatRepository.save(chat3);
@@ -85,9 +90,9 @@ class ChatRepositoryTest {
         PageRequest pageRequest = PageRequest.of(0, 3, Sort.by("id").descending());
 
         List<Chat> content = chatRepository.getChatRoomChats(chatRoom.getId(),
-            Optional.of(chat4.getId()), pageRequest,
+            Optional.of(chat3.getId()), pageRequest,
             user1.getId()).getContent();
 
-        assertThat(content).containsExactly(chat3, chat2, chat1);
+        assertThat(content).containsExactly(chat2, chat1, chat0);
     }
 }

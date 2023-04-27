@@ -29,7 +29,7 @@ public class ChatQueryRepositoryImpl implements ChatQueryRepository {
         Long userId) {
         return toSlice(queryFactory.select(chat)
             .from(chat)
-            .join(chat.user, user).fetchJoin()
+            .leftJoin(chat.user, user).fetchJoin()
             .where(chat.chatRoom.id.eq(JPAExpressions.select(participant.chatRoom.id)
                     .from(participant)
                     .where(participant.user.id.eq(userId)
