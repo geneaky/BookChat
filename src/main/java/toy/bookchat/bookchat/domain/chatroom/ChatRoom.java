@@ -50,7 +50,15 @@ public class ChatRoom extends BaseEntity {
         this.host = user;
     }
 
-    public List<String> getAuthors() {
+    public List<String> getBookAuthors() {
         return this.book.getAuthors();
+    }
+
+    public String getBookCoverImageUrl() {
+        return this.book.getBookCoverImageUrl();
+    }
+
+    public String getBookTitle() {
+        return this.book.getTitle();
     }
 }

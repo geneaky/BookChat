@@ -22,6 +22,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
+import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.chat.QChat;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
 import toy.bookchat.bookchat.domain.chatroom.QChatRoomHashTag;
@@ -94,6 +95,18 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
             .orderBy(chat.id.desc(), chatRoom.id.desc())
             .fetch();
 
+        List<Long> chatRoomIds = contents.stream().map(UserChatRoomResponse::getRoomId)
+            .collect(toList());
+        List<ChatRoom> chatRooms = queryFactory.select(chatRoom)
+            .from(chatRoom)
+            .join(chatRoom.book, book).fetchJoin()
+            .where(chatRoom.id.in(chatRoomIds))
+            .fetch();
+
+        Map<Long, Book> mapBooksByChatRoomId = chatRooms.stream()
+            .collect(toMap(ChatRoom::getId, ChatRoom::getBook));
+        contents.forEach(c -> c.setBookInfo(mapBooksByChatRoomId.get(c.getRoomId())));
+
         return toSlice(contents, pageable);
     }
 
@@ -148,15 +161,14 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
 
         List<Long> chatRoomIds = contents.stream().map(ChatRoomResponse::getRoomId)
             .collect(toList());
-
         List<ChatRoom> chatRooms = queryFactory.select(chatRoom)
             .from(chatRoom)
             .join(chatRoom.book, book).fetchJoin()
             .where(chatRoom.id.in(chatRoomIds))
             .fetch();
 
-        Map<Long, String> authorsMap = chatRooms.stream()
-            .collect(toMap(ChatRoom::getId, chatRoom -> String.join(",", chatRoom.getAuthors())));
+        Map<Long, List<String>> authorsMap = chatRooms.stream()
+            .collect(toMap(ChatRoom::getId, ChatRoom::getBookAuthors));
         contents.forEach(c -> c.setBookAuthors(authorsMap.get(c.getRoomId())));
 
         return toSlice(contents, pageable);

@@ -1,6 +1,7 @@
 package toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -14,7 +15,7 @@ public class ChatRoomResponse {
     private String roomSid;
     private String bookTitle;
     private String bookCoverImageUri;
-    private String bookAuthors;
+    private List<String> bookAuthors;
     private String hostName;
     private Integer hostDefaultProfileImageType;
     private String hostProfileImageUri;
@@ -27,7 +28,7 @@ public class ChatRoomResponse {
 
     @Builder
     public ChatRoomResponse(Long roomId, String roomName, String roomSid,
-        String bookTitle, String bookCoverImageUri, String bookAuthors, String hostName,
+        String bookTitle, String bookCoverImageUri, List<String> bookAuthors, String hostName,
         Integer hostDefaultProfileImageType, String hostProfileImageUri, Long roomMemberCount,
         Integer defaultRoomImageType,
         String roomImageUri, String tags, Long lastChatId, LocalDateTime lastActiveTime) {
@@ -70,7 +71,7 @@ public class ChatRoomResponse {
         this.lastActiveTime = lastActiveTime;
     }
 
-    public void setBookAuthors(String bookAuthors) {
+    public void setBookAuthors(List<String> bookAuthors) {
         this.bookAuthors = bookAuthors;
     }
 }
