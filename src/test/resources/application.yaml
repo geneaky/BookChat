@@ -24,7 +24,6 @@ rabbit:
   host: localhost
   virtual-host: /
   stomp-port: 61613
-  amqp-port: 5672
   login: guest
   passcode: guest
 
