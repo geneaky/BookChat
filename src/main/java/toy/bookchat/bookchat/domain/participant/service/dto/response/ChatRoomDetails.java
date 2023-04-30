@@ -5,6 +5,7 @@ import java.util.List;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
 import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.participant.service.dto.RoomGuest;
 import toy.bookchat.bookchat.domain.participant.service.dto.RoomHost;
@@ -13,21 +14,33 @@ import toy.bookchat.bookchat.domain.user.User;
 
 @Getter
 @EqualsAndHashCode
-public class ChatRoomParticipantsResponse {
+public class ChatRoomDetails {
 
+    private Integer roomSize;
+    private List<String> roomTags;
+    private String bookTitle;
+    private String bookCoverImageUrl;
+    private List<String> bookAuthors;
     private RoomHost roomHost;
     private List<RoomSubHost> roomSubHostList;
     private List<RoomGuest> roomGuestList;
 
     @Builder
-    private ChatRoomParticipantsResponse(RoomHost roomHost, List<RoomSubHost> roomSubHostList,
+    private ChatRoomDetails(Integer roomSize, List<String> roomTags, String bookTitle,
+        String bookCoverImageUrl, List<String> bookAuthors, RoomHost roomHost,
+        List<RoomSubHost> roomSubHostList,
         List<RoomGuest> roomGuestList) {
+        this.roomSize = roomSize;
+        this.roomTags = roomTags;
+        this.bookTitle = bookTitle;
+        this.bookCoverImageUrl = bookCoverImageUrl;
+        this.bookAuthors = bookAuthors;
         this.roomHost = roomHost;
         this.roomSubHostList = roomSubHostList;
         this.roomGuestList = roomGuestList;
     }
 
-    public static ChatRoomParticipantsResponse from(List<Participant> participants) {
+    public static ChatRoomDetails from(List<Participant> participants, List<String> roomTags) {
         User host = getHost(participants);
         RoomHost roomHost = RoomHost.builder()
             .id(host.getId())
@@ -38,8 +51,15 @@ public class ChatRoomParticipantsResponse {
         List<RoomSubHost> roomSubHostList = new ArrayList<>();
         List<RoomGuest> roomGuestList = new ArrayList<>();
         fillParticipantsResponse(participants, host, roomSubHostList, roomGuestList);
+        ChatRoom chatRoom = getChatRoom(participants);
 
-        return new ChatRoomParticipantsResponse(roomHost, roomSubHostList, roomGuestList);
+        return new ChatRoomDetails(chatRoom.getRoomSize(), roomTags, chatRoom.getBookTitle(),
+            chatRoom.getBookCoverImageUrl(), chatRoom.getBookAuthors(), roomHost, roomSubHostList,
+            roomGuestList);
+    }
+
+    private static ChatRoom getChatRoom(List<Participant> participants) {
+        return participants.get(0).getChatRoom();
     }
 
     private static User getHost(List<Participant> participants) {

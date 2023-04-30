@@ -29,7 +29,10 @@ import toy.bookchat.bookchat.domain.chatroom.QChatRoomHashTag;
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomResponse;
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.UserChatRoomResponse;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.ChatRoomRequest;
+import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.participant.QParticipant;
+import toy.bookchat.bookchat.domain.participant.service.dto.response.ChatRoomDetails;
+import toy.bookchat.bookchat.exception.participant.ParticipantNotFoundException;
 
 @Repository
 public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
@@ -40,23 +43,27 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
         this.queryFactory = queryFactory;
     }
 
-    private static BooleanExpression inTags(ChatRoomRequest chatRoomRequest) {
+    private BooleanExpression inTags(ChatRoomRequest chatRoomRequest) {
         if (chatRoomRequest.getTags().isEmpty()) {
             return null;
         }
         return hashTag.tagName.in(chatRoomRequest.getTags());
     }
 
-    private static BooleanExpression eqIsbn(ChatRoomRequest chatRoomRequest) {
+    private BooleanExpression eqIsbn(ChatRoomRequest chatRoomRequest) {
         return chatRoomRequest.getIsbn().map(book.isbn::eq).orElse(null);
     }
 
-    private static BooleanExpression containsTitle(ChatRoomRequest chatRoomRequest) {
+    private BooleanExpression containsTitle(ChatRoomRequest chatRoomRequest) {
         return chatRoomRequest.getTitle().map(book.title::contains).orElse(null);
     }
 
-    private static BooleanExpression containsRoomName(ChatRoomRequest chatRoomRequest) {
+    private BooleanExpression containsRoomName(ChatRoomRequest chatRoomRequest) {
         return chatRoomRequest.getRoomName().map(chatRoom.roomName::contains).orElse(null);
+    }
+
+    private BooleanExpression afterPostCursorId(Optional<Long> postCursorId) {
+        return postCursorId.map(chat.id::lt).orElse(null);
     }
 
     @Override
@@ -174,7 +181,31 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
         return toSlice(contents, pageable);
     }
 
-    private BooleanExpression afterPostCursorId(Optional<Long> postCursorId) {
-        return postCursorId.map(chat.id::lt).orElse(null);
+    @Override
+    public ChatRoomDetails findChatRoomDetails(Long roomId, Long userId) {
+        QParticipant subParticipant = new QParticipant("subParticipant");
+
+        List<Participant> participants = queryFactory.select(participant)
+            .from(participant)
+            .join(participant.user, user).fetchJoin()
+            .join(participant.chatRoom, chatRoom).fetchJoin()
+            .join(chatRoom.book, book).fetchJoin()
+            .where(participant.chatRoom.id.eq(JPAExpressions.select(subParticipant.chatRoom.id)
+                .from(subParticipant)
+                .where(subParticipant.chatRoom.id.eq(roomId)
+                    .and(subParticipant.user.id.eq(userId)))))
+            .fetch();
+
+        if (participants.isEmpty()) {
+            throw new ParticipantNotFoundException();
+        }
+
+        List<String> roomTags = queryFactory.select(hashTag.tagName)
+            .from(hashTag)
+            .join(chatRoomHashTag).on(chatRoomHashTag.hashTag.id.eq(hashTag.id))
+            .where(chatRoomHashTag.chatRoom.id.eq(roomId))
+            .fetch();
+
+        return ChatRoomDetails.from(participants, roomTags);
     }
 }

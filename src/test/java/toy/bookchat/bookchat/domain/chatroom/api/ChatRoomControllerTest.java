@@ -21,6 +21,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.requestP
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -53,6 +54,10 @@ import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.UserC
 import toy.bookchat.bookchat.domain.chatroom.service.ChatRoomService;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.CreateChatRoomRequest;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.response.CreatedChatRoomDto;
+import toy.bookchat.bookchat.domain.participant.service.dto.RoomGuest;
+import toy.bookchat.bookchat.domain.participant.service.dto.RoomHost;
+import toy.bookchat.bookchat.domain.participant.service.dto.RoomSubHost;
+import toy.bookchat.bookchat.domain.participant.service.dto.response.ChatRoomDetails;
 
 @ChatRoomPresentationTest
 class ChatRoomControllerTest extends ControllerTestExtension {
@@ -374,6 +379,93 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                     fieldWithPath("chatRoomResponseList[].lastActiveTime").type(STRING)
                         .description("마지막 채팅 활성 시간")
                 ).and(getCursorField())));
+    }
+
+    @Test
+    void 채팅방_세부정보_조회() throws Exception {
+
+        RoomHost roomHost = RoomHost.builder()
+            .id(1L)
+            .nickname("마스터")
+            .profileImageUrl("test@s3.com")
+            .defaultProfileImageType(1)
+            .build();
+
+        RoomSubHost roomSubHost1 = RoomSubHost.builder()
+            .id(2L)
+            .nickname("서브 마스터1")
+            .defaultProfileImageType(2)
+            .build();
+
+        RoomSubHost roomSubHost2 = RoomSubHost.builder()
+            .id(3L)
+            .nickname("서브 마스터2")
+            .profileImageUrl("subHost@s3.com")
+            .defaultProfileImageType(3)
+            .build();
+
+        RoomGuest roomGuest1 = RoomGuest.builder()
+            .id(4L)
+            .nickname("게스트1")
+            .defaultProfileImageType(4)
+            .build();
+
+        RoomGuest roomGuest2 = RoomGuest.builder()
+            .id(5L)
+            .nickname("게스트2")
+            .profileImageUrl("guest@s3.com")
+            .defaultProfileImageType(1)
+            .build();
+
+        ChatRoomDetails chatRoomDetails = ChatRoomDetails.builder()
+            .roomSize(100)
+            .roomTags(List.of("개발", "DB"))
+            .bookTitle("RealMySQL")
+            .bookCoverImageUrl("realmysql@s3.com")
+            .bookAuthors(List.of("author1", "author2"))
+            .roomHost(roomHost)
+            .roomSubHostList(List.of(roomSubHost1, roomSubHost2))
+            .roomGuestList(List.of(roomGuest1, roomGuest2))
+            .build();
+
+        when(chatRoomService.getChatRoomDetails(any(), any())).thenReturn(
+            chatRoomDetails);
+        mockMvc.perform(get("/v1/api/chatrooms/{roomId}", 1)
+                .header(AUTHORIZATION, JWT_TOKEN)
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isOk())
+            .andDo(document("get-chatroom-details",
+                requestHeaders(
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
+                ),
+                pathParameters(
+                    parameterWithName("roomId").description("Room Id")
+                ),
+                responseFields(
+                    fieldWithPath("roomSize").type(NUMBER).description("채팅방 인원수"),
+                    fieldWithPath("roomTags").type(ARRAY).description("채팅방 태그"),
+                    fieldWithPath("bookTitle").type(STRING).description("책 제목"),
+                    fieldWithPath("bookCoverImageUrl").type(STRING).description("책 커버 이미지 url"),
+                    fieldWithPath("bookAuthors").type(ARRAY).description("책 저자"),
+                    fieldWithPath("roomHost.id").type(NUMBER).description("방장 Id"),
+                    fieldWithPath("roomHost.nickname").type(STRING).description("방장 닉네임"),
+                    fieldWithPath("roomHost.profileImageUrl").type(STRING).optional()
+                        .description("방장 프로필 이미지 url"),
+                    fieldWithPath("roomHost.defaultProfileImageType").type(NUMBER)
+                        .description("방장 기본 프로필 이미지 타입"),
+                    fieldWithPath("roomSubHostList[].id").type(NUMBER).description("부방장 Id"),
+                    fieldWithPath("roomSubHostList[].nickname").type(STRING).description("부방장 닉네임"),
+                    fieldWithPath("roomSubHostList[].profileImageUrl").type(STRING).optional()
+                        .description("부방장 프로필 이미지 url"),
+                    fieldWithPath("roomSubHostList[].defaultProfileImageType").type(NUMBER)
+                        .description("부방장 기본 프로필 이미지 타입"),
+                    fieldWithPath("roomGuestList[].id").type(NUMBER).description("참여자 Id"),
+                    fieldWithPath("roomGuestList[].nickname").type(STRING).description("참여자 닉네임"),
+                    fieldWithPath("roomGuestList[].profileImageUrl").type(STRING).optional()
+                        .description("참여자 프로필 이미지 url"),
+                    fieldWithPath("roomGuestList[].defaultProfileImageType").type(NUMBER)
+                        .description("참여자 기본 프로필 이미지 타입")
+                )));
     }
 
     private UserChatRoomResponse getChatRoomResponse(ChatRoom chatRoom, Chat chat) {

@@ -253,4 +253,10 @@ class ChatRoomServiceTest {
 
         assertThat(result).isEqualTo(ChatRoomsResponseSlice.of(chatRoomResponses));
     }
+
+    @Test
+    void 채팅방_세부정보_조회_성공() throws Exception {
+        chatRoomService.getChatRoomDetails(1L, 1L);
+        verify(chatRoomRepository).findChatRoomDetails(any(), any());
+    }
 }

@@ -1,6 +1,7 @@
 package toy.bookchat.bookchat.domain.chatroom.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static toy.bookchat.bookchat.domain.common.RepositorySupport.toSlice;
 import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.GUEST;
 import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.HOST;
@@ -28,8 +29,10 @@ import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.UserC
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.ChatRoomRequest;
 import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
+import toy.bookchat.bookchat.domain.participant.service.dto.response.ChatRoomDetails;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
+import toy.bookchat.bookchat.exception.participant.ParticipantNotFoundException;
 
 @RepositoryTest
 class ChatRoomRepositoryTest {
@@ -403,5 +406,80 @@ class ChatRoomRepositoryTest {
             .build();
 
         assertThat(result.getContent()).isEqualTo(List.of(expect));
+    }
+
+    @Test
+    void 채팅방_세부정보_조회_성공() throws Exception {
+        User aUser = User.builder()
+            .nickname("AUser")
+            .defaultProfileImageType(1)
+            .build();
+        User bUser = User.builder()
+            .nickname("BUser")
+            .profileImageUrl("testB@s3.com")
+            .defaultProfileImageType(1)
+            .build();
+        User cUser = User.builder()
+            .nickname("CUser")
+            .profileImageUrl("testC@s3.com")
+            .defaultProfileImageType(1)
+            .build();
+        userRepository.saveAll(List.of(aUser, bUser, cUser));
+
+        Book book = Book.builder()
+            .title("effectiveJava")
+            .isbn("tXaid")
+            .publishAt(LocalDate.now())
+            .authors(List.of("joshua", "jcr"))
+            .bookCoverImageUrl("effective@s3.com")
+            .build();
+        bookRepository.save(book);
+
+        ChatRoom chatRoom = ChatRoom.builder()
+            .host(aUser)
+            .book(book)
+            .roomSid("cES1Cn4N")
+            .roomSize(275)
+            .defaultRoomImageType(2)
+            .build();
+        chatRoomRepository.save(chatRoom);
+
+        HashTag tag = HashTag.of("tag1");
+        hashTagRepository.save(tag);
+
+        ChatRoomHashTag chatRoomHashTag = ChatRoomHashTag.of(chatRoom, tag);
+        chatRoomHashTagRepository.save(chatRoomHashTag);
+
+        Participant participant1 = Participant.builder()
+            .user(aUser)
+            .participantStatus(HOST)
+            .chatRoom(chatRoom)
+            .build();
+        Participant participant2 = Participant.builder()
+            .user(bUser)
+            .participantStatus(SUBHOST)
+            .chatRoom(chatRoom)
+            .build();
+        Participant participant3 = Participant.builder()
+            .user(cUser)
+            .participantStatus(GUEST)
+            .chatRoom(chatRoom)
+            .build();
+        participantRepository.saveAll(List.of(participant1, participant2, participant3));
+
+        ChatRoomDetails real = chatRoomRepository.findChatRoomDetails(chatRoom.getId(),
+            cUser.getId());
+
+        ChatRoomDetails expect = ChatRoomDetails.from(
+            List.of(participant1, participant2, participant3), List.of(tag.getTagName()));
+
+        assertThat(real).isEqualTo(expect);
+    }
+
+    @Test
+    void 존재하지않는_채팅방_세부정보_조회시_예외발생() throws Exception {
+        assertThatThrownBy(() -> {
+            chatRoomRepository.findChatRoomDetails(53L, 606L);
+        }).isInstanceOf(ParticipantNotFoundException.class);
     }
 }

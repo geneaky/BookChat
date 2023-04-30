@@ -12,7 +12,6 @@ import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomBlockedUserRepos
 import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.participant.ParticipantStatus;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
-import toy.bookchat.bookchat.domain.participant.service.dto.response.ChatRoomParticipantsResponse;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.exception.participant.NotHostException;
 import toy.bookchat.bookchat.exception.participant.ParticipantNotFoundException;
@@ -33,12 +32,6 @@ public class ParticipantService {
         if (chatRoom.getHost() != user) {
             throw new NotHostException();
         }
-    }
-
-    @Transactional(readOnly = true)
-    public ChatRoomParticipantsResponse getChatRoomUsers(Long roomId, Long userId) {
-        return ChatRoomParticipantsResponse.from(
-            participantRepository.findChatRoomUsers(roomId, userId));
     }
 
     @Transactional
