@@ -32,7 +32,7 @@ import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
-import toy.bookchat.bookchat.domain.StompTestExtension;
+import toy.bookchat.bookchat.domain.ControllerTestExtension;
 import toy.bookchat.bookchat.domain.chat.Chat;
 import toy.bookchat.bookchat.domain.chat.repository.ChatRepository;
 import toy.bookchat.bookchat.domain.chat.service.dto.request.ChatDto;
@@ -43,7 +43,7 @@ import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-class ChatControllerMessagingTest extends StompTestExtension {
+class ChatControllerMessagingTest extends ControllerTestExtension {
 
     private final WebSocketStompClient webSocketStompClient;
     private final BlockingQueue<ChatDto> blockingQueue = new LinkedBlockingQueue<>();
