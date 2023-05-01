@@ -1,0 +1,2 @@
+### 채팅 조회
+GET localhost:8080/v1/api/chatrooms/1/chats?size=3

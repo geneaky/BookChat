@@ -22,17 +22,31 @@ public class ChatRoomChatsResponse {
 
     private List<ChatResponse> from(List<Chat> chatSlice) {
         List<ChatResponse> chatResponseList = new ArrayList<>();
-        for (Chat chat : chatSlice) {
+        chatSlice.forEach(chat -> addChatResponse(chatResponseList, chat));
+        return chatResponseList;
+    }
+
+    private void addChatResponse(List<ChatResponse> chatResponseList, Chat chat) {
+        if (isAnnouncementChat(chat)) {
             chatResponseList.add(ChatResponse.builder()
                 .chatId(chat.getId())
-                .senderId(chat.getUserId())
-                .senderNickname(chat.getUserNickname())
-                .senderProfileImageUrl(chat.getUserProfileImageUrl())
-                .senderDefaultProfileImageType(chat.getUserDefaultProfileImageType())
                 .message(chat.getMessage())
                 .dispatchTime(chat.getDispatchTime())
                 .build());
+            return;
         }
-        return chatResponseList;
+        chatResponseList.add(ChatResponse.builder()
+            .chatId(chat.getId())
+            .senderId(chat.getUserId())
+            .senderNickname(chat.getUserNickname())
+            .senderProfileImageUrl(chat.getUserProfileImageUrl())
+            .senderDefaultProfileImageType(chat.getUserDefaultProfileImageType())
+            .message(chat.getMessage())
+            .dispatchTime(chat.getDispatchTime())
+            .build());
+    }
+
+    private boolean isAnnouncementChat(Chat chat) {
+        return chat.getUser() == null;
     }
 }

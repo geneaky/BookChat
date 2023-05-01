@@ -8,7 +8,6 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import toy.bookchat.bookchat.domain.chat.api.dto.request.MessageDto;
 import toy.bookchat.bookchat.domain.chat.service.ChatService;
@@ -46,9 +45,7 @@ public class ChatController {
 
     @GetMapping("/v1/api/chatrooms/{roomId}/chats")
     public ChatRoomChatsResponse getChatRoomChats(@PathVariable Long roomId,
-        @RequestParam Optional<Long> postCursorId, Pageable pageable,
-        @UserPayload TokenPayload tokenPayload) {
-
+        Optional<Long> postCursorId, Pageable pageable, @UserPayload TokenPayload tokenPayload) {
         return chatService.getChatRoomChats(roomId, postCursorId, pageable,
             tokenPayload.getUserId());
     }
