@@ -10,7 +10,6 @@ import static toy.bookchat.bookchat.domain.common.RepositorySupport.toSlice;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
@@ -28,7 +27,7 @@ public class AgonyRecordQueryRepositoryImpl implements AgonyRecordQueryRepositor
     @Override
     public Slice<AgonyRecord> findSliceOfUserAgonyRecords(Long bookShelfId, Long agonyId,
         Long userId,
-        Pageable pageable, Optional<Long> postCursorId) {
+        Pageable pageable, Long postCursorId) {
         List<AgonyRecord> contents = queryFactory.select(agonyRecord)
             .from(agonyRecord)
             .join(agonyRecord.agony, agony).on(agony.id.eq(agonyId))

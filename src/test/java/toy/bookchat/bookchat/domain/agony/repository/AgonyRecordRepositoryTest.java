@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import org.junit.jupiter.api.Test;
@@ -121,7 +120,7 @@ class AgonyRecordRepositoryTest {
         List<AgonyRecord> content = agonyRecordRepository.findSliceOfUserAgonyRecords(
             bookShelf.getId(),
             agony.getId(),
-            user.getId(), pageable, Optional.empty()).getContent();
+            user.getId(), pageable, null).getContent();
         assertThat(content).containsExactly(agonyRecord);
     }
 
@@ -150,7 +149,7 @@ class AgonyRecordRepositoryTest {
         List<AgonyRecord> content = agonyRecordRepository.findSliceOfUserAgonyRecords(
                 bookShelf.getId(),
                 agony.getId(),
-                user.getId(), pageable, Optional.of(agonyRecord3.getId()))
+                user.getId(), pageable, agonyRecord3.getId())
             .getContent();
         assertThat(content).containsExactly(agonyRecord2);
     }
@@ -180,7 +179,7 @@ class AgonyRecordRepositoryTest {
         List<AgonyRecord> content = agonyRecordRepository.findSliceOfUserAgonyRecords(
                 bookShelf.getId(),
                 agony.getId(),
-                user.getId(), pageable, Optional.of(agonyRecord1.getId()))
+                user.getId(), pageable, agonyRecord1.getId())
             .getContent();
         assertThat(content).containsExactly(agonyRecord2, agonyRecord3);
     }
@@ -209,8 +208,7 @@ class AgonyRecordRepositoryTest {
         Pageable pageable = PageRequest.of(0, 2, Sort.by("title").ascending());
         assertThatThrownBy(() -> {
             agonyRecordRepository.findSliceOfUserAgonyRecords(bookShelf.getId(), agony.getId(),
-                user.getId(), pageable,
-                Optional.of(agonyRecord1.getId()));
+                user.getId(), pageable, agonyRecord1.getId());
         }).isInstanceOf(NotSupportedPagingConditionException.class);
     }
 

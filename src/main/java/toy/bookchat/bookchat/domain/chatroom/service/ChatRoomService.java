@@ -121,7 +121,7 @@ public class ChatRoomService {
     }
 
     @Transactional(readOnly = true)
-    public UserChatRoomsResponseSlice getUserChatRooms(Long bookId, Optional<Long> postCursorId,
+    public UserChatRoomsResponseSlice getUserChatRooms(Long bookId, Long postCursorId,
         Pageable pageable, Long userId) {
         return UserChatRoomsResponseSlice.of(
             chatRoomRepository.findUserChatRoomsWithLastChat(pageable, bookId, postCursorId,

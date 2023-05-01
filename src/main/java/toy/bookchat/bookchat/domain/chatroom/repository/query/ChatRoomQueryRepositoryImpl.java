@@ -18,7 +18,6 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
@@ -62,13 +61,13 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
         return chatRoomRequest.getRoomName().map(chatRoom.roomName::contains).orElse(null);
     }
 
-    private BooleanExpression afterPostCursorId(Optional<Long> postCursorId) {
-        return postCursorId.map(chat.id::lt).orElse(null);
+    private BooleanExpression afterPostCursorId(Long postCursorId) {
+        return postCursorId == null ? null : chat.id.lt(postCursorId);
     }
 
     @Override
     public Slice<UserChatRoomResponse> findUserChatRoomsWithLastChat(Pageable pageable,
-        Long bookId, Optional<Long> postCursorId, Long userId) {
+        Long bookId, Long postCursorId, Long userId) {
         QChat subChat = new QChat("subChat");
         QParticipant subParticipant1 = new QParticipant("subParticipant1");
         QParticipant subParticipant2 = new QParticipant("subParticipant2");

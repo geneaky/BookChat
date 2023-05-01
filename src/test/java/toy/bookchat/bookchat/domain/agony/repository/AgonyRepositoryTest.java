@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -124,7 +123,7 @@ class AgonyRepositoryTest {
         PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("id").descending());
         Slice<Agony> pageOfAgonies = agonyRepository.findUserBookShelfSliceOfAgonies(
             bookShelf.getId(), user.getId(),
-            pageRequest, Optional.empty());
+            pageRequest, null);
 
         List<Agony> content = pageOfAgonies.getContent();
         assertThat(content).containsExactly(agony3, agony2);
@@ -152,7 +151,7 @@ class AgonyRepositoryTest {
         PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("id").descending());
         Slice<Agony> pageOfAgonies = agonyRepository.findUserBookShelfSliceOfAgonies(
             bookShelf.getId(), user.getId(),
-            pageRequest, Optional.of(agony3.getId()));
+            pageRequest, agony3.getId());
 
         List<Agony> content = pageOfAgonies.getContent();
         assertThat(content).containsExactly(agony2, agony1);
@@ -179,7 +178,7 @@ class AgonyRepositoryTest {
         PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("id").ascending());
         Slice<Agony> pageOfAgonies = agonyRepository.findUserBookShelfSliceOfAgonies(
             bookShelf.getId(), user.getId(),
-            pageRequest, Optional.of(agony1.getId()));
+            pageRequest, agony1.getId());
 
         List<Agony> content = pageOfAgonies.getContent();
         assertThat(content).containsExactly(agony2, agony3);
@@ -206,8 +205,7 @@ class AgonyRepositoryTest {
         PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("title").ascending());
         assertThatThrownBy(() -> {
             agonyRepository.findUserBookShelfSliceOfAgonies(bookShelf.getId(), user.getId(),
-                pageRequest,
-                Optional.of(agony1.getId()));
+                pageRequest, agony1.getId());
         }).isInstanceOf(NotSupportedPagingConditionException.class);
     }
 

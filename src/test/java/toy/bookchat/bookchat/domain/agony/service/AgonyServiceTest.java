@@ -81,10 +81,10 @@ class AgonyServiceTest {
 
         List<Agony> contents = List.of(agony1, agony2);
         Slice<Agony> page = new SliceImpl<>(contents, pageRequest, true);
-        when(agonyRepository.findUserBookShelfSliceOfAgonies(1L, 1L, pageRequest,
-            Optional.of(1L))).thenReturn(page);
+        when(agonyRepository.findUserBookShelfSliceOfAgonies(1L, 1L, pageRequest, 1L)).thenReturn(
+            page);
         SliceOfAgoniesResponse pageOfAgoniesResponse = agonyService.searchSliceOfAgonies(1L, 1L,
-            pageRequest, Optional.of(1L));
+            pageRequest, 1L);
 
         String title = pageOfAgoniesResponse.getAgonyResponseList().get(0).getTitle();
         assertThat(title).isEqualTo("agony1");

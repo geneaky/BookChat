@@ -51,7 +51,7 @@ public class ChatRoomController {
     }
 
     @GetMapping("/users/chatrooms")
-    public UserChatRoomsResponseSlice getUserChatRooms(Long bookId, Optional<Long> postCursorId,
+    public UserChatRoomsResponseSlice getUserChatRooms(Long bookId, Long postCursorId,
         Pageable pageable, @UserPayload TokenPayload tokenPayload) {
         return chatRoomService.getUserChatRooms(bookId, postCursorId, pageable,
             tokenPayload.getUserId());

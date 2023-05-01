@@ -1,7 +1,6 @@
 package toy.bookchat.bookchat.domain.agony.service;
 
 import java.util.List;
-import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,7 +42,7 @@ public class AgonyService {
 
     @Transactional(readOnly = true)
     public SliceOfAgoniesResponse searchSliceOfAgonies(Long bookShelfId, Long userId,
-        Pageable pageable, Optional<Long> postCursorId) {
+        Pageable pageable, Long postCursorId) {
         return new SliceOfAgoniesResponse(
             agonyRepository.findUserBookShelfSliceOfAgonies(bookShelfId, userId, pageable,
                 postCursorId));

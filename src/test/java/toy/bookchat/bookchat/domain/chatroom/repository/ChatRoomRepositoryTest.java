@@ -172,7 +172,7 @@ class ChatRoomRepositoryTest {
         Slice<UserChatRoomResponse> result = toSlice(contents, pageRequest);
 
         Slice<UserChatRoomResponse> slice = chatRoomRepository.findUserChatRoomsWithLastChat(
-            pageRequest, null, Optional.empty(), user1.getId());
+            pageRequest, null, null, user1.getId());
         assertThat(slice.getContent()).usingRecursiveComparison()
             .ignoringFieldsOfTypes(LocalDateTime.class)
             .isEqualTo(result.getContent());
@@ -270,7 +270,7 @@ class ChatRoomRepositoryTest {
         Slice<UserChatRoomResponse> result = toSlice(
             List.of(userChatRoomResponse2, userChatRoomResponse1), pageRequest);
         Slice<UserChatRoomResponse> slice = chatRoomRepository.findUserChatRoomsWithLastChat(
-            pageRequest, null, Optional.of(chat4.getId()), user1.getId());
+            pageRequest, null, chat4.getId(), user1.getId());
 
         assertThat(slice.getContent()).usingRecursiveComparison()
             .ignoringFieldsOfTypes(LocalDateTime.class)
@@ -362,7 +362,7 @@ class ChatRoomRepositoryTest {
 
         PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("id").ascending());
         Slice<UserChatRoomResponse> slice = chatRoomRepository.findUserChatRoomsWithLastChat(
-            pageRequest, book1.getId(), Optional.of(chat4.getId()), user1.getId());
+            pageRequest, book1.getId(), chat4.getId(), user1.getId());
 
         assertThat(slice.getContent()).containsOnly(userChatRoomResponse1);
     }

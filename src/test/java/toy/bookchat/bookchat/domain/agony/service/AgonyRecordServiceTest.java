@@ -87,7 +87,7 @@ class AgonyRecordServiceTest {
             any(), any())).thenReturn(
             page);
         SliceOfAgonyRecordsResponse pageOfAgonyRecordsResponse = agonyRecordService.searchPageOfAgonyRecords(
-            1L, 1L, 1L, pageable, Optional.empty());
+            1L, 1L, 1L, pageable, null);
 
         int result = pageOfAgonyRecordsResponse.getAgonyRecordResponseList().size();
         assertThat(result).isEqualTo(2);
