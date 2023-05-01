@@ -18,12 +18,25 @@ jobs:
           MYSQL_DATABASE: test
         ports:
           - 3306:3306
+      rabbitmq:
+        image: rabbitmq
+        ports:
+          - 61613:61613
+          - 15692:15692
+          - 5672:5672
+        options: --name rabbitmq
+        env:
+          RABBITMQ_DEFAULT_USER: guest
+          RABBITMQ_DEFAULT_PASS: guest
     permissions:
       checks: write
       pull-requests: write
       actions: read
 
     steps:
+    - name: enable rabbitmq stomp plugin
+      run: docker exec rabbitmq rabbitmq-plugins enable rabbitmq_stomp rabbitmq_web_stomp && docker restart rabbitmq
+
     - name: Check out
       uses: actions/checkout@v3
     

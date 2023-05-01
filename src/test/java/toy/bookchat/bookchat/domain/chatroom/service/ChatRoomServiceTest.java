@@ -84,9 +84,16 @@ class ChatRoomServiceTest {
         BookRequest bookRequest = getBookRequest();
         CreateChatRoomRequest createChatRoomRequest = getCreateChatRoomRequest(bookRequest);
 
+        ChatRoom chatRoom = ChatRoom.builder()
+            .id(1L)
+            .roomSid("7D6")
+            .roomImageUri("3wVp")
+            .build();
+
         when(bookRepository.findByIsbnAndPublishAt(any(), any())).thenReturn(
             Optional.ofNullable(mock(Book.class)));
         when(userRepository.findById(any())).thenReturn(Optional.of(mock(User.class)));
+        when(chatRoomRepository.save(any())).thenReturn(chatRoom);
 
         chatRoomService.createChatRoom(createChatRoomRequest, Optional.empty(), 1L);
 
@@ -102,9 +109,16 @@ class ChatRoomServiceTest {
         MultipartFile image = mock(MultipartFile.class);
         Optional<MultipartFile> chatRoomImage = Optional.of(image);
 
+        ChatRoom chatRoom = ChatRoom.builder()
+            .id(1L)
+            .roomSid("7D6")
+            .roomImageUri("3wVp")
+            .build();
+
         when(bookRepository.findByIsbnAndPublishAt(any(), any())).thenReturn(
             Optional.ofNullable(mock(Book.class)));
         when(userRepository.findById(any())).thenReturn(Optional.of(mock(User.class)));
+        when(chatRoomRepository.save(any())).thenReturn(chatRoom);
 
         chatRoomService.createChatRoom(createChatRoomRequest, chatRoomImage, 1L);
 
@@ -120,7 +134,14 @@ class ChatRoomServiceTest {
         BookRequest bookRequest = getBookRequest();
         CreateChatRoomRequest createChatRoomRequest = getCreateChatRoomRequest(bookRequest);
 
+        ChatRoom chatRoom = ChatRoom.builder()
+            .id(1L)
+            .roomSid("7D6")
+            .roomImageUri("3wVp")
+            .build();
+
         when(userRepository.findById(any())).thenReturn(Optional.of(mock(User.class)));
+        when(chatRoomRepository.save(any())).thenReturn(chatRoom);
 
         chatRoomService.createChatRoom(createChatRoomRequest, Optional.empty(), 1L);
 
@@ -178,7 +199,7 @@ class ChatRoomServiceTest {
             .roomMemberCount(3L)
             .roomImageUri("n8QpVmc")
             .bookTitle("book1")
-            .bookAuthors("author1,author2,author3")
+            .bookAuthors(List.of("author1", "author2", "author3"))
             .bookCoverImageUri("book1CoverImage@s3")
             .hostName("host1")
             .hostProfileImageUri("host1ProfileImage@s3")
@@ -194,7 +215,7 @@ class ChatRoomServiceTest {
             .roomImageUri("7jutu0i0")
             .roomMemberCount(100L)
             .bookTitle("book2")
-            .bookAuthors("author4,author5,author6")
+            .bookAuthors(List.of("author4", "author5", "author6"))
             .bookCoverImageUri("book2CoverImage@s3")
             .hostName("host2")
             .hostProfileImageUri("host2ProfileImage@s3")
@@ -210,7 +231,7 @@ class ChatRoomServiceTest {
             .roomMemberCount(1000L)
             .roomImageUri("sUzZNOV")
             .bookTitle("book3")
-            .bookAuthors("author7,author8,author9")
+            .bookAuthors(List.of("author7", "author8", "author9"))
             .bookCoverImageUri("book3CoverImage@s3")
             .hostName("host3")
             .hostProfileImageUri("host3ProfileImage@s3")
@@ -231,5 +252,11 @@ class ChatRoomServiceTest {
             mock(Pageable.class));
 
         assertThat(result).isEqualTo(ChatRoomsResponseSlice.of(chatRoomResponses));
+    }
+
+    @Test
+    void 채팅방_세부정보_조회_성공() throws Exception {
+        chatRoomService.getChatRoomDetails(1L, 1L);
+        verify(chatRoomRepository).findChatRoomDetails(any(), any());
     }
 }

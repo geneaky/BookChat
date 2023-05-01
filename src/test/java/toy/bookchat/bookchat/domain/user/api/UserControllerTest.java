@@ -121,6 +121,7 @@ class UserControllerTest extends ControllerTestExtension {
 
         User user = getUser();
         String real = objectMapper.writeValueAsString(UserProfileResponse.builder()
+            .userId(user.getId())
             .userEmail(user.getEmail())
             .userNickname(user.getNickname())
             .userProfileImageUri(user.getProfileImageUrl())
@@ -136,6 +137,7 @@ class UserControllerTest extends ControllerTestExtension {
                     headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 responseFields(
+                    fieldWithPath("userId").type(NUMBER).description("사용자 ID"),
                     fieldWithPath("userNickname").type(STRING).description("닉네임"),
                     fieldWithPath("userEmail").type(STRING).description("이메일"),
                     fieldWithPath("userProfileImageUri").type(STRING).description("프로필 사진 URI"),

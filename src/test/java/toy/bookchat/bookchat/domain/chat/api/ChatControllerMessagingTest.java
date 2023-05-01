@@ -32,7 +32,7 @@ import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
-import toy.bookchat.bookchat.domain.StompTestExtension;
+import toy.bookchat.bookchat.domain.ControllerTestExtension;
 import toy.bookchat.bookchat.domain.chat.Chat;
 import toy.bookchat.bookchat.domain.chat.repository.ChatRepository;
 import toy.bookchat.bookchat.domain.chat.service.dto.request.ChatDto;
@@ -43,7 +43,7 @@ import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-class ChatControllerMessagingTest extends StompTestExtension {
+class ChatControllerMessagingTest extends ControllerTestExtension {
 
     private final WebSocketStompClient webSocketStompClient;
     private final BlockingQueue<ChatDto> blockingQueue = new LinkedBlockingQueue<>();
@@ -122,7 +122,52 @@ class ChatControllerMessagingTest extends StompTestExtension {
     }
 
     @Test
-    void 채팅방_입장_메시지_수신_성공() throws Exception {
+    void 방장_채팅방_입장시_참여자등록없이_메시지_수신_성공() throws Exception {
+        StompHeaders subscribeHeader = stompSubscribeHeaders("/topic/heho");
+        StompHeaders enterHeader = stompSendHeaders("/subscriptions/enter/chatrooms/1");
+
+        ChatRoom chatRoom = ChatRoom.builder()
+            .id(1L)
+            .host(getUser())
+            .roomSid("heho")
+            .roomSize(3)
+            .build();
+
+        Chat chat = Chat.builder()
+            .id(1L)
+            .message(getUserNickname() + "님이 입장하셨습니다.")
+            .user(getUser())
+            .chatRoom(chatRoom)
+            .build();
+        chat.setCreatedAt(LocalDateTime.now());
+
+        ChatDto dto = ChatDto.builder()
+            .chatId(chat.getId())
+            .dispatchTime(chat.getDispatchTime())
+            .message(chat.getMessage())
+            .build();
+
+        Runnable[] chatActions = {
+            () -> this.stompSession.send(enterHeader, null),
+        };
+
+        when(userRepository.findById(any())).thenReturn(Optional.ofNullable(getUser()));
+        when(chatRoomRepository.findById(any())).thenReturn(
+            Optional.of(chatRoom));
+        when(chatRepository.save(any())).thenReturn(chat);
+
+        CountDownLatch chatAttemptCountLatch = new CountDownLatch(chatActions.length);
+        this.stompSession.subscribe(subscribeHeader,
+                subscribeFrameSessionHandler(chatAttemptCountLatch))
+            .addReceiptTask(() -> doChat(chatActions));
+        chatAttemptCountLatch.await();
+
+        assertThat(blockingQueue).containsExactlyInAnyOrder(dto);
+        verify(chatRepository).save(any());
+    }
+
+    @Test
+    void 게스트_채팅방_입장시_참여자등록후_메시지_수신_성공() throws Exception {
         StompHeaders subscribeHeader = stompSubscribeHeaders("/topic/heho");
         StompHeaders enterHeader = stompSendHeaders("/subscriptions/enter/chatrooms/1");
 

@@ -26,6 +26,7 @@ import toy.bookchat.bookchat.domain.chatroom.service.dto.request.CreateChatRoomR
 import toy.bookchat.bookchat.domain.chatroom.service.dto.response.CreatedChatRoomDto;
 import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
+import toy.bookchat.bookchat.domain.participant.service.dto.response.ChatRoomDetails;
 import toy.bookchat.bookchat.domain.storage.StorageService;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
@@ -81,10 +82,7 @@ public class ChatRoomService {
             chatRoom = registerChatRoom(createChatRoomRequest, book, host, null);
         }
 
-        return CreatedChatRoomDto.builder()
-            .roomId(chatRoom.getId())
-            .roomSid(chatRoom.getRoomSid())
-            .build();
+        return CreatedChatRoomDto.of(chatRoom);
     }
 
     private ChatRoom registerChatRoom(CreateChatRoomRequest createChatRoomRequest, Book book,
@@ -98,8 +96,8 @@ public class ChatRoomService {
 
     private ChatRoom saveChatRoom(CreateChatRoomRequest createChatRoomRequest,
         Book book, User host, String fileUrl) {
-        ChatRoom chatRoom = createChatRoomRequest.makeChatRoom(book, host, fileUrl);
-        chatRoomRepository.save(chatRoom);
+        ChatRoom chatRoom = chatRoomRepository.save(
+            createChatRoomRequest.makeChatRoom(book, host, fileUrl));
         saveParticipantWithRoomHostAndRoom(host, chatRoom);
         return chatRoom;
     }
@@ -133,5 +131,10 @@ public class ChatRoomService {
     public ChatRoomsResponseSlice getChatRooms(ChatRoomRequest chatRoomRequest, Pageable pageable) {
         return ChatRoomsResponseSlice.of(
             chatRoomRepository.findChatRooms(chatRoomRequest, pageable));
+    }
+
+    @Transactional(readOnly = true)
+    public ChatRoomDetails getChatRoomDetails(Long roomId, Long userId) {
+        return chatRoomRepository.findChatRoomDetails(roomId, userId);
     }
 }

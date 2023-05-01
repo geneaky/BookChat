@@ -656,6 +656,26 @@ include::{snippets}/post-chatroom/response-headers.adoc[]
 
 include::{snippets}/post-chatroom/http-response.adoc[]
 
+---
+
+=== 채팅방 참여인원 조회
+
+`Request Header`
+
+include::{snippets}/get-chatroom-details/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/get-chatroom-details/path-parameters.adoc[]
+include::{snippets}/get-chatroom-details/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/get-chatroom-details/response-fields.adoc[]
+include::{snippets}/get-chatroom-details/http-response.adoc[]
+
+---
+
 === 사용자 채팅방 조회
 
 `Request Header`
@@ -691,24 +711,6 @@ include::{snippets}/get-chatrooms/response-fields.adoc[]
 include::{snippets}/get-chatrooms/http-response.adoc[]
 
 == 참여자
-
-=== 채팅방 참여인원 조회
-
-`Request Header`
-
-include::{snippets}/get-chatroom-participants/request-headers.adoc[]
-
-`Request`
-
-include::{snippets}/get-chatroom-participants/path-parameters.adoc[]
-include::{snippets}/get-chatroom-participants/http-request.adoc[]
-
-`Response`
-
-include::{snippets}/get-chatroom-participants/response-fields.adoc[]
-include::{snippets}/get-chatroom-participants/http-response.adoc[]
-
----
 
 === 방장의 참여자 권한 관리
 

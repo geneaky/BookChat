@@ -21,6 +21,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.requestP
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -42,6 +43,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
+import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookRequest;
 import toy.bookchat.bookchat.domain.chat.Chat;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
@@ -52,6 +54,10 @@ import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.UserC
 import toy.bookchat.bookchat.domain.chatroom.service.ChatRoomService;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.CreateChatRoomRequest;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.response.CreatedChatRoomDto;
+import toy.bookchat.bookchat.domain.participant.service.dto.RoomGuest;
+import toy.bookchat.bookchat.domain.participant.service.dto.RoomHost;
+import toy.bookchat.bookchat.domain.participant.service.dto.RoomSubHost;
+import toy.bookchat.bookchat.domain.participant.service.dto.response.ChatRoomDetails;
 
 @ChatRoomPresentationTest
 class ChatRoomControllerTest extends ControllerTestExtension {
@@ -91,8 +97,9 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             objectMapper.writeValueAsString(createChatRoomRequest).getBytes(UTF_8));
 
         CreatedChatRoomDto createdChatRoomDto = CreatedChatRoomDto.builder()
-            .roomId(1L)
+            .roomId("1")
             .roomSid(UUID.randomUUID().toString())
+            .roomImageUri("roomImage@s3.com")
             .build();
 
         when(chatRoomService.createChatRoom(any(), any(), any())).thenReturn(createdChatRoomDto);
@@ -126,7 +133,8 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                 ),
                 responseHeaders(
                     headerWithName(LOCATION).description("채팅방 접속 Connection Url"),
-                    headerWithName("RoomId").description("채팅방 Id")
+                    headerWithName("RoomId").description("채팅방 Id"),
+                    headerWithName("RoomImageUri").description("채팅방 이미지 uri")
                 )));
 
         verify(chatRoomService).createChatRoom(any(), any(), any());
@@ -134,8 +142,27 @@ class ChatRoomControllerTest extends ControllerTestExtension {
 
     @Test
     void 사용자의_채팅방_목록_조회_성공() throws Exception {
+        Book book1 = Book.builder()
+            .title("effective java")
+            .bookCoverImageUrl("effectivejava@s3.com")
+            .authors(List.of("Joshua", "JJU"))
+            .build();
+
+        Book book2 = Book.builder()
+            .title("effective kotlin")
+            .bookCoverImageUrl("effectivekotlin@s3.com")
+            .authors(List.of("marcin mosckala"))
+            .build();
+
+        Book book3 = Book.builder()
+            .title("toby spring")
+            .bookCoverImageUrl("tobyspring@s3.com")
+            .authors(List.of("21min"))
+            .build();
+
         ChatRoom chatRoom1 = ChatRoom.builder()
             .id(1L)
+            .book(book1)
             .roomName("이펙티브 자바 부수는 방")
             .roomSid("secret1")
             .roomSize(100)
@@ -151,6 +178,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
         chat1.setCreatedAt(LocalDateTime.now());
         ChatRoom chatRoom2 = ChatRoom.builder()
             .id(2L)
+            .book(book2)
             .roomName("이펙티브 코틀린 부수는 방")
             .roomSid("secret2")
             .roomSize(10)
@@ -166,6 +194,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
         chat2.setCreatedAt(LocalDateTime.now());
         ChatRoom chatRoom3 = ChatRoom.builder()
             .id(3L)
+            .book(book3)
             .roomName("토비의 스프링 부수는 방")
             .roomSid("secret3")
             .roomSize(5)
@@ -216,6 +245,12 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                         .description("기본 이미지 타입 번호"),
                     fieldWithPath("userChatRoomResponseList[].roomImageUri").optional().type(STRING)
                         .description("채팅방 이미지 URI"),
+                    fieldWithPath("userChatRoomResponseList[].bookTitle").type(STRING)
+                        .description("책 제목"),
+                    fieldWithPath("userChatRoomResponseList[].bookCoverImageUrl").type(STRING)
+                        .description("책 커버 이미지"),
+                    fieldWithPath("userChatRoomResponseList[].bookAuthors[]").type(ARRAY)
+                        .description("책 저자"),
                     fieldWithPath("userChatRoomResponseList[].lastChatId").type(NUMBER)
                         .description("마지막 채팅 ID"),
                     fieldWithPath("userChatRoomResponseList[].lastActiveTime").type(STRING)
@@ -235,7 +270,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .roomMemberCount(3L)
             .roomImageUri("n8QpVmc")
             .bookTitle("book1")
-            .bookAuthors("author1,author2,author3")
+            .bookAuthors(List.of("author1", "author2", "author3"))
             .bookCoverImageUri("book1CoverImage@s3")
             .hostName("host1")
             .hostDefaultProfileImageType(1)
@@ -251,7 +286,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .roomName("R501")
             .roomImageUri("7jutu0i0")
             .bookTitle("book2")
-            .bookAuthors("author4,author5,author6")
+            .bookAuthors(List.of("author4", "author5", "author6"))
             .bookCoverImageUri("book2CoverImage@s3")
             .hostName("host2")
             .hostDefaultProfileImageType(2)
@@ -269,7 +304,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .roomMemberCount(1000L)
             .roomImageUri("sUzZNOV")
             .bookTitle("book3")
-            .bookAuthors("author7,author8,author9")
+            .bookAuthors(List.of("author7", "author8", "author9"))
             .bookCoverImageUri("book3CoverImage@s3")
             .hostName("host3")
             .hostDefaultProfileImageType(3)
@@ -323,7 +358,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                         .description("책 제목"),
                     fieldWithPath("chatRoomResponseList[].bookCoverImageUri").type(STRING)
                         .description("책 커버 이미지 URI"),
-                    fieldWithPath("chatRoomResponseList[].bookAuthors").type(STRING)
+                    fieldWithPath("chatRoomResponseList[].bookAuthors[]").type(ARRAY)
                         .description("책 저자"),
                     fieldWithPath("chatRoomResponseList[].hostName").type(STRING)
                         .description("방장 닉네임"),
@@ -346,6 +381,93 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                 ).and(getCursorField())));
     }
 
+    @Test
+    void 채팅방_세부정보_조회() throws Exception {
+
+        RoomHost roomHost = RoomHost.builder()
+            .id(1L)
+            .nickname("마스터")
+            .profileImageUrl("test@s3.com")
+            .defaultProfileImageType(1)
+            .build();
+
+        RoomSubHost roomSubHost1 = RoomSubHost.builder()
+            .id(2L)
+            .nickname("서브 마스터1")
+            .defaultProfileImageType(2)
+            .build();
+
+        RoomSubHost roomSubHost2 = RoomSubHost.builder()
+            .id(3L)
+            .nickname("서브 마스터2")
+            .profileImageUrl("subHost@s3.com")
+            .defaultProfileImageType(3)
+            .build();
+
+        RoomGuest roomGuest1 = RoomGuest.builder()
+            .id(4L)
+            .nickname("게스트1")
+            .defaultProfileImageType(4)
+            .build();
+
+        RoomGuest roomGuest2 = RoomGuest.builder()
+            .id(5L)
+            .nickname("게스트2")
+            .profileImageUrl("guest@s3.com")
+            .defaultProfileImageType(1)
+            .build();
+
+        ChatRoomDetails chatRoomDetails = ChatRoomDetails.builder()
+            .roomSize(100)
+            .roomTags(List.of("개발", "DB"))
+            .bookTitle("RealMySQL")
+            .bookCoverImageUrl("realmysql@s3.com")
+            .bookAuthors(List.of("author1", "author2"))
+            .roomHost(roomHost)
+            .roomSubHostList(List.of(roomSubHost1, roomSubHost2))
+            .roomGuestList(List.of(roomGuest1, roomGuest2))
+            .build();
+
+        when(chatRoomService.getChatRoomDetails(any(), any())).thenReturn(
+            chatRoomDetails);
+        mockMvc.perform(get("/v1/api/chatrooms/{roomId}", 1)
+                .header(AUTHORIZATION, JWT_TOKEN)
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isOk())
+            .andDo(document("get-chatroom-details",
+                requestHeaders(
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
+                ),
+                pathParameters(
+                    parameterWithName("roomId").description("Room Id")
+                ),
+                responseFields(
+                    fieldWithPath("roomSize").type(NUMBER).description("채팅방 인원수"),
+                    fieldWithPath("roomTags").type(ARRAY).description("채팅방 태그"),
+                    fieldWithPath("bookTitle").type(STRING).description("책 제목"),
+                    fieldWithPath("bookCoverImageUrl").type(STRING).description("책 커버 이미지 url"),
+                    fieldWithPath("bookAuthors").type(ARRAY).description("책 저자"),
+                    fieldWithPath("roomHost.id").type(NUMBER).description("방장 Id"),
+                    fieldWithPath("roomHost.nickname").type(STRING).description("방장 닉네임"),
+                    fieldWithPath("roomHost.profileImageUrl").type(STRING).optional()
+                        .description("방장 프로필 이미지 url"),
+                    fieldWithPath("roomHost.defaultProfileImageType").type(NUMBER)
+                        .description("방장 기본 프로필 이미지 타입"),
+                    fieldWithPath("roomSubHostList[].id").type(NUMBER).description("부방장 Id"),
+                    fieldWithPath("roomSubHostList[].nickname").type(STRING).description("부방장 닉네임"),
+                    fieldWithPath("roomSubHostList[].profileImageUrl").type(STRING).optional()
+                        .description("부방장 프로필 이미지 url"),
+                    fieldWithPath("roomSubHostList[].defaultProfileImageType").type(NUMBER)
+                        .description("부방장 기본 프로필 이미지 타입"),
+                    fieldWithPath("roomGuestList[].id").type(NUMBER).description("참여자 Id"),
+                    fieldWithPath("roomGuestList[].nickname").type(STRING).description("참여자 닉네임"),
+                    fieldWithPath("roomGuestList[].profileImageUrl").type(STRING).optional()
+                        .description("참여자 프로필 이미지 url"),
+                    fieldWithPath("roomGuestList[].defaultProfileImageType").type(NUMBER)
+                        .description("참여자 기본 프로필 이미지 타입")
+                )));
+    }
+
     private UserChatRoomResponse getChatRoomResponse(ChatRoom chatRoom, Chat chat) {
         return UserChatRoomResponse.builder()
             .roomId(chatRoom.getId())
@@ -353,6 +475,9 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .roomName(chatRoom.getRoomName())
             .roomMemberCount(2L)
             .defaultRoomImageType(1)
+            .bookTitle(chatRoom.getBookTitle())
+            .bookCoverImageUrl(chatRoom.getBookCoverImageUrl())
+            .bookAuthors(chatRoom.getBookAuthors())
             .lastChatId(chat.getId())
             .lastActiveTime(chat.getCreatedAt())
             .lastChatContent(chat.getMessage())

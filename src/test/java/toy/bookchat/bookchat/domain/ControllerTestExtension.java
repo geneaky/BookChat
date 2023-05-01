@@ -39,18 +39,40 @@ public abstract class ControllerTestExtension {
     @MockBean
     KakaoPublicKeyFetcher kakaoPublickeyFetcher;
 
+    private User testUser = User.builder()
+        .id(1L)
+        .email("test@gmail.com")
+        .nickname("testUserNickname")
+        .role(USER)
+        .name("testUser")
+        .profileImageUrl("somethingImageUrl@naver.com")
+        .defaultProfileImageType(1)
+        .provider(OAuth2Provider.KAKAO)
+        .readingTastes(List.of(ReadingTaste.DEVELOPMENT, ReadingTaste.ART))
+        .build();
+
     protected User getUser() {
-        return User.builder()
-            .id(1L)
-            .email("test@gmail.com")
-            .nickname("testUserNickname")
-            .role(USER)
-            .name("testUser")
-            .profileImageUrl("somethingImageUrl@naver.com")
-            .defaultProfileImageType(1)
-            .provider(OAuth2Provider.KAKAO)
-            .readingTastes(List.of(ReadingTaste.DEVELOPMENT, ReadingTaste.ART))
-            .build();
+        return this.testUser;
+    }
+
+    protected Long getUserId() {
+        return this.testUser.getId();
+    }
+
+    protected String getUserName() {
+        return this.testUser.getName();
+    }
+
+    protected String getUserNickname() {
+        return this.testUser.getNickname();
+    }
+
+    protected String getUserProfileImageUrl() {
+        return this.testUser.getProfileImageUrl();
+    }
+
+    protected Integer getUserDefaultProfileImageType() {
+        return this.testUser.getDefaultProfileImageType();
     }
 
     private TokenPayload getTokenPayload(User user) {

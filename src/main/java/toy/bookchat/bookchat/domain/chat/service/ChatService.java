@@ -60,14 +60,16 @@ public class ChatService {
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
             .orElseThrow(ChatRoomNotFoundException::new);
 
-        checkIsBlockedUser(user, chatRoom);
-        checkIsFullChatRoom(chatRoom);
+        if (chatRoom.getHost() != user) {
+            checkIsBlockedUser(user, chatRoom);
+            checkIsFullChatRoom(chatRoom);
 
-        participantRepository.save(Participant.builder()
-            .participantStatus(GUEST)
-            .user(user)
-            .chatRoom(chatRoom)
-            .build());
+            participantRepository.save(Participant.builder()
+                .participantStatus(GUEST)
+                .user(user)
+                .chatRoom(chatRoom)
+                .build());
+        }
 
         Chat chat = chatRepository.save(Chat.builder()
             .chatRoom(chatRoom)
