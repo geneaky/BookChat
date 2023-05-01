@@ -181,10 +181,11 @@ class ChatRoomServiceTest {
         List<UserChatRoomResponse> result = List.of(userChatRoomResponse);
         PageRequest pageRequest = PageRequest.of(0, 1, Sort.by("id").descending());
         Slice<UserChatRoomResponse> slice = new SliceImpl<>(result, pageRequest, true);
-        when(chatRoomRepository.findUserChatRoomsWithLastChat(any(), any(), any())).thenReturn(
+        when(chatRoomRepository.findUserChatRoomsWithLastChat(any(), any(), any(),
+            any())).thenReturn(
             slice);
         UserChatRoomsResponseSlice userChatRoomsResponseSlice = chatRoomService.getUserChatRooms(
-            any(), any(), any());
+            any(), any(), any(), any());
 
         assertThat(userChatRoomsResponseSlice).usingRecursiveComparison()
             .isEqualTo(UserChatRoomsResponseSlice.of(slice));

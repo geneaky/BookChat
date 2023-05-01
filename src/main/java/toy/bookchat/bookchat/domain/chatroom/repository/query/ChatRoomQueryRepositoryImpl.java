@@ -68,8 +68,7 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
 
     @Override
     public Slice<UserChatRoomResponse> findUserChatRoomsWithLastChat(Pageable pageable,
-        Optional<Long> postCursorId,
-        Long userId) {
+        Long bookId, Optional<Long> postCursorId, Long userId) {
         QChat subChat = new QChat("subChat");
         QParticipant subParticipant1 = new QParticipant("subParticipant1");
         QParticipant subParticipant2 = new QParticipant("subParticipant2");
@@ -97,7 +96,8 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
                         .and(subParticipant2.user.id.eq(userId)))
                     .groupBy(subParticipant2.chatRoom.id)).and(chat.chatRoom.id.eq(chatRoom.id)))
             .groupBy(chatRoom.id, chat.id)
-            .where(afterPostCursorId(postCursorId))
+            .where(afterPostCursorId(postCursorId),
+                eqBookId(bookId))
             .limit(pageable.getPageSize())
             .orderBy(chat.id.desc(), chatRoom.id.desc())
             .fetch();
@@ -115,6 +115,10 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
         contents.forEach(c -> c.setBookInfo(mapBooksByChatRoomId.get(c.getRoomId())));
 
         return toSlice(contents, pageable);
+    }
+
+    private BooleanExpression eqBookId(Long bookId) {
+        return bookId == null ? null : chatRoom.book.id.eq(bookId);
     }
 
     @Override

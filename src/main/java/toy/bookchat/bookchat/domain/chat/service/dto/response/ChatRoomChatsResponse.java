@@ -27,7 +27,7 @@ public class ChatRoomChatsResponse {
     }
 
     private void addChatResponse(List<ChatResponse> chatResponseList, Chat chat) {
-        if (isAnnouncementChat(chat)) {
+        if (chat.isAnnouncementChat()) {
             chatResponseList.add(ChatResponse.builder()
                 .chatId(chat.getId())
                 .message(chat.getMessage())
@@ -44,9 +44,5 @@ public class ChatRoomChatsResponse {
             .message(chat.getMessage())
             .dispatchTime(chat.getDispatchTime())
             .build());
-    }
-
-    private boolean isAnnouncementChat(Chat chat) {
-        return chat.getUser() == null;
     }
 }

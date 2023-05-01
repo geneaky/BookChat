@@ -216,10 +216,11 @@ class ChatRoomControllerTest extends ControllerTestExtension {
         PageRequest pageRequest = PageRequest.of(0, 3, Sort.by("id").descending());
         Slice<UserChatRoomResponse> slice = new SliceImpl<>(result, pageRequest, true);
         UserChatRoomsResponseSlice response = UserChatRoomsResponseSlice.of(slice);
-        when(chatRoomService.getUserChatRooms(any(), any(), any())).thenReturn(response);
+        when(chatRoomService.getUserChatRooms(any(), any(), any(), any())).thenReturn(response);
         mockMvc.perform(get("/v1/api/users/chatrooms")
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
+                .param("bookId", "1")
                 .param("postCursorId", "0")
                 .param("size", "3"))
             .andExpect(status().isOk())
@@ -228,6 +229,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                     headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 requestParameters(
+                    parameterWithName("bookId").optional().description("책 ID"),
                     parameterWithName("postCursorId").optional()
                         .description("마지막 커서 ID"),
                     parameterWithName("size").optional().description("페이지 사이즈")

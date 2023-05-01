@@ -121,10 +121,11 @@ public class ChatRoomService {
     }
 
     @Transactional(readOnly = true)
-    public UserChatRoomsResponseSlice getUserChatRooms(Optional<Long> postCursorId,
+    public UserChatRoomsResponseSlice getUserChatRooms(Long bookId, Optional<Long> postCursorId,
         Pageable pageable, Long userId) {
         return UserChatRoomsResponseSlice.of(
-            chatRoomRepository.findUserChatRoomsWithLastChat(pageable, postCursorId, userId));
+            chatRoomRepository.findUserChatRoomsWithLastChat(pageable, bookId, postCursorId,
+                userId));
     }
 
     @Transactional(readOnly = true)
