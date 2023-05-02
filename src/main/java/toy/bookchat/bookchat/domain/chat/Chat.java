@@ -55,4 +55,8 @@ public class Chat extends BaseEntity {
     public String getDispatchTime() {
         return getCreatedAt().toString();
     }
+
+    public boolean isAnnouncementChat() {
+        return this.user == null;
+    }
 }

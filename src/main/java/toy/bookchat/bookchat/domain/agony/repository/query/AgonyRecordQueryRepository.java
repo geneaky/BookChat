@@ -1,7 +1,6 @@
 package toy.bookchat.bookchat.domain.agony.repository.query;
 
 import java.util.List;
-import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import toy.bookchat.bookchat.domain.agony.AgonyRecord;
@@ -9,7 +8,7 @@ import toy.bookchat.bookchat.domain.agony.AgonyRecord;
 public interface AgonyRecordQueryRepository {
 
     Slice<AgonyRecord> findSliceOfUserAgonyRecords(Long bookShelfId, Long agonyId, Long userId,
-        Pageable pageable, Optional<Long> postCursorId);
+        Pageable pageable, Long postCursorId);
 
     void deleteAgonyRecord(Long bookShelfId, Long agonyId, Long recordId, Long userId);
 

@@ -10,7 +10,6 @@ import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.SUBHOST
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -172,7 +171,7 @@ class ChatRoomRepositoryTest {
         Slice<UserChatRoomResponse> result = toSlice(contents, pageRequest);
 
         Slice<UserChatRoomResponse> slice = chatRoomRepository.findUserChatRoomsWithLastChat(
-            pageRequest, Optional.empty(), user1.getId());
+            pageRequest, null, null, user1.getId());
         assertThat(slice.getContent()).usingRecursiveComparison()
             .ignoringFieldsOfTypes(LocalDateTime.class)
             .isEqualTo(result.getContent());
@@ -267,15 +266,104 @@ class ChatRoomRepositoryTest {
             .build();
 
         PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("id").ascending());
-        Slice<UserChatRoomResponse> result = toSlice(List.of(userChatRoomResponse2,
-                userChatRoomResponse1),
-            pageRequest);
+        Slice<UserChatRoomResponse> result = toSlice(
+            List.of(userChatRoomResponse2, userChatRoomResponse1), pageRequest);
         Slice<UserChatRoomResponse> slice = chatRoomRepository.findUserChatRoomsWithLastChat(
-            pageRequest, Optional.of(chat4.getId()), user1.getId());
+            pageRequest, null, chat4.getId(), user1.getId());
 
         assertThat(slice.getContent()).usingRecursiveComparison()
             .ignoringFieldsOfTypes(LocalDateTime.class)
             .isEqualTo(result.getContent());
+    }
+
+    @Test
+    void 사용자_채팅방_커서기반_조회_책_id_있는경우_연관된_채팅방만_조회_성공() throws Exception {
+        User user1 = User.builder().build();
+        User user2 = User.builder().build();
+        userRepository.save(user1);
+        userRepository.save(user2);
+
+        Book book1 = Book.builder()
+            .isbn("12329763345")
+            .publishAt(LocalDate.now())
+            .build();
+        Book book2 = Book.builder()
+            .isbn("12329724525")
+            .publishAt(LocalDate.now())
+            .build();
+        bookRepository.save(book1);
+        bookRepository.save(book2);
+
+        ChatRoom chatRoom1 = ChatRoom.builder()
+            .book(book1)
+            .host(user1)
+            .roomSid("4SyVX")
+            .roomSize(77)
+            .defaultRoomImageType(1)
+            .build();
+        ChatRoom chatRoom2 = ChatRoom.builder()
+            .book(book2)
+            .host(user1)
+            .roomSid("1Y2j9RlN")
+            .roomSize(573)
+            .defaultRoomImageType(2)
+            .build();
+        ChatRoom chatRoom3 = ChatRoom.builder()
+            .book(book2)
+            .host(user2)
+            .roomSid("r7xr")
+            .roomSize(38)
+            .defaultRoomImageType(3)
+            .build();
+        chatRoomRepository.save(chatRoom1);
+        chatRoomRepository.save(chatRoom2);
+        chatRoomRepository.save(chatRoom3);
+
+        Chat chat1 = Chat.builder().user(user1).message("a")
+            .chatRoom(chatRoom1)
+            .build();
+        Chat chat2 = Chat.builder().user(user1).message("b")
+            .chatRoom(chatRoom2)
+            .build();
+        Chat chat3 = Chat.builder().user(user2).message("c")
+            .chatRoom(chatRoom3)
+            .build();
+        Chat chat4 = Chat.builder().user(user1).message("d")
+            .chatRoom(chatRoom3)
+            .build();
+        chatRepository.save(chat1);
+        chatRepository.save(chat2);
+        chatRepository.save(chat3);
+        chatRepository.save(chat4);
+
+        Participant participant1 = Participant.builder().user(user1).chatRoom(chatRoom1)
+            .participantStatus(HOST).build();
+        Participant participant2 = Participant.builder().user(user1).chatRoom(chatRoom2)
+            .participantStatus(GUEST).build();
+        Participant participant3 = Participant.builder().user(user1).chatRoom(chatRoom3)
+            .participantStatus(SUBHOST).build();
+        Participant participant4 = Participant.builder().user(user2).chatRoom(chatRoom3)
+            .participantStatus(GUEST).build();
+        participantRepository.save(participant1);
+        participantRepository.save(participant2);
+        participantRepository.save(participant3);
+        participantRepository.save(participant4);
+
+        UserChatRoomResponse userChatRoomResponse1 = UserChatRoomResponse.builder()
+            .roomId(chatRoom1.getId())
+            .roomSid(chatRoom1.getRoomSid())
+            .defaultRoomImageType(chatRoom1.getDefaultRoomImageType())
+            .roomMemberCount(1L)
+            .lastChatId(chat1.getId())
+            .lastChatContent(chat1.getMessage())
+            .lastActiveTime(chat1.getCreatedAt())
+            .build();
+
+        PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("id").ascending());
+        Slice<UserChatRoomResponse> slice = chatRoomRepository.findUserChatRoomsWithLastChat(
+            pageRequest, book1.getId(), chat4.getId(), user1.getId());
+
+        assertThat(slice.getContent()).containsOnly(userChatRoomResponse1);
     }
 
     @Test
@@ -377,10 +465,7 @@ class ChatRoomRepositoryTest {
 
         PageRequest pageable = PageRequest.of(0, 1);
         ChatRoomRequest chatRoomRequest = ChatRoomRequest.builder()
-            .postCursorId(Optional.of(500L))
-            .title(Optional.empty())
-            .isbn(Optional.empty())
-            .roomName(Optional.empty())
+            .postCursorId(500L)
             .tags(List.of("hashTag1"))
             .build();
 

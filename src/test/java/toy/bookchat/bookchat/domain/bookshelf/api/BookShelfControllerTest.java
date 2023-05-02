@@ -34,7 +34,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -601,7 +600,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
     @Test
     void 현재_읽고있는_페이지_등록() throws Exception {
         ReviseBookShelfRequest reviseBookShelfRequest = ReviseBookShelfRequest.builder()
-            .pages(Optional.of(137))
+            .pages(137)
             .star(null)
             .readingStatus(READING)
             .build();
@@ -680,7 +679,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
     void 독서중_책_독서완료로_변경_성공() throws Exception {
         ReviseBookShelfRequest reviseBookShelfRequest = ReviseBookShelfRequest.builder()
             .pages(null)
-            .star(Optional.of(FOUR_HALF))
+            .star(FOUR_HALF)
             .readingStatus(COMPLETE)
             .build();
 
@@ -710,7 +709,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
     void 독서완료_책_별점_수정_성공() throws Exception {
         ReviseBookShelfRequest reviseBookShelfRequest = ReviseBookShelfRequest.builder()
             .pages(null)
-            .star(Optional.of(FOUR_HALF))
+            .star(FOUR_HALF)
             .readingStatus(COMPLETE)
             .build();
 

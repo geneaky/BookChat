@@ -1,7 +1,6 @@
 package toy.bookchat.bookchat.domain.chatroom.api;
 
 import java.net.URI;
-import java.util.Optional;
 import javax.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -38,7 +37,7 @@ public class ChatRoomController {
     @PostMapping("/chatrooms")
     public ResponseEntity<Void> createChatRoom(
         @Valid @RequestPart CreateChatRoomRequest createChatRoomRequest,
-        @RequestPart Optional<MultipartFile> chatRoomImage,
+        @RequestPart(required = false) MultipartFile chatRoomImage,
         @UserPayload TokenPayload tokenPayload) {
         CreatedChatRoomDto createdChatRoomDto = chatRoomService.createChatRoom(
             createChatRoomRequest, chatRoomImage, tokenPayload.getUserId());
@@ -51,9 +50,9 @@ public class ChatRoomController {
     }
 
     @GetMapping("/users/chatrooms")
-    public UserChatRoomsResponseSlice getUserChatRooms(Optional<Long> postCursorId,
+    public UserChatRoomsResponseSlice getUserChatRooms(Long bookId, Long postCursorId,
         Pageable pageable, @UserPayload TokenPayload tokenPayload) {
-        return chatRoomService.getUserChatRooms(postCursorId, pageable,
+        return chatRoomService.getUserChatRooms(bookId, postCursorId, pageable,
             tokenPayload.getUserId());
     }
 

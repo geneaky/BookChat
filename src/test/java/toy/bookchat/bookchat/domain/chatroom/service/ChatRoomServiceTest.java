@@ -95,7 +95,7 @@ class ChatRoomServiceTest {
         when(userRepository.findById(any())).thenReturn(Optional.of(mock(User.class)));
         when(chatRoomRepository.save(any())).thenReturn(chatRoom);
 
-        chatRoomService.createChatRoom(createChatRoomRequest, Optional.empty(), 1L);
+        chatRoomService.createChatRoom(createChatRoomRequest, null, 1L);
 
         verify(chatRoomRepository).save(any());
         verify(hashTagRepository, times(2)).save(any());
@@ -107,7 +107,6 @@ class ChatRoomServiceTest {
         BookRequest bookRequest = getBookRequest();
         CreateChatRoomRequest createChatRoomRequest = getCreateChatRoomRequest(bookRequest);
         MultipartFile image = mock(MultipartFile.class);
-        Optional<MultipartFile> chatRoomImage = Optional.of(image);
 
         ChatRoom chatRoom = ChatRoom.builder()
             .id(1L)
@@ -120,7 +119,7 @@ class ChatRoomServiceTest {
         when(userRepository.findById(any())).thenReturn(Optional.of(mock(User.class)));
         when(chatRoomRepository.save(any())).thenReturn(chatRoom);
 
-        chatRoomService.createChatRoom(createChatRoomRequest, chatRoomImage, 1L);
+        chatRoomService.createChatRoom(createChatRoomRequest, image, 1L);
 
         verify(chatRoomRepository).save(any());
         verify(hashTagRepository, times(2)).save(any());
@@ -143,7 +142,7 @@ class ChatRoomServiceTest {
         when(userRepository.findById(any())).thenReturn(Optional.of(mock(User.class)));
         when(chatRoomRepository.save(any())).thenReturn(chatRoom);
 
-        chatRoomService.createChatRoom(createChatRoomRequest, Optional.empty(), 1L);
+        chatRoomService.createChatRoom(createChatRoomRequest, null, 1L);
 
         verify(bookRepository).save(any());
         verify(chatRoomRepository).save(any());
@@ -181,10 +180,11 @@ class ChatRoomServiceTest {
         List<UserChatRoomResponse> result = List.of(userChatRoomResponse);
         PageRequest pageRequest = PageRequest.of(0, 1, Sort.by("id").descending());
         Slice<UserChatRoomResponse> slice = new SliceImpl<>(result, pageRequest, true);
-        when(chatRoomRepository.findUserChatRoomsWithLastChat(any(), any(), any())).thenReturn(
+        when(chatRoomRepository.findUserChatRoomsWithLastChat(any(), any(), any(),
+            any())).thenReturn(
             slice);
         UserChatRoomsResponseSlice userChatRoomsResponseSlice = chatRoomService.getUserChatRooms(
-            any(), any(), any());
+            any(), any(), any(), any());
 
         assertThat(userChatRoomsResponseSlice).usingRecursiveComparison()
             .isEqualTo(UserChatRoomsResponseSlice.of(slice));

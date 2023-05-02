@@ -273,7 +273,7 @@ class ChatServiceTest {
         SliceImpl<Chat> chatSlice = new SliceImpl<>(List.of(chat1, chat2, chat3), pageRequest,
             true);
         when(chatRepository.getChatRoomChats(any(), any(), any(), any())).thenReturn(chatSlice);
-        chatService.getChatRoomChats(1L, Optional.empty(), mock(Pageable.class), 1L);
+        chatService.getChatRoomChats(1L, null, mock(Pageable.class), 1L);
 
         verify(chatRepository).getChatRoomChats(any(), any(), any(), any());
     }
@@ -321,8 +321,7 @@ class ChatServiceTest {
         SliceImpl<Chat> chatSlice = new SliceImpl<>(List.of(chat1, chat2, chat3, chat4),
             pageRequest, true);
         when(chatRepository.getChatRoomChats(any(), any(), any(), any())).thenReturn(chatSlice);
-        ChatRoomChatsResponse chatRoomChatsResponse = chatService.getChatRoomChats(1L,
-            Optional.empty(),
+        ChatRoomChatsResponse chatRoomChatsResponse = chatService.getChatRoomChats(1L, null,
             mock(Pageable.class), 1L);
 
         verify(chatRepository).getChatRoomChats(any(), any(), any(), any());

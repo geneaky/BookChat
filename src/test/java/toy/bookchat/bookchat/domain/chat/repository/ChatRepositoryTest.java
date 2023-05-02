@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -89,9 +88,8 @@ class ChatRepositoryTest {
 
         PageRequest pageRequest = PageRequest.of(0, 3, Sort.by("id").descending());
 
-        List<Chat> content = chatRepository.getChatRoomChats(chatRoom.getId(),
-            Optional.of(chat3.getId()), pageRequest,
-            user1.getId()).getContent();
+        List<Chat> content = chatRepository.getChatRoomChats(chatRoom.getId(), chat3.getId(),
+            pageRequest, user1.getId()).getContent();
 
         assertThat(content).containsExactly(chat2, chat1, chat0);
     }

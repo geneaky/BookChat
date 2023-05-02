@@ -1,6 +1,5 @@
 package toy.bookchat.bookchat.domain.agony.api;
 
-import java.util.Optional;
 import javax.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -9,7 +8,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import toy.bookchat.bookchat.domain.agony.service.AgonyRecordService;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateAgonyRecordRequest;
@@ -35,25 +33,21 @@ public class AgonyRecordController {
         @UserPayload TokenPayload tokenPayload) {
 
         agonyRecordService.storeAgonyRecord(bookShelfId, createAgonyRecordRequest,
-            tokenPayload.getUserId(),
-            agonyId);
+            tokenPayload.getUserId(), agonyId);
     }
 
     @GetMapping("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records")
     public SliceOfAgonyRecordsResponse getAgonyRecordsOnBookAgony(@PathVariable Long bookShelfId,
-        @PathVariable Long agonyId,
-        @RequestParam Optional<Long> postCursorId,
-        @UserPayload TokenPayload tokenPayload, Pageable pageable) {
+        @PathVariable Long agonyId, Long postCursorId, @UserPayload TokenPayload tokenPayload,
+        Pageable pageable) {
 
         return agonyRecordService.searchPageOfAgonyRecords(bookShelfId, agonyId,
-            tokenPayload.getUserId(),
-            pageable, postCursorId);
+            tokenPayload.getUserId(), pageable, postCursorId);
     }
 
     @DeleteMapping("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records/{recordId}")
     public void deleteAgonyRecord(@PathVariable Long bookShelfId, @PathVariable Long agonyId,
-        @PathVariable Long recordId,
-        @UserPayload TokenPayload tokenPayload) {
+        @PathVariable Long recordId, @UserPayload TokenPayload tokenPayload) {
 
         agonyRecordService.deleteAgonyRecord(bookShelfId, agonyId, recordId,
             tokenPayload.getUserId());

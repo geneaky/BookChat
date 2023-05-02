@@ -256,7 +256,7 @@ class BookShelfServiceTest {
     @Test
     void 읽고있는_책_현재쪽수_업데이트_성공() throws Exception {
         ReviseBookShelfRequest reviseBookShelfRequest = ReviseBookShelfRequest.builder()
-            .pages(Optional.of(123))
+            .pages(123)
             .star(null)
             .readingStatus(READING)
             .build();
@@ -288,7 +288,7 @@ class BookShelfServiceTest {
     @Test
     void 책장에_책_독서상태_변경_성공() throws Exception {
         ReviseBookShelfRequest reviseBookShelfRequest = ReviseBookShelfRequest.builder()
-            .pages(Optional.of(123))
+            .pages(123)
             .star(null)
             .readingStatus(READING)
             .build();
@@ -316,8 +316,8 @@ class BookShelfServiceTest {
     @Test
     void 독서완료_서재_별점수정_성공() throws Exception {
         ReviseBookShelfRequest reviseBookShelfRequest = ReviseBookShelfRequest.builder()
-            .pages(Optional.of(123))
-            .star(Optional.of(FIVE))
+            .pages(123)
+            .star(FIVE)
             .readingStatus(COMPLETE)
             .build();
 

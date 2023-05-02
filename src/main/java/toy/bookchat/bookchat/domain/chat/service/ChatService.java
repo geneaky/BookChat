@@ -3,7 +3,6 @@ package toy.bookchat.bookchat.domain.chat.service;
 import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.GUEST;
 
 import java.util.List;
-import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -146,8 +145,8 @@ public class ChatService {
     }
 
     @Transactional(readOnly = true)
-    public ChatRoomChatsResponse getChatRoomChats(Long roomId, Optional<Long> postCursorId,
-        Pageable pageable, Long userId) {
+    public ChatRoomChatsResponse getChatRoomChats(Long roomId, Long postCursorId, Pageable pageable,
+        Long userId) {
         return new ChatRoomChatsResponse(
             chatRepository.getChatRoomChats(roomId, postCursorId, pageable, userId));
     }

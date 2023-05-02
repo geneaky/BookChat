@@ -8,7 +8,6 @@ import com.querydsl.core.types.dsl.EntityPathBase;
 import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.core.types.dsl.PathBuilder;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -53,14 +52,11 @@ public abstract class RepositorySupport {
     }
 
     public static <T extends Number & Comparable<?>> BooleanExpression numberBasedPagination(
-        EntityPathBase<?> entityPathBase, NumberPath<T> numberPath,
-        Optional<T> optionalNumberCursorId,
+        EntityPathBase<?> entityPathBase, NumberPath<T> numberPath, T optionalNumberCursorId,
         Pageable pageable) {
 
-        return optionalNumberCursorId.map(
-                numberCursorId -> getCursorExpression(entityPathBase, numberPath, numberCursorId,
-                    pageable))
-            .orElse(null);
+        return optionalNumberCursorId == null ? null
+            : getCursorExpression(entityPathBase, numberPath, optionalNumberCursorId, pageable);
     }
 
     private static <T extends Number & Comparable<?>> BooleanExpression getCursorExpression(

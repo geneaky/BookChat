@@ -2,9 +2,7 @@ package toy.bookchat.bookchat.domain.user.service;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Consumer;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,26 +42,28 @@ public class UserService {
 
     @Transactional
     public void registerNewUser(UserSignUpRequest userSignUpRequest,
-        Optional<MultipartFile> userProfileImage, String userName, String userEmail) {
-        userProfileImage.ifPresentOrElse(uploadWithImage(userSignUpRequest, userName, userEmail),
-            uploadWithoutImage(userSignUpRequest, userName, userEmail));
+        MultipartFile userProfileImage, String userName, String userEmail) {
+        if (imageExistent(userProfileImage)) {
+            uploadWithImage(userSignUpRequest, userProfileImage, userName, userEmail);
+            return;
+        }
+        uploadWithoutImage(userSignUpRequest, userName, userEmail);
     }
 
-    private Runnable uploadWithoutImage(UserSignUpRequest userSignUpRequest, String userName,
-        String userEmail) {
-        return () -> saveUser(userSignUpRequest, userName, userEmail, null);
-    }
-
-    private Consumer<MultipartFile> uploadWithImage(UserSignUpRequest userSignUpRequest,
+    private void uploadWithImage(UserSignUpRequest userSignUpRequest,
+        MultipartFile userProfileImage,
         String userName, String userEmail) {
-        return image -> {
-            String prefixedUUIDFileName = storageService.createFileName(
-                image, UUID.randomUUID().toString(),
-                new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
-            String prefixedUUIDFileUrl = storageService.getFileUrl(prefixedUUIDFileName);
-            saveUser(userSignUpRequest, userName, userEmail, prefixedUUIDFileUrl);
-            storageService.upload(image, prefixedUUIDFileName);
-        };
+        String prefixedUUIDFileName = storageService.createFileName(
+            userProfileImage, UUID.randomUUID().toString(),
+            new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+        String prefixedUUIDFileUrl = storageService.getFileUrl(prefixedUUIDFileName);
+        saveUser(userSignUpRequest, userName, userEmail, prefixedUUIDFileUrl);
+        storageService.upload(userProfileImage, prefixedUUIDFileName);
+    }
+
+    private void uploadWithoutImage(UserSignUpRequest userSignUpRequest, String userName,
+        String userEmail) {
+        saveUser(userSignUpRequest, userName, userEmail, null);
     }
 
     @Transactional(readOnly = true)
@@ -80,24 +80,28 @@ public class UserService {
     }
 
     @Transactional
-    public void updateUserProfile(
-        ChangeUserNicknameRequest changeUserNicknameRequest,
-        Optional<MultipartFile> userProfileImage, Long userId) {
+    public void updateUserProfile(ChangeUserNicknameRequest changeUserNicknameRequest,
+        MultipartFile userProfileImage, Long userId) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        userProfileImage.ifPresentOrElse(updateImage(user, changeUserNicknameRequest.getNickname()),
-            () -> user.changeUserNickname(changeUserNicknameRequest.getNickname()));
+        if (imageExistent(userProfileImage)) {
+            updateNicknameWithProfileImage(changeUserNicknameRequest, userProfileImage, user);
+            return;
+        }
+        user.changeUserNickname(changeUserNicknameRequest.getNickname());
     }
 
-    private Consumer<MultipartFile> updateImage(User user, String nickname) {
-        return image -> {
-            String prefixedUUIDFileName = storageService.createFileName(
-                image, UUID.randomUUID().toString(),
-                new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
-            String prefixedUUIDFileUrl = storageService.getFileUrl(prefixedUUIDFileName);
-            user.changeUserNickname(nickname);
-            user.changeProfileImageUrl(prefixedUUIDFileUrl);
-            storageService.upload(image, prefixedUUIDFileName);
-        };
+    private boolean imageExistent(MultipartFile userProfileImage) {
+        return userProfileImage != null;
+    }
+
+    private void updateNicknameWithProfileImage(ChangeUserNicknameRequest changeUserNicknameRequest,
+        MultipartFile userProfileImage, User user) {
+        String prefixedUUIDFileName = storageService.createFileName(userProfileImage,
+            UUID.randomUUID().toString(), new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+        String prefixedUUIDFileUrl = storageService.getFileUrl(prefixedUUIDFileName);
+        user.changeUserNickname(changeUserNicknameRequest.getNickname());
+        user.changeProfileImageUrl(prefixedUUIDFileUrl);
+        storageService.upload(userProfileImage, prefixedUUIDFileName);
     }
 
     private void saveUser(UserSignUpRequest userSignUpRequest, String userName,

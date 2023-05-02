@@ -1,6 +1,5 @@
 package toy.bookchat.bookchat.domain.agony.service;
 
-import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -37,7 +36,7 @@ public class AgonyRecordService {
 
     @Transactional(readOnly = true)
     public SliceOfAgonyRecordsResponse searchPageOfAgonyRecords(Long bookShelfId, Long agonyId,
-        Long userId, Pageable pageable, Optional<Long> postCursorId) {
+        Long userId, Pageable pageable, Long postCursorId) {
         Slice<AgonyRecord> agonyRecordSlice = agonyRecordRepository.findSliceOfUserAgonyRecords(
             bookShelfId, agonyId, userId, pageable, postCursorId);
         return new SliceOfAgonyRecordsResponse(agonyRecordSlice);

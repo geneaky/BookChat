@@ -1,6 +1,5 @@
 package toy.bookchat.bookchat.domain.chat.api;
 
-import java.util.Optional;
 import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -44,8 +43,8 @@ public class ChatController {
     }
 
     @GetMapping("/v1/api/chatrooms/{roomId}/chats")
-    public ChatRoomChatsResponse getChatRoomChats(@PathVariable Long roomId,
-        Optional<Long> postCursorId, Pageable pageable, @UserPayload TokenPayload tokenPayload) {
+    public ChatRoomChatsResponse getChatRoomChats(@PathVariable Long roomId, Long postCursorId,
+        Pageable pageable, @UserPayload TokenPayload tokenPayload) {
         return chatService.getChatRoomChats(roomId, postCursorId, pageable,
             tokenPayload.getUserId());
     }

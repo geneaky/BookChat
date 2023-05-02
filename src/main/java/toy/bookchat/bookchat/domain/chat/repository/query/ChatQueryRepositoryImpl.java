@@ -9,7 +9,6 @@ import static toy.bookchat.bookchat.domain.user.QUser.user;
 
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
@@ -25,7 +24,7 @@ public class ChatQueryRepositoryImpl implements ChatQueryRepository {
     }
 
     @Override
-    public Slice<Chat> getChatRoomChats(Long roomId, Optional<Long> postCursorId, Pageable pageable,
+    public Slice<Chat> getChatRoomChats(Long roomId, Long postCursorId, Pageable pageable,
         Long userId) {
         return toSlice(queryFactory.select(chat)
             .from(chat)
