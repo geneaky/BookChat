@@ -1,7 +1,6 @@
 package toy.bookchat.bookchat.domain.book;
 
 import java.net.URI;
-import java.util.Optional;
 import java.util.function.Consumer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
@@ -25,10 +24,14 @@ public class KakaoBookFetcher implements BookFetcher<KakaoBook> {
             .retrieve()
             .bodyToMono(KakaoBook.class).block();
 
-        if (Optional.ofNullable(kakaoBook).isPresent()) {
-            return kakaoBook;
-        }
+        checkKakaoBookIsExisted(kakaoBook);
 
-        throw new BookNotFoundException();
+        return kakaoBook;
+    }
+
+    private void checkKakaoBookIsExisted(KakaoBook kakaoBook) {
+        if (kakaoBook == null) {
+            throw new BookNotFoundException();
+        }
     }
 }

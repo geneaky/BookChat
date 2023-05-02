@@ -1,6 +1,5 @@
 package toy.bookchat.bookchat.domain.user.api;
 
-import java.util.Optional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
@@ -68,7 +67,7 @@ public class UserController {
     @PostMapping("/users/profile")
     public void updateUserProfile(
         @Valid @RequestPart ChangeUserNicknameRequest changeUserNicknameRequest,
-        @RequestPart Optional<MultipartFile> userProfileImage,
+        @RequestPart(required = false) MultipartFile userProfileImage,
         @UserPayload TokenPayload tokenPayload) {
         userService.updateUserProfile(changeUserNicknameRequest, userProfileImage,
             tokenPayload.getUserId());
@@ -76,7 +75,7 @@ public class UserController {
 
     @PostMapping("/users/signup")
     public void userSignUp(@Valid @RequestPart UserSignUpRequest userSignUpRequest,
-        @RequestPart Optional<MultipartFile> userProfileImage,
+        @RequestPart(required = false) MultipartFile userProfileImage,
         @RequestHeader(OIDC) @NotBlank @Pattern(regexp = "^(Bearer)\\s.+") String bearerToken) {
         String oauth2MemberNumber = idTokenManager.getOAuth2MemberNumberFromIdToken(bearerToken,
             userSignUpRequest.getOauth2Provider());

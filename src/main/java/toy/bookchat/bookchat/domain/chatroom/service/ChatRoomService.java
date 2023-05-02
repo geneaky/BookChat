@@ -4,7 +4,6 @@ import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.HOST;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
@@ -62,27 +61,30 @@ public class ChatRoomService {
 
     @Transactional
     public CreatedChatRoomDto createChatRoom(CreateChatRoomRequest createChatRoomRequest,
-        Optional<MultipartFile> chatRoomImage, Long userId) {
+        MultipartFile chatRoomImage, Long userId) {
         Book book = bookRepository.findByIsbnAndPublishAt(createChatRoomRequest.getIsbn(),
                 createChatRoomRequest.getPublishAt())
             .orElseGet(() -> bookRepository.save(createChatRoomRequest.createBook()));
         User host = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
         ChatRoom chatRoom;
-        if (chatRoomImage.isPresent()) {
-            MultipartFile image = chatRoomImage.get();
-            String prefixedUUIDFileName = storageService.createFileName(image,
+        if (chatRoomExistent(chatRoomImage)) {
+            String prefixedUUIDFileName = storageService.createFileName(chatRoomImage,
                 UUID.randomUUID().toString(),
                 new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
             String prefixedUUIDFileUrl = storageService.getFileUrl(prefixedUUIDFileName);
             chatRoom = registerChatRoom(createChatRoomRequest, book, host, prefixedUUIDFileUrl);
 
-            storageService.upload(image, prefixedUUIDFileName);
+            storageService.upload(chatRoomImage, prefixedUUIDFileName);
         } else {
             chatRoom = registerChatRoom(createChatRoomRequest, book, host, null);
         }
 
         return CreatedChatRoomDto.of(chatRoom);
+    }
+
+    private boolean chatRoomExistent(MultipartFile chatRoomImage) {
+        return chatRoomImage != null;
     }
 
     private ChatRoom registerChatRoom(CreateChatRoomRequest createChatRoomRequest, Book book,

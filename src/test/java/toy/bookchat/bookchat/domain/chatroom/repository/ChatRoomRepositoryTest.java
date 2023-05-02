@@ -10,7 +10,6 @@ import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.SUBHOST
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -466,10 +465,7 @@ class ChatRoomRepositoryTest {
 
         PageRequest pageable = PageRequest.of(0, 1);
         ChatRoomRequest chatRoomRequest = ChatRoomRequest.builder()
-            .postCursorId(Optional.of(500L))
-            .title(Optional.empty())
-            .isbn(Optional.empty())
-            .roomName(Optional.empty())
+            .postCursorId(500L)
             .tags(List.of("hashTag1"))
             .build();
 

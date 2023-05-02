@@ -42,23 +42,23 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
         this.queryFactory = queryFactory;
     }
 
-    private BooleanExpression inTags(ChatRoomRequest chatRoomRequest) {
-        if (chatRoomRequest.getTags().isEmpty()) {
+    private BooleanExpression inTags(List<String> tags) {
+        if (tags.isEmpty()) {
             return null;
         }
-        return hashTag.tagName.in(chatRoomRequest.getTags());
+        return hashTag.tagName.in(tags);
     }
 
-    private BooleanExpression eqIsbn(ChatRoomRequest chatRoomRequest) {
-        return chatRoomRequest.getIsbn().map(book.isbn::eq).orElse(null);
+    private BooleanExpression eqIsbn(String isbn) {
+        return isbn == null ? null : book.isbn.eq(isbn);
     }
 
-    private BooleanExpression containsTitle(ChatRoomRequest chatRoomRequest) {
-        return chatRoomRequest.getTitle().map(book.title::contains).orElse(null);
+    private BooleanExpression containsTitle(String title) {
+        return title == null ? null : book.title.contains(title);
     }
 
-    private BooleanExpression containsRoomName(ChatRoomRequest chatRoomRequest) {
-        return chatRoomRequest.getRoomName().map(chatRoom.roomName::contains).orElse(null);
+    private BooleanExpression containsRoomName(String roomName) {
+        return roomName == null ? null : chatRoom.roomName.contains(roomName);
     }
 
     private BooleanExpression afterPostCursorId(Long postCursorId) {
@@ -151,7 +151,7 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
                 JPAExpressions.select(subChatRoomHashTag.chatRoom.id)
                     .from(subChatRoomHashTag)
                     .where(subChatRoomHashTag.chatRoom.id.eq(chatRoom.id),
-                        inTags(chatRoomRequest))))
+                        inTags(chatRoomRequest.getTags()))))
             .join(hashTag).on(hashTag.id.eq(chatRoomHashTag.hashTag.id))
             .leftJoin(chat).on(chat.id.in(
                 JPAExpressions.select(subChat.id.max())
@@ -160,10 +160,10 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
                     .having(subChat.chatRoom.id.eq(chatRoom.id))))
             .groupBy(chatRoom.id, chat.id)
             .where(chat.chatRoom.id.eq(chatRoom.id),
-                chatRoomRequest.getPostCursorId().map(chatRoom.id::lt).orElse(null),
-                eqIsbn(chatRoomRequest),
-                containsTitle(chatRoomRequest),
-                containsRoomName(chatRoomRequest)
+                ltCursorId(chatRoomRequest.getPostCursorId()),
+                eqIsbn(chatRoomRequest.getIsbn()),
+                containsTitle(chatRoomRequest.getTitle()),
+                containsRoomName(chatRoomRequest.getRoomName())
             )
             .limit(pageable.getPageSize())
             .orderBy(chat.id.desc(), chatRoom.id.desc())
@@ -182,6 +182,10 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
         contents.forEach(c -> c.setBookAuthors(authorsMap.get(c.getRoomId())));
 
         return toSlice(contents, pageable);
+    }
+
+    private BooleanExpression ltCursorId(Long cursorId) {
+        return cursorId == null ? null : chatRoom.id.lt(cursorId);
     }
 
     @Override

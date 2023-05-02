@@ -67,7 +67,7 @@ class UserServiceTest {
         when(storageService.getFileUrl(any())).thenReturn("testBucketUrl");
         when(userSignUpRequest.getUser(any(), any(), any())).thenReturn(mockUser);
 
-        userService.registerNewUser(userSignUpRequest, Optional.of(multipartFile), "memberNumber",
+        userService.registerNewUser(userSignUpRequest, multipartFile, "memberNumber",
             "test@gmail.com");
 
         verify(userRepository).save(any(User.class));
@@ -78,12 +78,11 @@ class UserServiceTest {
     void 이미_가입된_사용자일경우_예외발생() throws Exception {
         UserSignUpRequest userSignUpRequest = mock(UserSignUpRequest.class);
         User mockUser = mock(User.class);
-        MultipartFile multipartFile = mock(MultipartFile.class);
 
         when(userRepository.findByName(any())).thenReturn(Optional.of(mockUser));
 
         assertThatThrownBy(() -> {
-            userService.registerNewUser(userSignUpRequest, Optional.empty(),
+            userService.registerNewUser(userSignUpRequest, null,
                 "testMemberNumber",
                 "test@gmail.com"
             );
@@ -92,7 +91,6 @@ class UserServiceTest {
 
     @Test
     void 가입된_사용자인지_체크시_가입되지_않은_사용자라면_예외발생() throws Exception {
-
         when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(null));
 
         assertThatThrownBy(() -> {
@@ -124,9 +122,7 @@ class UserServiceTest {
 
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         when(storageService.getFileUrl(any())).thenReturn("test-s3-image-url");
-        userService.updateUserProfile(changeUserNicknameRequest,
-            Optional.ofNullable(multipartFile),
-            user.getId());
+        userService.updateUserProfile(changeUserNicknameRequest, multipartFile, user.getId());
 
         String nickname = user.getNickname();
         String profileImageUrl = user.getProfileImageUrl();
@@ -146,7 +142,7 @@ class UserServiceTest {
             "user2");
 
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-        userService.updateUserProfile(changeUserNicknameRequest, Optional.empty(), user.getId());
+        userService.updateUserProfile(changeUserNicknameRequest, null, user.getId());
 
         String nickname = user.getNickname();
         assertThat(nickname).isEqualTo("user2");

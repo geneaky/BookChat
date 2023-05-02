@@ -7,7 +7,5 @@ import toy.bookchat.bookchat.domain.book.Book;
 
 public interface BookRepository extends JpaRepository<Book, Long> {
 
-    Optional<Book> findByIsbn(String isbn);
-
     Optional<Book> findByIsbnAndPublishAt(String isbn, LocalDate publishAt);
 }
