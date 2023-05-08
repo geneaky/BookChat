@@ -53,6 +53,7 @@ import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.UserC
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.UserChatRoomsResponseSlice;
 import toy.bookchat.bookchat.domain.chatroom.service.ChatRoomService;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.CreateChatRoomRequest;
+import toy.bookchat.bookchat.domain.chatroom.service.dto.request.ReviseChatRoomRequest;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.response.CreatedChatRoomDto;
 import toy.bookchat.bookchat.domain.participant.service.dto.RoomGuest;
 import toy.bookchat.bookchat.domain.participant.service.dto.RoomHost;
@@ -63,7 +64,6 @@ import toy.bookchat.bookchat.domain.participant.service.dto.response.ChatRoomDet
 class ChatRoomControllerTest extends ControllerTestExtension {
 
     public final String JWT_TOKEN = getTestToken();
-
     @MockBean
     private ChatRoomService chatRoomService;
     @Autowired
@@ -468,6 +468,41 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                     fieldWithPath("roomGuestList[].defaultProfileImageType").type(NUMBER)
                         .description("참여자 기본 프로필 이미지 타입")
                 )));
+    }
+
+    @Test
+    void 채팅방_정보_수정() throws Exception {
+        ReviseChatRoomRequest reviseChatRoomRequest = ReviseChatRoomRequest.builder()
+            .roomId(1L)
+            .roomSize(200)
+            .roomName("changedRoomName")
+            .build();
+
+        MockMultipartFile chatRoomImagePart = new MockMultipartFile("chatRoomImage", "",
+            "image/webp", "test".getBytes());
+        MockMultipartFile reviseChatRoomRequestFile = new MockMultipartFile("reviseChatRoomRequest",
+            "", APPLICATION_JSON_VALUE,
+            objectMapper.writeValueAsString(reviseChatRoomRequest).getBytes(UTF_8));
+
+        mockMvc.perform(multipart("/v1/api/chatrooms/{roomId}", 1)
+                .file(reviseChatRoomRequestFile)
+                .file(chatRoomImagePart)
+                .header(AUTHORIZATION, JWT_TOKEN)
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isOk())
+            .andDo(document("post-chatroom-info",
+                requestHeaders(
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
+                ),
+                requestParts(
+                    partWithName("reviseChatRoomRequest").description("채팅방 수정 폼"),
+                    partWithName("chatRoomImage").optional().description("채팅방 이미지 [200x200].webp")
+                ),
+                requestPartFields("reviseChatRoomRequest",
+                    fieldWithPath("roomId").type(NUMBER).description("채팅방 id"),
+                    fieldWithPath("roomName").type(STRING).optional().description("채팅방 이름"),
+                    fieldWithPath("roomSize").type(NUMBER).optional().description("채팅방 크기"))
+            ));
     }
 
     private UserChatRoomResponse getChatRoomResponse(ChatRoom chatRoom, Chat chat) {

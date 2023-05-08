@@ -710,6 +710,26 @@ include::{snippets}/get-chatrooms/http-request.adoc[]
 include::{snippets}/get-chatrooms/response-fields.adoc[]
 include::{snippets}/get-chatrooms/http-response.adoc[]
 
+---
+
+=== 채팅방 정보 수정
+
+`Request Header`
+
+include::{snippets}/post-chatroom-info/request-headers.adoc[]
+
+`Request`
+
+****
+include::{snippets}/post-chatroom-info/request-parts.adoc[]
+`reviseChatRoomRequest`
+include::{snippets}/post-chatroom-info/request-part-reviseChatRoomRequest-fields.adoc[]
+****
+
+`Response`
+
+include::{snippets}/post-chatroom-info/http-response.adoc[]
+
 == 참여자
 
 === 방장의 참여자 권한 관리

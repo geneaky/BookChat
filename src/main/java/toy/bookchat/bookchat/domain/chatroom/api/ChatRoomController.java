@@ -18,6 +18,7 @@ import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.UserC
 import toy.bookchat.bookchat.domain.chatroom.service.ChatRoomService;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.ChatRoomRequest;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.CreateChatRoomRequest;
+import toy.bookchat.bookchat.domain.chatroom.service.dto.request.ReviseChatRoomRequest;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.response.CreatedChatRoomDto;
 import toy.bookchat.bookchat.domain.participant.service.dto.response.ChatRoomDetails;
 import toy.bookchat.bookchat.security.user.TokenPayload;
@@ -67,5 +68,12 @@ public class ChatRoomController {
     public ChatRoomDetails getChatRoomDetails(@PathVariable Long roomId,
         @UserPayload TokenPayload tokenPayload) {
         return chatRoomService.getChatRoomDetails(roomId, tokenPayload.getUserId());
+    }
+
+    @PostMapping("/chatrooms/{roomId}")
+    public void reviseChatRoom(@Valid @RequestPart ReviseChatRoomRequest reviseChatRoomRequest,
+        @RequestPart(required = false) MultipartFile chatRoomImage,
+        @UserPayload TokenPayload tokenPayload) {
+
     }
 }
