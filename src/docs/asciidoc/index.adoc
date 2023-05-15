@@ -658,7 +658,7 @@ include::{snippets}/post-chatroom/http-response.adoc[]
 
 ---
 
-=== 채팅방 참여인원 조회
+=== 채팅방 정보 조회
 
 `Request Header`
 
