@@ -179,9 +179,6 @@ class ChatRoomServiceTest {
             .roomName(chatRoom1.getRoomName())
             .roomMemberCount(1L)
             .defaultRoomImageType(chatRoom1.getDefaultRoomImageType())
-            .lastChatId(chat1.getId())
-            .lastActiveTime(chat1.getCreatedAt())
-            .lastChatContent(chat1.getMessage())
             .build();
         List<UserChatRoomResponse> result = List.of(userChatRoomResponse);
         PageRequest pageRequest = PageRequest.of(0, 1, Sort.by("id").descending());

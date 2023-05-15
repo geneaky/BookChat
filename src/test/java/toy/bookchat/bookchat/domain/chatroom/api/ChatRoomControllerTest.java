@@ -45,7 +45,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
 import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookRequest;
-import toy.bookchat.bookchat.domain.chat.Chat;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomResponse;
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomsResponseSlice;
@@ -170,12 +169,6 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .roomImageUri(null)
             .build();
         chatRoom1.setCreatedAt(LocalDateTime.now());
-        Chat chat1 = Chat.builder()
-            .id(1L)
-            .message("안녕")
-            .chatRoom(chatRoom1)
-            .build();
-        chat1.setCreatedAt(LocalDateTime.now());
         ChatRoom chatRoom2 = ChatRoom.builder()
             .id(2L)
             .book(book2)
@@ -186,12 +179,6 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .roomImageUri("testRoomImageUri")
             .build();
         chatRoom2.setCreatedAt(LocalDateTime.now());
-        Chat chat2 = Chat.builder()
-            .id(2L)
-            .message("잘가")
-            .chatRoom(chatRoom2)
-            .build();
-        chat2.setCreatedAt(LocalDateTime.now());
         ChatRoom chatRoom3 = ChatRoom.builder()
             .id(3L)
             .book(book3)
@@ -202,21 +189,16 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .roomImageUri(null)
             .build();
         chatRoom3.setCreatedAt(LocalDateTime.now());
-        Chat chat3 = Chat.builder()
-            .id(3L)
-            .message("이거 모르겠음")
-            .chatRoom(chatRoom3)
-            .build();
-        chat3.setCreatedAt(LocalDateTime.now());
-        UserChatRoomResponse userChatRoomResponse1 = getChatRoomResponse(chatRoom1, chat1);
-        UserChatRoomResponse userChatRoomResponse2 = getChatRoomResponse(chatRoom2, chat2);
-        UserChatRoomResponse userChatRoomResponse3 = getChatRoomResponse(chatRoom3, chat3);
-        List<UserChatRoomResponse> result = List.of(userChatRoomResponse1, userChatRoomResponse2,
-            userChatRoomResponse3);
+
+        List<UserChatRoomResponse> result = List.of(getChatRoomResponse(chatRoom1),
+            getChatRoomResponse(chatRoom2), getChatRoomResponse(chatRoom3));
+
         PageRequest pageRequest = PageRequest.of(0, 3, Sort.by("id").descending());
         Slice<UserChatRoomResponse> slice = new SliceImpl<>(result, pageRequest, true);
         UserChatRoomsResponseSlice response = UserChatRoomsResponseSlice.of(slice);
+
         when(chatRoomService.getUserChatRooms(any(), any(), any(), any())).thenReturn(response);
+
         mockMvc.perform(get("/v1/api/users/chatrooms")
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
@@ -252,13 +234,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                     fieldWithPath("userChatRoomResponseList[].bookCoverImageUrl").type(STRING)
                         .description("책 커버 이미지"),
                     fieldWithPath("userChatRoomResponseList[].bookAuthors[]").type(ARRAY)
-                        .description("책 저자"),
-                    fieldWithPath("userChatRoomResponseList[].lastChatId").type(NUMBER)
-                        .description("마지막 채팅 ID"),
-                    fieldWithPath("userChatRoomResponseList[].lastActiveTime").type(STRING)
-                        .description("마지막 채팅 활성 시간"),
-                    fieldWithPath("userChatRoomResponseList[].lastChatContent").type(STRING)
-                        .description("마지막 채팅 내용")
+                        .description("책 저자")
                 ).and(getCursorField())));
     }
 
@@ -509,7 +485,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
         verify(chatRoomService).reviseChatRoom(any(), any(), any());
     }
 
-    private UserChatRoomResponse getChatRoomResponse(ChatRoom chatRoom, Chat chat) {
+    private UserChatRoomResponse getChatRoomResponse(ChatRoom chatRoom) {
         return UserChatRoomResponse.builder()
             .roomId(chatRoom.getId())
             .roomSid(chatRoom.getRoomSid())
@@ -519,9 +495,6 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .bookTitle(chatRoom.getBookTitle())
             .bookCoverImageUrl(chatRoom.getBookCoverImageUrl())
             .bookAuthors(chatRoom.getBookAuthors())
-            .lastChatId(chat.getId())
-            .lastActiveTime(chat.getCreatedAt())
-            .lastChatContent(chat.getMessage())
             .build();
     }
 }

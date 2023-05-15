@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -24,7 +25,7 @@ public class Book extends BaseEntity {
     private String publisher;
     private String bookCoverImageUrl;
     private LocalDate publishAt;
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     private List<String> authors = new ArrayList<>();
 
     @Builder
