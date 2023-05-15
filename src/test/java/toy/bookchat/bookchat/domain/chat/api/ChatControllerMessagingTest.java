@@ -122,96 +122,6 @@ class ChatControllerMessagingTest extends ControllerTestExtension {
     }
 
     @Test
-    void 방장_채팅방_입장시_참여자등록없이_메시지_수신_성공() throws Exception {
-        StompHeaders subscribeHeader = stompSubscribeHeaders("/topic/heho");
-        StompHeaders enterHeader = stompSendHeaders("/subscriptions/enter/chatrooms/1");
-
-        ChatRoom chatRoom = ChatRoom.builder()
-            .id(1L)
-            .host(getUser())
-            .roomSid("heho")
-            .roomSize(3)
-            .build();
-
-        Chat chat = Chat.builder()
-            .id(1L)
-            .message(getUserNickname() + "님이 입장하셨습니다.")
-            .user(getUser())
-            .chatRoom(chatRoom)
-            .build();
-        chat.setCreatedAt(LocalDateTime.now());
-
-        ChatDto dto = ChatDto.builder()
-            .chatId(chat.getId())
-            .dispatchTime(chat.getDispatchTime())
-            .message(chat.getMessage())
-            .build();
-
-        Runnable[] chatActions = {
-            () -> this.stompSession.send(enterHeader, null),
-        };
-
-        when(userRepository.findById(any())).thenReturn(Optional.ofNullable(getUser()));
-        when(chatRoomRepository.findById(any())).thenReturn(
-            Optional.of(chatRoom));
-        when(chatRepository.save(any())).thenReturn(chat);
-
-        CountDownLatch chatAttemptCountLatch = new CountDownLatch(chatActions.length);
-        this.stompSession.subscribe(subscribeHeader,
-                subscribeFrameSessionHandler(chatAttemptCountLatch))
-            .addReceiptTask(() -> doChat(chatActions));
-        chatAttemptCountLatch.await();
-
-        assertThat(blockingQueue).containsExactlyInAnyOrder(dto);
-        verify(chatRepository).save(any());
-    }
-
-    @Test
-    void 게스트_채팅방_입장시_참여자등록후_메시지_수신_성공() throws Exception {
-        StompHeaders subscribeHeader = stompSubscribeHeaders("/topic/heho");
-        StompHeaders enterHeader = stompSendHeaders("/subscriptions/enter/chatrooms/1");
-
-        ChatRoom chatRoom = ChatRoom.builder()
-            .id(1L)
-            .roomSid("heho")
-            .roomSize(3)
-            .build();
-
-        Chat chat = Chat.builder()
-            .id(1L)
-            .message(getUserNickname() + "님이 입장하셨습니다.")
-            .user(getUser())
-            .chatRoom(chatRoom)
-            .build();
-        chat.setCreatedAt(LocalDateTime.now());
-
-        ChatDto dto = ChatDto.builder()
-            .chatId(chat.getId())
-            .dispatchTime(chat.getDispatchTime())
-            .message(chat.getMessage())
-            .build();
-
-        Runnable[] chatActions = {
-            () -> this.stompSession.send(enterHeader, null),
-        };
-
-        when(userRepository.findById(any())).thenReturn(Optional.ofNullable(getUser()));
-        when(chatRoomRepository.findById(any())).thenReturn(
-            Optional.of(chatRoom));
-        when(chatRepository.save(any())).thenReturn(chat);
-
-        CountDownLatch chatAttemptCountLatch = new CountDownLatch(chatActions.length);
-        this.stompSession.subscribe(subscribeHeader,
-                subscribeFrameSessionHandler(chatAttemptCountLatch))
-            .addReceiptTask(() -> doChat(chatActions));
-        chatAttemptCountLatch.await();
-
-        assertThat(blockingQueue).containsExactlyInAnyOrder(dto);
-        verify(chatRepository).save(any());
-        verify(participantRepository).save(any());
-    }
-
-    @Test
     void 서로다른_세션_메시지_송신_수신_성공() throws Exception {
         StompHeaders subscribeHeader = stompSubscribeHeaders("/topic/heho");
         StompHeaders sendHeader = stompSendHeaders("/subscriptions/send/chatrooms/1");
@@ -306,67 +216,17 @@ class ChatControllerMessagingTest extends ControllerTestExtension {
     }
 
     @Test
-    void 채팅방_퇴장_메시지_수신_성공() throws Exception {
-        StompHeaders subscribeHeader = stompSubscribeHeaders("/topic/heho");
-        StompHeaders leaveHeader = stompSendHeaders("/subscriptions/leave/chatrooms/1");
-
-        ChatRoom chatRoom = ChatRoom.builder()
-            .id(1L)
-            .roomSize(3)
-            .roomSid("heho")
-            .build();
-
-        Participant participant = Participant.builder()
-            .id(1L)
-            .user(getUser())
-            .chatRoom(chatRoom)
-            .build();
-
-        Chat chat = Chat.builder()
-            .id(1L)
-            .message(getUserNickname() + "님이 퇴장하셨습니다.")
-            .user(getUser())
-            .chatRoom(chatRoom)
-            .build();
-        chat.setCreatedAt(LocalDateTime.now());
-
-        ChatDto dto = ChatDto.builder()
-            .chatId(chat.getId())
-            .dispatchTime(chat.getDispatchTime())
-            .message(chat.getMessage())
-            .build();
-
-        Runnable[] chatActions = {
-            () -> this.stompSession.send(leaveHeader, null)
-        };
-
-        when(participantRepository.findByUserIdAndChatRoomId(any(), any())).thenReturn(
-            Optional.ofNullable(participant));
-        when(chatRepository.save(any())).thenReturn(chat);
-
-        CountDownLatch chatAttemptCountLatch = new CountDownLatch(chatActions.length);
-        this.stompSession.subscribe(subscribeHeader,
-                subscribeFrameSessionHandler(chatAttemptCountLatch))
-            .addReceiptTask(() -> doChat(chatActions));
-        chatAttemptCountLatch.await();
-
-        assertThat(blockingQueue).containsExactlyInAnyOrder(dto);
-        verify(participantRepository).delete(any());
-        verify(chatRepository).save(any());
-    }
-
-    @Test
     void 메시지_예외_테스트() throws Exception {
         StompHeaders subscribeHeader = stompSubscribeHeaders("/topic/heho");
         StompHeaders subscribeError = stompSubscribeHeaders("/user/exchange/amq.direct/error");
-        StompHeaders enterHeader = stompSendHeaders("/subscriptions/enter/chatrooms/123");
+        StompHeaders sendHeader = stompSendHeaders("/subscriptions/send/chatrooms/1");
 
         ChatDto dto = ChatDto.builder()
             .message(BAD_REQUEST.getValue().toString())
             .build();
 
         Runnable[] chatActions = {
-            () -> this.stompSession.send(enterHeader, null),
+            () -> this.stompSession.send(sendHeader, null),
         };
 
         CountDownLatch chatAttemptCountLatch = new CountDownLatch(chatActions.length);

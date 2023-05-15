@@ -767,6 +767,38 @@ include::{snippets}/delete-participant/http-response.adoc[]
 
 == 채팅
 
+=== 채팅방 입장
+
+`Request Header`
+
+include::{snippets}/post-enter-chatrooms/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/post-enter-chatrooms/path-parameters.adoc[]
+
+`Response`
+
+include::{snippets}/post-enter-chatrooms/http-response.adoc[]
+
+---
+
+=== 채팅방 퇴장
+
+`Requset Header`
+
+include::{snippets}/delete-leave-chatrooms/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/delete-leave-chatrooms/path-parameters.adoc[]
+
+`Response`
+
+include::{snippets}/delete-leave-chatrooms/http-response.adoc[]
+
+---
+
 === 채팅내역 조회
 
 `Request Header`
@@ -816,38 +848,6 @@ include::{snippets}/get-chatroom-chats/http-response.adoc[]
     SUBSCRIBE
     Authorization: Bearer [JWT Token]
     host: wss://bookchat.link/user/exchange/amq.direct/error
-
-    ^@
-```
-
-=== 채팅방 입장 Send
-
-[cols="1,1"]
-|===
-|roomId|/enter/chatrooms/{roomId}
-|Long   |/enter/chatrooms/123
-|===
-
-```stomp
-    SEND
-    Authorization: Bearer [JWT Token]
-    host: wss://bookchat.link/subscriptions/enter/chatrooms/[123]
-
-    ^@
-```
-
-=== 채팅방 퇴장 Send
-
-[cols="1,1"]
-|===
-|roomId|/leave/chatrooms/{roomId}
-|Long   |/leave/chatrooms/123
-|===
-
-```stomp
-    SEND
-    Authorization: Bearer [JWT Token]
-    host: wss://bookchat.link/subscriptions/leave/chatrooms/[123]
 
     ^@
 ```

@@ -6,7 +6,9 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -40,6 +42,36 @@ class ChatControllerTest extends ControllerTestExtension {
     private ChatService chatService;
     @Autowired
     private MockMvc mockMvc;
+
+    @Test
+    void 채팅방_입장_성공() throws Exception {
+        mockMvc.perform(post("/v1/api/enter/chatrooms/{roomId}", 1)
+                .header(AUTHORIZATION, JWT_TOKEN)
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isOk())
+            .andDo(document("post-enter-chatrooms",
+                requestHeaders(
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
+                ),
+                pathParameters(
+                    parameterWithName("roomId").description("Room id")
+                )));
+    }
+
+    @Test
+    void 채팅방_퇴장_성공() throws Exception {
+        mockMvc.perform(delete("/v1/api/leave/chatrooms/{roomId}", 1)
+                .header(AUTHORIZATION, JWT_TOKEN)
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isOk())
+            .andDo(document("delete-leave-chatrooms",
+                requestHeaders(
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
+                ),
+                pathParameters(
+                    parameterWithName("roomId").description("Room id")
+                )));
+    }
 
     @Test
     void 현재_채팅방_채팅내역_조회_성공() throws Exception {
