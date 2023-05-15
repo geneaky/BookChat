@@ -1,5 +1,6 @@
 package toy.bookchat.bookchat.domain.chatroom;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -19,7 +20,7 @@ public class ChatRoomHashTag extends BaseEntity {
     @ManyToOne
     private ChatRoom chatRoom;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REMOVE)
     private HashTag hashTag;
 
     protected ChatRoomHashTag() {

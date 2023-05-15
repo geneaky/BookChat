@@ -476,6 +476,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .roomId(1L)
             .roomSize(200)
             .roomName("changedRoomName")
+            .tags(List.of("tag5", "tag6"))
             .build();
 
         MockMultipartFile chatRoomImagePart = new MockMultipartFile("chatRoomImage", "",
@@ -501,8 +502,11 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                 requestPartFields("reviseChatRoomRequest",
                     fieldWithPath("roomId").type(NUMBER).description("채팅방 id"),
                     fieldWithPath("roomName").type(STRING).optional().description("채팅방 이름"),
-                    fieldWithPath("roomSize").type(NUMBER).optional().description("채팅방 크기"))
+                    fieldWithPath("roomSize").type(NUMBER).optional().description("채팅방 크기"),
+                    fieldWithPath("tags").type(ARRAY).optional().description("채팅방 태그"))
             ));
+
+        verify(chatRoomService).reviseChatRoom(any(), any(), any());
     }
 
     private UserChatRoomResponse getChatRoomResponse(ChatRoom chatRoom, Chat chat) {

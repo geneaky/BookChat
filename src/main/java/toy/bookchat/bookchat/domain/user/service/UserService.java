@@ -1,7 +1,7 @@
 package toy.bookchat.bookchat.domain.user.service;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -24,6 +24,7 @@ public class UserService {
     private final BookShelfService bookShelfService;
     private final AgonyService agonyService;
     private final StorageService storageService;
+    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public UserService(UserRepository userRepository,
         BookShelfService bookShelfService,
@@ -51,14 +52,10 @@ public class UserService {
     }
 
     private void uploadWithImage(UserSignUpRequest userSignUpRequest,
-        MultipartFile userProfileImage,
-        String userName, String userEmail) {
-        String prefixedUUIDFileName = storageService.createFileName(
-            userProfileImage, UUID.randomUUID().toString(),
-            new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
-        String prefixedUUIDFileUrl = storageService.getFileUrl(prefixedUUIDFileName);
-        saveUser(userSignUpRequest, userName, userEmail, prefixedUUIDFileUrl);
-        storageService.upload(userProfileImage, prefixedUUIDFileName);
+        MultipartFile userProfileImage, String userName, String userEmail) {
+        String uploadFileUrl = storageService.upload(userProfileImage, UUID.randomUUID().toString(),
+            LocalDateTime.now().format(dateTimeFormatter));
+        saveUser(userSignUpRequest, userName, userEmail, uploadFileUrl);
     }
 
     private void uploadWithoutImage(UserSignUpRequest userSignUpRequest, String userName,
@@ -96,12 +93,10 @@ public class UserService {
 
     private void updateNicknameWithProfileImage(ChangeUserNicknameRequest changeUserNicknameRequest,
         MultipartFile userProfileImage, User user) {
-        String prefixedUUIDFileName = storageService.createFileName(userProfileImage,
-            UUID.randomUUID().toString(), new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
-        String prefixedUUIDFileUrl = storageService.getFileUrl(prefixedUUIDFileName);
+        String uploadFileUrl = storageService.upload(userProfileImage, UUID.randomUUID().toString(),
+            LocalDateTime.now().format(dateTimeFormatter));
         user.changeUserNickname(changeUserNicknameRequest.getNickname());
-        user.changeProfileImageUrl(prefixedUUIDFileUrl);
-        storageService.upload(userProfileImage, prefixedUUIDFileName);
+        user.changeProfileImageUrl(uploadFileUrl);
     }
 
     private void saveUser(UserSignUpRequest userSignUpRequest, String userName,

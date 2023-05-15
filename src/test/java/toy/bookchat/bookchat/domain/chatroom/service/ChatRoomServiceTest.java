@@ -1,7 +1,10 @@
 package toy.bookchat.bookchat.domain.chatroom.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -21,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.book.repository.BookRepository;
@@ -36,10 +40,12 @@ import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.UserC
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.UserChatRoomsResponseSlice;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.ChatRoomRequest;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.CreateChatRoomRequest;
+import toy.bookchat.bookchat.domain.chatroom.service.dto.request.ReviseChatRoomRequest;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
 import toy.bookchat.bookchat.domain.storage.ChatRoomStorageService;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
+import toy.bookchat.bookchat.exception.chatroom.NotEnoughRoomSizeException;
 
 @ExtendWith(MockitoExtension.class)
 class ChatRoomServiceTest {
@@ -124,7 +130,7 @@ class ChatRoomServiceTest {
         verify(chatRoomRepository).save(any());
         verify(hashTagRepository, times(2)).save(any());
         verify(chatRoomHashTagRepository, times(2)).save(any());
-        verify(storageService).upload(any(), any());
+        verify(storageService).upload(any(), any(), any());
 
     }
 
@@ -258,5 +264,73 @@ class ChatRoomServiceTest {
     void 채팅방_세부정보_조회_성공() throws Exception {
         chatRoomService.getChatRoomDetails(1L, 1L);
         verify(chatRoomRepository).findChatRoomDetails(any(), any());
+    }
+
+    @Test
+    void 채팅방_이미지를_포함한_정보_수정() throws Exception {
+        ReviseChatRoomRequest reviseChatRoomRequest = ChatRoomServiceTestFixture.createReviseChatRoomRequest(
+            100);
+        ChatRoom chatRoom = ChatRoomServiceTestFixture.getChatRoom();
+        MockMultipartFile chatRoomImage = new MockMultipartFile("newImageFile", "newImageFile",
+            "image/webp", "content".getBytes());
+
+        when(chatRoomRepository.findChatRoomByIdAndHostId(any(), any())).thenReturn(
+            Optional.of(chatRoom));
+        when(storageService.upload(eq(chatRoomImage), anyString(), anyString())).thenReturn(
+            "newRoomImageUri");
+
+        chatRoomService.reviseChatRoom(reviseChatRoomRequest, chatRoomImage, 763L);
+
+        assertThat(chatRoom.getRoomImageUri()).isEqualTo("newRoomImageUri");
+    }
+
+    @Test
+    void 채팅방_이미지를_제외한_정보_수정() throws Exception {
+        ReviseChatRoomRequest chatRoomRequest = ChatRoomServiceTestFixture.createReviseChatRoomRequest(
+            100);
+
+        ChatRoom chatRoom = ChatRoomServiceTestFixture.getChatRoom();
+
+        when(chatRoomRepository.findChatRoomByIdAndHostId(any(), any())).thenReturn(
+            Optional.of(chatRoom));
+
+        chatRoomService.reviseChatRoom(chatRoomRequest, null, 125L);
+
+        assertThat(chatRoom).extracting(ChatRoom::getRoomName, ChatRoom::getRoomSize)
+            .containsExactly(chatRoomRequest.getRoomName(), chatRoomRequest.getRoomSize());
+    }
+
+    @Test
+    void 채팅방_수정시_현재_방_크기보다_작은_크기로_변경시_예외발생() throws Exception {
+        ReviseChatRoomRequest chatRoomRequest = ChatRoomServiceTestFixture.createReviseChatRoomRequest(
+            50);
+
+        ChatRoom chatRoom = ChatRoomServiceTestFixture.getChatRoom();
+
+        when(chatRoomRepository.findChatRoomByIdAndHostId(any(), any())).thenReturn(
+            Optional.of(chatRoom));
+
+        assertThatThrownBy(() -> {
+            chatRoomService.reviseChatRoom(chatRoomRequest, null, 125L);
+        }).isInstanceOf(NotEnoughRoomSizeException.class);
+    }
+
+    private static class ChatRoomServiceTestFixture {
+
+        public static ReviseChatRoomRequest createReviseChatRoomRequest(Integer roomSize) {
+            return ReviseChatRoomRequest.builder()
+                .roomId(1L)
+                .roomName("afterRoomName")
+                .roomSize(roomSize)
+                .tags(List.of("tag4", "tag5"))
+                .build();
+        }
+
+        public static ChatRoom getChatRoom() {
+            return ChatRoom.builder()
+                .roomName("beforeRoomName")
+                .roomSize(100)
+                .build();
+        }
     }
 }

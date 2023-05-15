@@ -64,14 +64,13 @@ class UserServiceTest {
         User mockUser = mock(User.class);
         MultipartFile multipartFile = mock(MultipartFile.class);
 
-        when(storageService.getFileUrl(any())).thenReturn("testBucketUrl");
         when(userSignUpRequest.getUser(any(), any(), any())).thenReturn(mockUser);
 
         userService.registerNewUser(userSignUpRequest, multipartFile, "memberNumber",
             "test@gmail.com");
 
         verify(userRepository).save(any(User.class));
-        verify(storageService).upload(any(), any());
+        verify(storageService).upload(any(), any(), any());
     }
 
     @Test
@@ -108,30 +107,26 @@ class UserServiceTest {
     }
 
     @Test
-    void 프로필사진_있는경우_사용자_닉네임_프로필사진_변경_성공() throws Exception {
+    void 사용자_닉네임_프로필사진_변경_성공() throws Exception {
         User user = User.builder()
             .id(1L)
             .nickname("user1")
             .profileImageUrl("profile-image-url")
             .build();
-
         ChangeUserNicknameRequest changeUserNicknameRequest = new ChangeUserNicknameRequest(
             "user2");
-
         MultipartFile multipartFile = mock(MultipartFile.class);
 
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-        when(storageService.getFileUrl(any())).thenReturn("test-s3-image-url");
+        when(storageService.upload(any(), any(), any())).thenReturn("test-s3-image-url");
         userService.updateUserProfile(changeUserNicknameRequest, multipartFile, user.getId());
 
-        String nickname = user.getNickname();
-        String profileImageUrl = user.getProfileImageUrl();
-        assertThat(nickname).isEqualTo("user2");
-        assertThat(profileImageUrl).isEqualTo("test-s3-image-url");
+        assertThat(user).extracting(User::getNickname, User::getProfileImageUrl)
+            .containsExactly("user2", "test-s3-image-url");
     }
 
     @Test
-    void 프로필사진_없는경우_사용자_닉네임만_변경_성공() throws Exception {
+    void 사용자_닉네임만_변경_성공() throws Exception {
         User user = User.builder()
             .id(1L)
             .nickname("user1")
@@ -146,6 +141,6 @@ class UserServiceTest {
 
         String nickname = user.getNickname();
         assertThat(nickname).isEqualTo("user2");
-        verify(storageService, noInteractions()).upload(any(), any());
+        verify(storageService, noInteractions()).upload(any(), any(), any());
     }
 }

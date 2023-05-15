@@ -2,9 +2,11 @@ package toy.bookchat.bookchat.domain.chatroom.service;
 
 import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.HOST;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,7 @@ import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatR
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.UserChatRoomsResponseSlice;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.ChatRoomRequest;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.CreateChatRoomRequest;
+import toy.bookchat.bookchat.domain.chatroom.service.dto.request.ReviseChatRoomRequest;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.response.CreatedChatRoomDto;
 import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
@@ -29,6 +32,7 @@ import toy.bookchat.bookchat.domain.participant.service.dto.response.ChatRoomDet
 import toy.bookchat.bookchat.domain.storage.StorageService;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
+import toy.bookchat.bookchat.exception.chatroom.ChatRoomNotFoundException;
 import toy.bookchat.bookchat.exception.user.UserNotFoundException;
 
 @Service
@@ -41,6 +45,7 @@ public class ChatRoomService {
     private final StorageService storageService;
     private final BookRepository bookRepository;
     private final UserRepository userRepository;
+    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public ChatRoomService(
         ChatRoomRepository chatRoomRepository,
@@ -67,29 +72,21 @@ public class ChatRoomService {
             .orElseGet(() -> bookRepository.save(createChatRoomRequest.createBook()));
         User host = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
-        ChatRoom chatRoom;
-        if (chatRoomExistent(chatRoomImage)) {
-            String prefixedUUIDFileName = storageService.createFileName(chatRoomImage,
-                UUID.randomUUID().toString(),
-                new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
-            String prefixedUUIDFileUrl = storageService.getFileUrl(prefixedUUIDFileName);
-            chatRoom = registerChatRoom(createChatRoomRequest, book, host, prefixedUUIDFileUrl);
-
-            storageService.upload(chatRoomImage, prefixedUUIDFileName);
-        } else {
-            chatRoom = registerChatRoom(createChatRoomRequest, book, host, null);
+        if (chatRoomImageExistent(chatRoomImage)) {
+            String uploadFileUrl = storageService.upload(chatRoomImage,
+                UUID.randomUUID().toString(), LocalDateTime.now().format(dateTimeFormatter));
+            return CreatedChatRoomDto.of(
+                registerChatRoom(createChatRoomRequest, book, host, uploadFileUrl));
         }
-
-        return CreatedChatRoomDto.of(chatRoom);
+        return CreatedChatRoomDto.of(registerChatRoom(createChatRoomRequest, book, host, null));
     }
 
-    private boolean chatRoomExistent(MultipartFile chatRoomImage) {
+    private boolean chatRoomImageExistent(MultipartFile chatRoomImage) {
         return chatRoomImage != null;
     }
 
     private ChatRoom registerChatRoom(CreateChatRoomRequest createChatRoomRequest, Book book,
-        User host,
-        String prefixedUUIDFileUrl) {
+        User host, String prefixedUUIDFileUrl) {
         ChatRoom chatRoom;
         chatRoom = saveChatRoom(createChatRoomRequest, book, host, prefixedUUIDFileUrl);
         registerHashTagOnChatRoom(createChatRoomRequest, chatRoom);
@@ -139,5 +136,34 @@ public class ChatRoomService {
     @Transactional(readOnly = true)
     public ChatRoomDetails getChatRoomDetails(Long roomId, Long userId) {
         return chatRoomRepository.findChatRoomDetails(roomId, userId);
+    }
+
+    @Transactional
+    public void reviseChatRoom(ReviseChatRoomRequest reviseChatRoomRequest,
+        MultipartFile chatRoomImage, Long userId) {
+        ChatRoom chatRoom = chatRoomRepository.findChatRoomByIdAndHostId(
+            reviseChatRoomRequest.getRoomId(), userId).orElseThrow(ChatRoomNotFoundException::new);
+
+        updateIfChatRoomHashTagsPresent(reviseChatRoomRequest, chatRoom);
+        if (chatRoomImageExistent(chatRoomImage)) {
+            String roomImageUri = storageService.upload(chatRoomImage,
+                UUID.randomUUID().toString(), LocalDateTime.now().format(dateTimeFormatter));
+            chatRoom.changeRoomImageUri(roomImageUri);
+        }
+        reviseChatRoomRequest.reviseChatRoom(chatRoom);
+    }
+
+    private void updateIfChatRoomHashTagsPresent(ReviseChatRoomRequest reviseChatRoomRequest,
+        ChatRoom chatRoom) {
+        if (reviseChatRoomRequest.tagExistent()) {
+            chatRoomHashTagRepository.deleteAllByChatRoom(chatRoom);
+
+            List<HashTag> hashTags = reviseChatRoomRequest.createHashTag();
+            hashTagRepository.saveAll(hashTags);
+
+            List<ChatRoomHashTag> chatRoomHashTags = hashTags.stream()
+                .map(ht -> ChatRoomHashTag.of(chatRoom, ht)).collect(Collectors.toList());
+            chatRoomHashTagRepository.saveAll(chatRoomHashTags);
+        }
     }
 }

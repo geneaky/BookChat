@@ -15,8 +15,12 @@ services:
     image: grafana/grafana
     container_name: grafana
     ports:
-      - 3000:3000
+      - 443:443
     restart: always
+    volumes:
+      - ./grafana.ini:/etc/grafana/grafana.ini
+      - /etc/letsencrypt/live/monitoring.bookchat.link/fullchain.pem:/etc/grafana/grafana.crt
+      - /etc/letsencrypt/live/monitoring.bookchat.link/privkey.pem:/etc/grafana/grafana.key
 
   loki:
     image: grafana/loki
