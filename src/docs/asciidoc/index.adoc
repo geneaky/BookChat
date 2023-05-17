@@ -741,6 +741,7 @@ include::{snippets}/post-enter-chatrooms/request-headers.adoc[]
 `Request`
 
 include::{snippets}/post-enter-chatrooms/path-parameters.adoc[]
+include::{snippets}/post-enter-chatrooms/http-request.adoc[]
 
 `Response`
 
@@ -757,6 +758,7 @@ include::{snippets}/delete-leave-chatrooms/request-headers.adoc[]
 `Request`
 
 include::{snippets}/delete-leave-chatrooms/path-parameters.adoc[]
+include::{snippets}/delete-leave-chatrooms/http-request.adoc[]
 
 `Response`
 
