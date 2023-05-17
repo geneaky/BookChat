@@ -1,6 +1,5 @@
 package toy.bookchat.bookchat.domain.chat.api;
 
-import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -14,6 +13,8 @@ import toy.bookchat.bookchat.domain.chat.service.dto.response.ChatRoomChatsRespo
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPayload;
 
+import javax.validation.Valid;
+
 @Slf4j
 @RestController
 public class ChatController {
@@ -24,28 +25,16 @@ public class ChatController {
         this.chatService = chatService;
     }
 
-    @MessageMapping("/enter/chatrooms/{roomId}")
-    public void enterChatRoom(@UserPayload TokenPayload tokenPayload,
-        @DestinationVariable Long roomId) {
-        chatService.enterChatRoom(tokenPayload.getUserId(), roomId);
-    }
-
-    @MessageMapping("/leave/chatrooms/{roomId}")
-    public void leaveChatRoom(@UserPayload TokenPayload tokenPayload,
-        @DestinationVariable Long roomId) {
-        chatService.leaveChatRoom(tokenPayload.getUserId(), roomId);
-    }
-
     @MessageMapping("/send/chatrooms/{roomId}")
     public void sendMessage(@Valid MessageDto messageDto, @UserPayload TokenPayload tokenPayload,
-        @DestinationVariable Long roomId) {
+                            @DestinationVariable Long roomId) {
         chatService.sendMessage(tokenPayload.getUserId(), roomId, messageDto.getMessage());
     }
 
     @GetMapping("/v1/api/chatrooms/{roomId}/chats")
     public ChatRoomChatsResponse getChatRoomChats(@PathVariable Long roomId, Long postCursorId,
-        Pageable pageable, @UserPayload TokenPayload tokenPayload) {
+                                                  Pageable pageable, @UserPayload TokenPayload tokenPayload) {
         return chatService.getChatRoomChats(roomId, postCursorId, pageable,
-            tokenPayload.getUserId());
+                tokenPayload.getUserId());
     }
 }

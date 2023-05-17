@@ -61,16 +61,14 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
         return roomName == null ? null : chatRoom.roomName.contains(roomName);
     }
 
-    private BooleanExpression afterPostCursorId(Long postCursorId) {
-        return postCursorId == null ? null : chat.id.lt(postCursorId);
+    private BooleanExpression afterChatRoomId(Long postCursorId) {
+        return postCursorId == null ? null : chatRoom.id.lt(postCursorId);
     }
 
     @Override
-    public Slice<UserChatRoomResponse> findUserChatRoomsWithLastChat(Pageable pageable,
-        Long bookId, Long postCursorId, Long userId) {
-        QChat subChat = new QChat("subChat");
+    public Slice<UserChatRoomResponse> findUserChatRoomsWithLastChat(Pageable pageable, Long bookId,
+        Long postCursorId, Long userId) {
         QParticipant subParticipant1 = new QParticipant("subParticipant1");
-        QParticipant subParticipant2 = new QParticipant("subParticipant2");
 
         List<UserChatRoomResponse> contents = queryFactory.select(
                 Projections.constructor(UserChatRoomResponse.class,
@@ -79,26 +77,17 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
                     chatRoom.roomSid,
                     subParticipant1.count(),
                     chatRoom.defaultRoomImageType,
-                    chatRoom.roomImageUri,
-                    chat.id,
-                    chat.createdAt,
-                    chat.message
+                    chatRoom.roomImageUri
                 ))
             .from(chatRoom)
             .join(participant)
             .on(participant.chatRoom.id.eq(chatRoom.id).and(participant.user.id.eq(userId)))
             .leftJoin(subParticipant1).on(subParticipant1.chatRoom.id.eq(chatRoom.id))
-            .leftJoin(chat).on(chat.id.in(
-                JPAExpressions.select(subChat.id.max())
-                    .from(subChat).join(subParticipant2)
-                    .on(subChat.chatRoom.id.eq(subParticipant2.chatRoom.id)
-                        .and(subParticipant2.user.id.eq(userId)))
-                    .groupBy(subParticipant2.chatRoom.id)).and(chat.chatRoom.id.eq(chatRoom.id)))
-            .groupBy(chatRoom.id, chat.id)
-            .where(afterPostCursorId(postCursorId),
+            .groupBy(chatRoom.id)
+            .where(afterChatRoomId(postCursorId),
                 eqBookId(bookId))
             .limit(pageable.getPageSize())
-            .orderBy(chat.id.desc(), chatRoom.id.desc())
+            .orderBy(chatRoom.id.desc())
             .fetch();
 
         List<Long> chatRoomIds = contents.stream().map(UserChatRoomResponse::getRoomId)

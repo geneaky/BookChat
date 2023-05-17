@@ -1,6 +1,5 @@
 package toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -20,16 +19,11 @@ public class UserChatRoomResponse {
     private String bookTitle;
     private String bookCoverImageUrl;
     private List<String> bookAuthors;
-    private Long lastChatId;
-    private LocalDateTime lastActiveTime;
-    private String lastChatContent;
 
     @Builder
     public UserChatRoomResponse(Long roomId, String roomName, String roomSid, Long roomMemberCount,
         Integer defaultRoomImageType, String roomImageUri, String bookTitle,
-        String bookCoverImageUrl, List<String> bookAuthors, Long lastChatId,
-        LocalDateTime lastActiveTime,
-        String lastChatContent) {
+        String bookCoverImageUrl, List<String> bookAuthors) {
         this.roomId = roomId;
         this.roomName = roomName;
         this.roomSid = roomSid;
@@ -39,23 +33,16 @@ public class UserChatRoomResponse {
         this.bookTitle = bookTitle;
         this.bookCoverImageUrl = bookCoverImageUrl;
         this.bookAuthors = bookAuthors;
-        this.lastChatId = lastChatId;
-        this.lastActiveTime = lastActiveTime;
-        this.lastChatContent = lastChatContent;
     }
 
     public UserChatRoomResponse(Long roomId, String roomName, String roomSid, Long roomMemberCount,
-        Integer defaultRoomImageType, String roomImageUri, Long lastChatId,
-        LocalDateTime lastActiveTime, String lastChatContent) {
+        Integer defaultRoomImageType, String roomImageUri) {
         this.roomId = roomId;
         this.roomName = roomName;
         this.roomSid = roomSid;
         this.roomMemberCount = roomMemberCount;
         this.defaultRoomImageType = defaultRoomImageType;
         this.roomImageUri = roomImageUri;
-        this.lastChatId = lastChatId;
-        this.lastActiveTime = lastActiveTime;
-        this.lastChatContent = lastChatContent;
     }
 
     public void setBookInfo(Book book) {

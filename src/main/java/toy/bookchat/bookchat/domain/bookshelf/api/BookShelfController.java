@@ -1,17 +1,8 @@
 package toy.bookchat.bookchat.domain.bookshelf.api;
 
-import java.time.LocalDate;
-import javax.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.service.BookShelfService;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookShelfRequest;
@@ -20,6 +11,9 @@ import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.ExistenceBook
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.SearchBookShelfByReadingStatus;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPayload;
+
+import javax.validation.Valid;
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/v1/api")
@@ -32,40 +26,27 @@ public class BookShelfController {
     }
 
     @PostMapping("/bookshelves")
-    public void putBookOnBookShelf(@RequestBody @Valid BookShelfRequest bookShelfRequest,
-        @UserPayload TokenPayload tokenPayload) {
-
+    public void putBookOnBookShelf(@RequestBody @Valid BookShelfRequest bookShelfRequest, @UserPayload TokenPayload tokenPayload) {
         bookShelfService.putBookOnBookShelf(bookShelfRequest, tokenPayload.getUserId());
     }
 
     @GetMapping("/bookshelves")
-    public SearchBookShelfByReadingStatus takeBooksOutOfBookShelves(ReadingStatus readingStatus,
-        Pageable pageable, @UserPayload TokenPayload tokenPayload) {
-        return bookShelfService.takeBooksOutOfBookShelves(readingStatus, pageable,
-            tokenPayload.getUserId());
+    public SearchBookShelfByReadingStatus takeBooksOutOfBookShelves(ReadingStatus readingStatus, Pageable pageable, @UserPayload TokenPayload tokenPayload) {
+        return bookShelfService.takeBooksOutOfBookShelves(readingStatus, pageable, tokenPayload.getUserId());
     }
 
     @GetMapping("/bookshelves/book")
-    public ExistenceBookOnBookShelfResponse findBookIfExistedOnBookShelves(String isbn,
-        @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate publishAt,
-        @UserPayload TokenPayload tokenPayload) {
-
+    public ExistenceBookOnBookShelfResponse findBookIfExistedOnBookShelves(String isbn, @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate publishAt, @UserPayload TokenPayload tokenPayload) {
         return bookShelfService.getBookIfExisted(isbn, publishAt, tokenPayload.getUserId());
     }
 
     @PutMapping("/bookshelves/{bookShelfId}")
-    public void reviseBookOnBookShelf(@PathVariable Long bookShelfId,
-        @Valid @RequestBody ReviseBookShelfRequest reviseBookShelfStarRequest,
-        @UserPayload TokenPayload tokenPayload) {
-
-        bookShelfService.reviseBookShelf(bookShelfId, reviseBookShelfStarRequest,
-            tokenPayload.getUserId());
+    public void reviseBookOnBookShelf(@PathVariable Long bookShelfId, @Valid @RequestBody ReviseBookShelfRequest reviseBookShelfStarRequest, @UserPayload TokenPayload tokenPayload) {
+        bookShelfService.reviseBookShelf(bookShelfId, reviseBookShelfStarRequest, tokenPayload.getUserId());
     }
 
     @DeleteMapping("/bookshelves/{bookShelfId}")
-    public void deleteBookOnBookShelf(@PathVariable Long bookShelfId,
-        @UserPayload TokenPayload tokenPayload) {
-
+    public void deleteBookOnBookShelf(@PathVariable Long bookShelfId, @UserPayload TokenPayload tokenPayload) {
         bookShelfService.deleteBookShelf(bookShelfId, tokenPayload.getUserId());
     }
 

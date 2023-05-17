@@ -61,4 +61,16 @@ public class ChatRoom extends BaseEntity {
     public String getBookTitle() {
         return this.book.getTitle();
     }
+
+    public void changeRoomName(String roomName) {
+        this.roomName = roomName;
+    }
+
+    public void changeRoomSize(Integer roomSize) {
+        this.roomSize = roomSize;
+    }
+
+    public void changeRoomImageUri(String roomImageUri) {
+        this.roomImageUri = roomImageUri;
+    }
 }

@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.domain.chat.service;
+package toy.bookchat.bookchat.domain.participant.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.flywaydb.core.Flyway;
@@ -6,7 +6,6 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -14,8 +13,8 @@ import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.book.repository.BookRepository;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
 import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomRepository;
-import toy.bookchat.bookchat.domain.chatroom.service.ChatRoomService;
 import toy.bookchat.bookchat.domain.participant.Participant;
+import toy.bookchat.bookchat.domain.participant.ParticipantStatus;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
@@ -33,19 +32,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
 @SpringBootTest
-@TestInstance(Lifecycle.PER_CLASS)
-public class ChatServiceConcurrentTest {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class ParticipantServiceConcurrentTest {
 
+    @Autowired
+    private ParticipantService participantService;
+    @Autowired
+    private ParticipantRepository participantRepository;
     @Autowired
     private UserRepository userRepository;
     @Autowired
     private BookRepository bookRepository;
     @Autowired
     private ChatRoomRepository chatRoomRepository;
-    @Autowired
-    private ParticipantRepository participantRepository;
-    @Autowired
-    private ChatRoomService chatRoomService;
     @Autowired
     private Flyway flyway;
     @MockBean
@@ -64,11 +63,9 @@ public class ChatServiceConcurrentTest {
     }
 
     @Test
-    void 제한된_인원수_채팅방_입장_동시성_테스트_성공() throws Exception {
-        int roomSize = 20;
-        int count = 100;
+    void 게스트_방장_위임_동시성_테스트() throws Exception {
+        int count = 50;
         CountDownLatch countDownLatch = new CountDownLatch(count);
-
         ExecutorService executorService = Executors.newFixedThreadPool(10);
 
         List<User> userList = new ArrayList<>();
@@ -93,17 +90,36 @@ public class ChatServiceConcurrentTest {
                 .host(userList.get(0))
                 .book(book)
                 .defaultRoomImageType(1)
-                .roomSize(roomSize)
+                .roomSize(200)
                 .roomSid("HNsIG51b")
                 .roomName("RtzE")
                 .build();
         chatRoomRepository.save(chatRoom);
 
-        for (User user : userList) {
+        List<Participant> participantList = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            if (i == 0) {
+                participantList.add(Participant.builder()
+                        .user(userList.get(i))
+                        .chatRoom(chatRoom)
+                        .participantStatus(ParticipantStatus.HOST)
+                        .build());
+                continue;
+            }
+            participantList.add(Participant.builder()
+                    .user(userList.get(i))
+                    .chatRoom(chatRoom)
+                    .participantStatus(ParticipantStatus.GUEST)
+                    .build());
+        }
+        participantRepository.saveAll(participantList);
+
+        countDownLatch.countDown();
+        for (int i = 1; i < count; i++) {
+            final int idx = i;
             executorService.execute(() -> {
                 try {
-                    log.info(user.getId().toString());
-                    chatRoomService.enterChatRoom(user.getId(), chatRoom.getId());
+                    participantService.changeParticipantRights(chatRoom.getId(), participantList.get(idx).getUserId(), ParticipantStatus.HOST, participantList.get(0).getUserId());
                 } catch (Exception exception) {
                     log.info(exception.getMessage());
                 }
@@ -113,8 +129,8 @@ public class ChatServiceConcurrentTest {
 
         countDownLatch.await();
 
-        List<Participant> participants = participantRepository.findAll();
-        assertThat(participants.size()).isEqualTo(roomSize);
-    }
+        long hostCount = participantList.stream().filter(p -> p.getParticipantStatus() == ParticipantStatus.HOST).count();
 
+        assertThat(hostCount).isOne();
+    }
 }

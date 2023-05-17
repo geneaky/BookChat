@@ -12,7 +12,7 @@ public class UserChatRoomsResponseSlice {
     private CursorMeta<UserChatRoomResponse, Long> cursorMeta;
 
     private UserChatRoomsResponseSlice(Slice<UserChatRoomResponse> slice) {
-        this.cursorMeta = new CursorMeta<>(slice, UserChatRoomResponse::getLastChatId);
+        this.cursorMeta = new CursorMeta<>(slice, UserChatRoomResponse::getRoomId);
         this.userChatRoomResponseList = slice.getContent();
     }
 

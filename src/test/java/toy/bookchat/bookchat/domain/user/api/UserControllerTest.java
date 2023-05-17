@@ -291,8 +291,9 @@ class UserControllerTest extends ControllerTestExtension {
                     headerWithName(OIDC).description("Bearer [openid token]")
                 ),
                 requestParts(
-                    partWithName("userProfileImage").description("프로필 이미지 [200 x 200].webp"),
-                    partWithName("userSignUpRequest").description("회원가입 입력 폼")
+                    partWithName("userSignUpRequest").description("회원가입 입력 폼"),
+                    partWithName("userProfileImage").optional()
+                        .description("프로필 이미지 [200 x 200].webp")
                 ),
                 requestPartFields("userSignUpRequest",
                     fieldWithPath("nickname").description("닉네임"),
@@ -494,8 +495,9 @@ class UserControllerTest extends ControllerTestExtension {
                     headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 requestParts(
-                    partWithName("userProfileImage").description("프로필 이미지 [200 x 200].webp"),
-                    partWithName("changeUserNicknameRequest").description("변경할 닉네임")
+                    partWithName("changeUserNicknameRequest").description("변경할 닉네임"),
+                    partWithName("userProfileImage").optional()
+                        .description("프로필 이미지 [200 x 200].webp")
                 ),
                 requestPartFields("changeUserNicknameRequest",
                     fieldWithPath("nickname").type(STRING).description("변경할 닉네임")

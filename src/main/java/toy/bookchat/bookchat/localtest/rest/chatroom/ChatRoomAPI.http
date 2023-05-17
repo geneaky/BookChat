@@ -8,7 +8,7 @@ Content-Type: application/json
 Content-Disposition: form-data; name="createChatRoomRequest"; filename="createChatRoomRequest";
 
 {
-  "roomName": "effective java 부수기3",
+  "roomName": "effective java 부수기4",
   "roomSize": 5,
   "hashTags": ["java", "joshua"],
   "defaultRoomImageType": 1,
@@ -25,7 +25,7 @@ Content-Disposition: form-data; name="createChatRoomRequest"; filename="createCh
 --WebAppBoundary
 
 ### 사용자 채팅방 조회
-GET localhost:8080/v1/api/users/chatrooms?size=1
+GET localhost:8080/v1/api/users/chatrooms?size=3
 Authorization: {{jwt_token}}
 
 

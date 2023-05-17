@@ -5,9 +5,7 @@ spring:
     password: root
   jpa:
     database-platform: toy.bookchat.bookchat.config.query.MySqlCustomDialect
-    hibernate:
-      ddl-auto: validate
-      properties:
+    properties:
       hibernate:
         default_batch_fetch_size: 100
     open-in-view: false

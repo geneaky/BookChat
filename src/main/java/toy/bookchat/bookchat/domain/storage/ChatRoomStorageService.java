@@ -32,10 +32,13 @@ public class ChatRoomStorageService implements StorageService {
 
 
     @Override
-    public void upload(MultipartFile multipartFile, String fileName) {
+    public String upload(MultipartFile multipartFile, String uuid, String date) {
         try {
+            String fileName = createFileName(multipartFile, uuid, date);
             amazonS3Client.putObject(storageProperties.getBucketName(), fileName,
                 multipartFile.getInputStream(), abstractObjectMetadataFrom(multipartFile));
+
+            return getFileUrl(fileName);
         } catch (SdkClientException | IOException exception) {
             throw new ImageUploadToStorageException(exception.getMessage());
         }
@@ -48,16 +51,14 @@ public class ChatRoomStorageService implements StorageService {
         return objectMetadata;
     }
 
-    @Override
-    public String getFileUrl(String fileName) {
+    private String getFileUrl(String fileName) {
         return storageProperties.getImageBucketUrl() + fileName;
     }
 
     /**
      * '날짜 역순' + UUID로 저장 - S3가 prefix를 사용하여 partitioning을 하기 때문에
      */
-    @Override
-    public String createFileName(MultipartFile file, String uuidFileName,
+    private String createFileName(MultipartFile file, String uuidFileName,
         String currentTime) {
         imageValidator.hasValidImage(file, WIDTH_LIMIT, HEIGHT_LIMIT);
         StringBuilder stringBuilder = new StringBuilder();

@@ -4,9 +4,5 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface StorageService {
 
-    void upload(MultipartFile multipartFile, String fileName);
-
-    String getFileUrl(String fileName);
-
-    String createFileName(MultipartFile file, String uuidFileName, String currentTime);
+    String upload(MultipartFile multipartFile, String uuid, String date);
 }
