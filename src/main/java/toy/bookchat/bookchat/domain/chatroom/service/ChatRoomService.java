@@ -1,12 +1,5 @@
 package toy.bookchat.bookchat.domain.chatroom.service;
 
-import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.HOST;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,9 +7,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.book.repository.BookRepository;
+import toy.bookchat.bookchat.domain.chat.Chat;
+import toy.bookchat.bookchat.domain.chat.repository.ChatRepository;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoomHashTag;
 import toy.bookchat.bookchat.domain.chatroom.HashTag;
+import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomBlockedUserRepository;
 import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomHashTagRepository;
 import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomRepository;
 import toy.bookchat.bookchat.domain.chatroom.repository.HashTagRepository;
@@ -32,12 +28,27 @@ import toy.bookchat.bookchat.domain.participant.service.dto.response.ChatRoomDet
 import toy.bookchat.bookchat.domain.storage.StorageService;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
+import toy.bookchat.bookchat.exception.chatroom.BlockedUserInChatRoomException;
+import toy.bookchat.bookchat.exception.chatroom.ChatRoomIsFullException;
 import toy.bookchat.bookchat.exception.chatroom.ChatRoomNotFoundException;
+import toy.bookchat.bookchat.exception.participant.ParticipantNotFoundException;
 import toy.bookchat.bookchat.exception.user.UserNotFoundException;
+import toy.bookchat.bookchat.infrastructure.broker.MessagePublisher;
+import toy.bookchat.bookchat.infrastructure.broker.message.NotificationMessage;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.GUEST;
+import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.HOST;
 
 @Service
 public class ChatRoomService {
 
+    private final ChatRepository chatRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final ParticipantRepository participantRepository;
     private final HashTagRepository hashTagRepository;
@@ -45,16 +56,19 @@ public class ChatRoomService {
     private final StorageService storageService;
     private final BookRepository bookRepository;
     private final UserRepository userRepository;
+    private final ChatRoomBlockedUserRepository chatRoomBlockedUserRepository;
+    private final MessagePublisher messagePublisher;
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public ChatRoomService(
-        ChatRoomRepository chatRoomRepository,
-        ParticipantRepository participantRepository,
-        HashTagRepository hashTagRepository,
-        ChatRoomHashTagRepository chatRoomHashTagRepository,
-        @Qualifier("chatRoomStorageService") StorageService storageService,
-        BookRepository bookRepository,
-        UserRepository userRepository) {
+            ChatRepository chatRepository, ChatRoomRepository chatRoomRepository,
+            ParticipantRepository participantRepository,
+            HashTagRepository hashTagRepository,
+            ChatRoomHashTagRepository chatRoomHashTagRepository,
+            @Qualifier("chatRoomStorageService") StorageService storageService,
+            BookRepository bookRepository,
+            UserRepository userRepository, ChatRoomBlockedUserRepository chatRoomBlockedUserRepository, MessagePublisher messagePublisher) {
+        this.chatRepository = chatRepository;
         this.chatRoomRepository = chatRoomRepository;
         this.participantRepository = participantRepository;
         this.hashTagRepository = hashTagRepository;
@@ -62,21 +76,23 @@ public class ChatRoomService {
         this.storageService = storageService;
         this.bookRepository = bookRepository;
         this.userRepository = userRepository;
+        this.chatRoomBlockedUserRepository = chatRoomBlockedUserRepository;
+        this.messagePublisher = messagePublisher;
     }
 
     @Transactional
     public CreatedChatRoomDto createChatRoom(CreateChatRoomRequest createChatRoomRequest,
-        MultipartFile chatRoomImage, Long userId) {
+                                             MultipartFile chatRoomImage, Long userId) {
         Book book = bookRepository.findByIsbnAndPublishAt(createChatRoomRequest.getIsbn(),
-                createChatRoomRequest.getPublishAt())
-            .orElseGet(() -> bookRepository.save(createChatRoomRequest.createBook()));
+                        createChatRoomRequest.getPublishAt())
+                .orElseGet(() -> bookRepository.save(createChatRoomRequest.createBook()));
         User host = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
         if (chatRoomImageExistent(chatRoomImage)) {
             String uploadFileUrl = storageService.upload(chatRoomImage,
-                UUID.randomUUID().toString(), LocalDateTime.now().format(dateTimeFormatter));
+                    UUID.randomUUID().toString(), LocalDateTime.now().format(dateTimeFormatter));
             return CreatedChatRoomDto.of(
-                registerChatRoom(createChatRoomRequest, book, host, uploadFileUrl));
+                    registerChatRoom(createChatRoomRequest, book, host, uploadFileUrl));
         }
         return CreatedChatRoomDto.of(registerChatRoom(createChatRoomRequest, book, host, null));
     }
@@ -86,7 +102,7 @@ public class ChatRoomService {
     }
 
     private ChatRoom registerChatRoom(CreateChatRoomRequest createChatRoomRequest, Book book,
-        User host, String prefixedUUIDFileUrl) {
+                                      User host, String prefixedUUIDFileUrl) {
         ChatRoom chatRoom;
         chatRoom = saveChatRoom(createChatRoomRequest, book, host, prefixedUUIDFileUrl);
         registerHashTagOnChatRoom(createChatRoomRequest, chatRoom);
@@ -94,43 +110,37 @@ public class ChatRoomService {
     }
 
     private ChatRoom saveChatRoom(CreateChatRoomRequest createChatRoomRequest,
-        Book book, User host, String fileUrl) {
+                                  Book book, User host, String fileUrl) {
         ChatRoom chatRoom = chatRoomRepository.save(
-            createChatRoomRequest.makeChatRoom(book, host, fileUrl));
+                createChatRoomRequest.makeChatRoom(book, host, fileUrl));
         saveParticipantWithRoomHostAndRoom(host, chatRoom);
         return chatRoom;
     }
 
     private void saveParticipantWithRoomHostAndRoom(User host, ChatRoom chatRoom) {
         Participant participant = Participant.builder()
-            .participantStatus(HOST)
-            .chatRoom(chatRoom)
-            .user(host)
-            .build();
+                .participantStatus(HOST)
+                .chatRoom(chatRoom)
+                .user(host)
+                .build();
         participantRepository.save(participant);
     }
 
-    private void registerHashTagOnChatRoom(CreateChatRoomRequest createChatRoomRequest,
-        ChatRoom chatRoom) {
+    private void registerHashTagOnChatRoom(CreateChatRoomRequest createChatRoomRequest, ChatRoom chatRoom) {
         createChatRoomRequest.getHashTags().stream()
-            .map(tagName -> hashTagRepository.findByTagName(tagName)
-                .orElseGet(() -> hashTagRepository.save(HashTag.of(tagName))))
-            .forEach(
-                hashTag -> chatRoomHashTagRepository.save(ChatRoomHashTag.of(chatRoom, hashTag)));
+                .map(tagName -> hashTagRepository.findByTagName(tagName)
+                        .orElseGet(() -> hashTagRepository.save(HashTag.of(tagName))))
+                .forEach(hashTag -> chatRoomHashTagRepository.save(ChatRoomHashTag.of(chatRoom, hashTag)));
     }
 
     @Transactional(readOnly = true)
-    public UserChatRoomsResponseSlice getUserChatRooms(Long bookId, Long postCursorId,
-        Pageable pageable, Long userId) {
-        return UserChatRoomsResponseSlice.of(
-            chatRoomRepository.findUserChatRoomsWithLastChat(pageable, bookId, postCursorId,
-                userId));
+    public UserChatRoomsResponseSlice getUserChatRooms(Long bookId, Long postCursorId, Pageable pageable, Long userId) {
+        return UserChatRoomsResponseSlice.of(chatRoomRepository.findUserChatRoomsWithLastChat(pageable, bookId, postCursorId, userId));
     }
 
     @Transactional(readOnly = true)
     public ChatRoomsResponseSlice getChatRooms(ChatRoomRequest chatRoomRequest, Pageable pageable) {
-        return ChatRoomsResponseSlice.of(
-            chatRoomRepository.findChatRooms(chatRoomRequest, pageable));
+        return ChatRoomsResponseSlice.of(chatRoomRepository.findChatRooms(chatRoomRequest, pageable));
     }
 
     @Transactional(readOnly = true)
@@ -140,21 +150,21 @@ public class ChatRoomService {
 
     @Transactional
     public void reviseChatRoom(ReviseChatRoomRequest reviseChatRoomRequest,
-        MultipartFile chatRoomImage, Long userId) {
+                               MultipartFile chatRoomImage, Long userId) {
         ChatRoom chatRoom = chatRoomRepository.findChatRoomByIdAndHostId(
-            reviseChatRoomRequest.getRoomId(), userId).orElseThrow(ChatRoomNotFoundException::new);
+                reviseChatRoomRequest.getRoomId(), userId).orElseThrow(ChatRoomNotFoundException::new);
 
         updateIfChatRoomHashTagsPresent(reviseChatRoomRequest, chatRoom);
         if (chatRoomImageExistent(chatRoomImage)) {
             String roomImageUri = storageService.upload(chatRoomImage,
-                UUID.randomUUID().toString(), LocalDateTime.now().format(dateTimeFormatter));
+                    UUID.randomUUID().toString(), LocalDateTime.now().format(dateTimeFormatter));
             chatRoom.changeRoomImageUri(roomImageUri);
         }
         reviseChatRoomRequest.reviseChatRoom(chatRoom);
     }
 
     private void updateIfChatRoomHashTagsPresent(ReviseChatRoomRequest reviseChatRoomRequest,
-        ChatRoom chatRoom) {
+                                                 ChatRoom chatRoom) {
         if (reviseChatRoomRequest.tagExistent()) {
             chatRoomHashTagRepository.deleteAllByChatRoom(chatRoom);
 
@@ -162,8 +172,74 @@ public class ChatRoomService {
             hashTagRepository.saveAll(hashTags);
 
             List<ChatRoomHashTag> chatRoomHashTags = hashTags.stream()
-                .map(ht -> ChatRoomHashTag.of(chatRoom, ht)).collect(Collectors.toList());
+                    .map(ht -> ChatRoomHashTag.of(chatRoom, ht)).collect(Collectors.toList());
             chatRoomHashTagRepository.saveAll(chatRoomHashTags);
         }
+    }
+
+    @Transactional
+    public void enterChatRoom(Long userId, Long roomId) {
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
+                .orElseThrow(ChatRoomNotFoundException::new);
+
+        if (chatRoom.getHost() != user) {
+            checkIsBlockedUser(user, chatRoom);
+            checkIsFullChatRoom(chatRoom);
+
+            participantRepository.save(Participant.builder()
+                    .participantStatus(GUEST)
+                    .user(user)
+                    .chatRoom(chatRoom)
+                    .build());
+        }
+
+        Chat chat = chatRepository.save(Chat.builder()
+                .chatRoom(chatRoom)
+                .message(user.getNickname() + "님이 입장하셨습니다.")
+                .build());
+
+        messagePublisher.sendNotificationMessage(chatRoom.getRoomSid(), NotificationMessage.createEntranceMessage(chat, user.getId()));
+    }
+
+    private void checkIsFullChatRoom(ChatRoom chatRoom) {
+        List<Participant> participants = participantRepository.findWithPessimisticLockByChatRoom(
+                chatRoom);
+
+        if (chatRoom.getRoomSize() <= participants.size()) {
+            throw new ChatRoomIsFullException();
+        }
+    }
+
+    private void checkIsBlockedUser(User user, ChatRoom chatRoom) {
+        chatRoomBlockedUserRepository.findByUserIdAndChatRoomId(user.getId(), chatRoom.getId())
+                .ifPresent(b -> {
+                    throw new BlockedUserInChatRoomException();
+                });
+    }
+
+    @Transactional
+    public void exitChatRoom(Long userId, Long roomId) {
+        Participant participant = participantRepository.findByUserIdAndChatRoomId(userId, roomId)
+                .orElseThrow(ParticipantNotFoundException::new);
+
+        User user = participant.getUser();
+        ChatRoom chatRoom = participant.getChatRoom();
+
+        if (user == chatRoom.getHost()) {
+            chatRepository.deleteByChatRoom(chatRoom);
+            participantRepository.deleteByChatRoom(chatRoom);
+            chatRoomRepository.delete(chatRoom);
+
+            return;
+        }
+
+        Chat chat = chatRepository.save(Chat.builder()
+                .chatRoom(chatRoom)
+                .message(user.getNickname() + "님이 퇴장하셨습니다.")
+                .build());
+
+        participantRepository.delete(participant);
+        messagePublisher.sendNotificationMessage(chatRoom.getRoomSid(), NotificationMessage.createExitMessage(chat, user.getId()));
     }
 }

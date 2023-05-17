@@ -511,6 +511,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_사용자_채팅방_조회">사용자 채팅방 조회</a></li>
 <li><a href="#_전체_채팅방_조회">전체 채팅방 조회</a></li>
 <li><a href="#_채팅방_정보_수정">채팅방 정보 수정</a></li>
+<li><a href="#_채팅방_입장">채팅방 입장</a></li>
+<li><a href="#_채팅방_퇴장">채팅방 퇴장</a></li>
 </ul>
 </li>
 <li><a href="#_참여자">참여자</a>
@@ -521,8 +523,6 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li><a href="#_채팅">채팅</a>
 <ul class="sectlevel2">
-<li><a href="#_채팅방_입장">채팅방 입장</a></li>
-<li><a href="#_채팅방_퇴장">채팅방 퇴장</a></li>
 <li><a href="#_채팅내역_조회">채팅내역 조회</a></li>
 <li><a href="#_stomp_connection_수립">Stomp Connection 수립</a></li>
 <li><a href="#_채팅방_subscribe">채팅방 Subscribe</a></li>
@@ -4217,7 +4217,7 @@ Strict-Transport-Security: max-age=31536000 ; includeSubDomains
 X-Frame-Options: DENY
 Content-Length: 360
 
-{"agonyRecordResponseList":[{"agonyRecordId":2,"agonyRecordTitle":"title1","agonyRecordContent":"content1","createdAt":"2023-05-15"},{"agonyRecordId":3,"agonyRecordTitle":"title2","agonyRecordContent":"content2","createdAt":"2023-05-15"}],"cursorMeta":{"sliceSize":2,"contentSize":2,"hasContent":true,"hasNext":false,"nextCursorId":3,"first":true,"last":true}}</code></pre>
+{"agonyRecordResponseList":[{"agonyRecordId":2,"agonyRecordTitle":"title1","agonyRecordContent":"content1","createdAt":"2023-05-16"},{"agonyRecordId":3,"agonyRecordTitle":"title2","agonyRecordContent":"content2","createdAt":"2023-05-16"}],"cursorMeta":{"sliceSize":2,"contentSize":2,"hasContent":true,"hasNext":false,"nextCursorId":3,"first":true,"last":true}}</code></pre>
 </div>
 </div>
 </div>
@@ -4564,7 +4564,7 @@ test
 Content-Disposition: form-data; name=createChatRoomRequest
 Content-Type: application/json
 
-{"roomName":"effective java 부수는 방","roomSize":5,"defaultRoomImageType":1,"hashTags":["Java","스터디"],"bookRequest":{"isbn":"124151214","title":"effective java","authors":["joshua"],"publisher":"insight","bookCoverImageUrl":"testImageUrl","publishAt":"2023-05-15"}}
+{"roomName":"effective java 부수는 방","roomSize":5,"defaultRoomImageType":1,"hashTags":["Java","스터디"],"bookRequest":{"isbn":"124151214","title":"effective java","authors":["joshua"],"publisher":"insight","bookCoverImageUrl":"testImageUrl","publishAt":"2023-05-17"}}
 --6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm--</code></pre>
 </div>
 </div>
@@ -4603,7 +4603,7 @@ Content-Type: application/json
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 201 Created
-Location: /topic/b8d3c42e-2bda-4008-acc6-0b517f27ea94
+Location: /topic/b671dc36-10f6-432e-a8d8-c0f420abad99
 RoomId: 1
 RoomImageUri: roomImage@s3.com
 X-Content-Type-Options: nosniff
@@ -5187,9 +5187,9 @@ Pragma: no-cache
 Expires: 0
 Strict-Transport-Security: max-age=31536000 ; includeSubDomains
 X-Frame-Options: DENY
-Content-Length: 1382
+Content-Length: 1380
 
-{"chatRoomResponseList":[{"roomId":1,"roomName":"WLMRXZ","roomSid":"Dhb","bookTitle":"book1","bookCoverImageUri":"book1CoverImage@s3","bookAuthors":["author1","author2","author3"],"hostName":"host1","hostDefaultProfileImageType":1,"hostProfileImageUri":"host1ProfileImage@s3","roomMemberCount":3,"defaultRoomImageType":1,"roomImageUri":"n8QpVmc","tags":"tag1,tag2,tag3","lastChatId":1,"lastActiveTime":"2023-05-15T17:42:45.267612"},{"roomId":2,"roomName":"R501","roomSid":"1vaaPp","bookTitle":"book2","bookCoverImageUri":"book2CoverImage@s3","bookAuthors":["author4","author5","author6"],"hostName":"host2","hostDefaultProfileImageType":2,"hostProfileImageUri":"host2ProfileImage@s3","roomMemberCount":100,"defaultRoomImageType":3,"roomImageUri":"7jutu0i0","tags":"tag4,tag2,tag3","lastChatId":2,"lastActiveTime":"2023-05-15T17:42:45.267655"},{"roomId":3,"roomName":"86H8735E","roomSid":"3YzLGXR7","bookTitle":"book3","bookCoverImageUri":"book3CoverImage@s3","bookAuthors":["author7","author8","author9"],"hostName":"host3","hostDefaultProfileImageType":3,"hostProfileImageUri":"host3ProfileImage@s3","roomMemberCount":1000,"defaultRoomImageType":2,"roomImageUri":"sUzZNOV","tags":"tag1,tag5,tag6","lastChatId":4,"lastActiveTime":"2023-05-15T17:42:45.267677"}],"cursorMeta":{"sliceSize":3,"contentSize":3,"hasContent":true,"hasNext":true,"nextCursorId":4,"first":true,"last":false}}</code></pre>
+{"chatRoomResponseList":[{"roomId":1,"roomName":"WLMRXZ","roomSid":"Dhb","bookTitle":"book1","bookCoverImageUri":"book1CoverImage@s3","bookAuthors":["author1","author2","author3"],"hostName":"host1","hostDefaultProfileImageType":1,"hostProfileImageUri":"host1ProfileImage@s3","roomMemberCount":3,"defaultRoomImageType":1,"roomImageUri":"n8QpVmc","tags":"tag1,tag2,tag3","lastChatId":1,"lastActiveTime":"2023-05-17T00:49:48.493103"},{"roomId":2,"roomName":"R501","roomSid":"1vaaPp","bookTitle":"book2","bookCoverImageUri":"book2CoverImage@s3","bookAuthors":["author4","author5","author6"],"hostName":"host2","hostDefaultProfileImageType":2,"hostProfileImageUri":"host2ProfileImage@s3","roomMemberCount":100,"defaultRoomImageType":3,"roomImageUri":"7jutu0i0","tags":"tag4,tag2,tag3","lastChatId":2,"lastActiveTime":"2023-05-17T00:49:48.49316"},{"roomId":3,"roomName":"86H8735E","roomSid":"3YzLGXR7","bookTitle":"book3","bookCoverImageUri":"book3CoverImage@s3","bookAuthors":["author7","author8","author9"],"hostName":"host3","hostDefaultProfileImageType":3,"hostProfileImageUri":"host3ProfileImage@s3","roomMemberCount":1000,"defaultRoomImageType":2,"roomImageUri":"sUzZNOV","tags":"tag1,tag5,tag6","lastChatId":4,"lastActiveTime":"2023-05-17T00:49:48.49319"}],"cursorMeta":{"sliceSize":3,"contentSize":3,"hasContent":true,"hasNext":true,"nextCursorId":4,"first":true,"last":false}}</code></pre>
 </div>
 </div>
 <hr>
@@ -5310,6 +5310,130 @@ Strict-Transport-Security: max-age=31536000 ; includeSubDomains
 X-Frame-Options: DENY</code></pre>
 </div>
 </div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_채팅방_입장">채팅방 입장</h3>
+<div class="paragraph">
+<p><code>Request Header</code></p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Authorization</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Bearer [JWT token]</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><code>Request</code></p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 18. /v1/api/enter/chatrooms/{roomId}</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>roomId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Room id</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><code>Response</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+Strict-Transport-Security: max-age=31536000 ; includeSubDomains
+X-Frame-Options: DENY</code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_채팅방_퇴장">채팅방 퇴장</h3>
+<div class="paragraph">
+<p><code>Requset Header</code></p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Authorization</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Bearer [JWT token]</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><code>Request</code></p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 19. /v1/api/leave/chatrooms/{roomId}</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>roomId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Room id</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><code>Response</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+Strict-Transport-Security: max-age=31536000 ; includeSubDomains
+X-Frame-Options: DENY</code></pre>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -5343,7 +5467,7 @@ X-Frame-Options: DENY</code></pre>
 <p><code>Request</code></p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 18. /v1/api/chatrooms/{roomId}/participants/{userId}</caption>
+<caption class="title">Table 20. /v1/api/chatrooms/{roomId}/participants/{userId}</caption>
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -5435,7 +5559,7 @@ X-Frame-Options: DENY</code></pre>
 <p><code>Request</code></p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 19. /v1/api/chatrooms/{roomId}/participants/{userId}</caption>
+<caption class="title">Table 21. /v1/api/chatrooms/{roomId}/participants/{userId}</caption>
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -5485,130 +5609,6 @@ X-Frame-Options: DENY</code></pre>
 <div class="sect1">
 <h2 id="_채팅">채팅</h2>
 <div class="sectionbody">
-<div class="sect2">
-<h3 id="_채팅방_입장">채팅방 입장</h3>
-<div class="paragraph">
-<p><code>Request Header</code></p>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Name</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Authorization</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Bearer [JWT token]</p></td>
-</tr>
-</tbody>
-</table>
-<div class="paragraph">
-<p><code>Request</code></p>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 20. /v1/api/enter/chatrooms/{roomId}</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Parameter</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>roomId</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Room id</p></td>
-</tr>
-</tbody>
-</table>
-<div class="paragraph">
-<p><code>Response</code></p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 1; mode=block
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-Strict-Transport-Security: max-age=31536000 ; includeSubDomains
-X-Frame-Options: DENY</code></pre>
-</div>
-</div>
-<hr>
-</div>
-<div class="sect2">
-<h3 id="_채팅방_퇴장">채팅방 퇴장</h3>
-<div class="paragraph">
-<p><code>Requset Header</code></p>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Name</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Authorization</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Bearer [JWT token]</p></td>
-</tr>
-</tbody>
-</table>
-<div class="paragraph">
-<p><code>Request</code></p>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 21. /v1/api/leave/chatrooms/{roomId}</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Parameter</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>roomId</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Room id</p></td>
-</tr>
-</tbody>
-</table>
-<div class="paragraph">
-<p><code>Response</code></p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 1; mode=block
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-Strict-Transport-Security: max-age=31536000 ; includeSubDomains
-X-Frame-Options: DENY</code></pre>
-</div>
-</div>
-<hr>
-</div>
 <div class="sect2">
 <h3 id="_채팅내역_조회">채팅내역 조회</h3>
 <div class="paragraph">
@@ -5792,7 +5792,7 @@ Strict-Transport-Security: max-age=31536000 ; includeSubDomains
 X-Frame-Options: DENY
 Content-Length: 694
 
-{"chatResponseList":[{"chatId":1,"senderId":1,"senderNickname":"AUser","senderProfileImageUrl":null,"senderDefaultProfileImageType":1,"message":"first chat","dispatchTime":"2023-05-15T17:42:25.072307"},{"chatId":2,"senderId":2,"senderNickname":"BUser","senderProfileImageUrl":"bUser@s3.com","senderDefaultProfileImageType":1,"message":"second chat","dispatchTime":"2023-05-15T17:42:25.072526"},{"chatId":3,"senderId":1,"senderNickname":"AUser","senderProfileImageUrl":null,"senderDefaultProfileImageType":1,"message":"welcome","dispatchTime":"2023-05-15T17:42:25.072533"}],"cursorMeta":{"sliceSize":3,"contentSize":3,"hasContent":true,"hasNext":true,"nextCursorId":3,"first":true,"last":false}}</code></pre>
+{"chatResponseList":[{"chatId":1,"senderId":1,"senderNickname":"AUser","senderProfileImageUrl":null,"senderDefaultProfileImageType":1,"message":"first chat","dispatchTime":"2023-05-17T00:49:20.676214"},{"chatId":2,"senderId":2,"senderNickname":"BUser","senderProfileImageUrl":"bUser@s3.com","senderDefaultProfileImageType":1,"message":"second chat","dispatchTime":"2023-05-17T00:49:20.676252"},{"chatId":3,"senderId":1,"senderNickname":"AUser","senderProfileImageUrl":null,"senderDefaultProfileImageType":1,"message":"welcome","dispatchTime":"2023-05-17T00:49:20.676259"}],"cursorMeta":{"sliceSize":3,"contentSize":3,"hasContent":true,"hasNext":true,"nextCursorId":3,"first":true,"last":false}}</code></pre>
 </div>
 </div>
 </div>
@@ -5885,7 +5885,7 @@ Content-Length: 694
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2023-05-15 19:00:30 +0900
+Last updated 2023-05-17 00:58:14 +0900
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>

@@ -730,6 +730,38 @@ include::{snippets}/post-chatroom-info/request-part-reviseChatRoomRequest-fields
 
 include::{snippets}/post-chatroom-info/http-response.adoc[]
 
+---
+
+=== 채팅방 입장
+
+`Request Header`
+
+include::{snippets}/post-enter-chatrooms/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/post-enter-chatrooms/path-parameters.adoc[]
+
+`Response`
+
+include::{snippets}/post-enter-chatrooms/http-response.adoc[]
+
+---
+
+=== 채팅방 퇴장
+
+`Requset Header`
+
+include::{snippets}/delete-leave-chatrooms/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/delete-leave-chatrooms/path-parameters.adoc[]
+
+`Response`
+
+include::{snippets}/delete-leave-chatrooms/http-response.adoc[]
+
 == 참여자
 
 === 방장의 참여자 권한 관리
@@ -766,38 +798,6 @@ include::{snippets}/delete-participant/http-request.adoc[]
 include::{snippets}/delete-participant/http-response.adoc[]
 
 == 채팅
-
-=== 채팅방 입장
-
-`Request Header`
-
-include::{snippets}/post-enter-chatrooms/request-headers.adoc[]
-
-`Request`
-
-include::{snippets}/post-enter-chatrooms/path-parameters.adoc[]
-
-`Response`
-
-include::{snippets}/post-enter-chatrooms/http-response.adoc[]
-
----
-
-=== 채팅방 퇴장
-
-`Requset Header`
-
-include::{snippets}/delete-leave-chatrooms/request-headers.adoc[]
-
-`Request`
-
-include::{snippets}/delete-leave-chatrooms/path-parameters.adoc[]
-
-`Response`
-
-include::{snippets}/delete-leave-chatrooms/http-response.adoc[]
-
----
 
 === 채팅내역 조회
 

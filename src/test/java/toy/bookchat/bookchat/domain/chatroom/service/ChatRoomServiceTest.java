@@ -1,36 +1,21 @@
 package toy.bookchat.bookchat.domain.chatroom.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.book.repository.BookRepository;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookRequest;
 import toy.bookchat.bookchat.domain.chat.Chat;
+import toy.bookchat.bookchat.domain.chat.repository.ChatRepository;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
+import toy.bookchat.bookchat.domain.chatroom.ChatRoomBlockedUser;
+import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomBlockedUserRepository;
 import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomHashTagRepository;
 import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomRepository;
 import toy.bookchat.bookchat.domain.chatroom.repository.HashTagRepository;
@@ -41,17 +26,37 @@ import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.UserC
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.ChatRoomRequest;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.CreateChatRoomRequest;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.ReviseChatRoomRequest;
+import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
 import toy.bookchat.bookchat.domain.storage.ChatRoomStorageService;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
+import toy.bookchat.bookchat.exception.chatroom.BlockedUserInChatRoomException;
+import toy.bookchat.bookchat.exception.chatroom.ChatRoomIsFullException;
 import toy.bookchat.bookchat.exception.chatroom.NotEnoughRoomSizeException;
+import toy.bookchat.bookchat.infrastructure.broker.MessagePublisher;
+import toy.bookchat.bookchat.infrastructure.broker.message.NotificationMessage;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ChatRoomServiceTest {
 
     @Mock
+    ChatRepository chatRepository;
+    @Mock
     ChatRoomRepository chatRoomRepository;
+    @Mock
+    ChatRoomBlockedUserRepository chatRoomBlockedUserRepository;
     @Mock
     HashTagRepository hashTagRepository;
     @Mock
@@ -64,25 +69,27 @@ class ChatRoomServiceTest {
     ParticipantRepository participantRepository;
     @Mock
     ChatRoomStorageService storageService;
+    @Mock
+    MessagePublisher messagePublisher;
     @InjectMocks
     ChatRoomService chatRoomService;
 
     private static BookRequest getBookRequest() {
         return BookRequest.builder()
-            .isbn("123124")
-            .title("effective java")
-            .authors(List.of("joshua"))
-            .publishAt(LocalDate.now())
-            .build();
+                .isbn("123124")
+                .title("effective java")
+                .authors(List.of("joshua"))
+                .publishAt(LocalDate.now())
+                .build();
     }
 
     private static CreateChatRoomRequest getCreateChatRoomRequest(BookRequest bookRequest) {
         return CreateChatRoomRequest.builder()
-            .roomSize(3)
-            .roomName("test room")
-            .hashTags(List.of("java", "joshua"))
-            .bookRequest(bookRequest)
-            .build();
+                .roomSize(3)
+                .roomName("test room")
+                .hashTags(List.of("java", "joshua"))
+                .bookRequest(bookRequest)
+                .build();
     }
 
     @Test
@@ -91,13 +98,13 @@ class ChatRoomServiceTest {
         CreateChatRoomRequest createChatRoomRequest = getCreateChatRoomRequest(bookRequest);
 
         ChatRoom chatRoom = ChatRoom.builder()
-            .id(1L)
-            .roomSid("7D6")
-            .roomImageUri("3wVp")
-            .build();
+                .id(1L)
+                .roomSid("7D6")
+                .roomImageUri("3wVp")
+                .build();
 
         when(bookRepository.findByIsbnAndPublishAt(any(), any())).thenReturn(
-            Optional.ofNullable(mock(Book.class)));
+                Optional.ofNullable(mock(Book.class)));
         when(userRepository.findById(any())).thenReturn(Optional.of(mock(User.class)));
         when(chatRoomRepository.save(any())).thenReturn(chatRoom);
 
@@ -115,13 +122,13 @@ class ChatRoomServiceTest {
         MultipartFile image = mock(MultipartFile.class);
 
         ChatRoom chatRoom = ChatRoom.builder()
-            .id(1L)
-            .roomSid("7D6")
-            .roomImageUri("3wVp")
-            .build();
+                .id(1L)
+                .roomSid("7D6")
+                .roomImageUri("3wVp")
+                .build();
 
         when(bookRepository.findByIsbnAndPublishAt(any(), any())).thenReturn(
-            Optional.ofNullable(mock(Book.class)));
+                Optional.ofNullable(mock(Book.class)));
         when(userRepository.findById(any())).thenReturn(Optional.of(mock(User.class)));
         when(chatRoomRepository.save(any())).thenReturn(chatRoom);
 
@@ -140,10 +147,10 @@ class ChatRoomServiceTest {
         CreateChatRoomRequest createChatRoomRequest = getCreateChatRoomRequest(bookRequest);
 
         ChatRoom chatRoom = ChatRoom.builder()
-            .id(1L)
-            .roomSid("7D6")
-            .roomImageUri("3wVp")
-            .build();
+                .id(1L)
+                .roomSid("7D6")
+                .roomImageUri("3wVp")
+                .build();
 
         when(userRepository.findById(any())).thenReturn(Optional.of(mock(User.class)));
         when(chatRoomRepository.save(any())).thenReturn(chatRoom);
@@ -159,100 +166,100 @@ class ChatRoomServiceTest {
     @Test
     void 사용자_채팅방_조회_성공() throws Exception {
         ChatRoom chatRoom1 = ChatRoom.builder()
-            .id(1L)
-            .roomName("이펙티브 자바 부수는 방")
-            .roomSid("secret1")
-            .roomSize(100)
-            .defaultRoomImageType(1)
-            .roomImageUri(null)
-            .build();
+                .id(1L)
+                .roomName("이펙티브 자바 부수는 방")
+                .roomSid("secret1")
+                .roomSize(100)
+                .defaultRoomImageType(1)
+                .roomImageUri(null)
+                .build();
         chatRoom1.setCreatedAt(LocalDateTime.now());
         Chat chat1 = Chat.builder()
-            .id(1L)
-            .message("안녕")
-            .chatRoom(chatRoom1)
-            .build();
+                .id(1L)
+                .message("안녕")
+                .chatRoom(chatRoom1)
+                .build();
         chat1.setCreatedAt(LocalDateTime.now());
         UserChatRoomResponse userChatRoomResponse = UserChatRoomResponse.builder()
-            .roomId(chatRoom1.getId())
-            .roomSid(chatRoom1.getRoomSid())
-            .roomName(chatRoom1.getRoomName())
-            .roomMemberCount(1L)
-            .defaultRoomImageType(chatRoom1.getDefaultRoomImageType())
-            .build();
+                .roomId(chatRoom1.getId())
+                .roomSid(chatRoom1.getRoomSid())
+                .roomName(chatRoom1.getRoomName())
+                .roomMemberCount(1L)
+                .defaultRoomImageType(chatRoom1.getDefaultRoomImageType())
+                .build();
         List<UserChatRoomResponse> result = List.of(userChatRoomResponse);
         PageRequest pageRequest = PageRequest.of(0, 1, Sort.by("id").descending());
         Slice<UserChatRoomResponse> slice = new SliceImpl<>(result, pageRequest, true);
         when(chatRoomRepository.findUserChatRoomsWithLastChat(any(), any(), any(),
-            any())).thenReturn(
-            slice);
+                any())).thenReturn(
+                slice);
         UserChatRoomsResponseSlice userChatRoomsResponseSlice = chatRoomService.getUserChatRooms(
-            any(), any(), any(), any());
+                any(), any(), any(), any());
 
         assertThat(userChatRoomsResponseSlice).usingRecursiveComparison()
-            .isEqualTo(UserChatRoomsResponseSlice.of(slice));
+                .isEqualTo(UserChatRoomsResponseSlice.of(slice));
     }
 
     @Test
     void 채팅방_조회_성공() throws Exception {
         ChatRoomResponse chatRoomResponse1 = ChatRoomResponse.builder()
-            .roomId(1L)
-            .roomSid("Dhb")
-            .roomName("WLMRXZ")
-            .roomMemberCount(3L)
-            .roomImageUri("n8QpVmc")
-            .bookTitle("book1")
-            .bookAuthors(List.of("author1", "author2", "author3"))
-            .bookCoverImageUri("book1CoverImage@s3")
-            .hostName("host1")
-            .hostProfileImageUri("host1ProfileImage@s3")
-            .defaultRoomImageType(1)
-            .lastChatId(1L)
-            .tags("tag1,tag2,tag3")
-            .lastActiveTime(LocalDateTime.now())
-            .build();
+                .roomId(1L)
+                .roomSid("Dhb")
+                .roomName("WLMRXZ")
+                .roomMemberCount(3L)
+                .roomImageUri("n8QpVmc")
+                .bookTitle("book1")
+                .bookAuthors(List.of("author1", "author2", "author3"))
+                .bookCoverImageUri("book1CoverImage@s3")
+                .hostName("host1")
+                .hostProfileImageUri("host1ProfileImage@s3")
+                .defaultRoomImageType(1)
+                .lastChatId(1L)
+                .tags("tag1,tag2,tag3")
+                .lastActiveTime(LocalDateTime.now())
+                .build();
         ChatRoomResponse chatRoomResponse2 = ChatRoomResponse.builder()
-            .roomId(2L)
-            .roomSid("1vaaPp")
-            .roomName("R501")
-            .roomImageUri("7jutu0i0")
-            .roomMemberCount(100L)
-            .bookTitle("book2")
-            .bookAuthors(List.of("author4", "author5", "author6"))
-            .bookCoverImageUri("book2CoverImage@s3")
-            .hostName("host2")
-            .hostProfileImageUri("host2ProfileImage@s3")
-            .defaultRoomImageType(3)
-            .lastChatId(2L)
-            .tags("tag4,tag2,tag3")
-            .lastActiveTime(LocalDateTime.now())
-            .build();
+                .roomId(2L)
+                .roomSid("1vaaPp")
+                .roomName("R501")
+                .roomImageUri("7jutu0i0")
+                .roomMemberCount(100L)
+                .bookTitle("book2")
+                .bookAuthors(List.of("author4", "author5", "author6"))
+                .bookCoverImageUri("book2CoverImage@s3")
+                .hostName("host2")
+                .hostProfileImageUri("host2ProfileImage@s3")
+                .defaultRoomImageType(3)
+                .lastChatId(2L)
+                .tags("tag4,tag2,tag3")
+                .lastActiveTime(LocalDateTime.now())
+                .build();
         ChatRoomResponse chatRoomResponse3 = ChatRoomResponse.builder()
-            .roomId(3L)
-            .roomSid("3YzLGXR7")
-            .roomName("86H8735E")
-            .roomMemberCount(1000L)
-            .roomImageUri("sUzZNOV")
-            .bookTitle("book3")
-            .bookAuthors(List.of("author7", "author8", "author9"))
-            .bookCoverImageUri("book3CoverImage@s3")
-            .hostName("host3")
-            .hostProfileImageUri("host3ProfileImage@s3")
-            .defaultRoomImageType(2)
-            .lastChatId(4L)
-            .tags("tag1,tag5,tag6")
-            .lastActiveTime(LocalDateTime.now())
-            .build();
+                .roomId(3L)
+                .roomSid("3YzLGXR7")
+                .roomName("86H8735E")
+                .roomMemberCount(1000L)
+                .roomImageUri("sUzZNOV")
+                .bookTitle("book3")
+                .bookAuthors(List.of("author7", "author8", "author9"))
+                .bookCoverImageUri("book3CoverImage@s3")
+                .hostName("host3")
+                .hostProfileImageUri("host3ProfileImage@s3")
+                .defaultRoomImageType(2)
+                .lastChatId(4L)
+                .tags("tag1,tag5,tag6")
+                .lastActiveTime(LocalDateTime.now())
+                .build();
 
         List<ChatRoomResponse> contents = List.of(chatRoomResponse1, chatRoomResponse2,
-            chatRoomResponse3);
+                chatRoomResponse3);
 
         Pageable pageable = PageRequest.of(0, 3);
 
         Slice<ChatRoomResponse> chatRoomResponses = new SliceImpl<>(contents, pageable, true);
         when(chatRoomRepository.findChatRooms(any(), any())).thenReturn(chatRoomResponses);
         ChatRoomsResponseSlice result = chatRoomService.getChatRooms(mock(ChatRoomRequest.class),
-            mock(Pageable.class));
+                mock(Pageable.class));
 
         assertThat(result).isEqualTo(ChatRoomsResponseSlice.of(chatRoomResponses));
     }
@@ -266,15 +273,15 @@ class ChatRoomServiceTest {
     @Test
     void 채팅방_이미지를_포함한_정보_수정() throws Exception {
         ReviseChatRoomRequest reviseChatRoomRequest = ChatRoomServiceTestFixture.createReviseChatRoomRequest(
-            100);
+                100);
         ChatRoom chatRoom = ChatRoomServiceTestFixture.getChatRoom();
         MockMultipartFile chatRoomImage = new MockMultipartFile("newImageFile", "newImageFile",
-            "image/webp", "content".getBytes());
+                "image/webp", "content".getBytes());
 
         when(chatRoomRepository.findChatRoomByIdAndHostId(any(), any())).thenReturn(
-            Optional.of(chatRoom));
+                Optional.of(chatRoom));
         when(storageService.upload(eq(chatRoomImage), anyString(), anyString())).thenReturn(
-            "newRoomImageUri");
+                "newRoomImageUri");
 
         chatRoomService.reviseChatRoom(reviseChatRoomRequest, chatRoomImage, 763L);
 
@@ -284,50 +291,196 @@ class ChatRoomServiceTest {
     @Test
     void 채팅방_이미지를_제외한_정보_수정() throws Exception {
         ReviseChatRoomRequest chatRoomRequest = ChatRoomServiceTestFixture.createReviseChatRoomRequest(
-            100);
+                100);
 
         ChatRoom chatRoom = ChatRoomServiceTestFixture.getChatRoom();
 
         when(chatRoomRepository.findChatRoomByIdAndHostId(any(), any())).thenReturn(
-            Optional.of(chatRoom));
+                Optional.of(chatRoom));
 
         chatRoomService.reviseChatRoom(chatRoomRequest, null, 125L);
 
         assertThat(chatRoom).extracting(ChatRoom::getRoomName, ChatRoom::getRoomSize)
-            .containsExactly(chatRoomRequest.getRoomName(), chatRoomRequest.getRoomSize());
+                .containsExactly(chatRoomRequest.getRoomName(), chatRoomRequest.getRoomSize());
     }
 
     @Test
     void 채팅방_수정시_현재_방_크기보다_작은_크기로_변경시_예외발생() throws Exception {
         ReviseChatRoomRequest chatRoomRequest = ChatRoomServiceTestFixture.createReviseChatRoomRequest(
-            50);
+                50);
 
         ChatRoom chatRoom = ChatRoomServiceTestFixture.getChatRoom();
 
         when(chatRoomRepository.findChatRoomByIdAndHostId(any(), any())).thenReturn(
-            Optional.of(chatRoom));
+                Optional.of(chatRoom));
 
         assertThatThrownBy(() -> {
             chatRoomService.reviseChatRoom(chatRoomRequest, null, 125L);
         }).isInstanceOf(NotEnoughRoomSizeException.class);
     }
 
+    @Test
+    void 차단된_사용자가_입장시도시_예외발생() throws Exception {
+        User user = mock(User.class);
+        ChatRoom chatRoom = mock(ChatRoom.class);
+        ChatRoomBlockedUser blockedUser = mock(ChatRoomBlockedUser.class);
+
+        when(userRepository.findById(any())).thenReturn(Optional.ofNullable(user));
+        when(chatRoomRepository.findById(any())).thenReturn(Optional.ofNullable(chatRoom));
+        when(chatRoomBlockedUserRepository.findByUserIdAndChatRoomId(any(), any())).thenReturn(
+                Optional.ofNullable(blockedUser));
+
+        assertThatThrownBy(() -> {
+            chatRoomService.enterChatRoom(69L, 988L);
+        }).isInstanceOf(BlockedUserInChatRoomException.class);
+    }
+
+    @Test
+    void 채팅방_인원수_가득_찼을_경우_예외발생() throws Exception {
+        User user = User.builder()
+                .id(1L)
+                .nickname("testNick")
+                .profileImageUrl("testImage")
+                .defaultProfileImageType(1)
+                .build();
+
+        ChatRoom chatRoom = ChatRoom.builder()
+                .id(1L)
+                .roomSid("testRoomSid")
+                .roomSize(3)
+                .build();
+
+        Chat chat = Chat.builder()
+                .user(user)
+                .chatRoom(chatRoom)
+                .message("test")
+                .build();
+        chat.setCreatedAt(LocalDateTime.now());
+
+        when(userRepository.findById(any())).thenReturn(Optional.ofNullable(user));
+        when(chatRoomRepository.findById(any())).thenReturn(Optional.ofNullable(chatRoom));
+        when(participantRepository.findWithPessimisticLockByChatRoom(any())).thenReturn(
+                List.of(mock(Participant.class), mock(Participant.class), mock(Participant.class)));
+        assertThatThrownBy(() -> {
+            chatRoomService.enterChatRoom(user.getId(), chatRoom.getId());
+        }).isInstanceOf(ChatRoomIsFullException.class);
+    }
+
+    @Test
+    void 채팅방_입장_성공() throws Exception {
+        User user = User.builder()
+                .id(1L)
+                .nickname("testNick")
+                .profileImageUrl("testImage")
+                .defaultProfileImageType(1)
+                .build();
+
+        ChatRoom chatRoom = ChatRoom.builder()
+                .id(1L)
+                .roomSid("testRoomSid")
+                .roomSize(3)
+                .build();
+
+        Chat chat = Chat.builder()
+                .user(user)
+                .chatRoom(chatRoom)
+                .message("test")
+                .build();
+        chat.setCreatedAt(LocalDateTime.now());
+
+        when(userRepository.findById(any())).thenReturn(Optional.ofNullable(user));
+        when(chatRoomRepository.findById(any())).thenReturn(Optional.ofNullable(chatRoom));
+        when(participantRepository.findWithPessimisticLockByChatRoom(any())).thenReturn(
+                new ArrayList<>());
+        when(chatRepository.save(any())).thenReturn(chat);
+        chatRoomService.enterChatRoom(user.getId(), chatRoom.getId());
+
+        verify(participantRepository).save(any());
+        verify(chatRepository).save(any());
+        verify(messagePublisher).sendNotificationMessage(anyString(), any(NotificationMessage.class));
+    }
+
+    @Test
+    void 방장이아닌_참가자_채팅방_퇴장_성공() throws Exception {
+        User user = User.builder()
+                .id(1L)
+                .nickname("testNick")
+                .profileImageUrl("testImage")
+                .defaultProfileImageType(1)
+                .build();
+
+        ChatRoom chatRoom = ChatRoom.builder()
+                .id(1L)
+                .roomSid("testRoomSid")
+                .build();
+
+        Participant participant = Participant.builder()
+                .id(1L)
+                .chatRoom(chatRoom)
+                .user(user)
+                .build();
+
+        Chat chat = Chat.builder()
+                .id(1L)
+                .message("퇴장")
+                .build();
+        chat.setCreatedAt(LocalDateTime.now());
+
+        when(participantRepository.findByUserIdAndChatRoomId(any(), any())).thenReturn(
+                Optional.ofNullable(participant));
+        when(chatRepository.save(any())).thenReturn(chat);
+        chatRoomService.exitChatRoom(user.getId(), chatRoom.getId());
+
+        verify(chatRepository).save(any());
+        verify(participantRepository).delete(any());
+        verify(messagePublisher).sendNotificationMessage(anyString(), any(NotificationMessage.class));
+    }
+
+    @Test
+    void 방장의_채팅방_퇴장_성공() throws Exception {
+        User user = User.builder()
+                .id(1L)
+                .nickname("testNick")
+                .profileImageUrl("testImage")
+                .defaultProfileImageType(1)
+                .build();
+
+        ChatRoom chatRoom = ChatRoom.builder()
+                .id(1L)
+                .roomSid("testRoomSid")
+                .host(user)
+                .build();
+
+        Participant participant = Participant.builder()
+                .user(user)
+                .chatRoom(chatRoom)
+                .build();
+
+        when(participantRepository.findByUserIdAndChatRoomId(any(), any())).thenReturn(
+                Optional.ofNullable(participant));
+        chatRoomService.exitChatRoom(user.getId(), chatRoom.getId());
+
+        verify(chatRepository).deleteByChatRoom(any());
+        verify(participantRepository).deleteByChatRoom(any());
+        verify(chatRoomRepository).delete(any());
+    }
+
     private static class ChatRoomServiceTestFixture {
 
         public static ReviseChatRoomRequest createReviseChatRoomRequest(Integer roomSize) {
             return ReviseChatRoomRequest.builder()
-                .roomId(1L)
-                .roomName("afterRoomName")
-                .roomSize(roomSize)
-                .tags(List.of("tag4", "tag5"))
-                .build();
+                    .roomId(1L)
+                    .roomName("afterRoomName")
+                    .roomSize(roomSize)
+                    .tags(List.of("tag4", "tag5"))
+                    .build();
         }
 
         public static ChatRoom getChatRoom() {
             return ChatRoom.builder()
-                .roomName("beforeRoomName")
-                .roomSize(100)
-                .build();
+                    .roomName("beforeRoomName")
+                    .roomSize(100)
+                    .build();
         }
     }
 }
