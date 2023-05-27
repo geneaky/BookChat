@@ -1,5 +1,22 @@
 package toy.bookchat.bookchat.domain.chat.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static toy.bookchat.bookchat.exception.ExceptionResponse.BAD_REQUEST;
+
+import java.lang.reflect.Type;
+import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,17 +41,6 @@ import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.infrastructure.broker.message.CommonMessage;
-
-import java.lang.reflect.Type;
-import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.concurrent.*;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static toy.bookchat.bookchat.exception.ExceptionResponse.BAD_REQUEST;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 class ChatControllerMessagingTest extends ControllerTestExtension {
@@ -62,13 +68,13 @@ class ChatControllerMessagingTest extends ControllerTestExtension {
     }
 
     private StompSession stompSession()
-            throws InterruptedException, ExecutionException, TimeoutException {
+        throws InterruptedException, ExecutionException, TimeoutException {
         StompHeaders stompHeaders = new StompHeaders();
         stompHeaders.set(AUTHORIZATION, getTestToken());
         ListenableFuture<StompSession> connect = this.webSocketStompClient.connect(
-                getStompConnectionEndPointUrl(), new WebSocketHttpHeaders(), stompHeaders,
-                new StompSessionHandlerAdapter() {
-                });
+            getStompConnectionEndPointUrl(), new WebSocketHttpHeaders(), stompHeaders,
+            new StompSessionHandlerAdapter() {
+            });
         StompSession stompSession = connect.get(60, TimeUnit.SECONDS);
         stompSession.setAutoReceipt(true);
         return stompSession;
@@ -121,92 +127,86 @@ class ChatControllerMessagingTest extends ControllerTestExtension {
         StompHeaders sendHeader = stompSendHeaders("/subscriptions/send/chatrooms/1");
 
         ChatRoom chatRoom = ChatRoom.builder()
-                .id(1L)
-                .roomSize(3)
-                .roomSid("heho")
-                .build();
+            .id(1L)
+            .roomSize(3)
+            .roomSid("heho")
+            .build();
 
         Chat chat1 = Chat.builder()
-                .id(1L)
-                .message("test")
-                .user(getUser())
-                .chatRoom(chatRoom)
-                .build();
+            .id(1L)
+            .message("test")
+            .user(getUser())
+            .chatRoom(chatRoom)
+            .build();
         chat1.setCreatedAt(LocalDateTime.now());
 
         Chat chat2 = Chat.builder()
-                .id(2L)
-                .message("test test")
-                .user(getUser())
-                .chatRoom(chatRoom)
-                .build();
+            .id(2L)
+            .message("test test")
+            .user(getUser())
+            .chatRoom(chatRoom)
+            .build();
         chat2.setCreatedAt(LocalDateTime.now());
 
         Chat chat3 = Chat.builder()
-                .id(3L)
-                .message("test test test")
-                .user(getUser())
-                .chatRoom(chatRoom)
-                .build();
+            .id(3L)
+            .message("test test test")
+            .user(getUser())
+            .chatRoom(chatRoom)
+            .build();
         chat3.setCreatedAt(LocalDateTime.now());
 
         Participant participant = Participant.builder()
-                .chatRoom(chatRoom)
-                .user(getUser())
-                .id(1L)
-                .build();
+            .chatRoom(chatRoom)
+            .user(getUser())
+            .id(1L)
+            .build();
 
         CommonMessage dto1 = CommonMessage.builder()
-                .senderId(getUserId())
-                .senderNickname(getUserNickname())
-                .senderProfileImageUrl(getUserProfileImageUrl())
-                .senderDefaultProfileImageType(getUserDefaultProfileImageType())
-                .chatId(chat1.getId())
-                .dispatchTime(chat1.getDispatchTime())
-                .message(chat1.getMessage())
-                .build();
+            .senderId(getUserId())
+            .chatId(chat1.getId())
+            .receiptId(1)
+            .dispatchTime(chat1.getDispatchTime())
+            .message(chat1.getMessage())
+            .build();
 
         CommonMessage dto2 = CommonMessage.builder()
-                .senderId(getUserId())
-                .senderNickname(getUserNickname())
-                .senderProfileImageUrl(getUserProfileImageUrl())
-                .senderDefaultProfileImageType(getUserDefaultProfileImageType())
-                .chatId(chat2.getId())
-                .dispatchTime(chat2.getDispatchTime())
-                .message(chat2.getMessage())
-                .build();
+            .senderId(getUserId())
+            .chatId(chat2.getId())
+            .receiptId(2)
+            .dispatchTime(chat2.getDispatchTime())
+            .message(chat2.getMessage())
+            .build();
 
         CommonMessage dto3 = CommonMessage.builder()
-                .senderId(getUserId())
-                .senderNickname(getUserNickname())
-                .senderProfileImageUrl(getUserProfileImageUrl())
-                .senderDefaultProfileImageType(getUserDefaultProfileImageType())
-                .chatId(chat3.getId())
-                .dispatchTime(chat3.getDispatchTime())
-                .message(chat3.getMessage())
-                .build();
+            .senderId(getUserId())
+            .chatId(chat3.getId())
+            .receiptId(3)
+            .dispatchTime(chat3.getDispatchTime())
+            .message(chat3.getMessage())
+            .build();
 
         Runnable[] chatActions = {
-                () -> this.stompSession.send(sendHeader, dto1),
-                () -> this.stompSession.send(sendHeader, dto2),
-                () -> this.stompSession.send(sendHeader, dto3)
+            () -> this.stompSession.send(sendHeader, dto1),
+            () -> this.stompSession.send(sendHeader, dto2),
+            () -> this.stompSession.send(sendHeader, dto3)
         };
 
         when(participantRepository.findByUserIdAndChatRoomId(any(), any())).thenReturn(
-                Optional.ofNullable(participant));
+            Optional.ofNullable(participant));
         when(chatRepository.save(any())).thenReturn(chat1, chat2, chat3);
 
         CountDownLatch chatAttemptCountLatch = new CountDownLatch(chatActions.length);
 
         StompSession stompSession2 = stompSession();
         stompSession2.subscribe(subscribeHeader,
-                        subscribeFrameSessionHandler(chatAttemptCountLatch))
-                .addReceiptTask(() -> doChat(chatActions));
+                subscribeFrameSessionHandler(chatAttemptCountLatch))
+            .addReceiptTask(() -> doChat(chatActions));
 
         chatAttemptCountLatch.await();
 
         assertThat(blockingQueue).containsExactlyInAnyOrder(dto1, dto2, dto3);
-        verify(chatRepository, times(3)).save(any());
+        verify(chatRepository, times(chatActions.length)).save(any());
     }
 
     @Test
@@ -216,20 +216,20 @@ class ChatControllerMessagingTest extends ControllerTestExtension {
         StompHeaders sendHeader = stompSendHeaders("/subscriptions/send/chatrooms/1");
 
         CommonMessage dto = CommonMessage.builder()
-                .message(BAD_REQUEST.getValue().toString())
-                .build();
+            .message(BAD_REQUEST.getValue().toString())
+            .build();
 
         Runnable[] chatActions = {
-                () -> this.stompSession.send(sendHeader, null),
+            () -> this.stompSession.send(sendHeader, null),
         };
 
         CountDownLatch chatAttemptCountLatch = new CountDownLatch(chatActions.length);
         this.stompSession.subscribe(subscribeError,
-                subscribeFrameSessionHandler(chatAttemptCountLatch));
+            subscribeFrameSessionHandler(chatAttemptCountLatch));
 
         this.stompSession.subscribe(subscribeHeader,
-                        subscribeFrameSessionHandler(chatAttemptCountLatch))
-                .addReceiptTask(() -> doChat(chatActions));
+                subscribeFrameSessionHandler(chatAttemptCountLatch))
+            .addReceiptTask(() -> doChat(chatActions));
 
         chatAttemptCountLatch.await();
 

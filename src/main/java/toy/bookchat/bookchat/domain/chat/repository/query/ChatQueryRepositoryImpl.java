@@ -5,7 +5,6 @@ import static toy.bookchat.bookchat.domain.common.RepositorySupport.extractOrder
 import static toy.bookchat.bookchat.domain.common.RepositorySupport.numberBasedPagination;
 import static toy.bookchat.bookchat.domain.common.RepositorySupport.toSlice;
 import static toy.bookchat.bookchat.domain.participant.QParticipant.participant;
-import static toy.bookchat.bookchat.domain.user.QUser.user;
 
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -28,7 +27,6 @@ public class ChatQueryRepositoryImpl implements ChatQueryRepository {
         Long userId) {
         return toSlice(queryFactory.select(chat)
             .from(chat)
-            .leftJoin(chat.user, user).fetchJoin()
             .where(chat.chatRoom.id.eq(JPAExpressions.select(participant.chatRoom.id)
                     .from(participant)
                     .where(participant.user.id.eq(userId)

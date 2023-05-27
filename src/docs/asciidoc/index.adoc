@@ -868,6 +868,7 @@ include::{snippets}/get-chatroom-chats/http-response.adoc[]
     host: wss://bookchat.link/subscriptions/send/chatrooms/[123]
 
     {
+        receiptId: 1
         message: "hi hi"
     }
 

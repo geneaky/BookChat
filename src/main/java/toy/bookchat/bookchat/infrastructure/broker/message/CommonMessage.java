@@ -1,48 +1,44 @@
 package toy.bookchat.bookchat.infrastructure.broker.message;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import toy.bookchat.bookchat.domain.chat.Chat;
-import toy.bookchat.bookchat.domain.user.User;
-
-import javax.validation.constraints.NotBlank;
+import toy.bookchat.bookchat.domain.chat.api.dto.request.MessageDto;
 
 @Getter
-@EqualsAndHashCode
+@EqualsAndHashCode(of = {"chatId", "senderId"})
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CommonMessage {
 
     private Long chatId;
-    @NotBlank
+    private Long senderId;
+    private MessageType messageType;
+    private Integer receiptId;
     private String message;
     private String dispatchTime;
-    private MessageType messageType;
-    private Long senderId;
-    private String senderNickname;
-    private String senderProfileImageUrl;
-    private Integer senderDefaultProfileImageType;
 
     @Builder
-    private CommonMessage(Long chatId, Long senderId, String senderNickname, String senderProfileImageUrl, Integer senderDefaultProfileImageType, String dispatchTime, MessageType messageType, String message) {
+    private CommonMessage(Long chatId, Long senderId, Integer receiptId, String dispatchTime,
+        MessageType messageType, String message) {
         this.chatId = chatId;
         this.senderId = senderId;
-        this.senderNickname = senderNickname;
-        this.senderProfileImageUrl = senderProfileImageUrl;
-        this.senderDefaultProfileImageType = senderDefaultProfileImageType;
-        this.dispatchTime = dispatchTime;
         this.messageType = MessageType.CHAT;
+        this.receiptId = receiptId;
         this.message = message;
+        this.dispatchTime = dispatchTime;
     }
 
-    public static CommonMessage from(User user, Chat chat) {
+    public static CommonMessage from(Long senderId, Chat chat, MessageDto messageDto) {
         return CommonMessage.builder()
-                .senderId(user.getId())
-                .senderNickname(user.getNickname())
-                .senderProfileImageUrl(user.getProfileImageUrl())
-                .senderDefaultProfileImageType(user.getDefaultProfileImageType())
-                .chatId(chat.getId())
-                .dispatchTime(chat.getDispatchTime())
-                .messageType(MessageType.CHAT)
-                .message(chat.getMessage())
-                .build();
+            .chatId(chat.getId())
+            .senderId(senderId)
+            .messageType(MessageType.CHAT)
+            .receiptId(messageDto.getReceiptId())
+            .message(messageDto.getMessage())
+            .dispatchTime(chat.getDispatchTime())
+            .build();
     }
 }
