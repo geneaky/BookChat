@@ -8,10 +8,12 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Scrap {
 

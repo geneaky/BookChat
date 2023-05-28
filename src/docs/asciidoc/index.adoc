@@ -526,6 +526,20 @@ include::{snippets}/get-scrap/http-response.adoc[]
 
 === 스크랩 삭제
 
+`Request Header`
+
+include::{snippets}/delete-scrap/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/delete-scrap/request-parameters.adoc[]
+include::{snippets}/delete-scrap/path-parameters.adoc[]
+include::{snippets}/delete-scrap/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/delete-scrap/http-response.adoc[]
+
 == 고민
 
 === 고민 폴더 생성

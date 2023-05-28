@@ -7,6 +7,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
@@ -15,6 +16,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -120,6 +122,20 @@ class ScrapControllerTest extends ControllerTestExtension {
 
     @Test
     void scrap_삭제_성공() throws Exception {
-
+        mockMvc.perform(delete("/v1/api/scraps/{scrapIds}", "1, 2, 3")
+                .header(AUTHORIZATION, JWT_TOKEN)
+                .with(user(getUserPrincipal()))
+                .param("bookShelfId", "1"))
+            .andExpect(status().isOk())
+            .andDo(document("delete-scrap",
+                requestHeaders(
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
+                ),
+                requestParameters(
+                    parameterWithName("bookShelfId").description("서재 Id")
+                ),
+                pathParameters(
+                    parameterWithName("scrapIds").description("scrap id")
+                )));
     }
 }

@@ -17,6 +17,7 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
+import toy.bookchat.bookchat.domain.scrap.Scrap;
 import toy.bookchat.bookchat.domain.scrap.repository.ScrapRepository;
 import toy.bookchat.bookchat.domain.scrap.service.dto.request.CreateScrapRequest;
 import toy.bookchat.bookchat.domain.scrap.service.dto.response.ScrapResponse;
@@ -68,6 +69,18 @@ class ScrapServiceTest {
         verify(scrapRepository).findScraps(any(), any(), any(), any());
     }
 
+    @Test
+    void 스크랩_삭제_성공() throws Exception {
+
+        when(bookShelfRepository.findByIdAndUserId(any(), any())).thenReturn(
+            ScrapServiceTestFixture.mockBookShelf());
+        when(scrapRepository.findAllById(any())).thenReturn(ScrapServiceTestFixture.getScrapList());
+
+        scrapService.deleteScraps(1L, List.of(1L, 2L, 3L), 1L);
+
+        verify(scrapRepository).deleteAllInBatch(any());
+    }
+
     private static class ScrapServiceTestFixture {
 
         private static CreateScrapRequest create() {
@@ -79,6 +92,17 @@ class ScrapServiceTest {
 
         private static Optional<BookShelf> mockBookShelf() {
             return Optional.of(BookShelf.builder().build());
+        }
+
+        private static List<Scrap> getScrapList() {
+            Scrap scrap1 = Scrap.builder()
+                .scrapContent("scrap content1")
+                .build();
+            Scrap scrap2 = Scrap.builder()
+                .scrapContent("scrap content2")
+                .build();
+
+            return List.of(scrap1, scrap2);
         }
     }
 }
