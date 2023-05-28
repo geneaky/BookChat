@@ -1,7 +1,7 @@
 package toy.bookchat.bookchat.domain.chat.service.dto.response;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.springframework.data.domain.Slice;
@@ -17,32 +17,23 @@ public class ChatRoomChatsResponse {
 
     public ChatRoomChatsResponse(Slice<Chat> chatSlice) {
         this.cursorMeta = new CursorMeta<>(chatSlice, Chat::getId);
-        this.chatResponseList = from(chatSlice.getContent());
+        this.chatResponseList = chatSlice.stream().map(this::createChatResponse)
+            .collect(Collectors.toList());
     }
 
-    private List<ChatResponse> from(List<Chat> chatSlice) {
-        List<ChatResponse> chatResponseList = new ArrayList<>();
-        chatSlice.forEach(chat -> addChatResponse(chatResponseList, chat));
-        return chatResponseList;
-    }
-
-    private void addChatResponse(List<ChatResponse> chatResponseList, Chat chat) {
+    private ChatResponse createChatResponse(Chat chat) {
         if (chat.isAnnouncementChat()) {
-            chatResponseList.add(ChatResponse.builder()
+            return ChatResponse.builder()
                 .chatId(chat.getId())
                 .message(chat.getMessage())
                 .dispatchTime(chat.getDispatchTime())
-                .build());
-            return;
+                .build();
         }
-        chatResponseList.add(ChatResponse.builder()
+        return ChatResponse.builder()
             .chatId(chat.getId())
             .senderId(chat.getUserId())
-            .senderNickname(chat.getUserNickname())
-            .senderProfileImageUrl(chat.getUserProfileImageUrl())
-            .senderDefaultProfileImageType(chat.getUserDefaultProfileImageType())
             .message(chat.getMessage())
             .dispatchTime(chat.getDispatchTime())
-            .build());
+            .build();
     }
 }

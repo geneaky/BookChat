@@ -8,7 +8,11 @@
     <RollingFile fileName="./logs/spring.log"
       filePattern="./logs/spring-%d{yyyy-MM-dd}-%i.log"
       name="FileLog">
-      <DefaultRolloverStrategy fileIndex="min" max="20"/>
+      <DefaultRolloverStrategy fileIndex="max" max="7">
+        <Delete basePath="logs" maxDepth="1">
+          <IfAccumulatedFileCount exceeds="5"/>
+        </Delete>
+      </DefaultRolloverStrategy>
       <PatternLayout charset="UTF-8"
         pattern="%style{%d{ISO8601}}{cyan} %highlight{[%-5p]}{FATAL=bg_red, ERROR=red,INFO=green, DEBUG=blue} [%C] %style{[%t]}{yellow}:: %m%n ::"/>
       <Policies>

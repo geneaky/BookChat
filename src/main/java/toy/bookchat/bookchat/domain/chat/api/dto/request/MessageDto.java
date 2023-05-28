@@ -1,6 +1,7 @@
 package toy.bookchat.bookchat.domain.chat.api.dto.request;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -12,11 +13,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class MessageDto {
 
+    @NotNull
+    private Integer receiptId;
     @NotBlank
     private String message;
 
     @Builder
-    private MessageDto(String message) {
+    private MessageDto(Integer receiptId, String message) {
+        this.receiptId = receiptId;
         this.message = message;
     }
 }

@@ -336,6 +336,7 @@ class ChatRoomRepositoryTest {
             .roomSid(chatRoom1.getRoomSid())
             .roomImageUri(chatRoom1.getRoomImageUri())
             .roomMemberCount(2L)
+            .roomSize(chatRoom1.getRoomSize())
             .defaultRoomImageType(chatRoom1.getDefaultRoomImageType())
             .bookTitle(book.getTitle())
             .bookCoverImageUri(book.getBookCoverImageUrl())

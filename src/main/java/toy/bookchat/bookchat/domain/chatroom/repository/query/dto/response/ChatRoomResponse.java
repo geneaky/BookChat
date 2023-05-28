@@ -20,6 +20,7 @@ public class ChatRoomResponse {
     private Integer hostDefaultProfileImageType;
     private String hostProfileImageUri;
     private Long roomMemberCount;
+    private Integer roomSize;
     private Integer defaultRoomImageType;
     private String roomImageUri;
     private String tags;
@@ -30,7 +31,7 @@ public class ChatRoomResponse {
     public ChatRoomResponse(Long roomId, String roomName, String roomSid,
         String bookTitle, String bookCoverImageUri, List<String> bookAuthors, String hostName,
         Integer hostDefaultProfileImageType, String hostProfileImageUri, Long roomMemberCount,
-        Integer defaultRoomImageType,
+        Integer roomSize, Integer defaultRoomImageType,
         String roomImageUri, String tags, Long lastChatId, LocalDateTime lastActiveTime) {
         this.roomId = roomId;
         this.roomName = roomName;
@@ -42,6 +43,7 @@ public class ChatRoomResponse {
         this.hostDefaultProfileImageType = hostDefaultProfileImageType;
         this.hostProfileImageUri = hostProfileImageUri;
         this.roomMemberCount = roomMemberCount;
+        this.roomSize = roomSize;
         this.defaultRoomImageType = defaultRoomImageType;
         this.roomImageUri = roomImageUri;
         this.tags = tags;
@@ -53,7 +55,7 @@ public class ChatRoomResponse {
     public ChatRoomResponse(Long roomId, String roomName, String roomSid,
         String bookTitle, String bookCoverImageUri, String hostName,
         Integer hostDefaultProfileImageType, String hostProfileImageUri, Long roomMemberCount,
-        Integer defaultRoomImageType,
+        Integer roomSize, Integer defaultRoomImageType,
         String roomImageUri, String tags, Long lastChatId, LocalDateTime lastActiveTime) {
         this.roomId = roomId;
         this.roomName = roomName;
@@ -64,6 +66,7 @@ public class ChatRoomResponse {
         this.hostDefaultProfileImageType = hostDefaultProfileImageType;
         this.hostProfileImageUri = hostProfileImageUri;
         this.roomMemberCount = roomMemberCount;
+        this.roomSize = roomSize;
         this.defaultRoomImageType = defaultRoomImageType;
         this.roomImageUri = roomImageUri;
         this.tags = tags;
