@@ -488,6 +488,31 @@ include::{snippets}/put-book-report/http-request.adoc[]
 
 include::{snippets}/put-book-report/http-response.adoc[]
 
+== 스크랩
+
+=== 스크랩 등록
+
+`Request Header`
+
+include::{snippets}/post-scrap/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/post-scrap/request-fields.adoc[]
+include::{snippets}/post-scrap/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/post-scrap/http-response.adoc[]
+
+---
+
+=== 스크랩 조회
+
+---
+
+=== 스크랩 삭제
+
 == 고민
 
 === 고민 폴더 생성
