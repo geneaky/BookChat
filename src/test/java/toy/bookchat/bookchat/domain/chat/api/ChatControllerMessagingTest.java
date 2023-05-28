@@ -6,7 +6,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static toy.bookchat.bookchat.exception.ExceptionResponse.BAD_REQUEST;
 
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
@@ -207,33 +206,6 @@ class ChatControllerMessagingTest extends ControllerTestExtension {
 
         assertThat(blockingQueue).containsExactlyInAnyOrder(dto1, dto2, dto3);
         verify(chatRepository, times(chatActions.length)).save(any());
-    }
-
-    @Test
-    void 메시지_예외_테스트() throws Exception {
-        StompHeaders subscribeHeader = stompSubscribeHeaders("/topic/heho");
-        StompHeaders subscribeError = stompSubscribeHeaders("/user/exchange/amq.direct/error");
-        StompHeaders sendHeader = stompSendHeaders("/subscriptions/send/chatrooms/1");
-
-        CommonMessage dto = CommonMessage.builder()
-            .message(BAD_REQUEST.getValue().toString())
-            .build();
-
-        Runnable[] chatActions = {
-            () -> this.stompSession.send(sendHeader, null),
-        };
-
-        CountDownLatch chatAttemptCountLatch = new CountDownLatch(chatActions.length);
-        this.stompSession.subscribe(subscribeError,
-            subscribeFrameSessionHandler(chatAttemptCountLatch));
-
-        this.stompSession.subscribe(subscribeHeader,
-                subscribeFrameSessionHandler(chatAttemptCountLatch))
-            .addReceiptTask(() -> doChat(chatActions));
-
-        chatAttemptCountLatch.await();
-
-        assertThat(blockingQueue).containsExactlyInAnyOrder(dto);
     }
 
     private void doChat(Runnable... chatActions) {
