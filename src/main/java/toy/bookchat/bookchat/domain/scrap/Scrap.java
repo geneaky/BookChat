@@ -7,6 +7,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 
@@ -20,4 +21,11 @@ public class Scrap {
     private String scrapContent;
     @ManyToOne(fetch = FetchType.LAZY)
     private BookShelf bookShelf;
+
+    @Builder
+    private Scrap(Long id, String scrapContent, BookShelf bookShelf) {
+        this.id = id;
+        this.scrapContent = scrapContent;
+        this.bookShelf = bookShelf;
+    }
 }

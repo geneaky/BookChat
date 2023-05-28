@@ -6,6 +6,7 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.headerWit
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
@@ -15,8 +16,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
+import toy.bookchat.bookchat.domain.scrap.service.ScrapService;
 import toy.bookchat.bookchat.domain.scrap.service.dto.request.CreateScrapRequest;
 
 
@@ -24,6 +27,8 @@ import toy.bookchat.bookchat.domain.scrap.service.dto.request.CreateScrapRequest
 class ScrapControllerTest extends ControllerTestExtension {
 
     public final String JWT_TOKEN = getTestToken();
+    @MockBean
+    private ScrapService scrapService;
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
@@ -33,6 +38,7 @@ class ScrapControllerTest extends ControllerTestExtension {
     void scrap_저장_성공() throws Exception {
 
         CreateScrapRequest createScrapRequest = CreateScrapRequest.builder()
+            .bookShelfId(1L)
             .scrapContent("스크랩할 내용")
             .build();
 
@@ -47,6 +53,7 @@ class ScrapControllerTest extends ControllerTestExtension {
                     headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
                 requestFields(
+                    fieldWithPath("bookShelfId").type(NUMBER).description("서재 ID"),
                     fieldWithPath("scrapContent").type(STRING).description("스크랩 내용")
                 )));
     }
