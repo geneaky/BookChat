@@ -128,6 +128,7 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
                     // TODO: 2023/03/19 scalar subquery 성능 문제가 있다면 대체 방법 고려
                     JPAExpressions.select(participant.count()).from(participant)
                         .where(participant.chatRoom.id.eq(chatRoom.id)),
+                    chatRoom.roomSize,
                     chatRoom.defaultRoomImageType,
                     chatRoom.roomImageUri,
                     Expressions.stringTemplate("group_concat({0})", hashTag.tagName),
