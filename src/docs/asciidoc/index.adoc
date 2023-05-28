@@ -509,6 +509,19 @@ include::{snippets}/post-scrap/http-response.adoc[]
 
 === 스크랩 조회
 
+`Request Header`
+
+include::{snippets}/get-scrap/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/get-scrap/request-parameters.adoc[]
+include::{snippets}/get-scrap/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/get-scrap/http-response.adoc[]
+
 ---
 
 === 스크랩 삭제

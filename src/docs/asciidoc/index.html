@@ -3580,6 +3580,85 @@ X-Frame-Options: DENY</code></pre>
 </div>
 <div class="sect2">
 <h3 id="_스크랩_조회">스크랩 조회</h3>
+<div class="paragraph">
+<p><code>Request Header</code></p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Authorization</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Bearer [JWT token]</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><code>Request</code></p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Parameter</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bookShelfId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>false</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">서재 Id</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>postCursorId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>true</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">마지막 커서 ID</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>size</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>true</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">페이지 사이즈</p></td>
+</tr>
+</tbody>
+</table>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /v1/api/scraps?bookShelfId=1&amp;postCursorId=5&amp;size=3 HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwicHJvdmlkZXIiOiJnb29nbGUiLCJuYW1lIjoiZ29vZ2xlMTIzIiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSJ9.LKub56oLOIJFlTzNiwxqH0V4SubOOBiIZESje9yJDco
+Host: bookchat.link</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>Response</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/json
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+Strict-Transport-Security: max-age=31536000 ; includeSubDomains
+X-Frame-Options: DENY
+Content-Length: 264
+
+{"scrapResponseList":[{"scrapId":1,"scrapContent":"content1"},{"scrapId":2,"scrapContent":"content2"},{"scrapId":3,"scrapContent":"content3"}],"cursorMeta":{"sliceSize":3,"contentSize":3,"hasContent":true,"hasNext":true,"nextCursorId":3,"first":true,"last":false}}</code></pre>
+</div>
+</div>
 <hr>
 </div>
 <div class="sect2">
@@ -5992,7 +6071,7 @@ Content-Length: 420
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2023-05-28 23:40:43 +0900
+Last updated 2023-05-29 01:56:39 +0900
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>
