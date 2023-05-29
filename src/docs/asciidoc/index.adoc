@@ -488,6 +488,58 @@ include::{snippets}/put-book-report/http-request.adoc[]
 
 include::{snippets}/put-book-report/http-response.adoc[]
 
+== 스크랩
+
+=== 스크랩 등록
+
+`Request Header`
+
+include::{snippets}/post-scrap/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/post-scrap/request-fields.adoc[]
+include::{snippets}/post-scrap/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/post-scrap/http-response.adoc[]
+
+---
+
+=== 스크랩 조회
+
+`Request Header`
+
+include::{snippets}/get-scrap/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/get-scrap/request-parameters.adoc[]
+include::{snippets}/get-scrap/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/get-scrap/http-response.adoc[]
+
+---
+
+=== 스크랩 삭제
+
+`Request Header`
+
+include::{snippets}/delete-scrap/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/delete-scrap/request-parameters.adoc[]
+include::{snippets}/delete-scrap/path-parameters.adoc[]
+include::{snippets}/delete-scrap/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/delete-scrap/http-response.adoc[]
+
 == 고민
 
 === 고민 폴더 생성

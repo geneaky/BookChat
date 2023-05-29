@@ -92,4 +92,8 @@ public class Participant {
     public String getChatRoomSid() {
         return this.chatRoom.getRoomSid();
     }
+
+    public boolean isNotSubHost() {
+        return this.participantStatus != SUBHOST;
+    }
 }

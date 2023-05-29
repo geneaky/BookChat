@@ -488,6 +488,13 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_독후감_수정">독후감 수정</a></li>
 </ul>
 </li>
+<li><a href="#_스크랩">스크랩</a>
+<ul class="sectlevel2">
+<li><a href="#_스크랩_등록">스크랩 등록</a></li>
+<li><a href="#_스크랩_조회">스크랩 조회</a></li>
+<li><a href="#_스크랩_삭제">스크랩 삭제</a></li>
+</ul>
+</li>
 <li><a href="#_고민">고민</a>
 <ul class="sectlevel2">
 <li><a href="#_고민_폴더_생성">고민 폴더 생성</a></li>
@@ -3487,6 +3494,263 @@ X-Frame-Options: DENY</code></pre>
 </div>
 </div>
 <div class="sect1">
+<h2 id="_스크랩">스크랩</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_스크랩_등록">스크랩 등록</h3>
+<div class="paragraph">
+<p><code>Request Header</code></p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Authorization</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Bearer [JWT token]</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><code>Request</code></p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Field</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bookShelfId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>false</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">서재 ID</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scrapContent</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">String</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>false</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">스크랩 내용</p></td>
+</tr>
+</tbody>
+</table>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /v1/api/scraps HTTP/1.1
+Content-Type: application/json;charset=UTF-8
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwicHJvdmlkZXIiOiJnb29nbGUiLCJuYW1lIjoiZ29vZ2xlMTIzIiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSJ9.LKub56oLOIJFlTzNiwxqH0V4SubOOBiIZESje9yJDco
+Content-Length: 54
+Host: bookchat.link
+
+{"bookShelfId":1,"scrapContent":"스크랩할 내용"}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>Response</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+Strict-Transport-Security: max-age=31536000 ; includeSubDomains
+X-Frame-Options: DENY</code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_스크랩_조회">스크랩 조회</h3>
+<div class="paragraph">
+<p><code>Request Header</code></p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Authorization</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Bearer [JWT token]</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><code>Request</code></p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Parameter</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bookShelfId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>false</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">서재 Id</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>postCursorId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>true</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">마지막 커서 ID</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>size</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>true</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">페이지 사이즈</p></td>
+</tr>
+</tbody>
+</table>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /v1/api/scraps?bookShelfId=1&amp;postCursorId=5&amp;size=3 HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwicHJvdmlkZXIiOiJnb29nbGUiLCJuYW1lIjoiZ29vZ2xlMTIzIiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSJ9.LKub56oLOIJFlTzNiwxqH0V4SubOOBiIZESje9yJDco
+Host: bookchat.link</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>Response</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/json
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+Strict-Transport-Security: max-age=31536000 ; includeSubDomains
+X-Frame-Options: DENY
+Content-Length: 264
+
+{"scrapResponseList":[{"scrapId":1,"scrapContent":"content1"},{"scrapId":2,"scrapContent":"content2"},{"scrapId":3,"scrapContent":"content3"}],"cursorMeta":{"sliceSize":3,"contentSize":3,"hasContent":true,"hasNext":true,"nextCursorId":3,"first":true,"last":false}}</code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_스크랩_삭제">스크랩 삭제</h3>
+<div class="paragraph">
+<p><code>Request Header</code></p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Authorization</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Bearer [JWT token]</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><code>Request</code></p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Parameter</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bookShelfId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>false</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">서재 Id</p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 9. /v1/api/scraps/{scrapIds}</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scrapIds</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">scrap id</p></td>
+</tr>
+</tbody>
+</table>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">DELETE /v1/api/scraps/1,%202,%203?bookShelfId=1 HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwicHJvdmlkZXIiOiJnb29nbGUiLCJuYW1lIjoiZ29vZ2xlMTIzIiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSJ9.LKub56oLOIJFlTzNiwxqH0V4SubOOBiIZESje9yJDco
+Host: bookchat.link</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>Response</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+Strict-Transport-Security: max-age=31536000 ; includeSubDomains
+X-Frame-Options: DENY</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_고민">고민</h2>
 <div class="sectionbody">
 <div class="sect2">
@@ -3516,7 +3780,7 @@ X-Frame-Options: DENY</code></pre>
 <p><code>Request</code></p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 9. /v1/api/bookshelves/{bookShelfId}/agonies</caption>
+<caption class="title">Table 10. /v1/api/bookshelves/{bookShelfId}/agonies</caption>
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -3617,7 +3881,7 @@ X-Frame-Options: DENY</code></pre>
 <p><code>Request</code></p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 10. /v1/api/bookshelves/{bookShelfId}/agonies</caption>
+<caption class="title">Table 11. /v1/api/bookshelves/{bookShelfId}/agonies</caption>
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -3785,7 +4049,7 @@ Content-Length: 256
 <p><code>Request</code></p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 11. /v1/api/bookshelves/{bookShelfId}/agonies/{agoniesIds}</caption>
+<caption class="title">Table 12. /v1/api/bookshelves/{bookShelfId}/agonies/{agoniesIds}</caption>
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -3858,7 +4122,7 @@ X-Frame-Options: DENY</code></pre>
 <p><code>Request</code></p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 12. /v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}</caption>
+<caption class="title">Table 13. /v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}</caption>
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -3967,7 +4231,7 @@ X-Frame-Options: DENY</code></pre>
 <p><code>Request</code></p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 13. /v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records</caption>
+<caption class="title">Table 14. /v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records</caption>
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -4072,7 +4336,7 @@ X-Frame-Options: DENY</code></pre>
 <p><code>Request</code></p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 14. /v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records</caption>
+<caption class="title">Table 15. /v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records</caption>
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -4248,7 +4512,7 @@ Content-Length: 360
 <p><code>Request</code></p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 15. /v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records/{recordId}</caption>
+<caption class="title">Table 16. /v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records/{recordId}</caption>
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -4325,7 +4589,7 @@ X-Frame-Options: DENY</code></pre>
 <p><code>Request</code></p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 16. /v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records/{recordId}</caption>
+<caption class="title">Table 17. /v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records/{recordId}</caption>
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -4644,7 +4908,7 @@ X-Frame-Options: DENY</code></pre>
 <p><code>Request</code></p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 17. /v1/api/chatrooms/{roomId}</caption>
+<caption class="title">Table 18. /v1/api/chatrooms/{roomId}</caption>
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -5344,7 +5608,7 @@ X-Frame-Options: DENY</code></pre>
 <p><code>Request</code></p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 18. /v1/api/enter/chatrooms/{roomId}</caption>
+<caption class="title">Table 19. /v1/api/enter/chatrooms/{roomId}</caption>
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -5413,7 +5677,7 @@ X-Frame-Options: DENY</code></pre>
 <p><code>Request</code></p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 19. /v1/api/leave/chatrooms/{roomId}</caption>
+<caption class="title">Table 20. /v1/api/leave/chatrooms/{roomId}</caption>
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -5486,7 +5750,7 @@ X-Frame-Options: DENY</code></pre>
 <p><code>Request</code></p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 20. /v1/api/chatrooms/{roomId}/participants/{userId}</caption>
+<caption class="title">Table 21. /v1/api/chatrooms/{roomId}/participants/{userId}</caption>
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -5578,7 +5842,7 @@ X-Frame-Options: DENY</code></pre>
 <p><code>Request</code></p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 21. /v1/api/chatrooms/{roomId}/participants/{userId}</caption>
+<caption class="title">Table 22. /v1/api/chatrooms/{roomId}/participants/{userId}</caption>
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -5655,7 +5919,7 @@ X-Frame-Options: DENY</code></pre>
 <p><code>Request</code></p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 22. /v1/api/chatrooms/{roomId}/chats</caption>
+<caption class="title">Table 23. /v1/api/chatrooms/{roomId}/chats</caption>
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -5890,7 +6154,7 @@ Content-Length: 420
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2023-05-28 00:48:57 +0900
+Last updated 2023-05-29 02:29:28 +0900
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>
