@@ -28,10 +28,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.util.Base64Utils;
 import toy.bookchat.bookchat.config.token.OAuth2Properties;
-import toy.bookchat.bookchat.exception.security.DeniedTokenException;
-import toy.bookchat.bookchat.exception.security.ExpiredTokenException;
-import toy.bookchat.bookchat.exception.security.IllegalStandardTokenException;
-import toy.bookchat.bookchat.exception.security.NotSupportedOAuth2ProviderException;
+import toy.bookchat.bookchat.exception.unauthorized.DeniedTokenException;
+import toy.bookchat.bookchat.exception.unauthorized.ExpiredTokenException;
 import toy.bookchat.bookchat.security.token.openid.KakaoIdToken;
 import toy.bookchat.bookchat.security.token.openid.OpenIdTestUtil;
 
@@ -182,7 +180,7 @@ class KakaoIdTokenFetcherTest {
 
         assertThatThrownBy(() -> {
             kakaoIdTokenFetcher.fetchKakaoIdToken(token);
-        }).isInstanceOf(NotSupportedOAuth2ProviderException.class);
+        }).isInstanceOf(DeniedTokenException.class);
     }
 
     @Test
@@ -206,7 +204,7 @@ class KakaoIdTokenFetcherTest {
 
         assertThatThrownBy(() -> {
             kakaoIdTokenFetcher.fetchKakaoIdToken(token);
-        }).isInstanceOf(IllegalStandardTokenException.class);
+        }).isInstanceOf(DeniedTokenException.class);
     }
 
     @Test
@@ -230,6 +228,6 @@ class KakaoIdTokenFetcherTest {
 
         assertThatThrownBy(() -> {
             kakaoIdTokenFetcher.fetchKakaoIdToken(token);
-        }).isInstanceOf(IllegalStandardTokenException.class);
+        }).isInstanceOf(DeniedTokenException.class);
     }
 }

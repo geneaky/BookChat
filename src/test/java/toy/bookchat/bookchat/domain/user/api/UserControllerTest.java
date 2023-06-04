@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -68,7 +67,7 @@ import toy.bookchat.bookchat.domain.user.service.UserService;
 import toy.bookchat.bookchat.domain.user.service.dto.request.ChangeUserNicknameRequest;
 import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignInRequest;
 import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignUpRequest;
-import toy.bookchat.bookchat.exception.security.ExpiredTokenException;
+import toy.bookchat.bookchat.exception.unauthorized.ExpiredTokenException;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenProvider;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenRecorder;
 import toy.bookchat.bookchat.security.token.openid.OpenIdTestUtil;
@@ -240,8 +239,9 @@ class UserControllerTest extends ControllerTestExtension {
 
         when(getPublicKeyFetcher().getPublicKey(any(), any())).thenReturn(
             publicKey);
-        doThrow(ExpiredTokenException.class).when(getIdTokenManager())
-            .getOAuth2MemberNumberFromIdToken(any(), any());
+
+        when(getIdTokenManager().getOAuth2MemberNumberFromIdToken(any(), any())).thenThrow(
+            new ExpiredTokenException());
 
         mockMvc.perform(multipart("/v1/api/users/signup")
                 .file(multipartFile)
@@ -442,8 +442,8 @@ class UserControllerTest extends ControllerTestExtension {
     void 만료된_토큰으로_요청시_401_예외발생() throws Exception {
         PrivateKey privateKey = getPrivateKey();
 
-        doThrow(ExpiredTokenException.class).when(getIdTokenManager())
-            .getOAuth2MemberNumberFromIdToken(any(), any());
+        when(getIdTokenManager().getOAuth2MemberNumberFromIdToken(any(), any())).thenThrow(
+            new ExpiredTokenException());
 
         Claims claims = Jwts.claims().setIssuer("https://kauth.kakao.com")
             .setSubject("test").setExpiration(new Date(0));

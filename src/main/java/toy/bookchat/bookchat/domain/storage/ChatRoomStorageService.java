@@ -1,14 +1,12 @@
 package toy.bookchat.bookchat.domain.storage;
 
-import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import java.io.IOException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import toy.bookchat.bookchat.config.aws.StorageProperties;
 import toy.bookchat.bookchat.domain.storage.image.ImageValidator;
-import toy.bookchat.bookchat.exception.storage.ImageUploadToStorageException;
+import toy.bookchat.bookchat.exception.internalserver.ImageUploadToStorageException;
 
 @Service
 public class ChatRoomStorageService implements StorageService {
@@ -39,8 +37,8 @@ public class ChatRoomStorageService implements StorageService {
                 multipartFile.getInputStream(), abstractObjectMetadataFrom(multipartFile));
 
             return getFileUrl(fileName);
-        } catch (SdkClientException | IOException exception) {
-            throw new ImageUploadToStorageException(exception.getMessage());
+        } catch (Exception exception) {
+            throw new ImageUploadToStorageException();
         }
     }
 

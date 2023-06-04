@@ -1,9 +1,12 @@
 package toy.bookchat.bookchat.infrastructure.broker.message;
 
-import lombok.*;
-import toy.bookchat.bookchat.domain.chat.Chat;
-
 import javax.validation.constraints.NotBlank;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import toy.bookchat.bookchat.domain.chat.Chat;
 
 @Getter
 @EqualsAndHashCode
@@ -15,74 +18,75 @@ public class NotificationMessage {
     @NotBlank
     private String message;
     private String dispatchTime;
-    private MessageType messageType;
+    private NotificationMessageType notificationMessageType;
 
     @Builder
-    private NotificationMessage(Long targetId, Long chatId, String dispatchTime, MessageType messageType, String message) {
+    private NotificationMessage(Long targetId, Long chatId, String dispatchTime,
+        NotificationMessageType notificationMessageType, String message) {
         this.targetId = targetId;
         this.chatId = chatId;
         this.dispatchTime = dispatchTime;
-        this.messageType = messageType;
+        this.notificationMessageType = notificationMessageType;
         this.message = message;
     }
 
     public static NotificationMessage createEntranceMessage(Chat chat, Long targetId) {
         return NotificationMessage.builder()
-                .targetId(targetId)
-                .chatId(chat.getId())
-                .message(chat.getMessage())
-                .messageType(MessageType.ENTER)
-                .dispatchTime(chat.getDispatchTime())
-                .build();
+            .targetId(targetId)
+            .chatId(chat.getId())
+            .message(chat.getMessage())
+            .notificationMessageType(NotificationMessageType.NOTICE_ENTER)
+            .dispatchTime(chat.getDispatchTime())
+            .build();
     }
 
     public static NotificationMessage createExitMessage(Chat chat, Long targetId) {
         return NotificationMessage.builder()
-                .targetId(targetId)
-                .chatId(chat.getId())
-                .message(chat.getMessage())
-                .messageType(MessageType.EXIT)
-                .dispatchTime(chat.getDispatchTime())
-                .build();
+            .targetId(targetId)
+            .chatId(chat.getId())
+            .message(chat.getMessage())
+            .notificationMessageType(NotificationMessageType.NOTICE_EXIT)
+            .dispatchTime(chat.getDispatchTime())
+            .build();
     }
 
     public static NotificationMessage createSubHostDelegateMessage(Chat chat, Long targetId) {
         return NotificationMessage.builder()
-                .targetId(targetId)
-                .chatId(chat.getId())
-                .message(chat.getMessage())
-                .messageType(MessageType.NOTICE_SUB_HOST_DELEGATE)
-                .dispatchTime(chat.getDispatchTime())
-                .build();
+            .targetId(targetId)
+            .chatId(chat.getId())
+            .message(chat.getMessage())
+            .notificationMessageType(NotificationMessageType.NOTICE_SUB_HOST_DELEGATE)
+            .dispatchTime(chat.getDispatchTime())
+            .build();
     }
 
     public static NotificationMessage createSubHostDismissMessage(Chat chat, Long targetId) {
         return NotificationMessage.builder()
-                .targetId(targetId)
-                .chatId(chat.getId())
-                .message(chat.getMessage())
-                .messageType(MessageType.NOTICE_SUB_HOST_DISMISS)
-                .dispatchTime(chat.getDispatchTime())
-                .build();
+            .targetId(targetId)
+            .chatId(chat.getId())
+            .message(chat.getMessage())
+            .notificationMessageType(NotificationMessageType.NOTICE_SUB_HOST_DISMISS)
+            .dispatchTime(chat.getDispatchTime())
+            .build();
     }
 
     public static NotificationMessage createHostDelegateMessage(Chat chat, Long targetId) {
         return NotificationMessage.builder()
-                .targetId(targetId)
-                .chatId(chat.getId())
-                .message(chat.getMessage())
-                .messageType(MessageType.NOTICE_HOST_DELEGATE)
-                .dispatchTime(chat.getDispatchTime())
-                .build();
+            .targetId(targetId)
+            .chatId(chat.getId())
+            .message(chat.getMessage())
+            .notificationMessageType(NotificationMessageType.NOTICE_HOST_DELEGATE)
+            .dispatchTime(chat.getDispatchTime())
+            .build();
     }
 
     public static NotificationMessage createKickMessage(Chat chat, Long targetId) {
         return NotificationMessage.builder()
-                .targetId(targetId)
-                .chatId(chat.getId())
-                .message(chat.getMessage())
-                .messageType(MessageType.NOTICE_KICK)
-                .dispatchTime(chat.getDispatchTime())
-                .build();
+            .targetId(targetId)
+            .chatId(chat.getId())
+            .message(chat.getMessage())
+            .notificationMessageType(NotificationMessageType.NOTICE_KICK)
+            .dispatchTime(chat.getDispatchTime())
+            .build();
     }
 }

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import toy.bookchat.bookchat.domain.book.service.BookFetcher;
 import toy.bookchat.bookchat.domain.book.service.dto.request.KakaoBook;
-import toy.bookchat.bookchat.exception.book.BookNotFoundException;
+import toy.bookchat.bookchat.exception.notfound.book.BookNotFoundException;
 
 @Component
 public class KakaoBookFetcher implements BookFetcher<KakaoBook> {

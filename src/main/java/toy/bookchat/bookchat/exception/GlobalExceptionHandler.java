@@ -1,153 +1,79 @@
 package toy.bookchat.bookchat.exception;
 
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
-import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import toy.bookchat.bookchat.exception.book.BookNotFoundException;
-import toy.bookchat.bookchat.exception.bookshelf.BookReportNotFoundException;
-import toy.bookchat.bookchat.exception.chatroom.BlockedUserInChatRoomException;
-import toy.bookchat.bookchat.exception.chatroom.ChatRoomIsFullException;
-import toy.bookchat.bookchat.exception.common.RateOverLimitException;
-import toy.bookchat.bookchat.exception.security.*;
-import toy.bookchat.bookchat.exception.storage.ImageUploadToStorageException;
-import toy.bookchat.bookchat.exception.user.ImageInputStreamException;
-import toy.bookchat.bookchat.exception.user.UserAlreadySignUpException;
-import toy.bookchat.bookchat.exception.user.UserNotFoundException;
-import toy.bookchat.bookchat.infrastructure.broker.message.CommonMessage;
-
-import static toy.bookchat.bookchat.exception.ExceptionResponse.*;
+import toy.bookchat.bookchat.exception.badrequest.BadRequestException;
+import toy.bookchat.bookchat.exception.forbidden.ForbiddenException;
+import toy.bookchat.bookchat.exception.internalserver.InternalServerException;
+import toy.bookchat.bookchat.exception.notfound.NotFoundException;
+import toy.bookchat.bookchat.exception.toomanyrequests.TooManyRequestException;
+import toy.bookchat.bookchat.exception.unauthorized.UnauthorizedException;
 
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private final String LOG_FORMAT = "Class :: {}, Message :: {}";
+    private final String LOG_FORMAT = "Class :: {}, Code :: {}, Message :: {}";
+    private final String UNKNOWN = "Unknown";
 
-    @ExceptionHandler(NotVerifiedIdTokenException.class)
-    public final ResponseEntity<String> handleNotVerifiedIdTokenException(
-            NotVerifiedIdTokenException exception) {
-        log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
-        return NOT_VERIFIED_TOKEN.getValue();
+    @ExceptionHandler(BadRequestException.class)
+    public final ResponseEntity<ExceptionResponse> handleBadRequestException(
+        BadRequestException e) {
+        log.info(LOG_FORMAT, e.getClass().getSimpleName(), e.getErrorCode().getValue(),
+            e.getMessage());
+        return ResponseEntity.badRequest().body(ExceptionResponse.from(e));
     }
 
-    @ExceptionHandler(NotSupportedOAuth2ProviderException.class)
-    public final ResponseEntity<String> handleNotSupportedOAuth2ProviderException(
-            NotSupportedOAuth2ProviderException exception) {
-        log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
-        return NOT_SUPPORTED_OAUTH2_PROVIDER.getValue();
+    @ExceptionHandler(UnauthorizedException.class)
+    public final ResponseEntity<ExceptionResponse> handleUnauthorizedException(
+        UnauthorizedException e) {
+        log.info(LOG_FORMAT, e.getClass().getSimpleName(), e.getErrorCode().getValue(),
+            e.getMessage());
+        return ResponseEntity.status(UNAUTHORIZED).body(ExceptionResponse.from(e));
     }
 
-    @ExceptionHandler(BookNotFoundException.class)
-    public final ResponseEntity<String> handleBookNotFoundException(
-            BookNotFoundException exception) {
-        log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
-        return BOOK_NOT_FOUND.getValue();
+    @ExceptionHandler(ForbiddenException.class)
+    public final ResponseEntity<ExceptionResponse> handleForbiddenException(ForbiddenException e) {
+        log.info(LOG_FORMAT, e.getClass().getSimpleName(), e.getErrorCode().getValue(),
+            e.getMessage());
+        return ResponseEntity.status(FORBIDDEN).body(ExceptionResponse.from(e));
     }
 
-    @ExceptionHandler(BookReportNotFoundException.class)
-    public final ResponseEntity<String> handleBookReportNotFoundException(
-            BookReportNotFoundException exception) {
-        log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
-        return BOOK_REPORT_NOT_FOUND.getValue();
+    @ExceptionHandler(NotFoundException.class)
+    public final ResponseEntity<ExceptionResponse> handleNotFoundException(NotFoundException e) {
+        log.info(LOG_FORMAT, e.getClass().getSimpleName(), e.getErrorCode().getValue(),
+            e.getMessage());
+        return ResponseEntity.status(NOT_FOUND).body(ExceptionResponse.from(e));
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public final ResponseEntity<String> handleUserNotFoundException(
-            UserNotFoundException exception) {
-        log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
-        return USER_NOT_FOUND.getValue();
+    @ExceptionHandler(TooManyRequestException.class)
+    public final ResponseEntity<ExceptionResponse> handleTooManyRequestException(
+        TooManyRequestException e) {
+        log.info(LOG_FORMAT, e.getClass().getSimpleName(), e.getErrorCode().getValue(),
+            e.getMessage());
+        return ResponseEntity.status(TOO_MANY_REQUESTS).body(ExceptionResponse.from(e));
     }
 
-    @ExceptionHandler(ExpiredTokenException.class)
-    public final ResponseEntity<String> handleExpiredTokenException(
-            ExpiredTokenException exception) {
-        log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
-        return NOT_VERIFIED_TOKEN.getValue();
-    }
-
-    @ExceptionHandler(DeniedTokenException.class)
-    public final ResponseEntity<String> handleDeniedTokenException(
-            DeniedTokenException exception) {
-        log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
-        return NOT_VERIFIED_TOKEN.getValue();
-    }
-
-    @ExceptionHandler(ImageInputStreamException.class)
-    public final ResponseEntity<String> handelImageInputStreamException(
-            ImageInputStreamException exception) {
-        log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
-        return IMAGE_PROCESSING_FAIL.getValue();
-    }
-
-    @ExceptionHandler(ImageUploadToStorageException.class)
-    public final ResponseEntity<String> handleImageUploadToStorageException(
-            ImageUploadToStorageException exception) {
-        log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
-        return IMAGE_UPLOAD_FAIL.getValue();
-    }
-
-    @ExceptionHandler(UserAlreadySignUpException.class)
-    public final ResponseEntity<String> handleUserAlreadyExistedException(
-            UserAlreadySignUpException exception) {
-        log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
-        return USER_ALREADY_EXISTED.getValue();
-    }
-
-    @ExceptionHandler(ExpiredPublicKeyCachedException.class)
-    public final ResponseEntity<String> handleExpiredPublicKeyCachedException(
-            ExpiredPublicKeyCachedException exception) {
-        log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
-        return EXPIRED_PUBLIC_KEY.getValue();
-    }
-
-    @ExceptionHandler(WrongKeySpecException.class)
-    public final ResponseEntity<String> handleWrongKeySpecException(
-            WrongKeySpecException exception) {
-        log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
-        return WRONG_KEY_SPEC.getValue();
-    }
-
-    @ExceptionHandler(RateOverLimitException.class)
-    public final ResponseEntity<String> handleRateOverLimitException(
-            RateOverLimitException exception) {
-        log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
-        return TOO_MANY_REQUESTS.getValue();
-    }
-
-    @MessageExceptionHandler(ChatRoomIsFullException.class)
-    @SendToUser(value = "/exchange/amq.direct/error", broadcast = false)
-    public final CommonMessage handleChatRoomIsFullException(ChatRoomIsFullException exception) {
-        log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
-        return CommonMessage.builder()
-                .message(CHAT_ROOM_IS_FULL.getValue().toString())
-                .build();
-    }
-
-    @MessageExceptionHandler(BlockedUserInChatRoomException.class)
-    @SendToUser(value = "/exchange/amq.direct/error", broadcast = false)
-    public final CommonMessage handleBlockedUserInChatRoomException(
-            BlockedUserInChatRoomException exception) {
-        log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
-        return CommonMessage.builder()
-                .message(BLOCKED_USER.getValue().toString())
-                .build();
-    }
-
-    @MessageExceptionHandler(Exception.class)
-    @SendToUser(value = "/exchange/amq.direct/error", broadcast = false)
-    public final CommonMessage handleUnExpectedMessagingException(Exception exception) {
-        log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
-        return CommonMessage.builder()
-                .message(BAD_REQUEST.getValue().toString())
-                .build();
+    @ExceptionHandler(InternalServerException.class)
+    public final ResponseEntity<ExceptionResponse> handleInternalServerException(
+        InternalServerException e) {
+        log.info(LOG_FORMAT, e.getClass().getSimpleName(), e.getErrorCode().getValue(),
+            e.getMessage());
+        return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(ExceptionResponse.from(e));
     }
 
     @ExceptionHandler(Exception.class)
-    public final ResponseEntity<String> handleUnExpectedException(Exception exception) {
-        log.info(LOG_FORMAT, exception.getClass().getSimpleName(), exception.getMessage());
-        return BAD_REQUEST.getValue();
+    public final ResponseEntity<ExceptionResponse> handleUnExpectedException(Exception e) {
+        log.info(LOG_FORMAT, e.getClass().getSimpleName(), UNKNOWN, e.getMessage());
+        return ResponseEntity.badRequest()
+            .body(ExceptionResponse.from(ErrorCode.INTERNAL_SERVER, "예상치 못한 예외가 발생했습니다."));
     }
 }

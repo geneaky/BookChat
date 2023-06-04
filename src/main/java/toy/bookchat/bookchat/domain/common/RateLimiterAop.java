@@ -8,7 +8,7 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
-import toy.bookchat.bookchat.exception.common.RateOverLimitException;
+import toy.bookchat.bookchat.exception.toomanyrequests.RateOverLimitException;
 
 @Aspect
 @Component

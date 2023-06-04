@@ -36,11 +36,11 @@ import toy.bookchat.bookchat.domain.participant.service.dto.response.ChatRoomDet
 import toy.bookchat.bookchat.domain.storage.StorageService;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
-import toy.bookchat.bookchat.exception.chatroom.BlockedUserInChatRoomException;
-import toy.bookchat.bookchat.exception.chatroom.ChatRoomIsFullException;
-import toy.bookchat.bookchat.exception.chatroom.ChatRoomNotFoundException;
-import toy.bookchat.bookchat.exception.participant.ParticipantNotFoundException;
-import toy.bookchat.bookchat.exception.user.UserNotFoundException;
+import toy.bookchat.bookchat.exception.badrequest.chatroom.ChatRoomIsFullException;
+import toy.bookchat.bookchat.exception.forbidden.chatroom.BlockedUserInChatRoomException;
+import toy.bookchat.bookchat.exception.notfound.chatroom.ChatRoomNotFoundException;
+import toy.bookchat.bookchat.exception.notfound.pariticipant.ParticipantNotFoundException;
+import toy.bookchat.bookchat.exception.notfound.user.UserNotFoundException;
 import toy.bookchat.bookchat.infrastructure.broker.MessagePublisher;
 import toy.bookchat.bookchat.infrastructure.broker.message.NotificationMessage;
 

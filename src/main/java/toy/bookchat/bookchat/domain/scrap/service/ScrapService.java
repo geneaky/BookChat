@@ -11,7 +11,7 @@ import toy.bookchat.bookchat.domain.scrap.Scrap;
 import toy.bookchat.bookchat.domain.scrap.repository.ScrapRepository;
 import toy.bookchat.bookchat.domain.scrap.service.dto.request.CreateScrapRequest;
 import toy.bookchat.bookchat.domain.scrap.service.dto.response.ScrapResponseSlice;
-import toy.bookchat.bookchat.exception.book.BookNotFoundException;
+import toy.bookchat.bookchat.exception.notfound.book.BookNotFoundException;
 
 @Service
 public class ScrapService {

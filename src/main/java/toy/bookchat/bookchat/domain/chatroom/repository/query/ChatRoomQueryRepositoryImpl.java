@@ -31,7 +31,7 @@ import toy.bookchat.bookchat.domain.chatroom.service.dto.request.ChatRoomRequest
 import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.participant.QParticipant;
 import toy.bookchat.bookchat.domain.participant.service.dto.response.ChatRoomDetails;
-import toy.bookchat.bookchat.exception.participant.ParticipantNotFoundException;
+import toy.bookchat.bookchat.exception.notfound.pariticipant.ParticipantNotFoundException;
 
 @Repository
 public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {

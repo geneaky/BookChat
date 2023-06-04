@@ -15,17 +15,15 @@ public class CommonMessage {
 
     private Long chatId;
     private Long senderId;
-    private MessageType messageType;
     private Integer receiptId;
     private String message;
     private String dispatchTime;
 
     @Builder
     private CommonMessage(Long chatId, Long senderId, Integer receiptId, String dispatchTime,
-        MessageType messageType, String message) {
+        String message) {
         this.chatId = chatId;
         this.senderId = senderId;
-        this.messageType = MessageType.CHAT;
         this.receiptId = receiptId;
         this.message = message;
         this.dispatchTime = dispatchTime;
@@ -35,7 +33,6 @@ public class CommonMessage {
         return CommonMessage.builder()
             .chatId(chat.getId())
             .senderId(senderId)
-            .messageType(MessageType.CHAT)
             .receiptId(messageDto.getReceiptId())
             .message(messageDto.getMessage())
             .dispatchTime(chat.getDispatchTime())

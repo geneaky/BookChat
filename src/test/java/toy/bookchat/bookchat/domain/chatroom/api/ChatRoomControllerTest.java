@@ -405,6 +405,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
         ChatRoomDetails chatRoomDetails = ChatRoomDetails.builder()
             .roomSize(100)
             .roomTags(List.of("개발", "DB"))
+            .roomName("test room name")
             .bookTitle("RealMySQL")
             .bookCoverImageUrl("realmysql@s3.com")
             .bookAuthors(List.of("author1", "author2"))
@@ -429,6 +430,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                 responseFields(
                     fieldWithPath("roomSize").type(NUMBER).description("채팅방 인원수"),
                     fieldWithPath("roomTags").type(ARRAY).description("채팅방 태그"),
+                    fieldWithPath("roomName").type(STRING).description("채팅방 이름"),
                     fieldWithPath("bookTitle").type(STRING).description("책 제목"),
                     fieldWithPath("bookCoverImageUrl").type(STRING).description("책 커버 이미지 url"),
                     fieldWithPath("bookAuthors").type(ARRAY).description("책 저자"),

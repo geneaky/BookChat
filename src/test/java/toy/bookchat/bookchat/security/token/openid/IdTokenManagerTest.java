@@ -12,7 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import toy.bookchat.bookchat.exception.security.NotSupportedOAuth2ProviderException;
+import toy.bookchat.bookchat.exception.unauthorized.NotSupportedOAuth2ProviderException;
 import toy.bookchat.bookchat.security.token.openid.google.GoogleIdTokenFetcher;
 import toy.bookchat.bookchat.security.token.openid.google.GoogleIdTokenWrapper;
 import toy.bookchat.bookchat.security.token.openid.kakao.KakaoIdTokenFetcher;

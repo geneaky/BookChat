@@ -1,7 +1,6 @@
 package toy.bookchat.bookchat.security.token;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
@@ -29,8 +28,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
 import toy.bookchat.bookchat.domain.user.api.dto.Token;
-import toy.bookchat.bookchat.exception.security.DeniedTokenException;
-import toy.bookchat.bookchat.exception.security.ExpiredTokenException;
+import toy.bookchat.bookchat.exception.unauthorized.DeniedTokenException;
+import toy.bookchat.bookchat.exception.unauthorized.ExpiredTokenException;
 import toy.bookchat.bookchat.security.SecurityConfig;
 import toy.bookchat.bookchat.security.token.dto.RefreshTokenRequest;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenProvider;
@@ -100,8 +99,7 @@ class TokenControllerTest extends ControllerTestExtension {
             .refreshToken(expiredRefreshToken)
             .build();
 
-        doThrow(ExpiredTokenException.class).when(tokenService)
-            .generateToken(any());
+        when(tokenService.generateToken(any())).thenThrow(new ExpiredTokenException());
 
         mockMvc.perform(post("/v1/api/auth/token").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(refreshTokenRequest)))
@@ -116,8 +114,7 @@ class TokenControllerTest extends ControllerTestExtension {
             .refreshToken(token.getRefreshToken() + "invalid")
             .build();
 
-        doThrow(DeniedTokenException.class).when(tokenService)
-            .generateToken(any());
+        when(tokenService.generateToken(any())).thenThrow(new DeniedTokenException());
 
         mockMvc.perform(post("/v1/api/auth/token").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(refreshTokenRequest)))
