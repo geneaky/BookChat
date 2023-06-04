@@ -6,7 +6,7 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import org.springframework.stereotype.Component;
 import toy.bookchat.bookchat.config.token.OAuth2Properties;
-import toy.bookchat.bookchat.exception.security.NotVerifiedIdTokenException;
+import toy.bookchat.bookchat.exception.unauthorized.NotVerifiedIdTokenException;
 
 @Component
 public class GoogleIdTokenFetcherImpl implements GoogleIdTokenFetcher {

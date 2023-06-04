@@ -32,7 +32,7 @@ import toy.bookchat.bookchat.domain.book.service.dto.request.BookSearchRequest;
 import toy.bookchat.bookchat.domain.book.service.dto.request.Meta;
 import toy.bookchat.bookchat.domain.book.service.dto.response.BookResponse;
 import toy.bookchat.bookchat.domain.book.service.dto.response.BookSearchResponse;
-import toy.bookchat.bookchat.exception.book.BookNotFoundException;
+import toy.bookchat.bookchat.exception.notfound.book.BookNotFoundException;
 
 @BookPresentationTest
 class BookControllerTest extends ControllerTestExtension {
@@ -69,7 +69,7 @@ class BookControllerTest extends ControllerTestExtension {
     @Test
     void 외부api_검색_요청_실패시_404() throws Exception {
         when(bookSearchService.searchByQuery(any(BookSearchRequest.class))).thenThrow(
-            BookNotFoundException.class);
+            new BookNotFoundException());
 
         mockMvc.perform(get("/v1/api/books")
                 .header(AUTHORIZATION, JWT_TOKEN)

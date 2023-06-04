@@ -21,7 +21,7 @@ import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
-import toy.bookchat.bookchat.exception.NotSupportedPagingConditionException;
+import toy.bookchat.bookchat.exception.badrequest.NotSupportedPagingConditionException;
 
 @RepositoryTest
 class AgonyRecordRepositoryTest {

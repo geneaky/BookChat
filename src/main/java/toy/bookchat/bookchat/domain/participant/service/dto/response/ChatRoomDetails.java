@@ -18,6 +18,7 @@ public class ChatRoomDetails {
 
     private Integer roomSize;
     private List<String> roomTags;
+    private String roomName;
     private String bookTitle;
     private String bookCoverImageUrl;
     private List<String> bookAuthors;
@@ -26,12 +27,14 @@ public class ChatRoomDetails {
     private List<RoomGuest> roomGuestList;
 
     @Builder
-    private ChatRoomDetails(Integer roomSize, List<String> roomTags, String bookTitle,
+    private ChatRoomDetails(Integer roomSize, List<String> roomTags, String roomName,
+        String bookTitle,
         String bookCoverImageUrl, List<String> bookAuthors, RoomHost roomHost,
         List<RoomSubHost> roomSubHostList,
         List<RoomGuest> roomGuestList) {
         this.roomSize = roomSize;
         this.roomTags = roomTags;
+        this.roomName = roomName;
         this.bookTitle = bookTitle;
         this.bookCoverImageUrl = bookCoverImageUrl;
         this.bookAuthors = bookAuthors;
@@ -53,7 +56,8 @@ public class ChatRoomDetails {
         fillParticipantsResponse(participants, host, roomSubHostList, roomGuestList);
         ChatRoom chatRoom = getChatRoom(participants);
 
-        return new ChatRoomDetails(chatRoom.getRoomSize(), roomTags, chatRoom.getBookTitle(),
+        return new ChatRoomDetails(chatRoom.getRoomSize(), roomTags, chatRoom.getRoomName(),
+            chatRoom.getBookTitle(),
             chatRoom.getBookCoverImageUrl(), chatRoom.getBookAuthors(), roomHost, roomSubHostList,
             roomGuestList);
     }

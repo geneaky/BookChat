@@ -5,7 +5,7 @@ import static toy.bookchat.bookchat.security.oauth.OAuth2Provider.KAKAO;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import toy.bookchat.bookchat.exception.security.NotSupportedOAuth2ProviderException;
+import toy.bookchat.bookchat.exception.unauthorized.NotSupportedOAuth2ProviderException;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.token.openid.google.GoogleIdTokenFetcher;
 import toy.bookchat.bookchat.security.token.openid.kakao.KakaoIdTokenFetcher;

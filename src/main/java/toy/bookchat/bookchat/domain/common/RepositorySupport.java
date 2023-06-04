@@ -13,7 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
-import toy.bookchat.bookchat.exception.NotSupportedPagingConditionException;
+import toy.bookchat.bookchat.exception.badrequest.NotSupportedPagingConditionException;
 
 public abstract class RepositorySupport {
 

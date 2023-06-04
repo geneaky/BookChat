@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.util.StringUtils;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
 import toy.bookchat.bookchat.domain.chatroom.HashTag;
-import toy.bookchat.bookchat.exception.chatroom.NotEnoughRoomSizeException;
+import toy.bookchat.bookchat.exception.badrequest.chatroom.NotEnoughRoomSizeException;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)

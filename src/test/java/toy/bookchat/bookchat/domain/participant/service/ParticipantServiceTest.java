@@ -25,8 +25,8 @@ import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomBlockedUserRepos
 import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
 import toy.bookchat.bookchat.domain.user.User;
-import toy.bookchat.bookchat.exception.participant.NoPermissionParticipantException;
-import toy.bookchat.bookchat.exception.participant.ParticipantNotFoundException;
+import toy.bookchat.bookchat.exception.forbidden.participant.NoPermissionParticipantException;
+import toy.bookchat.bookchat.exception.notfound.pariticipant.ParticipantNotFoundException;
 import toy.bookchat.bookchat.infrastructure.broker.MessagePublisher;
 import toy.bookchat.bookchat.infrastructure.broker.message.NotificationMessage;
 

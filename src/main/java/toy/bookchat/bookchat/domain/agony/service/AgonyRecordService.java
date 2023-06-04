@@ -11,7 +11,7 @@ import toy.bookchat.bookchat.domain.agony.repository.AgonyRepository;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateAgonyRecordRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRecordRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.response.SliceOfAgonyRecordsResponse;
-import toy.bookchat.bookchat.exception.agony.AgonyNotFoundException;
+import toy.bookchat.bookchat.exception.notfound.agony.AgonyNotFoundException;
 
 @Service
 public class AgonyRecordService {

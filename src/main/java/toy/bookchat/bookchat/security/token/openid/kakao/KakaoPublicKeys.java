@@ -11,8 +11,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.util.Base64Utils;
-import toy.bookchat.bookchat.exception.security.ExpiredPublicKeyCachedException;
-import toy.bookchat.bookchat.exception.security.WrongKeySpecException;
+import toy.bookchat.bookchat.exception.unauthorized.ExpiredPublicKeyCachedException;
+import toy.bookchat.bookchat.exception.unauthorized.WrongKeySpecException;
 
 @Getter
 @Setter

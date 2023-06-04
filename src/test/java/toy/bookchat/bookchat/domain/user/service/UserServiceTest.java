@@ -24,8 +24,8 @@ import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.domain.user.service.dto.request.ChangeUserNicknameRequest;
 import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignUpRequest;
-import toy.bookchat.bookchat.exception.user.UserAlreadySignUpException;
-import toy.bookchat.bookchat.exception.user.UserNotFoundException;
+import toy.bookchat.bookchat.exception.badrequest.user.UserAlreadySignUpException;
+import toy.bookchat.bookchat.exception.notfound.user.UserNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {

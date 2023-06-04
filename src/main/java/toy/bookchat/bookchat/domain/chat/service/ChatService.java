@@ -9,7 +9,7 @@ import toy.bookchat.bookchat.domain.chat.repository.ChatRepository;
 import toy.bookchat.bookchat.domain.chat.service.dto.response.ChatRoomChatsResponse;
 import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
-import toy.bookchat.bookchat.exception.participant.NotParticipatedException;
+import toy.bookchat.bookchat.exception.badrequest.participant.NotParticipatedException;
 import toy.bookchat.bookchat.infrastructure.broker.MessagePublisher;
 import toy.bookchat.bookchat.infrastructure.broker.message.CommonMessage;
 

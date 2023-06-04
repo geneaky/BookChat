@@ -1,11 +1,10 @@
 package toy.bookchat.bookchat.domain.storage.image;
 
-import java.io.IOException;
 import javax.imageio.ImageIO;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-import toy.bookchat.bookchat.exception.user.ImageInputStreamException;
+import toy.bookchat.bookchat.exception.internalserver.ImageInputStreamException;
 
 @Component
 public class ImageValidator {
@@ -44,8 +43,8 @@ public class ImageValidator {
         try {
             imageReaderAdapter.setInput(
                 ImageIO.createImageInputStream(multipartFile.getInputStream()));
-        } catch (IOException | NullPointerException exception) {
-            throw new ImageInputStreamException(exception.getMessage());
+        } catch (Exception exception) {
+            throw new ImageInputStreamException();
         }
 
         if (imageReaderAdapter.getWidth() > widthLimit

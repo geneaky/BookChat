@@ -3,7 +3,7 @@ package toy.bookchat.bookchat.security.token.jwt;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import toy.bookchat.bookchat.config.token.JwtTokenProperties;
-import toy.bookchat.bookchat.exception.security.DeniedTokenException;
+import toy.bookchat.bookchat.exception.unauthorized.DeniedTokenException;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 
 @Component
@@ -23,7 +23,7 @@ public class JwtTokenManagerImpl implements JwtTokenManager {
             return authorizationHeader.substring(BEGIN_INDEX);
         }
 
-        throw new DeniedTokenException("Token is Empty");
+        throw new DeniedTokenException();
     }
 
     @Override

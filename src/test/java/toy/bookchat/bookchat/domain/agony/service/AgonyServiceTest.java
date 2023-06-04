@@ -26,7 +26,7 @@ import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRequest
 import toy.bookchat.bookchat.domain.agony.service.dto.response.SliceOfAgoniesResponse;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
-import toy.bookchat.bookchat.exception.book.BookNotFoundException;
+import toy.bookchat.bookchat.exception.notfound.book.BookNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class AgonyServiceTest {

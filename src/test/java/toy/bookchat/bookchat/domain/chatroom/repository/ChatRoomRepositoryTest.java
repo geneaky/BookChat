@@ -31,7 +31,7 @@ import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository
 import toy.bookchat.bookchat.domain.participant.service.dto.response.ChatRoomDetails;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
-import toy.bookchat.bookchat.exception.participant.ParticipantNotFoundException;
+import toy.bookchat.bookchat.exception.notfound.pariticipant.ParticipantNotFoundException;
 
 @RepositoryTest
 class ChatRoomRepositoryTest {

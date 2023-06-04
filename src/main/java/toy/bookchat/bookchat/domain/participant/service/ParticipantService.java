@@ -15,8 +15,8 @@ import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.participant.ParticipantStatus;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
 import toy.bookchat.bookchat.domain.user.User;
-import toy.bookchat.bookchat.exception.participant.NoPermissionParticipantException;
-import toy.bookchat.bookchat.exception.participant.ParticipantNotFoundException;
+import toy.bookchat.bookchat.exception.forbidden.participant.NoPermissionParticipantException;
+import toy.bookchat.bookchat.exception.notfound.pariticipant.ParticipantNotFoundException;
 import toy.bookchat.bookchat.infrastructure.broker.MessagePublisher;
 import toy.bookchat.bookchat.infrastructure.broker.message.NotificationMessage;
 
@@ -69,7 +69,7 @@ public class ParticipantService {
             participant.getChatRoom().changeHost(participant.getUser());
             Chat chat = chatRepository.save(Chat.builder()
                 .chatRoom(participant.getChatRoom())
-                .message(participant.getUserNickname() + "님이 방장이 되었습니다.")
+                .message("#" + participant.getUserId() + "#님이 방장이 되었습니다.")
                 .build());
             messagePublisher.sendNotificationMessage(participant.getChatRoomSid(),
                 NotificationMessage.createHostDelegateMessage(chat, participant.getUserId()));
@@ -81,7 +81,7 @@ public class ParticipantService {
             participant.toGuest();
             Chat chat = chatRepository.save(Chat.builder()
                 .chatRoom(participant.getChatRoom())
-                .message(participant.getUserNickname() + "님이 부방장에서 해제되었습니다.")
+                .message("#" + participant.getUserId() + "#님이 부방장에서 해제되었습니다.")
                 .build());
             messagePublisher.sendNotificationMessage(participant.getChatRoomSid(),
                 NotificationMessage.createSubHostDismissMessage(chat, participant.getUserId()));
@@ -95,7 +95,7 @@ public class ParticipantService {
             participant.toSubHost();
             Chat chat = chatRepository.save(Chat.builder()
                 .chatRoom(participant.getChatRoom())
-                .message(participant.getUserNickname() + "님이 부방장이 되었습니다.")
+                .message("#" + participant.getUserId() + "#님이 부방장이 되었습니다.")
                 .build());
             messagePublisher.sendNotificationMessage(participant.getChatRoomSid(),
                 NotificationMessage.createSubHostDelegateMessage(chat, participant.getUserId()));
@@ -118,7 +118,7 @@ public class ParticipantService {
 
         Chat chat = chatRepository.save(Chat.builder()
             .chatRoom(adminParticipant.getChatRoom())
-            .message(participant.getUserNickname() + "님을 내보냈습니다.")
+            .message("#" + participant.getUserId() + "#님을 내보냈습니다.")
             .build());
         messagePublisher.sendNotificationMessage(adminParticipant.getChatRoomSid(),
             NotificationMessage.createKickMessage(chat, participant.getUserId()));

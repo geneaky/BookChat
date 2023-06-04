@@ -17,7 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import toy.bookchat.bookchat.config.aws.StorageProperties;
 import toy.bookchat.bookchat.domain.storage.image.ImageValidator;
-import toy.bookchat.bookchat.exception.storage.ImageUploadToStorageException;
+import toy.bookchat.bookchat.exception.internalserver.ImageUploadToStorageException;
 
 @ExtendWith(MockitoExtension.class)
 class StorageServiceTest {

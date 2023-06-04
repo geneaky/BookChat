@@ -23,8 +23,8 @@ import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ReviseBookRepo
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.WriteBookReportRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.BookReportResponse;
 import toy.bookchat.bookchat.domain.user.User;
-import toy.bookchat.bookchat.exception.book.BookNotFoundException;
-import toy.bookchat.bookchat.exception.bookshelf.BookReportNotFoundException;
+import toy.bookchat.bookchat.exception.notfound.book.BookNotFoundException;
+import toy.bookchat.bookchat.exception.notfound.bookshelf.BookReportNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class BookReportServiceTest {

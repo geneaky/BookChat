@@ -7,7 +7,7 @@ import java.io.IOException;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import org.springframework.stereotype.Component;
-import toy.bookchat.bookchat.exception.user.ImageInputStreamException;
+import toy.bookchat.bookchat.exception.internalserver.ImageInputStreamException;
 
 @Component
 public class ImageReaderAdapterImpl implements ImageReaderAdapter {
@@ -18,7 +18,7 @@ public class ImageReaderAdapterImpl implements ImageReaderAdapter {
         try {
             this.readerInstance = new WebPImageReaderSpi().createReaderInstance(WEBP.getValue());
         } catch (IOException exception) {
-            throw new ImageInputStreamException(exception.getMessage());
+            throw new ImageInputStreamException();
         }
     }
 
@@ -32,7 +32,7 @@ public class ImageReaderAdapterImpl implements ImageReaderAdapter {
         try {
             return readerInstance.getWidth(0);
         } catch (IOException exception) {
-            throw new ImageInputStreamException(exception.getMessage());
+            throw new ImageInputStreamException();
         }
     }
 
@@ -41,7 +41,7 @@ public class ImageReaderAdapterImpl implements ImageReaderAdapter {
         try {
             return readerInstance.getHeight(0);
         } catch (IOException exception) {
-            throw new ImageInputStreamException(exception.getMessage());
+            throw new ImageInputStreamException();
         }
     }
 }

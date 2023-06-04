@@ -9,7 +9,7 @@ import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ReviseBookReportRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.WriteBookReportRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.BookReportResponse;
-import toy.bookchat.bookchat.exception.book.BookNotFoundException;
+import toy.bookchat.bookchat.exception.notfound.book.BookNotFoundException;
 
 @Service
 public class BookReportService {

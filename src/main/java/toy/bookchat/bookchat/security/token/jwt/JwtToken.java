@@ -2,20 +2,17 @@ package toy.bookchat.bookchat.security.token.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import java.util.Date;
 import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import toy.bookchat.bookchat.domain.user.ROLE;
-import toy.bookchat.bookchat.exception.security.DeniedTokenException;
-import toy.bookchat.bookchat.exception.security.ExpiredTokenException;
-import toy.bookchat.bookchat.exception.security.IllegalStandardTokenException;
+import toy.bookchat.bookchat.exception.unauthorized.DeniedTokenException;
+import toy.bookchat.bookchat.exception.unauthorized.ExpiredTokenException;
+import toy.bookchat.bookchat.exception.unauthorized.IllegalStandardTokenException;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 
-@Slf4j
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class JwtToken {
 
@@ -55,11 +52,9 @@ public class JwtToken {
                 .parseClaimsJws(this.token)
                 .getBody()).orElseThrow(IllegalStandardTokenException::new);
         } catch (ExpiredJwtException exception) {
-            log.info("Token Is Expired :: {}", this.token);
-            throw new ExpiredTokenException(exception.getMessage());
-        } catch (IllegalArgumentException | JwtException exception) {
-            log.info("Token Is Denied :: {}", this.token);
-            throw new DeniedTokenException(exception.getMessage());
+            throw new ExpiredTokenException();
+        } catch (Exception exception) {
+            throw new DeniedTokenException();
         }
     }
 
