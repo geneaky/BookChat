@@ -238,6 +238,8 @@ public class ChatRoomService {
             participantRepository.deleteByChatRoom(chatRoom);
             chatRoomRepository.delete(chatRoom);
 
+            messagePublisher.sendNotificationMessage(chatRoom.getRoomSid(),
+                NotificationMessage.createHostExitMessage());
             return;
         }
 

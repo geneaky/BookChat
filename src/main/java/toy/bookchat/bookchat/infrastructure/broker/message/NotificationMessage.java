@@ -50,6 +50,13 @@ public class NotificationMessage {
             .build();
     }
 
+    public static NotificationMessage createHostExitMessage() {
+        return NotificationMessage.builder()
+            .message("방장이 오픈채팅방을 종료했습니다.\n더 이상 대화를 할 수 없으며, 채팅방을 나가면 다시 입장 할 수 없게 됩니다.")
+            .notificationMessageType(NotificationMessageType.NOTICE_HOST_EXIT)
+            .build();
+    }
+
     public static NotificationMessage createSubHostDelegateMessage(Chat chat, Long targetId) {
         return NotificationMessage.builder()
             .targetId(targetId)

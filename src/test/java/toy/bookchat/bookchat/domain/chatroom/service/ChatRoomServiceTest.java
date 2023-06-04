@@ -473,6 +473,8 @@ class ChatRoomServiceTest {
         verify(chatRepository).deleteByChatRoom(any());
         verify(participantRepository).deleteByChatRoom(any());
         verify(chatRoomRepository).delete(any());
+        verify(messagePublisher).sendNotificationMessage(anyString(),
+            any(NotificationMessage.class));
     }
 
     private static class ChatRoomServiceTestFixture {
