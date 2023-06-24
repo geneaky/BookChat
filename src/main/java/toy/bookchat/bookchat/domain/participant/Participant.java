@@ -32,17 +32,19 @@ public class Participant {
     private User user;
     @ManyToOne(fetch = FetchType.LAZY)
     private ChatRoom chatRoom;
+    private Boolean isConnected;
 
     protected Participant() {
     }
 
     @Builder
     private Participant(Long id, ParticipantStatus participantStatus, User user,
-        ChatRoom chatRoom) {
+        ChatRoom chatRoom, Boolean isConnected) {
         this.id = id;
         this.participantStatus = participantStatus;
         this.user = user;
         this.chatRoom = chatRoom;
+        this.isConnected = isConnected;
     }
 
     public Long getUserId() {

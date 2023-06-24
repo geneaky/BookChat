@@ -1,0 +1,1 @@
+alter table participant add is_connected boolean;

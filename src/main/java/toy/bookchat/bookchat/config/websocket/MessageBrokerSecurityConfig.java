@@ -9,21 +9,33 @@ import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.security.config.annotation.web.socket.AbstractSecurityWebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
+import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
+import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
 
-@Configuration
 @EnableWebSocketMessageBroker
-public class WebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBrokerConfigurer {
+@Configuration(proxyBeanMethods = false)
+public class MessageBrokerSecurityConfig extends AbstractSecurityWebSocketMessageBrokerConfigurer {
 
     private final ChannelInterceptor webSocketTokenValidationInterceptor;
     private final MessageAuthenticationArgumentResolver messageAuthenticationArgumentResolver;
     private final ExternalBrokerProperties externalBrokerProperties;
+    private final ParticipantRepository participantRepository;
 
-    public WebSocketSecurityConfig(ChannelInterceptor webSocketTokenValidationInterceptor,
+    public MessageBrokerSecurityConfig(ChannelInterceptor webSocketTokenValidationInterceptor,
         MessageAuthenticationArgumentResolver messageAuthenticationArgumentResolver,
-        ExternalBrokerProperties externalBrokerProperties) {
+        ExternalBrokerProperties externalBrokerProperties,
+        ParticipantRepository participantRepository) {
         this.webSocketTokenValidationInterceptor = webSocketTokenValidationInterceptor;
         this.messageAuthenticationArgumentResolver = messageAuthenticationArgumentResolver;
         this.externalBrokerProperties = externalBrokerProperties;
+        this.participantRepository = participantRepository;
+    }
+
+    @Override
+    public void configureWebSocketTransport(WebSocketTransportRegistration registration) {
+        registration.addDecoratorFactory(
+            handler -> new CustomWebSocketHandlerDecorator(participantRepository, handler));
+        super.configureWebSocketTransport(registration);
     }
 
     @Override
