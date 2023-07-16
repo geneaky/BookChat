@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * @Param https status code
- * @Description {404, 400, 403, 429, 401, 500}
+ * @Description {404, 400, 403, 429, 401, 409, 500}
  * @Param domain number
  * @Description {Etc:00,User:01, Book:02, BookReport:03, ChatRoom:04,Participant:05,Agony:06}
  * @Param error number
@@ -16,8 +16,10 @@ public enum ErrorCode {
     UNAUTHORIZED("401"),
     FORBIDDEN("403"),
     NOT_FOUND("404"),
+    CONFLICT("409"),
     TOO_MANY_REQUESTS("429"),
     INTERNAL_SERVER("500"),
+    SERVICE_UNAVAILABLE("503"),
 
     //Default Domain Code
     ETC("00"),
@@ -27,6 +29,7 @@ public enum ErrorCode {
     CHAT_ROOM("04"),
     PARTICIPANT("05"),
     AGONY("06"),
+    DEVICE("07"),
 
     //BAD REQUEST
     NOT_SUPPORTED_PAGING_CONDITION(BAD_REQUEST.value + ETC.value + "00"),
@@ -59,10 +62,16 @@ public enum ErrorCode {
     //TOO MANY REQUESTS
     RATE_OVER_LIMIT(TOO_MANY_REQUESTS.value + ETC.value + "00"),
 
+    //CONFLICT
+    DEVICE_USAGE_CONFLICT(CONFLICT.value + DEVICE.value + "00"),
+
     //INTERNAL SERVER
     IMAGE_INPUT_STREAM(INTERNAL_SERVER.value + ETC.value + "00"),
-    IMAGE_UPLOAD_STORAGE(INTERNAL_SERVER.value + ETC.value + "01");
+    IMAGE_UPLOAD_STORAGE(INTERNAL_SERVER.value + ETC.value + "01"),
 
+    //SERVICE UNAVAILABLE
+    PUSH_SERVICE_FAIL(SERVICE_UNAVAILABLE.value + ETC.value + "00");
+    
     private final String value;
 
     ErrorCode(String value) {

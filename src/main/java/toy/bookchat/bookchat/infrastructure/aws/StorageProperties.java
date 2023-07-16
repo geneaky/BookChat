@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.config.aws;
+package toy.bookchat.bookchat.infrastructure.aws;
 
 import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;

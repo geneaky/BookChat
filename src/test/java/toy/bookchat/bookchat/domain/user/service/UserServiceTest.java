@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -18,14 +19,19 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
 import toy.bookchat.bookchat.domain.agony.service.AgonyService;
 import toy.bookchat.bookchat.domain.bookshelf.service.BookShelfService;
+import toy.bookchat.bookchat.domain.device.Device;
+import toy.bookchat.bookchat.domain.device.service.DeviceService;
 import toy.bookchat.bookchat.domain.storage.StorageService;
 import toy.bookchat.bookchat.domain.storage.image.ImageValidator;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.domain.user.service.dto.request.ChangeUserNicknameRequest;
+import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignInRequest;
 import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignUpRequest;
 import toy.bookchat.bookchat.exception.badrequest.user.UserAlreadySignUpException;
+import toy.bookchat.bookchat.exception.conflict.device.DeviceAlreadyRegisteredException;
 import toy.bookchat.bookchat.exception.notfound.user.UserNotFoundException;
+import toy.bookchat.bookchat.infrastructure.push.service.PushService;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -36,6 +42,10 @@ class UserServiceTest {
     BookShelfService bookShelfService;
     @Mock
     AgonyService agonyService;
+    @Mock
+    DeviceService deviceService;
+    @Mock
+    PushService pushService;
     @Mock
     StorageService storageService;
     @Mock
@@ -142,5 +152,90 @@ class UserServiceTest {
         String nickname = user.getNickname();
         assertThat(nickname).isEqualTo("user2");
         verify(storageService, noInteractions()).upload(any(), any(), any());
+    }
+
+    @Test
+    void 등록된_디바이스가_없을경우_사용자_디바이스를_등록한다() throws Exception {
+        UserSignInRequest userSignInRequest = UserSignInRequest.builder()
+            .deviceToken("5o9")
+            .fcmToken("w0teX6P")
+            .build();
+
+        User user = User.builder().build();
+
+        userService.checkDevice(userSignInRequest, user);
+
+        verify(deviceService).registerDevice(any());
+    }
+
+    @Test
+    void 등록된_디바이스가_있는데_같은_디바이스인경우_fcm토큰_최신화() throws Exception {
+        UserSignInRequest userSignInRequest = UserSignInRequest.builder()
+            .deviceToken("5o9")
+            .fcmToken("w0teX6P")
+            .build();
+
+        User user = User.builder().build();
+
+        Device device = Device.builder()
+            .deviceToken("5o9")
+            .fcmToken("nMhp5")
+            .build();
+
+        when(deviceService.findUserDevice(user)).thenReturn(Optional.of(device));
+        userService.checkDevice(userSignInRequest, user);
+        assertThat(device.getFcmToken()).isEqualTo(userSignInRequest.getFcmToken());
+    }
+
+    @Test
+    void 등록된_디바이스가_있는데_승인한경우_fcm발송후_디바이스정보_최신화() throws Exception {
+        UserSignInRequest userSignInRequest = UserSignInRequest.builder()
+            .deviceToken("5o9")
+            .fcmToken("w0teX6P")
+            .approveChangingDevice(true)
+            .build();
+
+        User user = User.builder().build();
+
+        Device device = Device.builder()
+            .deviceToken("18P1xu8")
+            .fcmToken("nMhp5")
+            .build();
+
+        String oldDeviceFcmToken = device.getFcmToken();
+
+        when(deviceService.findUserDevice(eq(user))).thenReturn(Optional.of(device));
+        userService.checkDevice(userSignInRequest, user);
+
+        assertThat(device.getDeviceToken()).isEqualTo(userSignInRequest.getDeviceToken());
+        assertThat(device.getFcmToken()).isEqualTo(userSignInRequest.getFcmToken());
+        verify(pushService).send(eq(oldDeviceFcmToken), any());
+    }
+
+    @Test
+    void 등록된_디바이스가_현재_디바이스와_다른_디바이스이고_승인이나지_않은경우_예외발생() throws Exception {
+        UserSignInRequest userSignInRequest = UserSignInRequest.builder()
+            .deviceToken("5o9")
+            .fcmToken("w0teX6P")
+            .build();
+
+        User user = User.builder().build();
+
+        Device device = Device.builder()
+            .deviceToken("N8vD8hy")
+            .fcmToken("nMhp5")
+            .build();
+
+        when(deviceService.findUserDevice(user)).thenReturn(Optional.of(device));
+        assertThatThrownBy(() -> {
+            userService.checkDevice(userSignInRequest, user);
+        }).isInstanceOf(DeviceAlreadyRegisteredException.class);
+    }
+
+    @Test
+    void 사용자_디바이스_삭제_성공() throws Exception {
+        userService.deleteDevice(17L);
+
+        verify(deviceService).deleteUserDevice(eq(17L));
     }
 }

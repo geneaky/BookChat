@@ -16,6 +16,7 @@ jobs:
       actions: read
     env:
      APPLICATION: ${{secrets.PRODUCTION}}
+     FCM: ${{secrets.FIRE_BASE}}
      AWS_REGION: ap-northeast-2
      S3_BUCKET_NAME: bookchat-codedeploy
      CODE_DEPLOY_APPLICATION_NAME: bookchat-codedeploy-app
@@ -38,6 +39,9 @@ jobs:
     - name: Create Configuration File
       run: echo "${{ env.APPLICATION }}" > ./src/main/resources/application.yml
       shell: bash
+
+    - name: Create Fcm Configuration File
+      run: echo "${{ env.FCM }}" > ./src/main/resources/firebase/bookchat-firebase-private.json
       
     - name: Substitute Configuration File
       uses: actions/upload-artifact@v3

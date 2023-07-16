@@ -47,8 +47,7 @@ public class TokenService {
             getUserFromRefreshToken(refreshTokenRequest));
     }
 
-    private String generateOrUsingDefaultRefreshToken(
-        RefreshTokenRequest refreshTokenRequest) {
+    private String generateOrUsingDefaultRefreshToken(RefreshTokenRequest refreshTokenRequest) {
         String refreshToken = refreshTokenRequest.getRefreshToken();
 
         if (shouldBeRenew(refreshToken)) {

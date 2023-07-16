@@ -92,12 +92,19 @@ public class UserController {
         @Valid @RequestBody UserSignInRequest userSignInRequest) {
         String userName = idTokenManager.getOAuth2MemberNumberFromIdToken(bearerToken,
             userSignInRequest.getOauth2Provider());
+
         User user = userService.findUserByUsername(userName);
+        userService.checkDevice(userSignInRequest, user);
 
         Token token = jwtTokenProvider.createToken(user);
         jwtTokenRecorder.record(user.getId(), token.getRefreshToken());
 
         return token;
+    }
+
+    @PostMapping("/users/logout")
+    public void userLogout(@UserPayload TokenPayload tokenPayload) {
+        userService.deleteDevice(tokenPayload.getUserId());
     }
 
     @DeleteMapping("/users")
