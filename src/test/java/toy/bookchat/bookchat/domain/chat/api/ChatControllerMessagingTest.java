@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
+import com.google.firebase.messaging.FirebaseMessaging;
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -55,6 +56,8 @@ class ChatControllerMessagingTest extends ControllerTestExtension {
     private DeviceRepository deviceRepository;
     @MockBean
     private PushService pushService;
+    @MockBean
+    private FirebaseMessaging firebaseMessaging;
     @MockBean
     private UserRepository userRepository;
     @MockBean
