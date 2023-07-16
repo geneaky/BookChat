@@ -14,6 +14,7 @@ jobs:
       mysql:
         image: mysql:8.0
         env:
+          FCM: ${{secrets.FIRE_BASE}}
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: test
         ports:
@@ -49,6 +50,9 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x ./gradlew
       shell: bash
+
+    - name: Create Fcm Configuration File
+      run: echo "${{ env.FCM }}" > ./src/main/resources/firebase/bookchat-firebase-private.json
 
     - name: Test with Gradle
       run: ./gradlew clean test -x asciidoctor
