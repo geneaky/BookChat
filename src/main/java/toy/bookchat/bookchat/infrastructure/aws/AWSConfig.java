@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.config.aws;
+package toy.bookchat.bookchat.infrastructure.aws;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;

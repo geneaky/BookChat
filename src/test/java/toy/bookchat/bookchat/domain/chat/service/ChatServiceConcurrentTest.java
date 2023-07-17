@@ -1,5 +1,14 @@
 package toy.bookchat.bookchat.domain.chat.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.google.firebase.messaging.FirebaseMessaging;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import lombok.extern.slf4j.Slf4j;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.AfterAll;
@@ -20,16 +29,8 @@ import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.infrastructure.broker.MessagePublisher;
+import toy.bookchat.bookchat.infrastructure.push.service.PushService;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
 @SpringBootTest
@@ -50,6 +51,10 @@ public class ChatServiceConcurrentTest {
     private Flyway flyway;
     @MockBean
     private MessagePublisher messagePublisher;
+    @MockBean
+    private PushService pushService;
+    @MockBean
+    private FirebaseMessaging firebaseMessaging;
 
     @BeforeAll
     public void tearUp() {
@@ -74,29 +79,29 @@ public class ChatServiceConcurrentTest {
         List<User> userList = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             userList.add(User.builder()
-                    .nickname(i + "nickname")
-                    .defaultProfileImageType(1)
-                    .provider(OAuth2Provider.KAKAO)
-                    .email(i + "email")
-                    .name(i + "name")
-                    .build());
+                .nickname(i + "nickname")
+                .defaultProfileImageType(1)
+                .provider(OAuth2Provider.KAKAO)
+                .email(i + "email")
+                .name(i + "name")
+                .build());
         }
         userRepository.saveAll(userList);
 
         Book book = Book.builder()
-                .isbn("4640485366")
-                .publishAt(LocalDate.now())
-                .build();
+            .isbn("4640485366")
+            .publishAt(LocalDate.now())
+            .build();
         bookRepository.save(book);
 
         ChatRoom chatRoom = ChatRoom.builder()
-                .host(userList.get(0))
-                .book(book)
-                .defaultRoomImageType(1)
-                .roomSize(roomSize)
-                .roomSid("HNsIG51b")
-                .roomName("RtzE")
-                .build();
+            .host(userList.get(0))
+            .book(book)
+            .defaultRoomImageType(1)
+            .roomSize(roomSize)
+            .roomSid("HNsIG51b")
+            .roomName("RtzE")
+            .build();
         chatRoomRepository.save(chatRoom);
 
         for (User user : userList) {

@@ -23,11 +23,13 @@ import toy.bookchat.bookchat.domain.chat.api.dto.request.MessageDto;
 import toy.bookchat.bookchat.domain.chat.repository.ChatRepository;
 import toy.bookchat.bookchat.domain.chat.service.dto.response.ChatRoomChatsResponse;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
+import toy.bookchat.bookchat.domain.device.repository.DeviceRepository;
 import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.infrastructure.broker.MessagePublisher;
 import toy.bookchat.bookchat.infrastructure.broker.message.CommonMessage;
+import toy.bookchat.bookchat.infrastructure.push.service.PushService;
 
 @ExtendWith(MockitoExtension.class)
 class ChatServiceTest {
@@ -36,6 +38,10 @@ class ChatServiceTest {
     private ChatRepository chatRepository;
     @Mock
     private ParticipantRepository participantRepository;
+    @Mock
+    private DeviceRepository deviceRepository;
+    @Mock
+    private PushService pushService;
     @Mock
     private MessagePublisher messagingTemplate;
     @InjectMocks
@@ -63,6 +69,7 @@ class ChatServiceTest {
 
         Chat chat = Chat.builder()
             .id(1L)
+            .chatRoom(chatRoom)
             .message("test message")
             .build();
         chat.setCreatedAt(LocalDateTime.now());

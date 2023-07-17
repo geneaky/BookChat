@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
+import com.google.firebase.messaging.FirebaseMessaging;
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -36,10 +37,12 @@ import toy.bookchat.bookchat.domain.chat.Chat;
 import toy.bookchat.bookchat.domain.chat.repository.ChatRepository;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
 import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomRepository;
+import toy.bookchat.bookchat.domain.device.repository.DeviceRepository;
 import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.infrastructure.broker.message.CommonMessage;
+import toy.bookchat.bookchat.infrastructure.push.service.PushService;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 class ChatControllerMessagingTest extends ControllerTestExtension {
@@ -49,6 +52,12 @@ class ChatControllerMessagingTest extends ControllerTestExtension {
     @LocalServerPort
     private int port;
     private StompSession stompSession;
+    @MockBean
+    private DeviceRepository deviceRepository;
+    @MockBean
+    private PushService pushService;
+    @MockBean
+    private FirebaseMessaging firebaseMessaging;
     @MockBean
     private UserRepository userRepository;
     @MockBean

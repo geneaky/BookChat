@@ -4,9 +4,9 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import toy.bookchat.bookchat.config.aws.StorageProperties;
 import toy.bookchat.bookchat.domain.storage.image.ImageValidator;
 import toy.bookchat.bookchat.exception.internalserver.ImageUploadToStorageException;
+import toy.bookchat.bookchat.infrastructure.aws.StorageProperties;
 
 @Service
 public class UserProfileStorageService implements StorageService {

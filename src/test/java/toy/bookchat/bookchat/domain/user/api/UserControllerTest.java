@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -18,6 +19,7 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.multipart;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -67,6 +69,7 @@ import toy.bookchat.bookchat.domain.user.service.UserService;
 import toy.bookchat.bookchat.domain.user.service.dto.request.ChangeUserNicknameRequest;
 import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignInRequest;
 import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignUpRequest;
+import toy.bookchat.bookchat.exception.conflict.device.DeviceAlreadyRegisteredException;
 import toy.bookchat.bookchat.exception.unauthorized.ExpiredTokenException;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenProvider;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenRecorder;
@@ -375,6 +378,9 @@ class UserControllerTest extends ControllerTestExtension {
 
         UserSignInRequest userSignInRequest = UserSignInRequest.builder()
             .oauth2Provider(KAKAO)
+            .fcmToken("5Nh2lN")
+            .deviceToken("JI82uSMi")
+            .approveChangingDevice(false)
             .build();
 
         when(jwtTokenProvider.createToken(any())).thenReturn(responseToken);
@@ -390,7 +396,11 @@ class UserControllerTest extends ControllerTestExtension {
                 ),
                 requestFields(
                     fieldWithPath("oauth2Provider").type(STRING)
-                        .description("프로바이더 타입[kakao/google]")
+                        .description("프로바이더 타입[kakao/google]"),
+                    fieldWithPath("fcmToken").type(STRING).description("FCM Token"),
+                    fieldWithPath("deviceToken").type(STRING).description("Unique Device Id"),
+                    fieldWithPath("approveChangingDevice").type(BOOLEAN).optional()
+                        .description("기기 변경 승인")
                 ),
                 responseFields(
                     fieldWithPath("accessToken").type(STRING).description("Access Token"),
@@ -401,6 +411,41 @@ class UserControllerTest extends ControllerTestExtension {
         verify(jwtTokenRecorder).record(any(), any());
         assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo(
             objectMapper.writeValueAsString(responseToken));
+    }
+
+    @Test
+    void 사용자가_새로운_기기로_접속시_승인이없다면_충돌응답() throws Exception {
+        PrivateKey privateKey = getPrivateKey();
+        PublicKey publicKey = getPublicKey();
+
+        String testToken = Jwts.builder()
+            .setHeaderParam("kid", "abcedf")
+            .setClaims(getClaims())
+            .signWith(RS256, privateKey)
+            .compact();
+
+        Token responseToken = Token.builder()
+            .accessToken("accessToken")
+            .refreshToken("refreshToken")
+            .build();
+
+        UserSignInRequest userSignInRequest = UserSignInRequest.builder()
+            .oauth2Provider(KAKAO)
+            .fcmToken("5Nh2lN")
+            .deviceToken("JI82uSMi")
+            .approveChangingDevice(false)
+            .build();
+
+        when(getPublicKeyFetcher().getPublicKey(any(), any())).thenReturn(publicKey);
+        doThrow(new DeviceAlreadyRegisteredException()).when(userService).checkDevice(any(), any());
+        when(jwtTokenProvider.createToken(any())).thenReturn(responseToken);
+        when(userService.findUserByUsername(any())).thenReturn(getUser());
+
+        mockMvc.perform(post("/v1/api/users/signin")
+                .header(OIDC, BEARER + testToken)
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userSignInRequest)))
+            .andExpect(status().isConflict());
     }
 
     @Test
@@ -455,7 +500,9 @@ class UserControllerTest extends ControllerTestExtension {
         mockMvc.perform(post("/v1/api/users/signin")
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(
-                    UserSignInRequest.builder().oauth2Provider(KAKAO).build()))
+                    UserSignInRequest.builder().oauth2Provider(KAKAO).fcmToken("jMYy")
+                        .deviceToken("40vB5")
+                        .build()))
                 .header(OIDC, BEARER + testToken))
             .andExpect(status().isUnauthorized())
             .andDo(document("user-signin-error4"));
@@ -504,5 +551,17 @@ class UserControllerTest extends ControllerTestExtension {
                 )));
 
         verify(userService).updateUserProfile(any(), any(), any());
+    }
+
+    @Test
+    void 로그아웃_요청_성공() throws Exception {
+        mockMvc.perform(post("/v1/api/users/logout")
+                .header(AUTHORIZATION, JWT_TOKEN)
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isOk())
+            .andDo(document("post-logout",
+                requestHeaders(
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
+                )));
     }
 }

@@ -13,6 +13,7 @@ import toy.bookchat.bookchat.domain.chat.api.dto.request.MessageDto;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CommonMessage {
 
+    private Long chatRoomId;
     private Long chatId;
     private Long senderId;
     private Integer receiptId;
@@ -20,8 +21,10 @@ public class CommonMessage {
     private String dispatchTime;
 
     @Builder
-    private CommonMessage(Long chatId, Long senderId, Integer receiptId, String dispatchTime,
+    private CommonMessage(Long chatRoomId, Long chatId, Long senderId, Integer receiptId,
+        String dispatchTime,
         String message) {
+        this.chatRoomId = chatRoomId;
         this.chatId = chatId;
         this.senderId = senderId;
         this.receiptId = receiptId;
@@ -31,6 +34,7 @@ public class CommonMessage {
 
     public static CommonMessage from(Long senderId, Chat chat, MessageDto messageDto) {
         return CommonMessage.builder()
+            .chatRoomId(chat.getChatRoomId())
             .chatId(chat.getId())
             .senderId(senderId)
             .receiptId(messageDto.getReceiptId())

@@ -44,6 +44,10 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation 'io.micrometer:micrometer-registry-prometheus'
 
+    implementation 'org.springframework:spring-aspects'
+    implementation 'org.springframework.retry:spring-retry'
+
+    implementation 'com.google.firebase:firebase-admin:9.1.1'
     implementation 'org.springframework.boot:spring-boot-starter-amqp'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.springframework.boot:spring-boot-starter-reactor-netty'

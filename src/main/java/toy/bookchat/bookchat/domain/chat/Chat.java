@@ -59,4 +59,8 @@ public class Chat extends BaseEntity {
     public boolean isAnnouncementChat() {
         return this.user == null;
     }
+
+    public Long getChatRoomId() {
+        return this.chatRoom.getId();
+    }
 }
