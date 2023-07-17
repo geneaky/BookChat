@@ -44,8 +44,4 @@ public class UserSignInRequest {
     public boolean approved() {
         return this.approveChangingDevice != null && this.approveChangingDevice;
     }
-
-    public boolean hasSameDeviceToken(String deviceToken) {
-        return this.deviceToken.equals(deviceToken);
-    }
 }

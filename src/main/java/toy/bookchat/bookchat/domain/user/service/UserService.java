@@ -137,10 +137,6 @@ public class UserService {
 
     private Consumer<Device> changeDeviceIfApproved(UserSignInRequest userSignInRequest) {
         return device -> {
-            if (userSignInRequest.hasSameDeviceToken(device.getDeviceToken())) {
-                device.changeFcmToken(userSignInRequest.getFcmToken());
-                return;
-            }
             if (userSignInRequest.approved()) {
                 String oldDeviceFcmToken = device.getFcmToken();
                 device.changeDeviceToken(userSignInRequest.getDeviceToken());

@@ -169,25 +169,6 @@ class UserServiceTest {
     }
 
     @Test
-    void 등록된_디바이스가_있는데_같은_디바이스인경우_fcm토큰_최신화() throws Exception {
-        UserSignInRequest userSignInRequest = UserSignInRequest.builder()
-            .deviceToken("5o9")
-            .fcmToken("w0teX6P")
-            .build();
-
-        User user = User.builder().build();
-
-        Device device = Device.builder()
-            .deviceToken("5o9")
-            .fcmToken("nMhp5")
-            .build();
-
-        when(deviceService.findUserDevice(user)).thenReturn(Optional.of(device));
-        userService.checkDevice(userSignInRequest, user);
-        assertThat(device.getFcmToken()).isEqualTo(userSignInRequest.getFcmToken());
-    }
-
-    @Test
     void 등록된_디바이스가_있는데_승인한경우_fcm발송후_디바이스정보_최신화() throws Exception {
         UserSignInRequest userSignInRequest = UserSignInRequest.builder()
             .deviceToken("5o9")
