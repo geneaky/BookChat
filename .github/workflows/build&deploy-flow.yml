@@ -37,7 +37,7 @@ jobs:
       shell: bash
 
     - name: Create Configuration File
-      run: echo "${{ env.APPLICATION }}" > ./src/main/resources/application.yml
+      run: echo '${{ env.APPLICATION }}' > ./src/main/resources/application.yml
       shell: bash
 
     - name: Create Fcm Configuration File
