@@ -8,4 +8,6 @@ public interface DeviceQueryRepository {
     void deleteByUserId(Long userId);
 
     List<Device> getDisconnectedUserDevice(Long roomId);
+
+    void deleteExpiredFcmToken();
 }
