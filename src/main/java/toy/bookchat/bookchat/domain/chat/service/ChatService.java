@@ -2,6 +2,7 @@ package toy.bookchat.bookchat.domain.chat.service;
 
 import static toy.bookchat.bookchat.infrastructure.push.PushType.CHAT;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import toy.bookchat.bookchat.infrastructure.push.service.PushService;
 @Service
 public class ChatService {
 
+    private static final int SEPARATE_LENGTH = 1000;
     private final ChatRepository chatRepository;
     private final ParticipantRepository participantRepository;
     private final DeviceRepository deviceRepository;
@@ -54,10 +56,33 @@ public class ChatService {
 
         CommonMessage message = CommonMessage.from(participant.getUserId(), chat, messageDto);
 
+        List<PushMessageBody> separatedMessages = separateMessage(participant.getUserId(), chat,
+            messageDto);
+
         for (Device device : disconnectedUserDevice) {
-            pushService.send(device.getFcmToken(), PushMessageBody.of(CHAT, message));
+            for (PushMessageBody pushMessageBody : separatedMessages) {
+                pushService.send(device.getFcmToken(), pushMessageBody);
+            }
         }
         messagePublisher.sendCommonMessage(participant.getChatRoomSid(), message);
+    }
+
+    private List<PushMessageBody> separateMessage(Long userId, Chat chat, MessageDto messageDto) {
+        List<PushMessageBody> result = new ArrayList<>();
+        int length = messageDto.getMessage().length();
+        int startIdx = 0;
+        int order = 0;
+
+        while (startIdx < length) {
+            int endIdx = Math.min(startIdx + SEPARATE_LENGTH, length);
+            String subMessage = messageDto.getMessage().substring(startIdx, endIdx);
+            result.add(
+                PushMessageBody.of(CHAT, CommonMessage.from(userId, chat, messageDto, subMessage),
+                    order));
+            startIdx = endIdx;
+            order++;
+        }
+        return result;
     }
 
     @Transactional(readOnly = true)

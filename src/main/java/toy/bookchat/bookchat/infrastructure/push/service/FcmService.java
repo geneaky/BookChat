@@ -8,6 +8,8 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import toy.bookchat.bookchat.exception.serviceunavailable.push.PushServiceCallException;
@@ -26,6 +28,7 @@ public class FcmService implements PushService {
     }
 
     @Async
+    @Retryable(value = PushServiceCallException.class, maxAttempts = 5, backoff = @Backoff(delay = 2000L, multiplier = 2.0))
     @Override
     public void send(String fcmToken, PushMessageBody messageBody) {
         try {
