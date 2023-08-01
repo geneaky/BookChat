@@ -42,6 +42,7 @@ public class FcmService implements PushService {
             Message message = Message.builder()
                 .setToken(fcmToken)
                 .setAndroidConfig(AndroidConfig.builder()
+                    .setDirectBootOk(true)
                     .setPriority(Priority.HIGH)
                     .build())
                 .putAllData(data)
