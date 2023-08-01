@@ -1,12 +1,15 @@
 package toy.bookchat.bookchat.domain.chat.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static toy.bookchat.bookchat.infrastructure.push.PushType.CHAT;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -29,6 +32,7 @@ import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.infrastructure.broker.MessagePublisher;
 import toy.bookchat.bookchat.infrastructure.broker.message.CommonMessage;
+import toy.bookchat.bookchat.infrastructure.push.PushMessageBody;
 import toy.bookchat.bookchat.infrastructure.push.service.PushService;
 
 @ExtendWith(MockitoExtension.class)
@@ -176,5 +180,32 @@ class ChatServiceTest {
             mock(Pageable.class), 1L);
 
         verify(chatRepository).getChatRoomChats(any(), any(), any(), any());
+    }
+
+    @Test
+    void 문자길이_특정길이_단위로_분할() throws Exception {
+        MessageDto messageDto = MessageDto.builder()
+            .message("가나다라마바사아자차카파타하")
+            .build();
+        List<PushMessageBody> result = new ArrayList<>();
+        int defaultSize = 3;
+        int length = messageDto.getMessage().length();
+        int startIdx = 0;
+        int order = 0;
+
+        while (startIdx < length) {
+            int endIdx = Math.min(startIdx + defaultSize, length);
+            String subMessage = messageDto.getMessage().substring(startIdx, endIdx);
+            if (endIdx >= length) {
+                result.add(PushMessageBody.of(CHAT, subMessage, order, true));
+            } else {
+                result.add(PushMessageBody.of(CHAT, subMessage, order, false));
+            }
+            startIdx = endIdx;
+            order++;
+        }
+
+        assertThat(result).hasSize(5)
+            .last().extracting("isLast").isEqualTo(true);
     }
 }

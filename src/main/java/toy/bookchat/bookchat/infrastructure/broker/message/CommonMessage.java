@@ -42,4 +42,16 @@ public class CommonMessage {
             .dispatchTime(chat.getDispatchTime())
             .build();
     }
+
+    public static CommonMessage from(Long senderId, Chat chat, MessageDto messageDto,
+        String subMessage) {
+        return CommonMessage.builder()
+            .chatRoomId(chat.getChatRoomId())
+            .chatId(chat.getId())
+            .senderId(senderId)
+            .receiptId(messageDto.getReceiptId())
+            .message(subMessage)
+            .dispatchTime(chat.getDispatchTime())
+            .build();
+    }
 }
