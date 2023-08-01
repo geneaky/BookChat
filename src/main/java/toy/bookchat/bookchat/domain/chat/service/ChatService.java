@@ -76,9 +76,13 @@ public class ChatService {
         while (startIdx < length) {
             int endIdx = Math.min(startIdx + SEPARATE_LENGTH, length);
             String subMessage = messageDto.getMessage().substring(startIdx, endIdx);
-            result.add(
-                PushMessageBody.of(CHAT, CommonMessage.from(userId, chat, messageDto, subMessage),
-                    order));
+            if (endIdx >= length) {
+                result.add(PushMessageBody.of(CHAT,
+                    CommonMessage.from(userId, chat, messageDto, subMessage), order, true));
+            } else {
+                result.add(PushMessageBody.of(CHAT,
+                    CommonMessage.from(userId, chat, messageDto, subMessage), order, false));
+            }
             startIdx = endIdx;
             order++;
         }

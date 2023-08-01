@@ -196,11 +196,16 @@ class ChatServiceTest {
         while (startIdx < length) {
             int endIdx = Math.min(startIdx + defaultSize, length);
             String subMessage = messageDto.getMessage().substring(startIdx, endIdx);
-            result.add(PushMessageBody.of(CHAT, subMessage, order));
+            if (endIdx >= length) {
+                result.add(PushMessageBody.of(CHAT, subMessage, order, true));
+            } else {
+                result.add(PushMessageBody.of(CHAT, subMessage, order, false));
+            }
             startIdx = endIdx;
             order++;
         }
 
-        assertThat(result).hasSize(5);
+        assertThat(result).hasSize(5)
+            .last().extracting("isLast").isEqualTo(true);
     }
 }
