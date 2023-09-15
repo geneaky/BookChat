@@ -20,7 +20,7 @@ services:
     depends_on:
       - app
     container_name: nginx
-    image: geneaky/nginx
+    image: nginx
     environment:
       TZ: "Asia/Seoul"
     ports:
