@@ -41,6 +41,8 @@ public class MessageBrokerSecurityConfig extends AbstractSecurityWebSocketMessag
     @Override
     protected void customizeClientInboundChannel(ChannelRegistration registration) {
         registration.interceptors(webSocketTokenValidationInterceptor);
+        registration.taskExecutor().corePoolSize(10);
+        registration.taskExecutor().maxPoolSize(10);
     }
 
     @Override
