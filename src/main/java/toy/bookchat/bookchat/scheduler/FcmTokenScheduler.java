@@ -14,8 +14,8 @@ public class FcmTokenScheduler {
         this.deviceRepository = deviceRepository;
     }
 
-    @Scheduled(cron = "0 0 0 * * *")
     @Transactional
+    @Scheduled(cron = "0 0 0 * * *")
     public void clearExpiredFcmTokens() {
         deviceRepository.deleteExpiredFcmToken();
     }
