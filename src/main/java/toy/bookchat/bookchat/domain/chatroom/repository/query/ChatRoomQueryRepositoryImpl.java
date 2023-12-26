@@ -68,22 +68,32 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
     @Override
     public Slice<UserChatRoomResponse> findUserChatRoomsWithLastChat(Pageable pageable, Long bookId,
         Long postCursorId, Long userId) {
-        QParticipant subParticipant1 = new QParticipant("subParticipant1");
+        QChat subChat = new QChat("subChat");
+        QParticipant subParticipant = new QParticipant("subParticipant1");
 
         List<UserChatRoomResponse> contents = queryFactory.select(
                 Projections.constructor(UserChatRoomResponse.class,
                     chatRoom.id,
                     chatRoom.roomName,
                     chatRoom.roomSid,
-                    subParticipant1.count(),
+                    subParticipant.count(),
                     chatRoom.defaultRoomImageType,
-                    chatRoom.roomImageUri
+                    chatRoom.roomImageUri,
+                    chat.id,
+                    chat.message
                 ))
             .from(chatRoom)
             .join(participant)
-            .on(participant.chatRoom.id.eq(chatRoom.id).and(participant.user.id.eq(userId)))
-            .leftJoin(subParticipant1).on(subParticipant1.chatRoom.id.eq(chatRoom.id))
-            .groupBy(chatRoom.id)
+            .on(participant.chatRoom.id.eq(chatRoom.id)
+                .and(participant.user.id.eq(userId))) //사용자 채팅방
+            .leftJoin(subParticipant).on(subParticipant.chatRoom.id.eq(chatRoom.id)) // 채팅방 인원수
+            .leftJoin(chat).on(chat.id.eq( // 마지막 채팅, 채팅 내
+                    JPAExpressions.select(subChat.id.max())
+                        .from(subChat)
+                        .where(subChat.chatRoom.id.eq(chatRoom.id))
+                )
+            )
+            .groupBy(chatRoom.id, chat.id)
             .where(afterChatRoomId(postCursorId),
                 eqBookId(bookId))
             .limit(pageable.getPageSize())

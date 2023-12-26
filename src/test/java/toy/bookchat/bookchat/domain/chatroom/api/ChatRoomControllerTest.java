@@ -47,6 +47,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
 import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookRequest;
+import toy.bookchat.bookchat.domain.chat.Chat;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomResponse;
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomsResponseSlice;
@@ -192,8 +193,26 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .build();
         chatRoom3.setCreatedAt(LocalDateTime.now());
 
-        List<UserChatRoomResponse> result = List.of(getChatRoomResponse(chatRoom1),
-            getChatRoomResponse(chatRoom2), getChatRoomResponse(chatRoom3));
+        Chat chat1 = Chat.builder()
+            .id(1L)
+            .chatRoom(chatRoom1)
+            .message("이펙티브 자바 부수는 방 입니다.")
+            .build();
+
+        Chat chat2 = Chat.builder()
+            .id(2L)
+            .chatRoom(chatRoom2)
+            .message("이펙티브 코틀린 부수는 방 입니다.")
+            .build();
+
+        Chat chat3 = Chat.builder()
+            .id(3L)
+            .chatRoom(chatRoom3)
+            .message("토비의 스프링 부수는 방 입니다.")
+            .build();
+
+        List<UserChatRoomResponse> result = List.of(getChatRoomResponse(chatRoom1, chat1),
+            getChatRoomResponse(chatRoom2, chat2), getChatRoomResponse(chatRoom3, chat3));
 
         PageRequest pageRequest = PageRequest.of(0, 3, Sort.by("id").descending());
         Slice<UserChatRoomResponse> slice = new SliceImpl<>(result, pageRequest, true);
@@ -236,7 +255,11 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                     fieldWithPath("userChatRoomResponseList[].bookCoverImageUrl").type(STRING)
                         .description("책 커버 이미지"),
                     fieldWithPath("userChatRoomResponseList[].bookAuthors[]").type(ARRAY)
-                        .description("책 저자")
+                        .description("책 저자"),
+                    fieldWithPath("userChatRoomResponseList[].lastChatId").type(NUMBER)
+                        .description("마지막 채팅 ID"),
+                    fieldWithPath("userChatRoomResponseList[].lastChatContent").type(STRING)
+                        .description("마지막 채팅 내용")
                 ).and(getCursorField())));
     }
 
@@ -524,7 +547,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                 )));
     }
 
-    private UserChatRoomResponse getChatRoomResponse(ChatRoom chatRoom) {
+    private UserChatRoomResponse getChatRoomResponse(ChatRoom chatRoom, Chat chat) {
         return UserChatRoomResponse.builder()
             .roomId(chatRoom.getId())
             .roomSid(chatRoom.getRoomSid())
@@ -534,6 +557,8 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .bookTitle(chatRoom.getBookTitle())
             .bookCoverImageUrl(chatRoom.getBookCoverImageUrl())
             .bookAuthors(chatRoom.getBookAuthors())
+            .lastChatId(chat.getId())
+            .lastChatContent(chat.getMessage())
             .build();
     }
 }
