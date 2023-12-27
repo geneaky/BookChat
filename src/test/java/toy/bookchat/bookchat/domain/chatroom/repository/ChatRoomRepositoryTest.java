@@ -123,6 +123,31 @@ class ChatRoomRepositoryTest {
         participantRepository.save(participant3);
         participantRepository.save(participant4);
 
+        Chat chat1 = Chat.builder()
+            .chatRoom(chatRoom1)
+            .user(user1)
+            .message("first chat in chatRoom1")
+            .build();
+        Chat chat2 = Chat.builder()
+            .chatRoom(chatRoom2)
+            .user(user1)
+            .message("first chat in chatRoom2")
+            .build();
+        Chat chat3 = Chat.builder()
+            .chatRoom(chatRoom3)
+            .user(user1)
+            .message("first chat in chatRoom3")
+            .build();
+        Chat chat4 = Chat.builder()
+            .chatRoom(chatRoom3)
+            .user(user2)
+            .message("second chat in chatRoom3")
+            .build();
+        chatRepository.save(chat1);
+        chatRepository.save(chat2);
+        chatRepository.save(chat3);
+        chatRepository.save(chat4);
+
         UserChatRoomResponse userChatRoomResponse1 = UserChatRoomResponse.builder()
             .roomId(chatRoom3.getId())
             .defaultRoomImageType(chatRoom3.getDefaultRoomImageType())
@@ -131,6 +156,8 @@ class ChatRoomRepositoryTest {
             .bookTitle(chatRoom3.getBookTitle())
             .bookCoverImageUrl(chatRoom3.getBookCoverImageUrl())
             .bookAuthors(chatRoom3.getBookAuthors())
+            .lastChatId(chat4.getId())
+            .lastChatContent(chat4.getMessage())
             .build();
 
         UserChatRoomResponse userChatRoomResponse2 = UserChatRoomResponse.builder()
@@ -141,6 +168,8 @@ class ChatRoomRepositoryTest {
             .bookTitle(chatRoom2.getBookTitle())
             .bookCoverImageUrl(chatRoom2.getBookCoverImageUrl())
             .bookAuthors(chatRoom2.getBookAuthors())
+            .lastChatId(chat2.getId())
+            .lastChatContent(chat2.getMessage())
             .build();
 
         PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("id").descending());
