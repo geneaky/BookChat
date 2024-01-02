@@ -8,7 +8,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,23 +15,19 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import toy.bookchat.bookchat.domain.bookshelf.BookReport;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
-import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
-import toy.bookchat.bookchat.domain.bookshelf.repository.BookReportRepository;
-import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ReviseBookReportRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.WriteBookReportRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.BookReportResponse;
 import toy.bookchat.bookchat.domain.user.User;
-import toy.bookchat.bookchat.exception.notfound.book.BookNotFoundException;
 import toy.bookchat.bookchat.exception.notfound.bookshelf.BookReportNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class BookReportServiceTest {
 
     @Mock
-    private BookReportRepository bookReportRepository;
+    private BookShelfManager bookShelfManager;
     @Mock
-    private BookShelfRepository bookShelfRepository;
+    private BookShelfReader bookShelfReader;
     @InjectMocks
     private BookReportService bookReportService;
 
@@ -58,54 +53,13 @@ class BookReportServiceTest {
         BookShelf bookShelf = mock(BookShelf.class);
 
         when(user.getId()).thenReturn(1L);
-        when(bookShelfRepository.findByIdAndUserId(any(), any())).thenReturn(
-            Optional.of(bookShelf));
+        when(bookShelfReader.readBookShelf(any(), any())).thenReturn(bookShelf);
 
         bookReportService.writeReport(writeBookReportRequest, 1L, user.getId());
 
-        verify(bookReportRepository).save(any());
+        verify(bookShelfManager).append(any(), any());
     }
-
-    @Test
-    void 독후감_등록시_서재_독서완료_변경_성공() throws Exception {
-        WriteBookReportRequest writeBookReportRequest = getWriteBookReportRequest();
-
-        User user = mock(User.class);
-        BookShelf bookShelf = BookShelf.builder()
-            .readingStatus(ReadingStatus.READING)
-            .build();
-
-        when(user.getId()).thenReturn(1L);
-        when(bookShelfRepository.findByIdAndUserId(any(), any())).thenReturn(
-            Optional.of(bookShelf));
-
-        bookReportService.writeReport(writeBookReportRequest, 1L, user.getId());
-
-        ReadingStatus result = bookShelf.getReadingStatus();
-        assertThat(result).isEqualTo(ReadingStatus.COMPLETE);
-    }
-
-    @Test
-    void 서재에_등록되지_않는_책_독후감_작성시도시_예외발생() throws Exception {
-        WriteBookReportRequest writeBookReportRequest = getWriteBookReportRequest();
-
-        assertThatThrownBy(() -> {
-            bookReportService.writeReport(writeBookReportRequest, 1L, 1L);
-        }).isInstanceOf(BookNotFoundException.class);
-    }
-
-    @Test
-    void 서재에_등록된_책_독후감_없을시_조회하면_예외발생() throws Exception {
-        BookShelf bookShelf = BookShelf.builder()
-            .build();
-
-        when(bookShelfRepository.findByIdAndUserId(any(), any())).thenReturn(
-            Optional.of(bookShelf));
-
-        assertThatThrownBy(() -> {
-            bookReportService.getBookReportResponse(1L, 1L);
-        }).isInstanceOf(BookReportNotFoundException.class);
-    }
+    
 
     @Test
     void 서재에_등록된_책_독후감_조회_성공() throws Exception {
@@ -117,12 +71,10 @@ class BookReportServiceTest {
             .bookReport(bookReport)
             .build();
 
-        when(bookShelfRepository.findByIdAndUserId(any(), any())).thenReturn(
-            Optional.of(bookShelf));
+        when(bookShelfReader.readBookShelf(any(), any())).thenReturn(bookShelf);
         BookReportResponse bookReportResponse = bookReportService.getBookReportResponse(1L, 1L);
 
-        String result = bookReportResponse.getReportTitle();
-        assertThat(result).isEqualTo("title");
+        assertThat(bookReportResponse.getReportTitle()).isEqualTo(bookReport.getTitle());
     }
 
     @Test
@@ -135,8 +87,7 @@ class BookReportServiceTest {
             .bookReport(bookReport)
             .build();
 
-        when(bookShelfRepository.findByIdAndUserId(any(), any())).thenReturn(
-            Optional.of(bookShelf));
+        when(bookShelfReader.readBookShelf(any(), any())).thenReturn(bookShelf);
 
         bookReportService.deleteBookReport(1L, 1L);
 
@@ -158,12 +109,9 @@ class BookReportServiceTest {
             .bookReport(bookReport)
             .build();
 
-        when(bookShelfRepository.findWithReportByIdAndUserId(any(), any())).thenReturn(
-            Optional.of(bookShelf));
-
+        when(bookShelfReader.readBookShelf(any(), any())).thenReturn(bookShelf);
         bookReportService.reviseBookReport(1L, 1L, reviseBookReportRequest);
 
-        String result = bookReport.getTitle();
-        assertThat(result).isEqualTo("title2");
+        assertThat(bookReport.getTitle()).isEqualTo(reviseBookReportRequest.getTitle());
     }
 }

@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import toy.bookchat.bookchat.domain.bookshelf.BookReport;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -19,5 +20,10 @@ public class ReviseBookReportRequest {
     private ReviseBookReportRequest(String title, String content) {
         this.title = title;
         this.content = content;
+    }
+
+    public void revise(BookReport bookReport) {
+        bookReport.reviseTitle(title);
+        bookReport.reviseContent(content);
     }
 }
