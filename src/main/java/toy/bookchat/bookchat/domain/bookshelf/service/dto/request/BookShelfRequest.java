@@ -11,8 +11,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import toy.bookchat.bookchat.domain.book.Book;
+import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.Star;
+import toy.bookchat.bookchat.domain.user.User;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -60,5 +62,21 @@ public class BookShelfRequest {
     @JsonIgnore
     public LocalDate getPublishAt() {
         return this.bookRequest.getPublishAt();
+    }
+
+    public BookShelf createBookShelfByReadingStatus(Book book, User user) {
+        if (this.isCompleteReading()) {
+            return BookShelf.builder()
+                .book(book)
+                .readingStatus(this.getReadingStatus())
+                .user(user)
+                .star(this.getStar())
+                .build();
+        }
+        return BookShelf.builder()
+            .book(book)
+            .readingStatus(this.getReadingStatus())
+            .user(user)
+            .build();
     }
 }

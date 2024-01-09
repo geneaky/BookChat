@@ -19,7 +19,6 @@ public class ExistenceBookOnBookShelfResponse {
     }
 
     public static ExistenceBookOnBookShelfResponse from(BookShelf bookShelf) {
-        return new ExistenceBookOnBookShelfResponse(bookShelf.getId(),
-            bookShelf.getReadingStatus());
+        return new ExistenceBookOnBookShelfResponse(bookShelf.getId(), bookShelf.getReadingStatus());
     }
 }

@@ -5,108 +5,64 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import toy.bookchat.bookchat.domain.agony.repository.AgonyRecordRepository;
-import toy.bookchat.bookchat.domain.agony.repository.AgonyRepository;
 import toy.bookchat.bookchat.domain.book.Book;
-import toy.bookchat.bookchat.domain.book.repository.BookRepository;
+import toy.bookchat.bookchat.domain.book.service.BookReader;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
-import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookShelfRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ReviseBookShelfRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.ExistenceBookOnBookShelfResponse;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.SearchBookShelfByReadingStatus;
 import toy.bookchat.bookchat.domain.user.User;
-import toy.bookchat.bookchat.domain.user.repository.UserRepository;
-import toy.bookchat.bookchat.exception.notfound.book.BookNotFoundException;
-import toy.bookchat.bookchat.exception.notfound.user.UserNotFoundException;
+import toy.bookchat.bookchat.domain.user.service.UserReader;
 
 @Service
+@Transactional(readOnly = true)
 public class BookShelfService {
 
-    private final BookShelfRepository bookShelfRepository;
-    private final AgonyRepository agonyRepository;
-    private final AgonyRecordRepository agonyRecordRepository;
-    private final BookRepository bookRepository;
-    private final UserRepository userRepository;
+    private final BookShelfManager bookShelfManager;
+    private final BookShelfReader bookShelfReader;
+    private final BookReader bookReader;
+    private final UserReader userReader;
 
-    public BookShelfService(BookShelfRepository bookShelfRepository,
-        AgonyRepository agonyRepository, AgonyRecordRepository agonyRecordRepository,
-        BookRepository bookRepository,
-        UserRepository userRepository) {
-        this.bookShelfRepository = bookShelfRepository;
-        this.agonyRepository = agonyRepository;
-        this.agonyRecordRepository = agonyRecordRepository;
-        this.bookRepository = bookRepository;
-        this.userRepository = userRepository;
+    public BookShelfService(UserReader userReader, BookShelfManager bookShelfManager, BookShelfReader bookShelfReader, BookReader bookReader) {
+        this.userReader = userReader;
+        this.bookShelfManager = bookShelfManager;
+        this.bookShelfReader = bookShelfReader;
+        this.bookReader = bookReader;
     }
 
     @Transactional
     public void putBookOnBookShelf(BookShelfRequest bookShelfRequest, Long userId) {
-        Book book = bookRepository.findByIsbnAndPublishAt(bookShelfRequest.getIsbn(),
-                bookShelfRequest.getPublishAt())
-            .orElseGet(() -> bookRepository.save(bookShelfRequest.extractBookEntity()));
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-
-        bookShelfRepository.save(createBookShelfByReadingStatus(bookShelfRequest, book, user));
+        Book book = bookReader.readBook(bookShelfRequest.getIsbn(), bookShelfRequest.getPublishAt(), bookShelfRequest.extractBookEntity());
+        User user = userReader.readUser(userId);
+        bookShelfManager.store(bookShelfRequest.createBookShelfByReadingStatus(book, user));
     }
 
-    private BookShelf createBookShelfByReadingStatus(BookShelfRequest bookShelfRequest,
-        Book book, User user) {
-        if (bookShelfRequest.isCompleteReading()) {
-            return BookShelf.builder()
-                .book(book)
-                .readingStatus(bookShelfRequest.getReadingStatus())
-                .user(user)
-                .star(bookShelfRequest.getStar())
-                .build();
-        }
-        return BookShelf.builder()
-            .book(book)
-            .readingStatus(bookShelfRequest.getReadingStatus())
-            .user(user)
-            .build();
-    }
-
-    @Transactional(readOnly = true)
-    public SearchBookShelfByReadingStatus takeBooksOutOfBookShelves(ReadingStatus readingStatus,
-        Pageable pageable, Long userId) {
-        Page<BookShelf> pagingBookShelves = bookShelfRepository.findSpecificStatusBookByUserId(
-            readingStatus, pageable,
-            userId);
-
+    public SearchBookShelfByReadingStatus takeBooksOutOfBookShelves(ReadingStatus readingStatus, Pageable pageable, Long userId) {
+        Page<BookShelf> pagingBookShelves = bookShelfReader.readBookShelf(userId, readingStatus, pageable);
         return new SearchBookShelfByReadingStatus(pagingBookShelves);
     }
 
-    @Transactional(readOnly = true)
-    public ExistenceBookOnBookShelfResponse getBookIfExisted(String isbn,
-        LocalDate publishAt, Long userId) {
-        BookShelf bookShelf = bookShelfRepository.findByUserIdAndIsbnAndPublishAt(userId, isbn,
-                publishAt)
-            .orElseThrow(BookNotFoundException::new);
-
+    public ExistenceBookOnBookShelfResponse getBookIfExisted(String isbn, LocalDate publishAt, Long userId) {
+        BookShelf bookShelf = bookShelfReader.readBookShelf(userId, isbn, publishAt);
         return ExistenceBookOnBookShelfResponse.from(bookShelf);
     }
 
     @Transactional
-    public void reviseBookShelf(Long bookShelfId, ReviseBookShelfRequest reviseBookShelfRequest,
-        Long userId) {
-        BookShelf bookShelf = bookShelfRepository.findByIdAndUserId(bookShelfId, userId)
-            .orElseThrow(BookNotFoundException::new);
-
+    public void reviseBookShelf(Long bookShelfId, ReviseBookShelfRequest reviseBookShelfRequest, Long userId) {
+        BookShelf bookShelf = bookShelfReader.readBookShelf(bookShelfId, userId);
         reviseBookShelfRequest.applyChanges(bookShelf);
     }
 
     @Transactional
     public void deleteBookShelf(Long bookShelfId, Long userId) {
-        agonyRecordRepository.deleteByBookShelfIdAndUserId(bookShelfId, userId);
-        agonyRepository.deleteByBookShelfIdAndUserId(bookShelfId, userId);
-        bookShelfRepository.deleteBookShelfByIdAndUserId(bookShelfId, userId);
+        bookShelfManager.vacate(bookShelfId, userId);
     }
 
     @Transactional
     public void deleteAllUserBookShelves(Long userId) {
-        bookShelfRepository.deleteAllByUserId(userId);
+        bookShelfManager.remove(userId);
     }
 
 }
