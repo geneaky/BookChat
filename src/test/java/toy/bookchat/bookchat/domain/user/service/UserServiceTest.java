@@ -5,10 +5,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.noInteractions;
+import static toy.bookchat.bookchat.domain.common.Status.ACTIVE;
 
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -19,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
 import toy.bookchat.bookchat.domain.agony.service.AgonyService;
 import toy.bookchat.bookchat.domain.bookshelf.service.BookShelfService;
+import toy.bookchat.bookchat.domain.common.Status;
 import toy.bookchat.bookchat.domain.device.Device;
 import toy.bookchat.bookchat.domain.device.service.DeviceService;
 import toy.bookchat.bookchat.domain.storage.StorageService;
@@ -30,7 +33,6 @@ import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignInRequest;
 import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignUpRequest;
 import toy.bookchat.bookchat.exception.badrequest.user.UserAlreadySignUpException;
 import toy.bookchat.bookchat.exception.conflict.device.DeviceAlreadyRegisteredException;
-import toy.bookchat.bookchat.exception.notfound.user.UserNotFoundException;
 import toy.bookchat.bookchat.infrastructure.push.service.PushService;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,6 +40,8 @@ class UserServiceTest {
 
     @Mock
     UserRepository userRepository;
+    @Mock
+    UserReader userReader;
     @Mock
     BookShelfService bookShelfService;
     @Mock
@@ -99,21 +103,15 @@ class UserServiceTest {
     }
 
     @Test
-    void 가입된_사용자인지_체크시_가입되지_않은_사용자라면_예외발생() throws Exception {
-        when(userRepository.findByName(any())).thenReturn(Optional.ofNullable(null));
-
-        assertThatThrownBy(() -> {
-            userService.findUserByUsername("username");
-        }).isInstanceOf(UserNotFoundException.class);
-    }
-
-    @Test
     void 사용자_회원탈퇴_요청시_삭제_성공() throws Exception {
-        userService.deleteUser(any());
+        User user = User.builder()
+            .status(ACTIVE)
+            .build();
 
-        verify(agonyService).deleteAllUserAgony(any());
-        verify(bookShelfService).deleteAllUserBookShelves(any());
-        verify(userRepository).deleteById(any());
+        given(userReader.readUser(eq(1L))).willReturn(user);
+        userService.deleteUser(1L);
+
+        assertThat(user.getStatus()).isEqualTo(Status.INACTIVE);
     }
 
     @Test
@@ -127,7 +125,7 @@ class UserServiceTest {
             "user2");
         MultipartFile multipartFile = mock(MultipartFile.class);
 
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(userReader.readUser(user.getId())).thenReturn(user);
         when(storageService.upload(any(), any(), any())).thenReturn("test-s3-image-url");
         userService.updateUserProfile(changeUserNicknameRequest, multipartFile, user.getId());
 
@@ -146,7 +144,7 @@ class UserServiceTest {
         ChangeUserNicknameRequest changeUserNicknameRequest = new ChangeUserNicknameRequest(
             "user2");
 
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(userReader.readUser(user.getId())).thenReturn(user);
         userService.updateUserProfile(changeUserNicknameRequest, null, user.getId());
 
         String nickname = user.getNickname();

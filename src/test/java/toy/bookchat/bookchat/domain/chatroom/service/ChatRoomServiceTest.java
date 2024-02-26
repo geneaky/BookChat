@@ -3,12 +3,14 @@ package toy.bookchat.bookchat.domain.chatroom.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static toy.bookchat.bookchat.domain.common.Status.ACTIVE;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -49,7 +51,7 @@ import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
 import toy.bookchat.bookchat.domain.storage.ChatRoomStorageService;
 import toy.bookchat.bookchat.domain.user.User;
-import toy.bookchat.bookchat.domain.user.repository.UserRepository;
+import toy.bookchat.bookchat.domain.user.service.UserReader;
 import toy.bookchat.bookchat.exception.badrequest.chatroom.ChatRoomIsFullException;
 import toy.bookchat.bookchat.exception.badrequest.chatroom.NotEnoughRoomSizeException;
 import toy.bookchat.bookchat.exception.forbidden.chatroom.BlockedUserInChatRoomException;
@@ -72,7 +74,7 @@ class ChatRoomServiceTest {
     @Mock
     BookRepository bookRepository;
     @Mock
-    UserRepository userRepository;
+    UserReader userReader;
     @Mock
     ParticipantRepository participantRepository;
     @Mock
@@ -113,7 +115,7 @@ class ChatRoomServiceTest {
 
         when(bookRepository.findByIsbnAndPublishAt(any(), any())).thenReturn(
             Optional.ofNullable(mock(Book.class)));
-        when(userRepository.findById(any())).thenReturn(Optional.of(mock(User.class)));
+        when(userReader.readUser(anyLong())).thenReturn(mock(User.class));
         when(chatRoomRepository.save(any())).thenReturn(chatRoom);
 
         chatRoomService.createChatRoom(createChatRoomRequest, null, 1L);
@@ -137,7 +139,7 @@ class ChatRoomServiceTest {
 
         when(bookRepository.findByIsbnAndPublishAt(any(), any())).thenReturn(
             Optional.ofNullable(mock(Book.class)));
-        when(userRepository.findById(any())).thenReturn(Optional.of(mock(User.class)));
+        when(userReader.readUser(anyLong())).thenReturn(mock(User.class));
         when(chatRoomRepository.save(any())).thenReturn(chatRoom);
 
         chatRoomService.createChatRoom(createChatRoomRequest, image, 1L);
@@ -160,7 +162,7 @@ class ChatRoomServiceTest {
             .roomImageUri("3wVp")
             .build();
 
-        when(userRepository.findById(any())).thenReturn(Optional.of(mock(User.class)));
+        when(userReader.readUser(anyLong())).thenReturn(mock(User.class));
         when(chatRoomRepository.save(any())).thenReturn(chatRoom);
 
         chatRoomService.createChatRoom(createChatRoomRequest, null, 1L);
@@ -333,7 +335,7 @@ class ChatRoomServiceTest {
         ChatRoom chatRoom = mock(ChatRoom.class);
         ChatRoomBlockedUser blockedUser = mock(ChatRoomBlockedUser.class);
 
-        when(userRepository.findById(any())).thenReturn(Optional.ofNullable(user));
+        when(userReader.readUser(anyLong())).thenReturn(user);
         when(chatRoomRepository.findById(any())).thenReturn(Optional.ofNullable(chatRoom));
         when(chatRoomBlockedUserRepository.findByUserIdAndChatRoomId(any(), any())).thenReturn(
             Optional.ofNullable(blockedUser));
@@ -350,6 +352,7 @@ class ChatRoomServiceTest {
             .nickname("testNick")
             .profileImageUrl("testImage")
             .defaultProfileImageType(1)
+            .status(ACTIVE)
             .build();
 
         ChatRoom chatRoom = ChatRoom.builder()
@@ -365,7 +368,7 @@ class ChatRoomServiceTest {
             .build();
         chat.setCreatedAt(LocalDateTime.now());
 
-        when(userRepository.findById(any())).thenReturn(Optional.ofNullable(user));
+        when(userReader.readUser(anyLong())).thenReturn(user);
         when(chatRoomRepository.findById(any())).thenReturn(Optional.ofNullable(chatRoom));
         when(participantRepository.findWithPessimisticLockByChatRoom(any())).thenReturn(
             List.of(mock(Participant.class), mock(Participant.class), mock(Participant.class)));
@@ -396,7 +399,7 @@ class ChatRoomServiceTest {
             .build();
         chat.setCreatedAt(LocalDateTime.now());
 
-        when(userRepository.findById(any())).thenReturn(Optional.ofNullable(user));
+        when(userReader.readUser(anyLong())).thenReturn(user);
         when(chatRoomRepository.findById(any())).thenReturn(Optional.ofNullable(chatRoom));
         when(participantRepository.findWithPessimisticLockByChatRoom(any())).thenReturn(
             new ArrayList<>());

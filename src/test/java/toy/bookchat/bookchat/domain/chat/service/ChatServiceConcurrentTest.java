@@ -1,6 +1,7 @@
 package toy.bookchat.bookchat.domain.chat.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static toy.bookchat.bookchat.domain.common.Status.ACTIVE;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import java.time.LocalDate;
@@ -84,6 +85,7 @@ public class ChatServiceConcurrentTest {
                 .provider(OAuth2Provider.KAKAO)
                 .email(i + "email")
                 .name(i + "name")
+                .status(ACTIVE)
                 .build());
         }
         userRepository.saveAll(userList);
