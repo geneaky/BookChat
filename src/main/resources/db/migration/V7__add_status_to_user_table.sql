@@ -1,0 +1,1 @@
+alter table user add column (status enum('ACTIVE', 'INACTIVE') not null);

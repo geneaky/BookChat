@@ -1,5 +1,7 @@
 package toy.bookchat.bookchat.domain.user.service;
 
+import static toy.bookchat.bookchat.domain.common.Status.ACTIVE;
+
 import org.springframework.stereotype.Component;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
@@ -15,6 +17,12 @@ public class UserReader {
     }
 
     public User readUser(Long userId) {
-        return userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        return userRepository.findByIdAndStatus(userId, ACTIVE).orElseThrow(UserNotFoundException::new);
+    }
+
+    public User readUser(String oauth2MemberNumber) {
+        return userRepository.findByNameAndStatus(oauth2MemberNumber, ACTIVE)
+            .orElseThrow(UserNotFoundException::new);
+
     }
 }

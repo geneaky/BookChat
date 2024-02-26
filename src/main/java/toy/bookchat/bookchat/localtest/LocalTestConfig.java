@@ -1,5 +1,7 @@
 package toy.bookchat.bookchat.localtest;
 
+import static toy.bookchat.bookchat.domain.common.Status.ACTIVE;
+
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -42,6 +44,7 @@ public class LocalTestConfig implements JwtTokenManager {
             .provider(OAuth2Provider.GOOGLE)
             .readingTastes(List.of(ReadingTaste.DEVELOPMENT, ReadingTaste.HEALTH))
             .role(ROLE.USER)
+            .status(ACTIVE)
             .build();
         userRepository.save(user);
     }

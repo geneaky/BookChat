@@ -35,12 +35,11 @@ import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository
 import toy.bookchat.bookchat.domain.participant.service.dto.response.ChatRoomDetails;
 import toy.bookchat.bookchat.domain.storage.StorageService;
 import toy.bookchat.bookchat.domain.user.User;
-import toy.bookchat.bookchat.domain.user.repository.UserRepository;
+import toy.bookchat.bookchat.domain.user.service.UserReader;
 import toy.bookchat.bookchat.exception.badrequest.chatroom.ChatRoomIsFullException;
 import toy.bookchat.bookchat.exception.forbidden.chatroom.BlockedUserInChatRoomException;
 import toy.bookchat.bookchat.exception.notfound.chatroom.ChatRoomNotFoundException;
 import toy.bookchat.bookchat.exception.notfound.pariticipant.ParticipantNotFoundException;
-import toy.bookchat.bookchat.exception.notfound.user.UserNotFoundException;
 import toy.bookchat.bookchat.infrastructure.broker.MessagePublisher;
 import toy.bookchat.bookchat.infrastructure.broker.message.NotificationMessage;
 
@@ -54,20 +53,14 @@ public class ChatRoomService {
     private final ChatRoomHashTagRepository chatRoomHashTagRepository;
     private final StorageService storageService;
     private final BookRepository bookRepository;
-    private final UserRepository userRepository;
+    private final UserReader userReader;
     private final ChatRoomBlockedUserRepository chatRoomBlockedUserRepository;
     private final MessagePublisher messagePublisher;
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    public ChatRoomService(
-        ChatRepository chatRepository, ChatRoomRepository chatRoomRepository,
-        ParticipantRepository participantRepository,
-        HashTagRepository hashTagRepository,
-        ChatRoomHashTagRepository chatRoomHashTagRepository,
-        @Qualifier("chatRoomStorageService") StorageService storageService,
-        BookRepository bookRepository,
-        UserRepository userRepository, ChatRoomBlockedUserRepository chatRoomBlockedUserRepository,
-        MessagePublisher messagePublisher) {
+    public ChatRoomService(ChatRepository chatRepository, ChatRoomRepository chatRoomRepository, ParticipantRepository participantRepository, HashTagRepository hashTagRepository,
+        ChatRoomHashTagRepository chatRoomHashTagRepository, @Qualifier("chatRoomStorageService") StorageService storageService, BookRepository bookRepository, UserReader userReader,
+        ChatRoomBlockedUserRepository chatRoomBlockedUserRepository, MessagePublisher messagePublisher) {
         this.chatRepository = chatRepository;
         this.chatRoomRepository = chatRoomRepository;
         this.participantRepository = participantRepository;
@@ -75,7 +68,7 @@ public class ChatRoomService {
         this.chatRoomHashTagRepository = chatRoomHashTagRepository;
         this.storageService = storageService;
         this.bookRepository = bookRepository;
-        this.userRepository = userRepository;
+        this.userReader = userReader;
         this.chatRoomBlockedUserRepository = chatRoomBlockedUserRepository;
         this.messagePublisher = messagePublisher;
     }
@@ -86,7 +79,7 @@ public class ChatRoomService {
         Book book = bookRepository.findByIsbnAndPublishAt(createChatRoomRequest.getIsbn(),
                 createChatRoomRequest.getPublishAt())
             .orElseGet(() -> bookRepository.save(createChatRoomRequest.createBook()));
-        User host = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        User host = userReader.readUser(userId);
 
         if (chatRoomImageExistent(chatRoomImage)) {
             String uploadFileUrl = storageService.upload(chatRoomImage,
@@ -185,7 +178,7 @@ public class ChatRoomService {
 
     @Transactional
     public void enterChatRoom(Long userId, Long roomId) {
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        User user = userReader.readUser(userId);
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
             .orElseThrow(ChatRoomNotFoundException::new);
 

@@ -20,8 +20,7 @@ public class BookController {
     }
 
     @GetMapping("/books")
-    public BookSearchResponse getBookInformation(
-        @Valid @ModelAttribute BookSearchRequest bookSearchRequest) {
+    public BookSearchResponse getBookInformation(@Valid @ModelAttribute BookSearchRequest bookSearchRequest) {
         return bookSearchService.searchByQuery(bookSearchRequest);
     }
 }
