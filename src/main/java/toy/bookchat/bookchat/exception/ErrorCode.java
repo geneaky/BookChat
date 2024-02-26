@@ -58,6 +58,7 @@ public enum ErrorCode {
     CHAT_ROOM_NOT_FOUND(NOT_FOUND.value + CHAT_ROOM.value + "00"),
     PARTICIPANT_NOT_FOUND(NOT_FOUND.value + PARTICIPANT.value + "00"),
     AGONY_NOT_FOUND(NOT_FOUND.value + AGONY.value + "00"),
+    DEVICE_NOT_FOUND(NOT_FOUND.value + DEVICE.value + "00"),
 
     //TOO MANY REQUESTS
     RATE_OVER_LIMIT(TOO_MANY_REQUESTS.value + ETC.value + "00"),
@@ -71,7 +72,7 @@ public enum ErrorCode {
 
     //SERVICE UNAVAILABLE
     PUSH_SERVICE_FAIL(SERVICE_UNAVAILABLE.value + ETC.value + "00");
-    
+
     private final String value;
 
     ErrorCode(String value) {
