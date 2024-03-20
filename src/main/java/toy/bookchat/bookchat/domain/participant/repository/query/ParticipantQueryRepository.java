@@ -14,7 +14,7 @@ public interface ParticipantQueryRepository {
     Long countSubHostByRoomId(Long roomId);
 
     @Transactional
-    void disconnectAll(String name);
+    void disconnectAllByUserId(Long userId);
 
     @Transactional
     void connect(Long userId, String roomSid);

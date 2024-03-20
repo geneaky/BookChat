@@ -25,15 +25,13 @@ public class ChatController {
     }
 
     @MessageMapping("/send/chatrooms/{roomId}")
-    public void sendMessage(@Valid MessageDto messageDto, @UserPayload TokenPayload tokenPayload,
-        @DestinationVariable Long roomId) {
+    public void sendMessage(@Valid MessageDto messageDto, @DestinationVariable Long roomId, @UserPayload TokenPayload tokenPayload) {
         chatService.sendMessage(tokenPayload.getUserId(), roomId, messageDto);
     }
 
     @GetMapping("/v1/api/chatrooms/{roomId}/chats")
     public ChatRoomChatsResponse getChatRoomChats(@PathVariable Long roomId, Long postCursorId,
         Pageable pageable, @UserPayload TokenPayload tokenPayload) {
-        return chatService.getChatRoomChats(roomId, postCursorId, pageable,
-            tokenPayload.getUserId());
+        return chatService.getChatRoomChats(roomId, postCursorId, pageable, tokenPayload.getUserId());
     }
 }

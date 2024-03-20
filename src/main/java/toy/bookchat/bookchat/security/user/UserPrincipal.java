@@ -74,4 +74,8 @@ public class UserPrincipal implements UserDetails, Principal {
     public boolean isEnabled() {
         return true;
     }
+
+    public Long getUserId() {
+        return this.tokenPayload.getUserId();
+    }
 }

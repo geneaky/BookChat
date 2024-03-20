@@ -59,11 +59,10 @@ public class ParticipantQueryRepositoryImpl implements ParticipantQueryRepositor
     }
 
     @Override
-    public void disconnectAll(String name) {
+    public void disconnectAllByUserId(Long userId) {
         queryFactory.update(participant)
             .set(participant.isConnected, false)
-            .where(participant.user.id.eq(
-                JPAExpressions.select(user.id).from(user).where(user.name.eq(name))))
+            .where(participant.user.id.eq(userId))
             .execute();
     }
 
