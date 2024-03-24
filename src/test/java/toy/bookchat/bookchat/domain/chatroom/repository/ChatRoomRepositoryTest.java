@@ -343,6 +343,7 @@ class ChatRoomRepositoryTest {
         Chat chat5 = Chat.builder()
             .chatRoom(chatRoom1)
             .user(user1)
+            .message("test chat5")
             .build();
         chatRepository.save(chat1);
         chatRepository.save(chat2);
@@ -370,12 +371,15 @@ class ChatRoomRepositoryTest {
             .bookTitle(book.getTitle())
             .bookCoverImageUri(book.getBookCoverImageUrl())
             .bookAuthors(book.getAuthors())
+            .hostId(user1.getId())
             .hostName(user1.getNickname())
             .hostDefaultProfileImageType(user1.getDefaultProfileImageType())
             .hostProfileImageUri(user1.getProfileImageUrl())
             .tags("hashTag1,hashTag3")
+            .lastChatSenderId(chat5.getUserId())
             .lastChatId(chat5.getId())
-            .lastActiveTime(chat5.getCreatedAt())
+            .lastChatMessage(chat5.getMessage())
+            .lastChatDispatchTime(chat5.getCreatedAt())
             .build();
 
         assertThat(result.getContent()).isEqualTo(List.of(expect));

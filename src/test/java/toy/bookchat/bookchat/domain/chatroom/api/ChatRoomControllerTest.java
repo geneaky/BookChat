@@ -128,8 +128,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                     fieldWithPath("bookRequest.isbn").type(STRING).description("ISBN 번호"),
                     fieldWithPath("bookRequest.title").type(STRING).description("책 제목"),
                     fieldWithPath("bookRequest.publisher").type(STRING).description("출판사"),
-                    fieldWithPath("bookRequest.bookCoverImageUrl").type(STRING)
-                        .description("책 표지 이미지 url"),
+                    fieldWithPath("bookRequest.bookCoverImageUrl").type(STRING).description("책 표지 이미지 url"),
                     fieldWithPath("bookRequest.authors").type(ARRAY).description("저자 목록"),
                     fieldWithPath("bookRequest.publishAt").type(STRING).description("출판일")
                 ),
@@ -265,7 +264,6 @@ class ChatRoomControllerTest extends ControllerTestExtension {
 
     @Test
     void 전체_채팅방_목록에서_검색_성공() throws Exception {
-
         ChatRoomResponse chatRoomResponse1 = ChatRoomResponse.builder()
             .roomId(1L)
             .roomSid("Dhb")
@@ -276,13 +274,16 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .bookTitle("book1")
             .bookAuthors(List.of("author1", "author2", "author3"))
             .bookCoverImageUri("book1CoverImage@s3")
+            .hostId(1L)
             .hostName("host1")
             .hostDefaultProfileImageType(1)
             .hostProfileImageUri("host1ProfileImage@s3")
             .defaultRoomImageType(1)
+            .lastChatSenderId(1L)
             .lastChatId(1L)
+            .lastChatMessage("lastChatMessage")
             .tags("tag1,tag2,tag3")
-            .lastActiveTime(LocalDateTime.now())
+            .lastChatDispatchTime(LocalDateTime.now())
             .build();
         ChatRoomResponse chatRoomResponse2 = ChatRoomResponse.builder()
             .roomId(2L)
@@ -292,15 +293,18 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .bookTitle("book2")
             .bookAuthors(List.of("author4", "author5", "author6"))
             .bookCoverImageUri("book2CoverImage@s3")
+            .hostId(2L)
             .hostName("host2")
             .hostDefaultProfileImageType(2)
             .hostProfileImageUri("host2ProfileImage@s3")
             .roomMemberCount(100L)
             .roomSize(100)
             .defaultRoomImageType(3)
+            .lastChatSenderId(3L)
             .lastChatId(2L)
+            .lastChatMessage("lastChatMessage2")
             .tags("tag4,tag2,tag3")
-            .lastActiveTime(LocalDateTime.now())
+            .lastChatDispatchTime(LocalDateTime.now())
             .build();
         ChatRoomResponse chatRoomResponse3 = ChatRoomResponse.builder()
             .roomId(3L)
@@ -312,13 +316,16 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .bookTitle("book3")
             .bookAuthors(List.of("author7", "author8", "author9"))
             .bookCoverImageUri("book3CoverImage@s3")
+            .hostId(203L)
             .hostName("host3")
             .hostDefaultProfileImageType(3)
             .hostProfileImageUri("host3ProfileImage@s3")
             .defaultRoomImageType(2)
+            .lastChatSenderId(8391L)
             .lastChatId(4L)
+            .lastChatMessage("lastChatMessage3")
             .tags("tag1,tag5,tag6")
-            .lastActiveTime(LocalDateTime.now())
+            .lastChatDispatchTime(LocalDateTime.now())
             .build();
 
         List<ChatRoomResponse> contents = List.of(chatRoomResponse1, chatRoomResponse2,
@@ -354,38 +361,25 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                     parameterWithName("tags").optional().description("채팅방 TAG")
                 ),
                 responseFields(
-                    fieldWithPath("chatRoomResponseList[].roomId").type(NUMBER)
-                        .description("채팅방 ID"),
-                    fieldWithPath("chatRoomResponseList[].roomName").type(STRING)
-                        .description("채팅방 이름"),
-                    fieldWithPath("chatRoomResponseList[].roomSid").type(STRING)
-                        .description("채팅방 SID"),
-                    fieldWithPath("chatRoomResponseList[].bookTitle").type(STRING)
-                        .description("책 제목"),
-                    fieldWithPath("chatRoomResponseList[].bookCoverImageUri").type(STRING)
-                        .description("책 커버 이미지 URI"),
-                    fieldWithPath("chatRoomResponseList[].bookAuthors[]").type(ARRAY)
-                        .description("책 저자"),
-                    fieldWithPath("chatRoomResponseList[].hostName").type(STRING)
-                        .description("방장 닉네임"),
-                    fieldWithPath("chatRoomResponseList[].hostDefaultProfileImageType").type(NUMBER)
-                        .description("방장 기본 프로필이미지 타입"),
-                    fieldWithPath("chatRoomResponseList[].hostProfileImageUri").type(STRING)
-                        .description("방장 프로필이미지"),
-                    fieldWithPath("chatRoomResponseList[].roomMemberCount").type(NUMBER)
-                        .description("채팅방 현재 인원수"),
-                    fieldWithPath("chatRoomResponseList[].roomSize").type(NUMBER)
-                        .description("채팅방 정원"),
-                    fieldWithPath("chatRoomResponseList[].defaultRoomImageType").type(NUMBER)
-                        .description("기본 이미지 타입 번호"),
-                    fieldWithPath("chatRoomResponseList[].roomImageUri").optional().type(STRING)
-                        .description("채팅방 이미지 URI"),
-                    fieldWithPath("chatRoomResponseList[].tags").optional().type(STRING)
-                        .description("채팅방 TAG"),
-                    fieldWithPath("chatRoomResponseList[].lastChatId").type(NUMBER)
-                        .description("마지막 채팅 ID"),
-                    fieldWithPath("chatRoomResponseList[].lastActiveTime").type(STRING)
-                        .description("마지막 채팅 활성 시간")
+                    fieldWithPath("chatRoomResponseList[].roomId").type(NUMBER).description("채팅방 ID"),
+                    fieldWithPath("chatRoomResponseList[].roomName").type(STRING).description("채팅방 이름"),
+                    fieldWithPath("chatRoomResponseList[].roomSid").type(STRING).description("채팅방 SID"),
+                    fieldWithPath("chatRoomResponseList[].bookTitle").type(STRING).description("책 제목"),
+                    fieldWithPath("chatRoomResponseList[].bookCoverImageUri").type(STRING).description("책 커버 이미지 URI"),
+                    fieldWithPath("chatRoomResponseList[].bookAuthors[]").type(ARRAY).description("책 저자"),
+                    fieldWithPath("chatRoomResponseList[].hostId").type(NUMBER).description("방장 ID"),
+                    fieldWithPath("chatRoomResponseList[].hostName").type(STRING).description("방장 닉네임"),
+                    fieldWithPath("chatRoomResponseList[].hostDefaultProfileImageType").type(NUMBER).description("방장 기본 프로필이미지 타입"),
+                    fieldWithPath("chatRoomResponseList[].hostProfileImageUri").type(STRING).description("방장 프로필이미지"),
+                    fieldWithPath("chatRoomResponseList[].roomMemberCount").type(NUMBER).description("채팅방 현재 인원수"),
+                    fieldWithPath("chatRoomResponseList[].roomSize").type(NUMBER).description("채팅방 정원"),
+                    fieldWithPath("chatRoomResponseList[].defaultRoomImageType").type(NUMBER).description("기본 이미지 타입 번호"),
+                    fieldWithPath("chatRoomResponseList[].roomImageUri").optional().type(STRING).description("채팅방 이미지 URI"),
+                    fieldWithPath("chatRoomResponseList[].tags").optional().type(STRING).description("채팅방 TAG"),
+                    fieldWithPath("chatRoomResponseList[].lastChatSenderId").type(NUMBER).description("마지막 채팅 보낸 사람 ID"),
+                    fieldWithPath("chatRoomResponseList[].lastChatId").type(NUMBER).description("마지막 채팅 ID"),
+                    fieldWithPath("chatRoomResponseList[].lastChatMessage").type(STRING).description("마지막 채팅 내용"),
+                    fieldWithPath("chatRoomResponseList[].lastChatDispatchTime").type(STRING).description("마지막 채팅 발송 시간")
                 ).and(getCursorField())));
     }
 
