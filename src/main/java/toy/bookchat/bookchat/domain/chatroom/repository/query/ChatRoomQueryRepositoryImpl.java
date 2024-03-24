@@ -132,6 +132,7 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
                     chatRoom.roomSid,
                     book.title,
                     book.bookCoverImageUrl,
+                    chatRoom.host.id,
                     chatRoom.host.nickname,
                     chatRoom.host.defaultProfileImageType,
                     chatRoom.host.profileImageUrl,
@@ -142,7 +143,9 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
                     chatRoom.defaultRoomImageType,
                     chatRoom.roomImageUri,
                     Expressions.stringTemplate("group_concat({0})", hashTag.tagName),
+                    chat.user.id,
                     chat.id,
+                    chat.message,
                     chat.createdAt))
             .from(chatRoom)
             .join(user).on(chatRoom.host.id.eq(user.id))

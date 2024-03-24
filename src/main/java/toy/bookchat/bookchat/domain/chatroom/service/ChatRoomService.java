@@ -74,18 +74,14 @@ public class ChatRoomService {
     }
 
     @Transactional
-    public CreatedChatRoomDto createChatRoom(CreateChatRoomRequest createChatRoomRequest,
-        MultipartFile chatRoomImage, Long userId) {
-        Book book = bookRepository.findByIsbnAndPublishAt(createChatRoomRequest.getIsbn(),
-                createChatRoomRequest.getPublishAt())
+    public CreatedChatRoomDto createChatRoom(CreateChatRoomRequest createChatRoomRequest, MultipartFile chatRoomImage, Long userId) {
+        Book book = bookRepository.findByIsbnAndPublishAt(createChatRoomRequest.getIsbn(), createChatRoomRequest.getPublishAt())
             .orElseGet(() -> bookRepository.save(createChatRoomRequest.createBook()));
         User host = userReader.readUser(userId);
 
         if (chatRoomImageExistent(chatRoomImage)) {
-            String uploadFileUrl = storageService.upload(chatRoomImage,
-                UUID.randomUUID().toString(), LocalDateTime.now().format(dateTimeFormatter));
-            return CreatedChatRoomDto.of(
-                registerChatRoom(createChatRoomRequest, book, host, uploadFileUrl));
+            String uploadFileUrl = storageService.upload(chatRoomImage, UUID.randomUUID().toString(), LocalDateTime.now().format(dateTimeFormatter));
+            return CreatedChatRoomDto.of(registerChatRoom(createChatRoomRequest, book, host, uploadFileUrl));
         }
         return CreatedChatRoomDto.of(registerChatRoom(createChatRoomRequest, book, host, null));
     }
@@ -94,18 +90,14 @@ public class ChatRoomService {
         return chatRoomImage != null;
     }
 
-    private ChatRoom registerChatRoom(CreateChatRoomRequest createChatRoomRequest, Book book,
-        User host, String prefixedUUIDFileUrl) {
-        ChatRoom chatRoom;
-        chatRoom = saveChatRoom(createChatRoomRequest, book, host, prefixedUUIDFileUrl);
+    private ChatRoom registerChatRoom(CreateChatRoomRequest createChatRoomRequest, Book book, User host, String prefixedUUIDFileUrl) {
+        ChatRoom chatRoom = saveChatRoom(createChatRoomRequest, book, host, prefixedUUIDFileUrl);
         registerHashTagOnChatRoom(createChatRoomRequest, chatRoom);
         return chatRoom;
     }
 
-    private ChatRoom saveChatRoom(CreateChatRoomRequest createChatRoomRequest,
-        Book book, User host, String fileUrl) {
-        ChatRoom chatRoom = chatRoomRepository.save(
-            createChatRoomRequest.makeChatRoom(book, host, fileUrl));
+    private ChatRoom saveChatRoom(CreateChatRoomRequest createChatRoomRequest, Book book, User host, String fileUrl) {
+        ChatRoom chatRoom = chatRoomRepository.save(createChatRoomRequest.makeChatRoom(book, host, fileUrl));
         saveParticipantWithRoomHostAndRoom(host, chatRoom);
         return chatRoom;
     }
@@ -119,8 +111,7 @@ public class ChatRoomService {
         participantRepository.save(participant);
     }
 
-    private void registerHashTagOnChatRoom(CreateChatRoomRequest createChatRoomRequest,
-        ChatRoom chatRoom) {
+    private void registerHashTagOnChatRoom(CreateChatRoomRequest createChatRoomRequest, ChatRoom chatRoom) {
         createChatRoomRequest.getHashTags().stream()
             .map(tagName -> hashTagRepository.findByTagName(tagName)
                 .orElseGet(() -> hashTagRepository.save(HashTag.of(tagName))))
@@ -129,17 +120,13 @@ public class ChatRoomService {
     }
 
     @Transactional(readOnly = true)
-    public UserChatRoomsResponseSlice getUserChatRooms(Long bookId, Long postCursorId,
-        Pageable pageable, Long userId) {
-        return UserChatRoomsResponseSlice.of(
-            chatRoomRepository.findUserChatRoomsWithLastChat(pageable, bookId, postCursorId,
-                userId));
+    public UserChatRoomsResponseSlice getUserChatRooms(Long bookId, Long postCursorId, Pageable pageable, Long userId) {
+        return UserChatRoomsResponseSlice.of(chatRoomRepository.findUserChatRoomsWithLastChat(pageable, bookId, postCursorId, userId));
     }
 
     @Transactional(readOnly = true)
     public ChatRoomsResponseSlice getChatRooms(ChatRoomRequest chatRoomRequest, Pageable pageable) {
-        return ChatRoomsResponseSlice.of(
-            chatRoomRepository.findChatRooms(chatRoomRequest, pageable));
+        return ChatRoomsResponseSlice.of(chatRoomRepository.findChatRooms(chatRoomRequest, pageable));
     }
 
     @Transactional(readOnly = true)
@@ -148,22 +135,18 @@ public class ChatRoomService {
     }
 
     @Transactional
-    public void reviseChatRoom(ReviseChatRoomRequest reviseChatRoomRequest,
-        MultipartFile chatRoomImage, Long userId) {
-        ChatRoom chatRoom = chatRoomRepository.findChatRoomByIdAndHostId(
-            reviseChatRoomRequest.getRoomId(), userId).orElseThrow(ChatRoomNotFoundException::new);
+    public void reviseChatRoom(ReviseChatRoomRequest reviseChatRoomRequest, MultipartFile chatRoomImage, Long userId) {
+        ChatRoom chatRoom = chatRoomRepository.findChatRoomByIdAndHostId(reviseChatRoomRequest.getRoomId(), userId).orElseThrow(ChatRoomNotFoundException::new);
 
         updateIfChatRoomHashTagsPresent(reviseChatRoomRequest, chatRoom);
         if (chatRoomImageExistent(chatRoomImage)) {
-            String roomImageUri = storageService.upload(chatRoomImage,
-                UUID.randomUUID().toString(), LocalDateTime.now().format(dateTimeFormatter));
+            String roomImageUri = storageService.upload(chatRoomImage, UUID.randomUUID().toString(), LocalDateTime.now().format(dateTimeFormatter));
             chatRoom.changeRoomImageUri(roomImageUri);
         }
         reviseChatRoomRequest.reviseChatRoom(chatRoom);
     }
 
-    private void updateIfChatRoomHashTagsPresent(ReviseChatRoomRequest reviseChatRoomRequest,
-        ChatRoom chatRoom) {
+    private void updateIfChatRoomHashTagsPresent(ReviseChatRoomRequest reviseChatRoomRequest, ChatRoom chatRoom) {
         if (reviseChatRoomRequest.tagExistent()) {
             chatRoomHashTagRepository.deleteAllByChatRoom(chatRoom);
 
@@ -171,7 +154,8 @@ public class ChatRoomService {
             hashTagRepository.saveAll(hashTags);
 
             List<ChatRoomHashTag> chatRoomHashTags = hashTags.stream()
-                .map(ht -> ChatRoomHashTag.of(chatRoom, ht)).collect(Collectors.toList());
+                .map(ht -> ChatRoomHashTag.of(chatRoom, ht))
+                .collect(Collectors.toList());
             chatRoomHashTagRepository.saveAll(chatRoomHashTags);
         }
     }
@@ -179,8 +163,7 @@ public class ChatRoomService {
     @Transactional
     public void enterChatRoom(Long userId, Long roomId) {
         User user = userReader.readUser(userId);
-        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
-            .orElseThrow(ChatRoomNotFoundException::new);
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId).orElseThrow(ChatRoomNotFoundException::new);
 
         if (chatRoom.getHost() != user) {
             checkIsBlockedUser(user, chatRoom);
@@ -203,8 +186,7 @@ public class ChatRoomService {
     }
 
     private void checkIsFullChatRoom(ChatRoom chatRoom) {
-        List<Participant> participants = participantRepository.findWithPessimisticLockByChatRoom(
-            chatRoom);
+        List<Participant> participants = participantRepository.findWithPessimisticLockByChatRoom(chatRoom);
 
         if (chatRoom.getRoomSize() <= participants.size()) {
             throw new ChatRoomIsFullException();
@@ -231,8 +213,7 @@ public class ChatRoomService {
             participantRepository.deleteByChatRoom(chatRoom);
             chatRoomRepository.delete(chatRoom);
 
-            messagePublisher.sendNotificationMessage(chatRoom.getRoomSid(),
-                NotificationMessage.createHostExitMessage());
+            messagePublisher.sendNotificationMessage(chatRoom.getRoomSid(), NotificationMessage.createHostExitMessage());
             return;
         }
 
@@ -242,7 +223,6 @@ public class ChatRoomService {
             .build());
 
         participantRepository.delete(participant);
-        messagePublisher.sendNotificationMessage(chatRoom.getRoomSid(),
-            NotificationMessage.createExitMessage(chat, user.getId()));
+        messagePublisher.sendNotificationMessage(chatRoom.getRoomSid(), NotificationMessage.createExitMessage(chat, user.getId()));
     }
 }

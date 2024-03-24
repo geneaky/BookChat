@@ -16,6 +16,7 @@ public class ChatRoomResponse {
     private String bookTitle;
     private String bookCoverImageUri;
     private List<String> bookAuthors;
+    private Long hostId;
     private String hostName;
     private Integer hostDefaultProfileImageType;
     private String hostProfileImageUri;
@@ -24,21 +25,24 @@ public class ChatRoomResponse {
     private Integer defaultRoomImageType;
     private String roomImageUri;
     private String tags;
+    private Long lastChatSenderId;
     private Long lastChatId;
-    private LocalDateTime lastActiveTime;
+    private String lastChatMessage;
+    private LocalDateTime lastChatDispatchTime;
 
     @Builder
     public ChatRoomResponse(Long roomId, String roomName, String roomSid,
-        String bookTitle, String bookCoverImageUri, List<String> bookAuthors, String hostName,
+        String bookTitle, String bookCoverImageUri, List<String> bookAuthors, Long hostId, String hostName,
         Integer hostDefaultProfileImageType, String hostProfileImageUri, Long roomMemberCount,
         Integer roomSize, Integer defaultRoomImageType,
-        String roomImageUri, String tags, Long lastChatId, LocalDateTime lastActiveTime) {
+        String roomImageUri, String tags, Long lastChatSenderId, Long lastChatId, String lastChatMessage, LocalDateTime lastChatDispatchTime) {
         this.roomId = roomId;
         this.roomName = roomName;
         this.roomSid = roomSid;
         this.bookTitle = bookTitle;
         this.bookCoverImageUri = bookCoverImageUri;
         this.bookAuthors = bookAuthors;
+        this.hostId = hostId;
         this.hostName = hostName;
         this.hostDefaultProfileImageType = hostDefaultProfileImageType;
         this.hostProfileImageUri = hostProfileImageUri;
@@ -47,21 +51,24 @@ public class ChatRoomResponse {
         this.defaultRoomImageType = defaultRoomImageType;
         this.roomImageUri = roomImageUri;
         this.tags = tags;
+        this.lastChatSenderId = lastChatSenderId;
         this.lastChatId = lastChatId;
-        this.lastActiveTime = lastActiveTime;
+        this.lastChatMessage = lastChatMessage;
+        this.lastChatDispatchTime = lastChatDispatchTime;
     }
 
     @Builder
     public ChatRoomResponse(Long roomId, String roomName, String roomSid,
-        String bookTitle, String bookCoverImageUri, String hostName,
+        String bookTitle, String bookCoverImageUri, Long hostId, String hostName,
         Integer hostDefaultProfileImageType, String hostProfileImageUri, Long roomMemberCount,
         Integer roomSize, Integer defaultRoomImageType,
-        String roomImageUri, String tags, Long lastChatId, LocalDateTime lastActiveTime) {
+        String roomImageUri, String tags, Long lastChatSenderId, Long lastChatId, String lastChatMessage, LocalDateTime lastChatDispatchTime) {
         this.roomId = roomId;
         this.roomName = roomName;
         this.roomSid = roomSid;
         this.bookTitle = bookTitle;
         this.bookCoverImageUri = bookCoverImageUri;
+        this.hostId = hostId;
         this.hostName = hostName;
         this.hostDefaultProfileImageType = hostDefaultProfileImageType;
         this.hostProfileImageUri = hostProfileImageUri;
@@ -70,8 +77,10 @@ public class ChatRoomResponse {
         this.defaultRoomImageType = defaultRoomImageType;
         this.roomImageUri = roomImageUri;
         this.tags = tags;
+        this.lastChatSenderId = lastChatSenderId;
         this.lastChatId = lastChatId;
-        this.lastActiveTime = lastActiveTime;
+        this.lastChatMessage = lastChatMessage;
+        this.lastChatDispatchTime = lastChatDispatchTime;
     }
 
     public void setBookAuthors(List<String> bookAuthors) {

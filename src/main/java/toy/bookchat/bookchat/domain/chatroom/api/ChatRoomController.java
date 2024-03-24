@@ -37,12 +37,9 @@ public class ChatRoomController {
     }
 
     @PostMapping("/chatrooms")
-    public ResponseEntity<Void> createChatRoom(
-        @Valid @RequestPart CreateChatRoomRequest createChatRoomRequest,
-        @RequestPart(required = false) MultipartFile chatRoomImage,
+    public ResponseEntity<Void> createChatRoom(@Valid @RequestPart CreateChatRoomRequest createChatRoomRequest, @RequestPart(required = false) MultipartFile chatRoomImage,
         @UserPayload TokenPayload tokenPayload) {
-        CreatedChatRoomDto createdChatRoomDto = chatRoomService.createChatRoom(
-            createChatRoomRequest, chatRoomImage, tokenPayload.getUserId());
+        CreatedChatRoomDto createdChatRoomDto = chatRoomService.createChatRoom(createChatRoomRequest, chatRoomImage, tokenPayload.getUserId());
 
         return ResponseEntity.status(HttpStatus.CREATED)
             .headers(hs -> hs.setLocation(URI.create("/topic/" + createdChatRoomDto.getRoomSid())))
@@ -52,29 +49,23 @@ public class ChatRoomController {
     }
 
     @GetMapping("/users/chatrooms")
-    public UserChatRoomsResponseSlice getUserChatRooms(Long bookId, Long postCursorId,
-        Pageable pageable, @UserPayload TokenPayload tokenPayload) {
-        return chatRoomService.getUserChatRooms(bookId, postCursorId, pageable,
-            tokenPayload.getUserId());
+    public UserChatRoomsResponseSlice getUserChatRooms(Long bookId, Long postCursorId, Pageable pageable, @UserPayload TokenPayload tokenPayload) {
+        return chatRoomService.getUserChatRooms(bookId, postCursorId, pageable, tokenPayload.getUserId());
     }
 
     @GetMapping("/chatrooms")
-    public ChatRoomsResponseSlice getChatRooms(@ModelAttribute ChatRoomRequest chatRoomRequest,
-        Pageable pageable) {
+    public ChatRoomsResponseSlice getChatRooms(@ModelAttribute ChatRoomRequest chatRoomRequest, Pageable pageable) {
         chatRoomRequest.validate();
         return chatRoomService.getChatRooms(chatRoomRequest, pageable);
     }
 
     @GetMapping("/chatrooms/{roomId}")
-    public ChatRoomDetails getChatRoomDetails(@PathVariable Long roomId,
-        @UserPayload TokenPayload tokenPayload) {
+    public ChatRoomDetails getChatRoomDetails(@PathVariable Long roomId, @UserPayload TokenPayload tokenPayload) {
         return chatRoomService.getChatRoomDetails(roomId, tokenPayload.getUserId());
     }
 
     @PostMapping("/chatrooms/{roomId}")
-    public void reviseChatRoom(@Valid @RequestPart ReviseChatRoomRequest reviseChatRoomRequest,
-        @RequestPart(required = false) MultipartFile chatRoomImage,
-        @UserPayload TokenPayload tokenPayload) {
+    public void reviseChatRoom(@Valid @RequestPart ReviseChatRoomRequest reviseChatRoomRequest, @RequestPart(required = false) MultipartFile chatRoomImage, @UserPayload TokenPayload tokenPayload) {
         chatRoomService.reviseChatRoom(reviseChatRoomRequest, chatRoomImage,
             tokenPayload.getUserId());
     }
