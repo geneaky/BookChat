@@ -5093,14 +5093,6 @@ Content-Type: application/json
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Location</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">채팅방 접속 Connection Url</p></td>
 </tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>RoomId</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">채팅방 Id</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>RoomImageUri</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">채팅방 이미지 uri</p></td>
-</tr>
 </tbody>
 </table>
 <div class="paragraph">
@@ -5109,9 +5101,7 @@ Content-Type: application/json
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 201 Created
-Location: /topic/d620c11d-d668-4f9e-a487-e1ba7d2dc222
-RoomId: 1
-RoomImageUri: roomImage@s3.com
+Location: /v1/api/chatrooms/1
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 1; mode=block
 Cache-Control: no-cache, no-store, max-age=0, must-revalidate
