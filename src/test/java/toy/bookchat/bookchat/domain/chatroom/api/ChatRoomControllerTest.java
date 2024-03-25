@@ -133,9 +133,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                     fieldWithPath("bookRequest.publishAt").type(STRING).description("출판일")
                 ),
                 responseHeaders(
-                    headerWithName(LOCATION).description("채팅방 접속 Connection Url"),
-                    headerWithName("RoomId").description("채팅방 Id"),
-                    headerWithName("RoomImageUri").description("채팅방 이미지 uri")
+                    headerWithName(LOCATION).description("채팅방 접속 Connection Url")
                 )));
 
         verify(chatRoomService).createChatRoom(any(), any(), any());
