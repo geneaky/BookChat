@@ -42,9 +42,7 @@ public class ChatRoomController {
         CreatedChatRoomDto createdChatRoomDto = chatRoomService.createChatRoom(createChatRoomRequest, chatRoomImage, tokenPayload.getUserId());
 
         return ResponseEntity.status(HttpStatus.CREATED)
-            .headers(hs -> hs.setLocation(URI.create("/topic/" + createdChatRoomDto.getRoomSid())))
-            .headers(hs -> hs.set("RoomId", createdChatRoomDto.getRoomId()))
-            .headers(hs -> hs.set("RoomImageUri", createdChatRoomDto.getRoomImageUri()))
+            .headers(hs -> hs.setLocation(URI.create("/v1/api/chatrooms/" + createdChatRoomDto.getRoomId())))
             .build();
     }
 
