@@ -156,8 +156,13 @@ class ChatRoomRepositoryTest {
             .bookTitle(chatRoom3.getBookTitle())
             .bookCoverImageUrl(chatRoom3.getBookCoverImageUrl())
             .bookAuthors(chatRoom3.getBookAuthors())
+            .senderId(chat4.getUserId())
+            .senderNickname(chat4.getUserNickname())
+            .senderProfileImageUrl(chat4.getUserProfileImageUrl())
+            .senderDefaultProfileImageType(chat4.getUserDefaultProfileImageType())
             .lastChatId(chat4.getId())
             .lastChatContent(chat4.getMessage())
+            .lastChatDispatchTime(chat4.getCreatedAt())
             .build();
 
         UserChatRoomResponse userChatRoomResponse2 = UserChatRoomResponse.builder()
@@ -168,8 +173,13 @@ class ChatRoomRepositoryTest {
             .bookTitle(chatRoom2.getBookTitle())
             .bookCoverImageUrl(chatRoom2.getBookCoverImageUrl())
             .bookAuthors(chatRoom2.getBookAuthors())
+            .senderId(chat2.getUserId())
+            .senderNickname(chat2.getUserNickname())
+            .senderProfileImageUrl(chat2.getUserProfileImageUrl())
+            .senderDefaultProfileImageType(chat2.getUserDefaultProfileImageType())
             .lastChatId(chat2.getId())
             .lastChatContent(chat2.getMessage())
+            .lastChatDispatchTime(chat2.getCreatedAt())
             .build();
 
         PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("id").descending());
@@ -187,8 +197,7 @@ class ChatRoomRepositoryTest {
     void 사용자_채팅방_조회_책_id_있는경우_연관된_채팅방만_조회_성공() throws Exception {
         User user1 = User.builder().build();
         User user2 = User.builder().build();
-        userRepository.save(user1);
-        userRepository.save(user2);
+        userRepository.saveAll(List.of(user1, user2));
 
         Book book1 = Book.builder()
             .isbn("12329763345")
@@ -198,8 +207,7 @@ class ChatRoomRepositoryTest {
             .isbn("12329724525")
             .publishAt(LocalDate.now())
             .build();
-        bookRepository.save(book1);
-        bookRepository.save(book2);
+        bookRepository.saveAll(List.of(book1, book2));
 
         ChatRoom chatRoom1 = ChatRoom.builder()
             .book(book1)
@@ -222,9 +230,7 @@ class ChatRoomRepositoryTest {
             .roomSize(38)
             .defaultRoomImageType(3)
             .build();
-        chatRoomRepository.save(chatRoom1);
-        chatRoomRepository.save(chatRoom2);
-        chatRoomRepository.save(chatRoom3);
+        chatRoomRepository.saveAll(List.of(chatRoom1, chatRoom2, chatRoom3));
 
         Participant participant1 = Participant.builder().user(user1).chatRoom(chatRoom1)
             .participantStatus(HOST).build();
@@ -234,10 +240,7 @@ class ChatRoomRepositoryTest {
             .participantStatus(SUBHOST).build();
         Participant participant4 = Participant.builder().user(user2).chatRoom(chatRoom3)
             .participantStatus(GUEST).build();
-        participantRepository.save(participant1);
-        participantRepository.save(participant2);
-        participantRepository.save(participant3);
-        participantRepository.save(participant4);
+        participantRepository.saveAll(List.of(participant1, participant2, participant3, participant4));
 
         UserChatRoomResponse userChatRoomResponse1 = UserChatRoomResponse.builder()
             .roomId(chatRoom1.getId())
@@ -247,8 +250,7 @@ class ChatRoomRepositoryTest {
             .build();
 
         PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("id").ascending());
-        Slice<UserChatRoomResponse> slice = chatRoomRepository.findUserChatRoomsWithLastChat(
-            pageRequest, book1.getId(), chatRoom3.getId(), user1.getId());
+        Slice<UserChatRoomResponse> slice = chatRoomRepository.findUserChatRoomsWithLastChat(pageRequest, book1.getId(), chatRoom3.getId(), user1.getId());
 
         assertThat(slice.getContent()).containsOnly(userChatRoomResponse1);
     }

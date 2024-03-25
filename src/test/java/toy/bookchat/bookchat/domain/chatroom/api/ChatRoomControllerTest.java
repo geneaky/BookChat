@@ -237,28 +237,22 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                     parameterWithName("size").optional().description("페이지 사이즈")
                 ),
                 responseFields(
-                    fieldWithPath("userChatRoomResponseList[].roomId").type(NUMBER)
-                        .description("채팅방 ID"),
-                    fieldWithPath("userChatRoomResponseList[].roomName").type(STRING)
-                        .description("채팅방 이름"),
-                    fieldWithPath("userChatRoomResponseList[].roomSid").type(STRING)
-                        .description("채팅방 SID"),
-                    fieldWithPath("userChatRoomResponseList[].roomMemberCount").type(NUMBER)
-                        .description("채팅방 현재 인원수"),
-                    fieldWithPath("userChatRoomResponseList[].defaultRoomImageType").type(NUMBER)
-                        .description("기본 이미지 타입 번호"),
-                    fieldWithPath("userChatRoomResponseList[].roomImageUri").optional().type(STRING)
-                        .description("채팅방 이미지 URI"),
-                    fieldWithPath("userChatRoomResponseList[].bookTitle").type(STRING)
-                        .description("책 제목"),
-                    fieldWithPath("userChatRoomResponseList[].bookCoverImageUrl").type(STRING)
-                        .description("책 커버 이미지"),
-                    fieldWithPath("userChatRoomResponseList[].bookAuthors[]").type(ARRAY)
-                        .description("책 저자"),
-                    fieldWithPath("userChatRoomResponseList[].lastChatId").type(NUMBER)
-                        .description("마지막 채팅 ID"),
-                    fieldWithPath("userChatRoomResponseList[].lastChatContent").type(STRING)
-                        .description("마지막 채팅 내용")
+                    fieldWithPath("userChatRoomResponseList[].roomId").type(NUMBER).description("채팅방 ID"),
+                    fieldWithPath("userChatRoomResponseList[].roomName").type(STRING).description("채팅방 이름"),
+                    fieldWithPath("userChatRoomResponseList[].roomSid").type(STRING).description("채팅방 SID"),
+                    fieldWithPath("userChatRoomResponseList[].roomMemberCount").type(NUMBER).description("채팅방 현재 인원수"),
+                    fieldWithPath("userChatRoomResponseList[].defaultRoomImageType").type(NUMBER).description("기본 이미지 타입 번호"),
+                    fieldWithPath("userChatRoomResponseList[].roomImageUri").optional().type(STRING).description("채팅방 이미지 URI"),
+                    fieldWithPath("userChatRoomResponseList[].bookTitle").type(STRING).description("책 제목"),
+                    fieldWithPath("userChatRoomResponseList[].bookCoverImageUrl").type(STRING).description("책 커버 이미지"),
+                    fieldWithPath("userChatRoomResponseList[].bookAuthors[]").type(ARRAY).description("책 저자"),
+                    fieldWithPath("userChatRoomResponseList[].senderId").type(NUMBER).description("마지막 채팅 보낸 사람 ID"),
+                    fieldWithPath("userChatRoomResponseList[].senderNickname").type(STRING).description("마지막 채팅 보낸 사람 닉네임"),
+                    fieldWithPath("userChatRoomResponseList[].senderProfileImageUrl").optional().type(STRING).description("마지막 채팅 보낸 사람 프로필 이미지"),
+                    fieldWithPath("userChatRoomResponseList[].senderDefaultProfileImageType").type(NUMBER).description("마지막 채팅 보낸 사람 기본 프로필 이미지 타입"),
+                    fieldWithPath("userChatRoomResponseList[].lastChatId").type(NUMBER).description("마지막 채팅 ID"),
+                    fieldWithPath("userChatRoomResponseList[].lastChatContent").type(STRING).description("마지막 채팅 내용"),
+                    fieldWithPath("userChatRoomResponseList[].lastChatDispatchTime").type(STRING).description("마지막 채팅 발송 시간")
                 ).and(getCursorField())));
     }
 
@@ -551,8 +545,13 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .bookTitle(chatRoom.getBookTitle())
             .bookCoverImageUrl(chatRoom.getBookCoverImageUrl())
             .bookAuthors(chatRoom.getBookAuthors())
+            .senderId(1L)
+            .senderNickname("sender Nickname")
+            .senderProfileImageUrl("sender Profile Image Url")
+            .senderDefaultProfileImageType(3)
             .lastChatId(chat.getId())
             .lastChatContent(chat.getMessage())
+            .lastChatDispatchTime(LocalDateTime.now())
             .build();
     }
 }
