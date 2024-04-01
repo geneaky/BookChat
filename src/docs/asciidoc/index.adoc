@@ -775,6 +775,24 @@ include::{snippets}/get-user-chatrooms/http-response.adoc[]
 
 ---
 
+=== FCM 응답 조회 : 사용자 채팅방 상세 조회
+
+`Request Header`
+
+include::{snippets}/get-user-chatroom-detail/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/get-user-chatroom-detail/path-parameters.adoc[]
+include::{snippets}/get-user-chatroom-detail/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/get-user-chatroom-detail/response-fields.adoc[]
+include::{snippets}/get-user-chatroom-detail/http-response.adoc[]
+
+---
+
 === 전체 채팅방 조회
 
 `Request Header`
@@ -882,7 +900,7 @@ include::{snippets}/delete-participant/http-response.adoc[]
 
 == 채팅
 
-=== 채팅 단 건 상세 조회
+=== FCM 응답 조회 : 채팅 단 건 상세 조회
 
 `Request Header`
 
