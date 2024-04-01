@@ -1,9 +1,11 @@
 package toy.bookchat.bookchat.domain.participant.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.GUEST;
 import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.HOST;
 import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.SUBHOST;
 
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import toy.bookchat.bookchat.domain.RepositoryTest;
@@ -94,5 +96,33 @@ class ParticipantRepositoryTest {
         Long memberOfSubHost = participantRepository.countSubHostByRoomId(chatRoom.getId());
 
         assertThat(memberOfSubHost).isEqualTo(1);
+    }
+
+    @Test
+    void 채팅방에_접속한_참여자수_조회_성공() throws Exception {
+        ChatRoom chatRoom = ChatRoom.builder()
+            .roomSid("KUor")
+            .roomSize(655)
+            .defaultRoomImageType(1)
+            .build();
+        chatRoomRepository.save(chatRoom);
+
+        Participant participant1 = Participant.builder()
+            .participantStatus(HOST)
+            .chatRoom(chatRoom)
+            .build();
+        Participant participant2 = Participant.builder()
+            .participantStatus(SUBHOST)
+            .chatRoom(chatRoom)
+            .build();
+        Participant participant3 = Participant.builder()
+            .participantStatus(GUEST)
+            .chatRoom(chatRoom)
+            .build();
+        participantRepository.saveAll(List.of(participant1, participant2, participant3));
+
+        Long memberCount = participantRepository.countByChatRoom(chatRoom);
+
+        assertThat(memberCount).isEqualTo(3);
     }
 }

@@ -10,6 +10,7 @@ import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.SUBHOST
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -460,5 +461,29 @@ class ChatRoomRepositoryTest {
         assertThatThrownBy(() -> {
             chatRoomRepository.findChatRoomDetails(53L, 606L);
         }).isInstanceOf(ParticipantNotFoundException.class);
+    }
+
+    @Test
+    void 사용자가_접속한_채팅방_조회_성공() throws Exception {
+        User user = User.builder().build();
+        userRepository.save(user);
+
+        ChatRoom chatRoom = ChatRoom.builder()
+            .roomSid("4SyVX")
+            .roomSize(77)
+            .defaultRoomImageType(1)
+            .build();
+        chatRoomRepository.save(chatRoom);
+
+        Participant participant = Participant.builder()
+            .user(user)
+            .chatRoom(chatRoom)
+            .participantStatus(GUEST)
+            .build();
+        participantRepository.save(participant);
+
+        Optional<ChatRoom> optionalChatRoom = chatRoomRepository.findUserChatRoom(chatRoom.getId(), user.getId());
+
+        assertThat(optionalChatRoom).isPresent();
     }
 }

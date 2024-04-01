@@ -2,6 +2,7 @@ package toy.bookchat.bookchat.domain.chatroom.api;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -49,6 +50,7 @@ import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookRequest;
 import toy.bookchat.bookchat.domain.chat.Chat;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
+import toy.bookchat.bookchat.domain.chatroom.api.dto.response.UserChatRoomDetailResponse;
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomResponse;
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomsResponseSlice;
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.UserChatRoomResponse;
@@ -252,6 +254,40 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                     fieldWithPath("userChatRoomResponseList[].lastChatContent").type(STRING).description("마지막 채팅 내용"),
                     fieldWithPath("userChatRoomResponseList[].lastChatDispatchTime").type(STRING).description("마지막 채팅 발송 시간")
                 ).and(getCursorField())));
+    }
+
+    @Test
+    void 사용자_채팅방_상세_조회_성공() throws Exception {
+        given(chatRoomService.getUserChatRoomDetails(1L, 1L))
+            .willReturn(UserChatRoomDetailResponse.builder()
+                .roomId(1L)
+                .roomName("testRoom")
+                .roomSid("testSid")
+                .roomMemberCount(3L)
+                .roomImageUri("testImageUri")
+                .defaultRoomImageType(1)
+                .build());
+
+        mockMvc.perform(get("/v1/api/users/chatrooms/{roomId}", 1)
+                .header(AUTHORIZATION, JWT_TOKEN)
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isOk())
+            .andDo(document("get-user-chatroom-detail",
+                requestHeaders(
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
+                ),
+                pathParameters(
+                    parameterWithName("roomId").description("Room Id")
+                ),
+                responseFields(
+                    fieldWithPath("roomId").type(NUMBER).description("채팅방 ID"),
+                    fieldWithPath("roomName").type(STRING).description("채팅방 이름"),
+                    fieldWithPath("roomSid").type(STRING).description("채팅방 SID"),
+                    fieldWithPath("roomMemberCount").type(NUMBER).description("채팅방 현재 인원수"),
+                    fieldWithPath("roomImageUri").optional().type(STRING).description("채팅방 이미지 URI"),
+                    fieldWithPath("defaultRoomImageType").type(NUMBER).description("기본 이미지 타입 번호")
+                )
+            ));
     }
 
     @Test

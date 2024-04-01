@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -36,6 +37,7 @@ import toy.bookchat.bookchat.domain.chat.Chat;
 import toy.bookchat.bookchat.domain.chat.repository.ChatRepository;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoomBlockedUser;
+import toy.bookchat.bookchat.domain.chatroom.api.dto.response.UserChatRoomDetailResponse;
 import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomBlockedUserRepository;
 import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomHashTagRepository;
 import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomRepository;
@@ -55,6 +57,7 @@ import toy.bookchat.bookchat.domain.user.service.UserReader;
 import toy.bookchat.bookchat.exception.badrequest.chatroom.ChatRoomIsFullException;
 import toy.bookchat.bookchat.exception.badrequest.chatroom.NotEnoughRoomSizeException;
 import toy.bookchat.bookchat.exception.forbidden.chatroom.BlockedUserInChatRoomException;
+import toy.bookchat.bookchat.exception.notfound.chatroom.ChatRoomNotFoundException;
 import toy.bookchat.bookchat.infrastructure.broker.MessagePublisher;
 import toy.bookchat.bookchat.infrastructure.broker.message.NotificationMessage;
 
@@ -487,6 +490,43 @@ class ChatRoomServiceTest {
         verify(chatRoomRepository).delete(any());
         verify(messagePublisher).sendNotificationMessage(anyString(),
             any(NotificationMessage.class));
+    }
+
+    @Test
+    void 사용자가_채팅방에_참여자가_아닌경우_채팅방_상세정보_조회_실패() throws Exception {
+        assertThatThrownBy(() -> chatRoomService.getUserChatRoomDetails(1L, 1L)).isInstanceOf(ChatRoomNotFoundException.class);
+    }
+
+    @Test
+    void 사용자_채팅방_상세정보_조회_성공() throws Exception {
+        ChatRoom chatRoom = ChatRoom.builder()
+            .id(1L)
+            .roomSid("WGmILQSqkZ")
+            .roomName("Xo07yxaT")
+            .roomImageUri("oTsF1I1bAR")
+            .defaultRoomImageType(1)
+            .build();
+
+        given(chatRoomRepository.findUserChatRoom(any(), any())).willReturn(Optional.of(chatRoom));
+        given(participantRepository.countByChatRoom(any())).willReturn(10L);
+
+        UserChatRoomDetailResponse userChatRoomDetailResponse = chatRoomService.getUserChatRoomDetails(1L, 1L);
+
+        assertThat(userChatRoomDetailResponse).extracting(
+            UserChatRoomDetailResponse::getRoomId,
+            UserChatRoomDetailResponse::getRoomName,
+            UserChatRoomDetailResponse::getRoomSid,
+            UserChatRoomDetailResponse::getRoomMemberCount,
+            UserChatRoomDetailResponse::getRoomImageUri,
+            UserChatRoomDetailResponse::getDefaultRoomImageType
+        ).containsExactly(
+            chatRoom.getId(),
+            chatRoom.getRoomName(),
+            chatRoom.getRoomSid(),
+            10L,
+            chatRoom.getRoomImageUri(),
+            chatRoom.getDefaultRoomImageType()
+        );
     }
 
     private static class ChatRoomServiceTestFixture {
