@@ -15,4 +15,6 @@ public interface ParticipantRepository extends ParticipantQueryRepository,
     List<Participant> findWithPessimisticLockByChatRoom(ChatRoom chatRoom);
 
     void deleteByChatRoom(ChatRoom chatRoom);
+
+    Long countByChatRoom(ChatRoom chatroom);
 }

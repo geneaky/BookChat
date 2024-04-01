@@ -18,6 +18,7 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
@@ -219,5 +220,14 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
             .fetch();
 
         return ChatRoomDetails.from(participants, roomTags);
+    }
+
+    @Override
+    public Optional<ChatRoom> findUserChatRoom(Long roomId, Long userId) {
+        return Optional.ofNullable(queryFactory.select(chatRoom)
+            .from(chatRoom)
+            .join(participant).on(participant.chatRoom.eq(chatRoom).and(participant.user.id.eq(userId)))
+            .where(chatRoom.id.eq(roomId))
+            .fetchOne());
     }
 }

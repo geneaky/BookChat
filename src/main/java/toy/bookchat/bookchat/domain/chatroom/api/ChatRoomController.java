@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import toy.bookchat.bookchat.domain.chatroom.api.dto.response.UserChatRoomDetailResponse;
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomsResponseSlice;
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.UserChatRoomsResponseSlice;
 import toy.bookchat.bookchat.domain.chatroom.service.ChatRoomService;
@@ -49,6 +50,11 @@ public class ChatRoomController {
     @GetMapping("/users/chatrooms")
     public UserChatRoomsResponseSlice getUserChatRooms(Long bookId, Long postCursorId, Pageable pageable, @UserPayload TokenPayload tokenPayload) {
         return chatRoomService.getUserChatRooms(bookId, postCursorId, pageable, tokenPayload.getUserId());
+    }
+
+    @GetMapping("/users/chatrooms/{roomId}")
+    public UserChatRoomDetailResponse getUserChatRoomDetails(@PathVariable Long roomId, @UserPayload TokenPayload tokenPayload) {
+        return chatRoomService.getUserChatRoomDetails(roomId, tokenPayload.getUserId());
     }
 
     @GetMapping("/chatrooms")

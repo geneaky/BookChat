@@ -20,6 +20,7 @@ import toy.bookchat.bookchat.domain.chat.repository.ChatRepository;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoomHashTag;
 import toy.bookchat.bookchat.domain.chatroom.HashTag;
+import toy.bookchat.bookchat.domain.chatroom.api.dto.response.UserChatRoomDetailResponse;
 import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomBlockedUserRepository;
 import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomHashTagRepository;
 import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomRepository;
@@ -125,6 +126,14 @@ public class ChatRoomService {
     }
 
     @Transactional(readOnly = true)
+    public UserChatRoomDetailResponse getUserChatRoomDetails(Long roomId, Long userId) {
+        ChatRoom chatroom = chatRoomRepository.findUserChatRoom(roomId, userId).orElseThrow(ChatRoomNotFoundException::new);
+        Long roomMemberCount = participantRepository.countByChatRoom(chatroom);
+
+        return UserChatRoomDetailResponse.from(chatroom, roomMemberCount);
+    }
+
+    @Transactional(readOnly = true)
     public ChatRoomsResponseSlice getChatRooms(ChatRoomRequest chatRoomRequest, Pageable pageable) {
         return ChatRoomsResponseSlice.of(chatRoomRepository.findChatRooms(chatRoomRequest, pageable));
     }
@@ -225,4 +234,5 @@ public class ChatRoomService {
         participantRepository.delete(participant);
         messagePublisher.sendNotificationMessage(chatRoom.getRoomSid(), NotificationMessage.createExitMessage(chat, user.getId()));
     }
+
 }
