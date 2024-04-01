@@ -882,6 +882,24 @@ include::{snippets}/delete-participant/http-response.adoc[]
 
 == 채팅
 
+=== 채팅 단 건 상세 조회
+
+`Request Header`
+
+include::{snippets}/get-chats-detail/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/get-chats-detail/path-parameters.adoc[]
+include::{snippets}/get-chats-detail/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/get-chats-detail/response-fields.adoc[]
+include::{snippets}/get-chats-detail/http-response.adoc[]
+
+---
+
 === 채팅내역 조회
 
 `Request Header`
