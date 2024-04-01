@@ -1,7 +1,10 @@
 package toy.bookchat.bookchat.domain.chat.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -20,6 +23,8 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
 import toy.bookchat.bookchat.domain.chat.Chat;
 import toy.bookchat.bookchat.domain.chat.api.dto.request.MessageDto;
+import toy.bookchat.bookchat.domain.chat.api.dto.response.ChatDetailResponse;
+import toy.bookchat.bookchat.domain.chat.api.dto.response.ChatSender;
 import toy.bookchat.bookchat.domain.chat.repository.ChatRepository;
 import toy.bookchat.bookchat.domain.chat.service.dto.response.ChatRoomChatsResponse;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
@@ -27,6 +32,7 @@ import toy.bookchat.bookchat.domain.device.repository.DeviceRepository;
 import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
 import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.exception.badrequest.participant.NotParticipatedException;
 import toy.bookchat.bookchat.infrastructure.broker.MessagePublisher;
 import toy.bookchat.bookchat.infrastructure.broker.message.CommonMessage;
 import toy.bookchat.bookchat.infrastructure.push.service.PushService;
@@ -176,5 +182,33 @@ class ChatServiceTest {
             mock(Pageable.class), 1L);
 
         verify(chatRepository).getChatRoomChats(any(), any(), any(), any());
+    }
+
+    @Test
+    void 사용자가_참여하지않은_채팅방_채팅_조회_실패() throws Exception {
+        assertThatThrownBy(() -> chatService.getChatDetail(1L, 1L))
+            .isInstanceOf(NotParticipatedException.class);
+    }
+
+    @Test
+    void 채팅_채팅방_발신자정보를_조회_성공() throws Exception {
+        User user = User.builder()
+            .id(1L)
+            .nickname("EWNrSKNRR")
+            .profileImageUrl("Dv1TTe0uJn")
+            .defaultProfileImageType(1)
+            .build();
+        ChatRoom chatRoom = ChatRoom.builder().id(1L).build();
+        Chat chat = Chat.builder()
+            .user(user)
+            .chatRoom(chatRoom)
+            .message("TTuaihiP")
+            .build();
+        given(chatRepository.getUserChatRoomChat(any(), any())).willReturn(Optional.of(chat));
+
+        ChatDetailResponse chatDetail = chatService.getChatDetail(1L, 1L);
+
+        assertThat(chatDetail).extracting(ChatDetailResponse::getChatId, ChatDetailResponse::getChatRoomId, ChatDetailResponse::getMessage, ChatDetailResponse::getSender)
+            .containsExactly(chat.getId(), chatRoom.getId(), chat.getMessage(), ChatSender.from(user));
     }
 }

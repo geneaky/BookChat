@@ -1,6 +1,7 @@
 package toy.bookchat.bookchat.domain.chat.api;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
@@ -28,6 +29,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
 import toy.bookchat.bookchat.domain.chat.Chat;
+import toy.bookchat.bookchat.domain.chat.api.dto.response.ChatDetailResponse;
+import toy.bookchat.bookchat.domain.chat.api.dto.response.ChatSender;
 import toy.bookchat.bookchat.domain.chat.service.ChatService;
 import toy.bookchat.bookchat.domain.chat.service.dto.response.ChatRoomChatsResponse;
 import toy.bookchat.bookchat.domain.user.User;
@@ -101,6 +104,45 @@ class ChatControllerTest extends ControllerTestExtension {
                     fieldWithPath("chatResponseList[].dispatchTime").type(STRING)
                         .description("메세지 발송 시간")
                 ).and(getCursorField())
+            ));
+    }
+
+    @Test
+    void 채팅_상세_정보_조회() throws Exception {
+        given(chatService.getChatDetail(1L, 1L)).willReturn(ChatDetailResponse.builder()
+            .chatId(1L)
+            .chatRoomId(1L)
+            .message("first chat")
+            .dispatchTime(LocalDateTime.now())
+            .sender(ChatSender.builder()
+                .id(1L)
+                .nickname("test")
+                .profileImageUrl("test-image-url.com")
+                .defaultProfileImageType(1)
+                .build())
+            .build());
+
+        mockMvc.perform(get("/v1/api/chats/{chatId}", 1)
+                .header(AUTHORIZATION, JWT_TOKEN)
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isOk())
+            .andDo(document("get-chats-detail",
+                requestHeaders(
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
+                ),
+                pathParameters(
+                    parameterWithName("chatId").description("Chat Id")
+                ),
+                responseFields(
+                    fieldWithPath("chatId").type(NUMBER).description("채팅 Id"),
+                    fieldWithPath("chatRoomId").type(NUMBER).description("채팅방 Id"),
+                    fieldWithPath("message").type(STRING).description("메세지 내용"),
+                    fieldWithPath("dispatchTime").type(STRING).description("메세지 발송 시간"),
+                    fieldWithPath("sender.id").type(NUMBER).description("송신자 Id"),
+                    fieldWithPath("sender.nickname").type(STRING).description("송신자 닉네임"),
+                    fieldWithPath("sender.profileImageUrl").optional().type(STRING).description("송신자 프로필 이미지 Url"),
+                    fieldWithPath("sender.defaultProfileImageType").type(NUMBER).description("송신자 기본 프로필 이미지 타입")
+                )
             ));
     }
 }
