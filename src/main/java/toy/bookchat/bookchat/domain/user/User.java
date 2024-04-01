@@ -13,14 +13,12 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.ToString;
 import toy.bookchat.bookchat.domain.BaseEntity;
 import toy.bookchat.bookchat.domain.common.Status;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
 @Entity
 @Getter
-@ToString
 public class User extends BaseEntity {
 
     @Id

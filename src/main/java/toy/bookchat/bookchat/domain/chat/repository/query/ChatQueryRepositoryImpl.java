@@ -1,13 +1,16 @@
 package toy.bookchat.bookchat.domain.chat.repository.query;
 
 import static toy.bookchat.bookchat.domain.chat.QChat.chat;
+import static toy.bookchat.bookchat.domain.chatroom.QChatRoom.chatRoom;
 import static toy.bookchat.bookchat.domain.common.RepositorySupport.extractOrderSpecifierFrom;
 import static toy.bookchat.bookchat.domain.common.RepositorySupport.numberBasedPagination;
 import static toy.bookchat.bookchat.domain.common.RepositorySupport.toSlice;
 import static toy.bookchat.bookchat.domain.participant.QParticipant.participant;
+import static toy.bookchat.bookchat.domain.user.QUser.user;
 
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
@@ -35,5 +38,19 @@ public class ChatQueryRepositoryImpl implements ChatQueryRepository {
             )
             .limit(pageable.getPageSize())
             .orderBy(extractOrderSpecifierFrom(chat, pageable)).fetch(), pageable);
+    }
+
+    @Override
+    public Optional<Chat> getUserChatRoomChat(Long chatId, Long userId) {
+        return Optional.ofNullable(queryFactory.select(chat)
+            .from(chat)
+            .join(chat.user, user).fetchJoin()
+            .where(chat.id.eq(chatId)
+                .and(chat.chatRoom.id.eq(
+                    JPAExpressions.select(participant.chatRoom.id)
+                        .from(participant)
+                        .where(participant.user.id.eq(userId)
+                            .and(participant.chatRoom.id.eq(chatRoom.id))))))
+            .fetchOne());
     }
 }

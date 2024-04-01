@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import toy.bookchat.bookchat.domain.chat.Chat;
 import toy.bookchat.bookchat.domain.chat.api.dto.request.MessageDto;
+import toy.bookchat.bookchat.domain.chat.api.dto.response.ChatDetailResponse;
 import toy.bookchat.bookchat.domain.chat.repository.ChatRepository;
 import toy.bookchat.bookchat.domain.chat.service.dto.response.ChatRoomChatsResponse;
 import toy.bookchat.bookchat.domain.device.Device;
@@ -67,5 +68,11 @@ public class ChatService {
         Long userId) {
         return new ChatRoomChatsResponse(
             chatRepository.getChatRoomChats(roomId, postCursorId, pageable, userId));
+    }
+
+    @Transactional(readOnly = true)
+    public ChatDetailResponse getChatDetail(Long chatId, Long userId) {
+        Chat chat = chatRepository.getUserChatRoomChat(chatId, userId).orElseThrow(NotParticipatedException::new);
+        return ChatDetailResponse.from(chat);
     }
 }
