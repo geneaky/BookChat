@@ -11,6 +11,7 @@ import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookShelfRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ReviseBookShelfRequest;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.BookShelfResponse;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.ExistenceBookOnBookShelfResponse;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.SearchBookShelfByReadingStatus;
 import toy.bookchat.bookchat.domain.user.User;
@@ -32,11 +33,20 @@ public class BookShelfService {
         this.bookReader = bookReader;
     }
 
+    @Transactional(readOnly = true)
+    public BookShelfResponse getBookOnBookShelf(Long bookShelfId, Long userId) {
+        BookShelf bookShelf = bookShelfReader.readBookShelf(bookShelfId, userId);
+        return BookShelfResponse.from(bookShelf);
+    }
+
     @Transactional
-    public void putBookOnBookShelf(BookShelfRequest bookShelfRequest, Long userId) {
+    public BookShelf putBookOnBookShelf(BookShelfRequest bookShelfRequest, Long userId) {
         Book book = bookReader.readBook(bookShelfRequest.getIsbn(), bookShelfRequest.getPublishAt(), bookShelfRequest.extractBookEntity());
         User user = userReader.readUser(userId);
-        bookShelfManager.store(bookShelfRequest.createBookShelfByReadingStatus(book, user));
+        BookShelf bookShelf = bookShelfRequest.createBookShelfByReadingStatus(book, user);
+        bookShelfManager.store(bookShelf);
+
+        return bookShelf;
     }
 
     public SearchBookShelfByReadingStatus takeBooksOutOfBookShelves(ReadingStatus readingStatus, Pageable pageable, Long userId) {

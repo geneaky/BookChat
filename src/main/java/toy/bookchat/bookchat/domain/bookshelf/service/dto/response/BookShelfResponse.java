@@ -3,10 +3,13 @@ package toy.bookchat.bookchat.domain.bookshelf.service.dto.response;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.Star;
 
 @Getter
+@EqualsAndHashCode
 public class BookShelfResponse {
 
     private Long bookShelfId;
@@ -32,5 +35,19 @@ public class BookShelfResponse {
         this.publisher = publisher;
         this.star = star;
         this.pages = pages;
+    }
+
+    public static BookShelfResponse from(BookShelf bookShelf) {
+        return BookShelfResponse.builder()
+            .bookShelfId(bookShelf.getId())
+            .title(bookShelf.getBookTitle())
+            .isbn(bookShelf.getIsbn())
+            .authors(bookShelf.getBookAuthors())
+            .publisher(bookShelf.getBookPublisher())
+            .bookCoverImageUrl(bookShelf.getBookCoverImageUrl())
+            .publishAt(bookShelf.getBook().getPublishAt())
+            .star(bookShelf.getStar())
+            .pages(bookShelf.getPages())
+            .build();
     }
 }

@@ -22,19 +22,7 @@ public class SearchBookShelfByReadingStatus {
         this.contents = new ArrayList<>();
 
         for (BookShelf bookShelf : bookShelves) {
-            BookShelfResponse bookShelfResponse = BookShelfResponse.builder()
-                .bookShelfId(bookShelf.getId())
-                .title(bookShelf.getBookTitle())
-                .isbn(bookShelf.getIsbn())
-                .authors(bookShelf.getBookAuthors())
-                .publisher(bookShelf.getBookPublisher())
-                .bookCoverImageUrl(bookShelf.getBookCoverImageUrl())
-                .publishAt(bookShelf.getBook().getPublishAt())
-                .star(bookShelf.getStar())
-                .pages(bookShelf.getPages())
-                .build();
-
-            contents.add(bookShelfResponse);
+            contents.add(BookShelfResponse.from(bookShelf));
         }
     }
 }
