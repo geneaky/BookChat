@@ -1,14 +1,19 @@
 package toy.bookchat.bookchat.domain.bookshelf.api;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpHeaders.LOCATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.headers.HeaderDocumentation.responseHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
@@ -20,8 +25,6 @@ import static org.springframework.restdocs.request.RequestDocumentation.paramete
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static toy.bookchat.bookchat.domain.bookshelf.ReadingStatus.COMPLETE;
@@ -50,6 +53,7 @@ import toy.bookchat.bookchat.domain.bookshelf.service.BookShelfService;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookShelfRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ReviseBookShelfRequest;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.BookShelfResponse;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.ExistenceBookOnBookShelfResponse;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.SearchBookShelfByReadingStatus;
 import toy.bookchat.bookchat.domain.user.User;
@@ -101,13 +105,57 @@ class BookShelfControllerTest extends ControllerTestExtension {
     }
 
     @Test
+    void 책_단_건조회_성공() throws Exception {
+        BookShelfResponse response = BookShelfResponse.builder()
+            .bookShelfId(234L)
+            .title("effectiveJava")
+            .isbn("124151214")
+            .bookCoverImageUrl("bookCoverImage.com")
+            .authors(List.of("Joshua"))
+            .publisher("oreilly")
+            .publishAt(LocalDate.now())
+            .pages(152)
+            .star(FOUR_HALF)
+            .build();
+        given(bookShelfService.getBookOnBookShelf(any(), any())).willReturn(response);
+
+        mockMvc.perform(get("/v1/api/bookshelves/{bookShelfId}", 234L)
+                .header(AUTHORIZATION, JWT_TOKEN)
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isOk())
+            .andDo(document("get-one-bookshelf",
+                pathParameters(
+                    parameterWithName("bookShelfId").description("BookShelf Id")
+                ),
+                requestHeaders(
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
+                ),
+                responseFields(
+                    fieldWithPath("bookShelfId").type(NUMBER).description("BookShelf Id"),
+                    fieldWithPath("title").type(STRING).description("제목"),
+                    fieldWithPath("isbn").type(STRING).description("ISBN"),
+                    fieldWithPath("bookCoverImageUrl").type(STRING).optional().description("책 커버 이미지 URI"),
+                    fieldWithPath("authors[]").type(ARRAY).description("저자"),
+                    fieldWithPath("publisher").type(STRING).description("출판사"),
+                    fieldWithPath("publishAt").type(STRING).description("출판일자"),
+                    fieldWithPath("pages").type(NUMBER).description("현재 읽고 있는 페이지 번호"),
+                    fieldWithPath("star").type(STRING).optional().description("평점"))
+            ));
+    }
+
+    @Test
     void 읽고_있는_책_등록_성공() throws Exception {
+        BookShelf bookShelf = BookShelf.builder()
+            .id(234L)
+            .build();
+        given(bookShelfService.putBookOnBookShelf(any(), any())).willReturn(bookShelf);
+
         mockMvc.perform(post("/v1/api/bookshelves")
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .content(objectMapper.writeValueAsString(getBookShelfRequest(READING)))
                 .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated())
             .andDo(document("bookshelf-reading",
                 requestHeaders(
                     headerWithName(AUTHORIZATION).description("Bearer [JWT token]")),
@@ -119,20 +167,30 @@ class BookShelfControllerTest extends ControllerTestExtension {
                         .description("책 커버 이미지 URI"),
                     fieldWithPath("bookRequest.publishAt").type(STRING).description("출판일"),
                     fieldWithPath("readingStatus").type(STRING).description("READING"),
-                    fieldWithPath("star").ignored())));
+                    fieldWithPath("star").ignored()
+                ),
+                responseHeaders(
+                    headerWithName(LOCATION).description("등록된 책 조회 URI")
+                )
+            ));
 
         verify(bookShelfService).putBookOnBookShelf(any(BookShelfRequest.class), any());
     }
 
     @Test
     void 읽은_책_등록_성공() throws Exception {
+        BookShelf bookShelf = BookShelf.builder()
+            .id(234L)
+            .build();
+        given(bookShelfService.putBookOnBookShelf(any(), any())).willReturn(bookShelf);
+
         mockMvc.perform(post("/v1/api/bookshelves")
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .content(
                     objectMapper.writeValueAsString(getBookShelfRequest(COMPLETE)))
                 .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated())
             .andDo(document("bookshelf-complete",
                 requestHeaders(
                     headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
@@ -141,11 +199,15 @@ class BookShelfControllerTest extends ControllerTestExtension {
                     fieldWithPath("bookRequest.title").type(STRING).description("제목"),
                     fieldWithPath("bookRequest.authors[]").type(ARRAY).description("저자"),
                     fieldWithPath("bookRequest.publisher").type(STRING).description("출판사"),
-                    fieldWithPath("bookRequest.bookCoverImageUrl").type(STRING).optional()
-                        .description("책 커버 이미지 URI"),
+                    fieldWithPath("bookRequest.bookCoverImageUrl").type(STRING).optional().description("책 커버 이미지 URI"),
                     fieldWithPath("bookRequest.publishAt").type(STRING).description("출판일"),
                     fieldWithPath("readingStatus").type(STRING).description("COMPLETE"),
-                    fieldWithPath("star").type(STRING).description("평점"))));
+                    fieldWithPath("star").type(STRING).description("평점")
+                ),
+                responseHeaders(
+                    headerWithName(LOCATION).description("등록된 책 조회 URI")
+                )
+            ));
 
         verify(bookShelfService).putBookOnBookShelf(any(BookShelfRequest.class),
             any());
@@ -153,12 +215,17 @@ class BookShelfControllerTest extends ControllerTestExtension {
 
     @Test
     void 읽을_책_등록_성공() throws Exception {
+        BookShelf bookShelf = BookShelf.builder()
+            .id(234L)
+            .build();
+        given(bookShelfService.putBookOnBookShelf(any(), any())).willReturn(bookShelf);
+
         mockMvc.perform(post("/v1/api/bookshelves")
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .content(objectMapper.writeValueAsString(getBookShelfRequest(WISH)))
                 .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated())
             .andDo(document("bookshelf-wish",
                 requestHeaders(
                     headerWithName(AUTHORIZATION).description("Bearer [openid token]")
@@ -171,7 +238,12 @@ class BookShelfControllerTest extends ControllerTestExtension {
                         .description("책 커버 이미지 URI"),
                     fieldWithPath("bookRequest.publishAt").type(STRING).description("출판일"),
                     fieldWithPath("readingStatus").type(STRING).description("WISH"),
-                    fieldWithPath("star").ignored())));
+                    fieldWithPath("star").ignored()
+                ),
+                responseHeaders(
+                    headerWithName(LOCATION).description("등록된 책 조회 URI")
+                )
+            ));
 
         verify(bookShelfService).putBookOnBookShelf(any(BookShelfRequest.class),
             any());

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -32,6 +33,7 @@ import toy.bookchat.bookchat.domain.bookshelf.Star;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookShelfRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ReviseBookShelfRequest;
+import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.BookShelfResponse;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.ExistenceBookOnBookShelfResponse;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.SearchBookShelfByReadingStatus;
 import toy.bookchat.bookchat.domain.user.User;
@@ -90,6 +92,23 @@ class BookShelfServiceTest {
             .bookRequest(getBookRequest())
             .readingStatus(READING)
             .build();
+    }
+
+    @Test
+    void 서재에서_책_조회_성공() throws Exception {
+        BookShelf bookShelf = BookShelf.builder()
+            .id(1L)
+            .book(getBook())
+            .readingStatus(WISH)
+            .pages(0)
+            .star(null)
+            .build();
+
+        given(bookShelfReader.readBookShelf(1L, 1L)).willReturn(bookShelf);
+
+        BookShelfResponse result = bookShelfService.getBookOnBookShelf(1L, 1L);
+        BookShelfResponse expect = BookShelfResponse.from(bookShelf);
+        assertThat(result).isEqualTo(expect);
     }
 
     @Test
