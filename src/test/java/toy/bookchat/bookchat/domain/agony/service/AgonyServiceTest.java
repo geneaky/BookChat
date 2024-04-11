@@ -3,6 +3,7 @@ package toy.bookchat.bookchat.domain.agony.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -23,6 +24,7 @@ import toy.bookchat.bookchat.domain.agony.repository.AgonyRecordRepository;
 import toy.bookchat.bookchat.domain.agony.repository.AgonyRepository;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateBookAgonyRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRequest;
+import toy.bookchat.bookchat.domain.agony.service.dto.response.AgonyResponse;
 import toy.bookchat.bookchat.domain.agony.service.dto.response.SliceOfAgoniesResponse;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
@@ -51,9 +53,11 @@ class AgonyServiceTest {
 
     @Test
     void 고민_생성_성공() throws Exception {
-
         BookShelf bookShelf = mock(BookShelf.class);
-        CreateBookAgonyRequest createBookAgonyRequest = mock(CreateBookAgonyRequest.class);
+        CreateBookAgonyRequest createBookAgonyRequest = CreateBookAgonyRequest.builder()
+            .title("title")
+            .hexColorCode("color")
+            .build();
 
         when(bookShelfRepository.findByIdAndUserId(any(), any())).thenReturn(
             Optional.of(bookShelf));
@@ -70,6 +74,15 @@ class AgonyServiceTest {
         assertThatThrownBy(() -> {
             agonyService.storeBookShelfAgony(createBookAgonyRequest, 1L, 1L);
         }).isInstanceOf(BookNotFoundException.class);
+    }
+
+    @Test
+    void 서재에_등록된_고민_단_건_조회_성공() throws Exception {
+        Agony agony = getAgony(1L, "고민", "파랑");
+        given(agonyRepository.findUserBookShelfAgony(1L, 1L, 1L)).willReturn(Optional.of(agony));
+        AgonyResponse actual = agonyService.searchAgony(1L, 1L, 1L);
+        AgonyResponse expect = AgonyResponse.from(agony);
+        assertThat(actual).isEqualTo(expect);
     }
 
     @Test

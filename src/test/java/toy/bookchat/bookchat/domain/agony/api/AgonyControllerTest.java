@@ -1,13 +1,16 @@
 package toy.bookchat.bookchat.domain.agony.api;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpHeaders.LOCATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.headers.HeaderDocumentation.responseHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
@@ -40,6 +43,7 @@ import toy.bookchat.bookchat.domain.agony.Agony;
 import toy.bookchat.bookchat.domain.agony.service.AgonyService;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateBookAgonyRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRequest;
+import toy.bookchat.bookchat.domain.agony.service.dto.response.AgonyResponse;
 import toy.bookchat.bookchat.domain.agony.service.dto.response.SliceOfAgoniesResponse;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 
@@ -75,14 +79,18 @@ class AgonyControllerTest extends ControllerTestExtension {
 
     @Test
     void 고민_생성_성공() throws Exception {
-        CreateBookAgonyRequest createBookAgonyRequest = new CreateBookAgonyRequest("title",
-            "#062498");
+        CreateBookAgonyRequest createBookAgonyRequest = CreateBookAgonyRequest.builder()
+            .title("title")
+            .hexColorCode("#062498")
+            .build();
+        given(agonyService.storeBookShelfAgony(any(), any(), any())).willReturn(1L);
+
         mockMvc.perform(post("/v1/api/bookshelves/{bookShelfId}/agonies", 1)
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(createBookAgonyRequest)))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated())
             .andDo(document("post-agony",
                 requestHeaders(
                     headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
@@ -93,9 +101,42 @@ class AgonyControllerTest extends ControllerTestExtension {
                 requestFields(
                     fieldWithPath("title").type(STRING).description("고민 제목"),
                     fieldWithPath("hexColorCode").type(STRING).description("고민 폴더 색상")
-                )));
+                ),
+                responseHeaders(
+                    headerWithName(LOCATION).description("생성된 고민 폴더 URI")
+                )
+            ));
 
         verify(agonyService).storeBookShelfAgony(any(), any(), any());
+    }
+
+    @Test
+    void 고민_조회_단_건_성공() throws Exception {
+        AgonyResponse response = AgonyResponse.builder()
+            .agonyId(1L)
+            .title("고민1")
+            .hexColorCode("빨강")
+            .build();
+        given(agonyService.searchAgony(any(), any(), any())).willReturn(response);
+
+        mockMvc.perform(get("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}", 1, 1)
+                .header(AUTHORIZATION, JWT_TOKEN)
+                .with(user(getUserPrincipal()))
+                .contentType(APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andDo(document("get-one-agony",
+                requestHeaders(
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
+                ),
+                pathParameters(
+                    parameterWithName("bookShelfId").description("BookShelf Id"),
+                    parameterWithName("agonyId").description("Agony Id")
+                ),
+                responseFields(
+                    fieldWithPath("agonyId").type(NUMBER).description("고민 Id"),
+                    fieldWithPath("title").type(STRING).description("고민 제목"),
+                    fieldWithPath("hexColorCode").type(STRING).description("16진수 색상 코드")
+                )));
     }
 
     @Test

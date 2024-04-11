@@ -148,7 +148,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
         BookShelf bookShelf = BookShelf.builder()
             .id(234L)
             .build();
-        given(bookShelfService.putBookOnBookShelf(any(), any())).willReturn(bookShelf);
+        given(bookShelfService.putBookOnBookShelf(any(), any())).willReturn(456L);
 
         mockMvc.perform(post("/v1/api/bookshelves")
                 .header(AUTHORIZATION, JWT_TOKEN)
@@ -182,7 +182,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
         BookShelf bookShelf = BookShelf.builder()
             .id(234L)
             .build();
-        given(bookShelfService.putBookOnBookShelf(any(), any())).willReturn(bookShelf);
+        given(bookShelfService.putBookOnBookShelf(any(), any())).willReturn(343L);
 
         mockMvc.perform(post("/v1/api/bookshelves")
                 .header(AUTHORIZATION, JWT_TOKEN)
@@ -218,7 +218,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
         BookShelf bookShelf = BookShelf.builder()
             .id(234L)
             .build();
-        given(bookShelfService.putBookOnBookShelf(any(), any())).willReturn(bookShelf);
+        given(bookShelfService.putBookOnBookShelf(any(), any())).willReturn(847L);
 
         mockMvc.perform(post("/v1/api/bookshelves")
                 .header(AUTHORIZATION, JWT_TOKEN)
