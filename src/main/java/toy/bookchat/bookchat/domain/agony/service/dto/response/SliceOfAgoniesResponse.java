@@ -21,7 +21,8 @@ public class SliceOfAgoniesResponse {
     private List<AgonyResponse> from(List<Agony> content) {
         List<AgonyResponse> result = new ArrayList<>();
         for (Agony agony : content) {
-            result.add(new AgonyResponse(agony.getId(), agony.getTitle(), agony.getHexColorCode()));
+
+            result.add(AgonyResponse.from(agony));
         }
         return result;
     }

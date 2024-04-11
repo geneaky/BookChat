@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.service.BookShelfService;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookShelfRequest;
@@ -45,10 +44,10 @@ public class BookShelfController {
 
     @PostMapping("/bookshelves")
     public ResponseEntity<Void> putBookOnBookShelf(@Valid @RequestBody BookShelfRequest bookShelfRequest, @UserPayload TokenPayload tokenPayload) {
-        BookShelf bookShelf = bookShelfService.putBookOnBookShelf(bookShelfRequest, tokenPayload.getUserId());
+        Long bookShelfId = bookShelfService.putBookOnBookShelf(bookShelfRequest, tokenPayload.getUserId());
 
         return ResponseEntity.status(CREATED)
-            .headers(hs -> hs.setLocation(URI.create("/v1/api/bookshelves/" + bookShelf.getId())))
+            .headers(hs -> hs.setLocation(URI.create("/v1/api/bookshelves/" + bookShelfId)))
             .build();
     }
 

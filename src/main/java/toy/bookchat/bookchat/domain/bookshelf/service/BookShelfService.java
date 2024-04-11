@@ -40,13 +40,13 @@ public class BookShelfService {
     }
 
     @Transactional
-    public BookShelf putBookOnBookShelf(BookShelfRequest bookShelfRequest, Long userId) {
+    public Long putBookOnBookShelf(BookShelfRequest bookShelfRequest, Long userId) {
         Book book = bookReader.readBook(bookShelfRequest.getIsbn(), bookShelfRequest.getPublishAt(), bookShelfRequest.extractBookEntity());
         User user = userReader.readUser(userId);
         BookShelf bookShelf = bookShelfRequest.createBookShelfByReadingStatus(book, user);
         bookShelfManager.store(bookShelf);
 
-        return bookShelf;
+        return bookShelf.getId();
     }
 
     public SearchBookShelfByReadingStatus takeBooksOutOfBookShelves(ReadingStatus readingStatus, Pageable pageable, Long userId) {
