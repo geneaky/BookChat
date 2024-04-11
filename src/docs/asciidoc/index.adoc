@@ -237,6 +237,24 @@ include::{snippets}/book-search-paging/http-response.adoc[]
 
 == 책장
 
+=== 도서 단 건 조회
+
+`Request Header`
+
+include::{snippets}/get-one-bookshelf/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/get-one-bookshelf/path-parameters.adoc[]
+include::{snippets}/get-one-bookshelf/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/get-one-bookshelf/response-fields.adoc[]
+include::{snippets}/get-one-bookshelf/http-response.adoc[]
+
+---
+
 === 읽을 도서 등록
 
 `Request Header`
@@ -250,6 +268,7 @@ include::{snippets}/bookshelf-wish/http-request.adoc[]
 
 `Response`
 
+include::{snippets}/bookshelf-wish/response-headers.adoc[]
 include::{snippets}/bookshelf-wish/http-response.adoc[]
 
 ---
@@ -267,6 +286,7 @@ include::{snippets}/bookshelf-reading/http-request.adoc[]
 
 `Response`
 
+include::{snippets}/bookshelf-reading/response-headers.adoc[]
 include::{snippets}/bookshelf-reading/http-response.adoc[]
 
 ---
@@ -284,6 +304,7 @@ include::{snippets}/bookshelf-complete/http-request.adoc[]
 
 `Response`
 
+include::{snippets}/bookshelf-complete/response-headers.adoc[]
 include::{snippets}/bookshelf-complete/http-response.adoc[]
 
 ---
