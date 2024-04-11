@@ -70,8 +70,7 @@ public class ChatRoomController {
 
     @PostMapping("/chatrooms/{roomId}")
     public void reviseChatRoom(@Valid @RequestPart ReviseChatRoomRequest reviseChatRoomRequest, @RequestPart(required = false) MultipartFile chatRoomImage, @UserPayload TokenPayload tokenPayload) {
-        chatRoomService.reviseChatRoom(reviseChatRoomRequest, chatRoomImage,
-            tokenPayload.getUserId());
+        chatRoomService.reviseChatRoom(reviseChatRoomRequest, chatRoomImage, tokenPayload.getUserId());
     }
 
     @PostMapping("/enter/chatrooms/{roomId}")
