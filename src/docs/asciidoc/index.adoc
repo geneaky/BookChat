@@ -606,7 +606,26 @@ include::{snippets}/post-agony/http-request.adoc[]
 
 `Response`
 
+include::{snippets}/post-agony/response-headers.adoc[]
 include::{snippets}/post-agony/http-response.adoc[]
+
+---
+
+=== 고민 폴더 단 건 조회 성공
+
+`Request Header`
+
+include::{snippets}/get-one-agony/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/get-one-agony/path-parameters.adoc[]
+include::{snippets}/get-one-agony/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/get-one-agony/response-fields.adoc[]
+include::{snippets}/get-one-agony/http-response.adoc[]
 
 ---
 
