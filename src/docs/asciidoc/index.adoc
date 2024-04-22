@@ -697,7 +697,26 @@ include::{snippets}/post-agonyrecord/http-request.adoc[]
 
 `Response`
 
+include::{snippets}/post-agonyrecord/response-headers.adoc[]
 include::{snippets}/post-agonyrecord/http-response.adoc[]
+
+---
+
+=== 고민 기록 단 건 조회
+
+`Request Header`
+
+include::{snippets}/get-agonies-record/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/get-agonies-record/path-parameters.adoc[]
+include::{snippets}/get-agonies-record/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/get-agonies-record/response-fields.adoc[]
+include::{snippets}/get-agonies-record/http-response.adoc[]
 
 ---
 
