@@ -3,6 +3,7 @@ package toy.bookchat.bookchat.domain.scrap.repository.query;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -61,5 +62,33 @@ class ScrapQueryRepositoryTest {
             pageRequest, user.getId());
 
         assertThat(scrapResponseSlice.hasNext()).isFalse();
+    }
+
+    @Test
+    void 사용자_스크랩_단_건_조회_성공() throws Exception {
+        User user = User.builder().build();
+        userRepository.save(user);
+
+        Book book = Book.builder()
+            .isbn("1231241")
+            .publishAt(LocalDate.now())
+            .build();
+        bookRepository.save(book);
+
+        BookShelf bookShelf = BookShelf.builder()
+            .book(book)
+            .user(user)
+            .build();
+        bookShelfRepository.save(bookShelf);
+
+        Scrap scrap = Scrap.builder()
+            .bookShelf(bookShelf)
+            .scrapContent("content1")
+            .build();
+        scrapRepository.save(scrap);
+
+        Optional<Scrap> findScrap = scrapRepository.findUserScrap(scrap.getId(), user.getId());
+
+        assertThat(findScrap).isPresent();
     }
 }

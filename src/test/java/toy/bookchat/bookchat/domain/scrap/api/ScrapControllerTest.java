@@ -1,11 +1,14 @@
 package toy.bookchat.bookchat.domain.scrap.api;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpHeaders.LOCATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.headers.HeaderDocumentation.responseHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
@@ -51,7 +54,6 @@ class ScrapControllerTest extends ControllerTestExtension {
 
     @Test
     void scrap_저장_성공() throws Exception {
-
         CreateScrapRequest createScrapRequest = CreateScrapRequest.builder()
             .bookShelfId(1L)
             .scrapContent("스크랩할 내용")
@@ -62,15 +64,20 @@ class ScrapControllerTest extends ControllerTestExtension {
                 .content(objectMapper.writeValueAsString(createScrapRequest))
                 .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated())
             .andDo(document("post-scrap",
-                requestHeaders(
-                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
-                ),
-                requestFields(
-                    fieldWithPath("bookShelfId").type(NUMBER).description("서재 ID"),
-                    fieldWithPath("scrapContent").type(STRING).description("스크랩 내용")
-                )));
+                    requestHeaders(
+                        headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
+                    ),
+                    requestFields(
+                        fieldWithPath("bookShelfId").type(NUMBER).description("서재 ID"),
+                        fieldWithPath("scrapContent").type(STRING).description("스크랩 내용")
+                    ),
+                    responseHeaders(
+                        headerWithName(LOCATION).description("생성된 스크랩 URI")
+                    )
+                )
+            );
     }
 
     @Test
@@ -102,7 +109,7 @@ class ScrapControllerTest extends ControllerTestExtension {
                 .param("postCursorId", "5")
                 .param("size", "3"))
             .andExpect(status().isOk())
-            .andDo(document("get-scrap",
+            .andDo(document("get-scraps",
                 requestHeaders(
                     headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 ),
@@ -112,11 +119,38 @@ class ScrapControllerTest extends ControllerTestExtension {
                     parameterWithName("size").optional().description("페이지 사이즈")
                 ),
                 responseFields(
-                    fieldWithPath("scrapResponseList[].scrapId").type(NUMBER)
-                        .description("scrap id"),
-                    fieldWithPath("scrapResponseList[].scrapContent").type(STRING)
-                        .description("scrap content")
+                    fieldWithPath("scrapResponseList[].scrapId").type(NUMBER).description("scrap id"),
+                    fieldWithPath("scrapResponseList[].scrapContent").type(STRING).description("scrap content")
                 ).and(getCursorField())));
+
+    }
+
+    @Test
+    void scarp_단_건_조회_성공() throws Exception {
+        given(scrapService.getScrap(any(), any())).willReturn(
+            ScrapResponse.builder()
+                .scrapId(1L)
+                .scrapContent("content1")
+                .build()
+        );
+
+        mockMvc.perform(get("/v1/api/scraps/{scrapId}", 1)
+                .header(AUTHORIZATION, JWT_TOKEN)
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isOk())
+            .andDo(document("get-scrap",
+                    requestHeaders(
+                        headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
+                    ),
+                    pathParameters(
+                        parameterWithName("scrapId").description("scrap id")
+                    ),
+                    responseFields(
+                        fieldWithPath("scrapId").type(NUMBER).description("scrap id"),
+                        fieldWithPath("scrapContent").type(STRING).description("scrap content")
+                    )
+                )
+            );
 
     }
 

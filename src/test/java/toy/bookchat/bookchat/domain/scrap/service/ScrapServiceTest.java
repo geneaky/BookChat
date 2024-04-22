@@ -1,6 +1,8 @@
 package toy.bookchat.bookchat.domain.scrap.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -67,6 +69,20 @@ class ScrapServiceTest {
         scrapService.getScraps(1L, 1L, pageRequest, 1L);
 
         verify(scrapRepository).findScraps(any(), any(), any(), any());
+    }
+
+    @Test
+    void 스크랩_단_건_조회_성공() throws Exception {
+        Scrap scrap = Scrap.builder()
+            .id(100L)
+            .scrapContent("1BGKFmFC1Wj")
+            .build();
+        given(scrapRepository.findUserScrap(any(), any())).willReturn(Optional.of(scrap));
+
+        ScrapResponse actual = scrapService.getScrap(1L, 1L);
+        ScrapResponse expected = ScrapResponse.from(scrap);
+
+        assertThat(actual).isEqualTo(expected);
     }
 
     @Test
