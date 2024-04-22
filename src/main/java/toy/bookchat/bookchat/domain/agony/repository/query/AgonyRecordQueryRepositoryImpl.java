@@ -10,6 +10,7 @@ import static toy.bookchat.bookchat.domain.common.RepositorySupport.toSlice;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
@@ -25,9 +26,19 @@ public class AgonyRecordQueryRepositoryImpl implements AgonyRecordQueryRepositor
     }
 
     @Override
-    public Slice<AgonyRecord> findSliceOfUserAgonyRecords(Long bookShelfId, Long agonyId,
-        Long userId,
-        Pageable pageable, Long postCursorId) {
+    public Optional<AgonyRecord> findUserAgonyRecord(Long bookShelfId, Long agonyId, Long recordId, Long userId) {
+        return Optional.ofNullable(queryFactory.select(agonyRecord)
+            .from(agonyRecord)
+            .join(agonyRecord.agony, agony).on(agony.id.eq(agonyId))
+            .join(agony.bookShelf, bookShelf).on(bookShelf.id.eq(bookShelfId)
+                .and(bookShelf.user.id.eq(userId)))
+            .where(agonyRecord.id.eq(recordId))
+            .fetchOne());
+    }
+
+
+    @Override
+    public Slice<AgonyRecord> findSliceOfUserAgonyRecords(Long bookShelfId, Long agonyId, Long userId, Pageable pageable, Long postCursorId) {
         List<AgonyRecord> contents = queryFactory.select(agonyRecord)
             .from(agonyRecord)
             .join(agonyRecord.agony, agony).on(agony.id.eq(agonyId))
@@ -50,8 +61,7 @@ public class AgonyRecordQueryRepositoryImpl implements AgonyRecordQueryRepositor
     }
 
     @Override
-    public void reviseAgonyRecord(Long bookShelfId, Long agonyId, Long recordId, Long userId,
-        String recordTitle, String recordContent) {
+    public void reviseAgonyRecord(Long bookShelfId, Long agonyId, Long recordId, Long userId, String recordTitle, String recordContent) {
         queryFactory.update(agonyRecord)
             .set(agonyRecord.title, recordTitle)
             .set(agonyRecord.content, recordContent)
@@ -60,8 +70,7 @@ public class AgonyRecordQueryRepositoryImpl implements AgonyRecordQueryRepositor
             .execute();
     }
 
-    private Long fetchCorrespondedAgonyRecordId(Long bookShelfId, Long agonyId, Long recordId,
-        Long userId) {
+    private Long fetchCorrespondedAgonyRecordId(Long bookShelfId, Long agonyId, Long recordId, Long userId) {
         /* TODO: 2023-02-13 mysql error:1093 insert, update, delete시 같은 테이블에서
             서브쿼리를 가져오는 경우 발생하는 문제로 where절 조건을 subquery로 한 번 더 래핑해서
             from절 서브쿼리를 통해 해결할 수 있지만 querydsl from절 서브쿼리가 불가능하기 때문에

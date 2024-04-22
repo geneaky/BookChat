@@ -21,9 +21,7 @@ public class SliceOfAgonyRecordsResponse {
     private List<AgonyRecordResponse> from(List<AgonyRecord> content) {
         List<AgonyRecordResponse> agonyRecordResponseList = new ArrayList<>();
         for (AgonyRecord agonyRecord : content) {
-            agonyRecordResponseList.add(
-                new AgonyRecordResponse(agonyRecord.getId(), agonyRecord.getTitle(),
-                    agonyRecord.getContent(), agonyRecord.getCreateTimeInYearMonthDayFormat()));
+            agonyRecordResponseList.add(AgonyRecordResponse.from(agonyRecord));
         }
 
         return agonyRecordResponseList;
