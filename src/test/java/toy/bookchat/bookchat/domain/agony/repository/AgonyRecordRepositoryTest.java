@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import org.junit.jupiter.api.Test;
@@ -97,6 +98,28 @@ class AgonyRecordRepositoryTest {
 
         AgonyRecord findAgonyRecord = agonyRecordRepository.findById(agonyRecord.getId()).get();
         assertThat(agonyRecord).isEqualTo(findAgonyRecord);
+    }
+
+    @Test
+    void 고민_단_건_조회_성공() throws Exception {
+        Book book = getBook();
+        bookRepository.save(book);
+
+        User user = getUser();
+        userRepository.save(user);
+
+        BookShelf bookShelf = getBookShelf(user, book);
+        bookShelfRepository.save(bookShelf);
+
+        Agony agony = getAgony(bookShelf);
+        agonyRepository.save(agony);
+
+        AgonyRecord agonyRecord = getAgonyRecord(agony);
+        agonyRecordRepository.save(agonyRecord);
+
+        Optional<AgonyRecord> findAgonyRecord = agonyRecordRepository.findUserAgonyRecord(bookShelf.getId(), agony.getId(), agonyRecord.getId(), user.getId());
+
+        assertThat(findAgonyRecord).isPresent();
     }
 
     @Test

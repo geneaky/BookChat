@@ -3,6 +3,8 @@ package toy.bookchat.bookchat.domain.agony.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -26,6 +28,7 @@ import toy.bookchat.bookchat.domain.agony.repository.AgonyRecordRepository;
 import toy.bookchat.bookchat.domain.agony.repository.AgonyRepository;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateAgonyRecordRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRecordRequest;
+import toy.bookchat.bookchat.domain.agony.service.dto.response.AgonyRecordResponse;
 import toy.bookchat.bookchat.domain.agony.service.dto.response.SliceOfAgonyRecordsResponse;
 import toy.bookchat.bookchat.exception.notfound.agony.AgonyNotFoundException;
 
@@ -41,12 +44,12 @@ class AgonyRecordServiceTest {
 
     @Test
     void 고민에_고민기록_등록_성공() throws Exception {
-        CreateAgonyRecordRequest createAgonyRecordRequest = mock(
-            CreateAgonyRecordRequest.class);
+        CreateAgonyRecordRequest createAgonyRecordRequest = mock(CreateAgonyRecordRequest.class);
         Agony agony = mock(Agony.class);
+        AgonyRecord agonyRecord = AgonyRecord.builder().build();
 
-        when(agonyRepository.findUserBookShelfAgony(any(), any(), any())).thenReturn(
-            Optional.of(agony));
+        given(agonyRepository.findUserBookShelfAgony(any(), any(), any())).willReturn(Optional.of(agony));
+        given(createAgonyRecordRequest.generateAgonyRecord(eq(agony))).willReturn(agonyRecord);
 
         agonyRecordService.storeAgonyRecord(1L, createAgonyRecordRequest, 1L, 1L);
 
@@ -91,6 +94,22 @@ class AgonyRecordServiceTest {
 
         int result = pageOfAgonyRecordsResponse.getAgonyRecordResponseList().size();
         assertThat(result).isEqualTo(2);
+    }
+
+    @Test
+    void 사용자_고민_기록_단_건_조회_성공() throws Exception {
+        AgonyRecord agonyRecord = AgonyRecord.builder()
+            .id(1L)
+            .title("title1")
+            .content("content1")
+            .build();
+        agonyRecord.setCreatedAt(LocalDateTime.now());
+        given(agonyRecordRepository.findUserAgonyRecord(any(), any(), any(), any())).willReturn(Optional.ofNullable(agonyRecord));
+
+        AgonyRecordResponse actual = agonyRecordService.searchAgonyRecord(1L, 1L, 1L, 1L);
+
+        AgonyRecordResponse expected = AgonyRecordResponse.from(agonyRecord);
+        assertThat(actual).isEqualTo(expected);
     }
 
     @Test

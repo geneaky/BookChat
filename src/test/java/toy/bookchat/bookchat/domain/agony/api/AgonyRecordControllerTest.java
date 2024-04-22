@@ -1,12 +1,15 @@
 package toy.bookchat.bookchat.domain.agony.api;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpHeaders.LOCATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.headers.HeaderDocumentation.responseHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
@@ -39,6 +42,7 @@ import toy.bookchat.bookchat.domain.agony.AgonyRecord;
 import toy.bookchat.bookchat.domain.agony.service.AgonyRecordService;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateAgonyRecordRequest;
 import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRecordRequest;
+import toy.bookchat.bookchat.domain.agony.service.dto.response.AgonyRecordResponse;
 import toy.bookchat.bookchat.domain.agony.service.dto.response.SliceOfAgonyRecordsResponse;
 
 @AgonyRecordPresentationTest
@@ -55,29 +59,68 @@ class AgonyRecordControllerTest extends ControllerTestExtension {
 
     @Test
     void 생성된_고민에_고민기록_추가_성공() throws Exception {
-        CreateAgonyRecordRequest createAgonyRecordRequest = new CreateAgonyRecordRequest(
-            "title", "blabla");
+        CreateAgonyRecordRequest createAgonyRecordRequest = new CreateAgonyRecordRequest("title", "blabla");
 
         mockMvc.perform(post("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records", 1, 1)
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(createAgonyRecordRequest)))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated())
             .andDo(document("post-agonyrecord",
-                requestHeaders(
-                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
-                ),
-                pathParameters(
-                    parameterWithName("bookShelfId").description("BookShelf Id"),
-                    parameterWithName("agonyId").description("Agony Id")
-                ),
-                requestFields(
-                    fieldWithPath("title").description("고민기록의 제목"),
-                    fieldWithPath("content").optional().description("고민기록의 내용")
-                )));
+                    requestHeaders(
+                        headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
+                    ),
+                    pathParameters(
+                        parameterWithName("bookShelfId").description("BookShelf Id"),
+                        parameterWithName("agonyId").description("Agony Id")
+                    ),
+                    requestFields(
+                        fieldWithPath("title").description("고민기록의 제목"),
+                        fieldWithPath("content").optional().description("고민기록의 내용")
+                    ),
+                    responseHeaders(
+                        headerWithName(LOCATION).description("생성된 고민기록의 URI")
+                    )
+                )
+            );
 
         verify(agonyRecordService).storeAgonyRecord(any(), any(), any(), any());
+    }
+
+    @Test
+    void 고민_기록_단_건_조회_성공() throws Exception {
+        given(agonyRecordService.searchAgonyRecord(any(), any(), any(), any())).willReturn(
+            AgonyRecordResponse.builder()
+                .agonyRecordId(1L)
+                .agonyRecordTitle("title")
+                .agonyRecordContent("content")
+                .createdAt(LocalDateTime.now().toString())
+                .build()
+        );
+
+        mockMvc.perform(get("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records/{recordId}", 1, 1, 1)
+                .header(AUTHORIZATION, JWT_TOKEN)
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isOk())
+            .andDo(document("get-agonies-record",
+                    requestHeaders(
+                        headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
+                    ),
+                    pathParameters(
+                        parameterWithName("bookShelfId").description("BookShelf Id"),
+                        parameterWithName("agonyId").description("Agony Id"),
+                        parameterWithName("recordId").description("Record Id")
+                    ),
+                    responseFields(
+                        fieldWithPath("agonyRecordId").type(NUMBER).description("고민 기록 Id"),
+                        fieldWithPath("agonyRecordTitle").type(STRING).description("고민 기록 제목"),
+                        fieldWithPath("agonyRecordContent").type(STRING).description("고민 기록 내용"),
+                        fieldWithPath("createdAt").type(STRING).description("고민 기록 생성 시간")
+                    )
+                )
+            );
+
     }
 
     @Test
