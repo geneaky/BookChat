@@ -553,6 +553,7 @@ include::{snippets}/post-scrap/http-request.adoc[]
 
 `Response`
 
+include::{snippets}/post-scrap/response-headers.adoc[]
 include::{snippets}/post-scrap/http-response.adoc[]
 
 ---
@@ -561,15 +562,33 @@ include::{snippets}/post-scrap/http-response.adoc[]
 
 `Request Header`
 
+include::{snippets}/get-scraps/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/get-scraps/request-parameters.adoc[]
+include::{snippets}/get-scraps/http-request.adoc[]
+
+`Response`
+
+include::{snippets}/get-scraps/http-response.adoc[]
+
+---
+
+=== 스크랩 단 건 조회
+
+`Request Header`
+
 include::{snippets}/get-scrap/request-headers.adoc[]
 
 `Request`
 
-include::{snippets}/get-scrap/request-parameters.adoc[]
+include::{snippets}/get-scrap/path-parameters.adoc[]
 include::{snippets}/get-scrap/http-request.adoc[]
 
 `Response`
 
+include::{snippets}/get-scrap/response-fields.adoc[]
 include::{snippets}/get-scrap/http-response.adoc[]
 
 ---
