@@ -31,6 +31,7 @@ public enum ErrorCode {
     AGONY("06"),
     DEVICE("07"),
     AGONY_RECORD("08"),
+    SCRAP("09"),
 
     //BAD REQUEST
     NOT_SUPPORTED_PAGING_CONDITION(BAD_REQUEST.value + ETC.value + "00"),
@@ -61,6 +62,7 @@ public enum ErrorCode {
     AGONY_NOT_FOUND(NOT_FOUND.value + AGONY.value + "00"),
     DEVICE_NOT_FOUND(NOT_FOUND.value + DEVICE.value + "00"),
     AGONY_RECORD_NOT_FOUND(NOT_FOUND.value + AGONY_RECORD.value + "00"),
+    SCRAP_NOT_FOUND(NOT_FOUND.value + SCRAP.value + "00"),
 
     //TOO MANY REQUESTS
     RATE_OVER_LIMIT(TOO_MANY_REQUESTS.value + ETC.value + "00"),

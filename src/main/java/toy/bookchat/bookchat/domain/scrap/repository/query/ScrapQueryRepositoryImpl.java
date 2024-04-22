@@ -8,9 +8,11 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
+import toy.bookchat.bookchat.domain.scrap.Scrap;
 import toy.bookchat.bookchat.domain.scrap.service.dto.response.ScrapResponse;
 
 @Repository
@@ -39,6 +41,17 @@ public class ScrapQueryRepositoryImpl implements ScrapQueryRepository {
             .fetch();
 
         return toSlice(scrapList, pageable);
+    }
+
+    @Override
+    public Optional<Scrap> findUserScrap(Long scrapId, Long userId) {
+        return Optional.ofNullable(
+            queryFactory.select(scrap)
+                .from(scrap)
+                .join(bookShelf).on(scrap.bookShelf.id.eq(bookShelf.id).and(bookShelf.user.id.eq(userId)))
+                .where(scrap.id.eq(scrapId))
+                .fetchOne()
+        );
     }
 
     private BooleanExpression gtCursorId(Long cursorId) {
