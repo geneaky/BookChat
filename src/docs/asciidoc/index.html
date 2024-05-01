@@ -2008,6 +2008,11 @@ Host: bookchat.link</code></pre>
 <td class="tableblock halign-left valign-top"><p class="tableblock">출판일자</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>lastUpdatedAt</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">서재 수정 일자</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>pages</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">현재 읽고 있는 페이지 번호</p></td>
@@ -2030,9 +2035,9 @@ Pragma: no-cache
 Expires: 0
 Strict-Transport-Security: max-age=31536000 ; includeSubDomains
 X-Frame-Options: DENY
-Content-Length: 202
+Content-Length: 247
 
-{"bookShelfId":234,"title":"effectiveJava","isbn":"124151214","bookCoverImageUrl":"bookCoverImage.com","publishAt":"2024-04-23","authors":["Joshua"],"publisher":"oreilly","star":"FOUR_HALF","pages":152}</code></pre>
+{"bookShelfId":234,"title":"effectiveJava","isbn":"124151214","bookCoverImageUrl":"bookCoverImage.com","publishAt":"2024-05-01","authors":["Joshua"],"publisher":"oreilly","star":"FOUR_HALF","pages":152,"lastUpdatedAt":"2024-05-01T13:30:08.109453"}</code></pre>
 </div>
 </div>
 <hr>
@@ -2129,7 +2134,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwicHJvdmlkZXIiOiJnb
 Content-Length: 204
 Host: bookchat.link
 
-{"bookRequest":{"isbn":"124151214","title":"effectiveJava","authors":["Joshua"],"publisher":"oreilly","bookCoverImageUrl":"bookCoverImage.com","publishAt":"2024-04-23"},"readingStatus":"WISH","star":null}</code></pre>
+{"bookRequest":{"isbn":"124151214","title":"effectiveJava","authors":["Joshua"],"publisher":"oreilly","bookCoverImageUrl":"bookCoverImage.com","publishAt":"2024-05-01"},"readingStatus":"WISH","star":null}</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2260,7 +2265,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwicHJvdmlkZXIiOiJnb
 Content-Length: 207
 Host: bookchat.link
 
-{"bookRequest":{"isbn":"124151214","title":"effectiveJava","authors":["Joshua"],"publisher":"oreilly","bookCoverImageUrl":"bookCoverImage.com","publishAt":"2024-04-23"},"readingStatus":"READING","star":null}</code></pre>
+{"bookRequest":{"isbn":"124151214","title":"effectiveJava","authors":["Joshua"],"publisher":"oreilly","bookCoverImageUrl":"bookCoverImage.com","publishAt":"2024-05-01"},"readingStatus":"READING","star":null}</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2397,7 +2402,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwicHJvdmlkZXIiOiJnb
 Content-Length: 210
 Host: bookchat.link
 
-{"bookRequest":{"isbn":"124151214","title":"effectiveJava","authors":["Joshua"],"publisher":"oreilly","bookCoverImageUrl":"bookCoverImage.com","publishAt":"2024-04-23"},"readingStatus":"COMPLETE","star":"FOUR"}</code></pre>
+{"bookRequest":{"isbn":"124151214","title":"effectiveJava","authors":["Joshua"],"publisher":"oreilly","bookCoverImageUrl":"bookCoverImage.com","publishAt":"2024-05-01"},"readingStatus":"COMPLETE","star":"FOUR"}</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2556,6 +2561,11 @@ Host: bookchat.link</code></pre>
 <td class="tableblock halign-left valign-top"><p class="tableblock">출판일자</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>contents[].lastUpdatedAt</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">서재 수정 일자</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>contents[].pages</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">현재 읽고 있는 페이지 번호</p></td>
@@ -2609,7 +2619,7 @@ Host: bookchat.link</code></pre>
 </table>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-none hljs">{"pageMeta":{"totalElements":1,"totalPages":1,"pageSize":1,"pageNumber":0,"offset":0,"first":true,"last":true,"empty":false},"contents":[{"bookShelfId":1,"title":"effectiveJava","isbn":"12345","bookCoverImageUrl":"testBookCoverImageUrl","publishAt":"2024-04-23","authors":["joshua"],"publisher":"testBookCoverImageUrl","star":null,"pages":0}]}</code></pre>
+<pre class="highlightjs highlight nowrap"><code class="language-none hljs">{"pageMeta":{"totalElements":1,"totalPages":1,"pageSize":1,"pageNumber":0,"offset":0,"first":true,"last":true,"empty":false},"contents":[{"bookShelfId":1,"title":"effectiveJava","isbn":"12345","bookCoverImageUrl":"testBookCoverImageUrl","publishAt":"2024-05-01","authors":["joshua"],"publisher":"testBookCoverImageUrl","star":null,"pages":0,"lastUpdatedAt":"2024-05-01T13:30:07.660041"}]}</code></pre>
 </div>
 </div>
 <hr>
@@ -2734,6 +2744,11 @@ Host: bookchat.link</code></pre>
 <td class="tableblock halign-left valign-top"><p class="tableblock">출판일자</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>contents[].lastUpdatedAt</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">서재 수정 일자</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>contents[].pages</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">현재 읽고 있는 페이지 번호</p></td>
@@ -2787,7 +2802,7 @@ Host: bookchat.link</code></pre>
 </table>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-none hljs">{"pageMeta":{"totalElements":1,"totalPages":1,"pageSize":1,"pageNumber":0,"offset":0,"first":true,"last":true,"empty":false},"contents":[{"bookShelfId":1,"title":"effectiveJava","isbn":"12345","bookCoverImageUrl":"testBookCoverImageUrl","publishAt":"2024-04-23","authors":["joshua"],"publisher":"testBookCoverImageUrl","star":null,"pages":152}]}</code></pre>
+<pre class="highlightjs highlight nowrap"><code class="language-none hljs">{"pageMeta":{"totalElements":1,"totalPages":1,"pageSize":1,"pageNumber":0,"offset":0,"first":true,"last":true,"empty":false},"contents":[{"bookShelfId":1,"title":"effectiveJava","isbn":"12345","bookCoverImageUrl":"testBookCoverImageUrl","publishAt":"2024-05-01","authors":["joshua"],"publisher":"testBookCoverImageUrl","star":null,"pages":152,"lastUpdatedAt":"2024-05-01T13:30:07.765499"}]}</code></pre>
 </div>
 </div>
 <hr>
@@ -2912,6 +2927,11 @@ Host: bookchat.link</code></pre>
 <td class="tableblock halign-left valign-top"><p class="tableblock">출판일자</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>contents[].lastUpdatedAt</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">서재 수정 일자</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>contents[].pages</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">현재 읽고 있는 페이지 번호</p></td>
@@ -2965,7 +2985,7 @@ Host: bookchat.link</code></pre>
 </table>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-none hljs">{"pageMeta":{"totalElements":1,"totalPages":1,"pageSize":1,"pageNumber":0,"offset":0,"first":true,"last":true,"empty":false},"contents":[{"bookShelfId":1,"title":"effectiveJava","isbn":"12345","bookCoverImageUrl":"testBookCoverImageUrl","publishAt":"2024-04-23","authors":["joshua"],"publisher":"testBookCoverImageUrl","star":"FOUR_HALF","pages":0}]}</code></pre>
+<pre class="highlightjs highlight nowrap"><code class="language-none hljs">{"pageMeta":{"totalElements":1,"totalPages":1,"pageSize":1,"pageNumber":0,"offset":0,"first":true,"last":true,"empty":false},"contents":[{"bookShelfId":1,"title":"effectiveJava","isbn":"12345","bookCoverImageUrl":"testBookCoverImageUrl","publishAt":"2024-05-01","authors":["joshua"],"publisher":"testBookCoverImageUrl","star":"FOUR_HALF","pages":0,"lastUpdatedAt":"2024-05-01T13:30:07.039839"}]}</code></pre>
 </div>
 </div>
 <hr>
@@ -3022,7 +3042,7 @@ Host: bookchat.link</code></pre>
 </table>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /v1/api/bookshelves/book?isbn=1234567891011+0123456789&amp;publishAt=2024-04-23 HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /v1/api/bookshelves/book?isbn=1234567891011+0123456789&amp;publishAt=2024-05-01 HTTP/1.1
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwicHJvdmlkZXIiOiJnb29nbGUiLCJuYW1lIjoiZ29vZ2xlMTIzIiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSJ9.LKub56oLOIJFlTzNiwxqH0V4SubOOBiIZESje9yJDco
 Host: bookchat.link</code></pre>
 </div>
