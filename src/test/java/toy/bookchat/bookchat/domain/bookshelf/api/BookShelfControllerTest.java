@@ -35,6 +35,7 @@ import static toy.bookchat.bookchat.domain.bookshelf.Star.FOUR_HALF;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -116,6 +117,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .publishAt(LocalDate.now())
             .pages(152)
             .star(FOUR_HALF)
+            .lastUpdatedAt(LocalDateTime.now())
             .build();
         given(bookShelfService.getBookOnBookShelf(any(), any())).willReturn(response);
 
@@ -138,6 +140,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
                     fieldWithPath("authors[]").type(ARRAY).description("저자"),
                     fieldWithPath("publisher").type(STRING).description("출판사"),
                     fieldWithPath("publishAt").type(STRING).description("출판일자"),
+                    fieldWithPath("lastUpdatedAt").type(STRING).description("서재 수정 일자"),
                     fieldWithPath("pages").type(NUMBER).description("현재 읽고 있는 페이지 번호"),
                     fieldWithPath("star").type(STRING).optional().description("평점"))
             ));
@@ -472,6 +475,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .pages(152)
             .readingStatus(READING)
             .build();
+        bookShelf.setUpdatedAt(LocalDateTime.now());
 
         result.add(bookShelf);
 
@@ -513,6 +517,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
                     fieldWithPath("contents[].authors[]").type(ARRAY).description("저자"),
                     fieldWithPath("contents[].publisher").type(STRING).description("출판사"),
                     fieldWithPath("contents[].publishAt").type(STRING).description("출판일자"),
+                    fieldWithPath("contents[].lastUpdatedAt").type(STRING).description("서재 수정 일자"),
                     fieldWithPath("contents[].pages").type(NUMBER).description("현재 읽고 있는 페이지 번호"),
                     fieldWithPath("contents[].star").type(STRING).optional().description("평점"))
                     .and(getPageField()))
@@ -546,6 +551,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .readingStatus(READING)
             .star(FOUR_HALF)
             .build();
+        bookShelf.setUpdatedAt(LocalDateTime.now());
 
         result.add(bookShelf);
 
@@ -587,6 +593,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
                     fieldWithPath("contents[].authors[]").type(ARRAY).description("저자"),
                     fieldWithPath("contents[].publisher").type(STRING).description("출판사"),
                     fieldWithPath("contents[].publishAt").type(STRING).description("출판일자"),
+                    fieldWithPath("contents[].lastUpdatedAt").type(STRING).description("서재 수정 일자"),
                     fieldWithPath("contents[].pages").type(NUMBER).description("현재 읽고 있는 페이지 번호"),
                     fieldWithPath("contents[].star").type(STRING).description("평점"))
                     .and(getPageField()))
@@ -619,6 +626,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .readingStatus(WISH)
             .star(null)
             .build();
+        bookShelf.setUpdatedAt(LocalDateTime.now());
 
         result.add(bookShelf);
 
@@ -660,6 +668,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
                     fieldWithPath("contents[].authors[]").type(ARRAY).description("저자"),
                     fieldWithPath("contents[].publisher").type(STRING).description("출판사"),
                     fieldWithPath("contents[].publishAt").type(STRING).description("출판일자"),
+                    fieldWithPath("contents[].lastUpdatedAt").type(STRING).description("서재 수정 일자"),
                     fieldWithPath("contents[].pages").type(NUMBER).description("현재 읽고 있는 페이지 번호"),
                     fieldWithPath("contents[].star").type(STRING).optional().description("평점"))
                     .and(getPageField()))
