@@ -1,6 +1,7 @@
 package toy.bookchat.bookchat.domain.bookshelf.service.dto.response;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -21,11 +22,12 @@ public class BookShelfResponse {
     private String publisher;
     private Star star;
     private Integer pages;
+    private LocalDateTime lastUpdatedAt;
 
     @Builder
     private BookShelfResponse(Long bookShelfId, String title, String isbn,
         String bookCoverImageUrl, LocalDate publishAt, List<String> authors, String publisher,
-        Star star, Integer pages) {
+        Star star, Integer pages, LocalDateTime lastUpdatedAt) {
         this.bookShelfId = bookShelfId;
         this.title = title;
         this.isbn = isbn;
@@ -35,6 +37,7 @@ public class BookShelfResponse {
         this.publisher = publisher;
         this.star = star;
         this.pages = pages;
+        this.lastUpdatedAt = lastUpdatedAt;
     }
 
     public static BookShelfResponse from(BookShelf bookShelf) {
@@ -48,6 +51,7 @@ public class BookShelfResponse {
             .publishAt(bookShelf.getBook().getPublishAt())
             .star(bookShelf.getStar())
             .pages(bookShelf.getPages())
+            .lastUpdatedAt(bookShelf.getUpdatedAt())
             .build();
     }
 }
