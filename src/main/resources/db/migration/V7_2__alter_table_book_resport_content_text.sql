@@ -1,0 +1,1 @@
+alter table book_report modify content longtext null;
