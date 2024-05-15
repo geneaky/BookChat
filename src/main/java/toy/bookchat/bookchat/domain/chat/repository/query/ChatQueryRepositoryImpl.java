@@ -1,7 +1,6 @@
 package toy.bookchat.bookchat.domain.chat.repository.query;
 
 import static toy.bookchat.bookchat.domain.chat.QChat.chat;
-import static toy.bookchat.bookchat.domain.chatroom.QChatRoom.chatRoom;
 import static toy.bookchat.bookchat.domain.common.RepositorySupport.extractOrderSpecifierFrom;
 import static toy.bookchat.bookchat.domain.common.RepositorySupport.numberBasedPagination;
 import static toy.bookchat.bookchat.domain.common.RepositorySupport.toSlice;
@@ -46,11 +45,11 @@ public class ChatQueryRepositoryImpl implements ChatQueryRepository {
             .from(chat)
             .join(chat.user, user).fetchJoin()
             .where(chat.id.eq(chatId)
-                .and(chat.chatRoom.id.eq(
+                .and(chat.chatRoom.id.in(
                     JPAExpressions.select(participant.chatRoom.id)
                         .from(participant)
-                        .where(participant.user.id.eq(userId)
-                            .and(participant.chatRoom.id.eq(chatRoom.id))))))
+                        .where(participant.user.id.eq(userId)))
+                ))
             .fetchOne());
     }
 }
