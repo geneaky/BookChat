@@ -18,8 +18,8 @@ import lombok.Getter;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
 import toy.bookchat.bookchat.domain.user.User;
 
-@Entity
 @Getter
+@Entity
 public class Participant {
 
     @Id

@@ -38,6 +38,7 @@ import toy.bookchat.bookchat.domain.storage.StorageService;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.service.UserReader;
 import toy.bookchat.bookchat.exception.badrequest.chatroom.ChatRoomIsFullException;
+import toy.bookchat.bookchat.exception.badrequest.participant.AlreadyParticipateException;
 import toy.bookchat.bookchat.exception.forbidden.chatroom.BlockedUserInChatRoomException;
 import toy.bookchat.bookchat.exception.notfound.chatroom.ChatRoomNotFoundException;
 import toy.bookchat.bookchat.exception.notfound.pariticipant.ParticipantNotFoundException;
@@ -173,6 +174,10 @@ public class ChatRoomService {
     public void enterChatRoom(Long userId, Long roomId) {
         User user = userReader.readUser(userId);
         ChatRoom chatRoom = chatRoomRepository.findById(roomId).orElseThrow(ChatRoomNotFoundException::new);
+        participantRepository.findByUserIdAndChatRoomId(user.getId(), chatRoom.getId())
+            .ifPresent(p -> {
+                throw new AlreadyParticipateException();
+            });
 
         if (chatRoom.getHost() != user) {
             checkIsBlockedUser(user, chatRoom);
