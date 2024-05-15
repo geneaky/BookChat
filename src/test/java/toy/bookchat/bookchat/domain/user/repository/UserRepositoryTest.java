@@ -122,4 +122,19 @@ class UserRepositoryTest {
             userRepository.flush();
         }).isInstanceOf(DataIntegrityViolationException.class);
     }
+
+    @Test
+    void 이미_존재하는_nickname인_경우_생성_실패() throws Exception {
+        User user1 = User.builder()
+            .nickname("test nickname")
+            .build();
+
+        userRepository.save(user1);
+
+        User user2 = User.builder()
+            .nickname("test nickname")
+            .build();
+        assertThatThrownBy(() -> userRepository.save(user2))
+            .isInstanceOf(DataIntegrityViolationException.class);
+    }
 }

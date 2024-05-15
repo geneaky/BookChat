@@ -1,11 +1,13 @@
 package toy.bookchat.bookchat.domain.bookshelf.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -306,5 +308,31 @@ class BookShelfRepositoryTest {
             book.getIsbn(), book.getPublishAt()).get();
 
         assertThat(findBookShelf).isEqualTo(bookShelf1);
+    }
+
+    @Test
+    void 서재에_도서_중복_저장_실패() throws Exception {
+        Book book = getBook("1-4133-0454-0");
+        bookRepository.save(book);
+
+        User user = User.builder().name("hi").build();
+        userRepository.save(user);
+
+        BookShelf bookShelf1 = BookShelf.builder()
+            .book(book)
+            .user(user)
+            .readingStatus(ReadingStatus.READING)
+            .build();
+
+        bookShelfRepository.save(bookShelf1);
+
+        BookShelf bookShelf2 = BookShelf.builder()
+            .book(book)
+            .user(user)
+            .readingStatus(ReadingStatus.READING)
+            .build();
+
+        assertThatThrownBy(() -> bookShelfRepository.save(bookShelf2))
+            .isInstanceOf(DataIntegrityViolationException.class);
     }
 }

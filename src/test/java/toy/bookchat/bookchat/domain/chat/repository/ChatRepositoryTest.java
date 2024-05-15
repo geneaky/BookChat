@@ -113,33 +113,49 @@ class ChatRepositoryTest {
             .build();
         userRepository.saveAll(List.of(user1, user2));
 
-        ChatRoom chatRoom = ChatRoom.builder()
+        ChatRoom chatRoom1 = ChatRoom.builder()
             .host(user1)
             .roomSize(348)
             .roomSid("XKewmLwG")
             .defaultRoomImageType(1)
             .build();
-        chatRoomRepository.save(chatRoom);
+        ChatRoom chatRoom2 = ChatRoom.builder()
+            .host(user1)
+            .roomSize(200)
+            .roomSid("pzSzDwI0Ev")
+            .defaultRoomImageType(1)
+            .build();
+        chatRoomRepository.saveAll(List.of(chatRoom1, chatRoom2));
 
         Chat chat = Chat.builder()
             .user(user1)
             .message("test")
-            .chatRoom(chatRoom)
+            .chatRoom(chatRoom1)
             .user(user1)
             .build();
         chatRepository.save(chat);
 
         Participant participant1 = Participant.builder()
             .user(user1)
-            .chatRoom(chatRoom)
+            .chatRoom(chatRoom1)
             .participantStatus(ParticipantStatus.HOST)
             .build();
         Participant participant2 = Participant.builder()
             .user(user2)
-            .chatRoom(chatRoom)
+            .chatRoom(chatRoom1)
             .participantStatus(ParticipantStatus.GUEST)
             .build();
-        participantRepository.saveAll(List.of(participant1, participant2));
+        Participant participant3 = Participant.builder()
+            .user(user1)
+            .chatRoom(chatRoom2)
+            .participantStatus(ParticipantStatus.HOST)
+            .build();
+        Participant participant4 = Participant.builder()
+            .user(user2)
+            .chatRoom(chatRoom2)
+            .participantStatus(ParticipantStatus.GUEST)
+            .build();
+        participantRepository.saveAll(List.of(participant1, participant2, participant3, participant4));
 
         em.flush();
         em.clear();
@@ -150,7 +166,7 @@ class ChatRepositoryTest {
         assertAll(
             () -> assertThat(findChat.getUser()).extracting(User::getId, User::getNickname, User::getProfileImageUrl, User::getDefaultProfileImageType)
                 .containsExactly(user1.getId(), user1.getNickname(), user1.getProfileImageUrl(), user1.getDefaultProfileImageType()),
-            () -> assertThat(findChat.getChatRoom().getId()).isEqualTo(chatRoom.getId())
+            () -> assertThat(findChat.getChatRoom().getId()).isEqualTo(chatRoom1.getId())
         );
     }
 }

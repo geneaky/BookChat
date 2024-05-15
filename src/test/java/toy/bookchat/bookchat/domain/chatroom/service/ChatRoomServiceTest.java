@@ -56,6 +56,7 @@ import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.service.UserReader;
 import toy.bookchat.bookchat.exception.badrequest.chatroom.ChatRoomIsFullException;
 import toy.bookchat.bookchat.exception.badrequest.chatroom.NotEnoughRoomSizeException;
+import toy.bookchat.bookchat.exception.badrequest.participant.AlreadyParticipateException;
 import toy.bookchat.bookchat.exception.forbidden.chatroom.BlockedUserInChatRoomException;
 import toy.bookchat.bookchat.exception.notfound.chatroom.ChatRoomNotFoundException;
 import toy.bookchat.bookchat.infrastructure.broker.MessagePublisher;
@@ -387,6 +388,15 @@ class ChatRoomServiceTest {
         assertThatThrownBy(() -> {
             chatRoomService.enterChatRoom(user.getId(), chatRoom.getId());
         }).isInstanceOf(ChatRoomIsFullException.class);
+    }
+
+    @Test
+    void 이미_입장한_사용자는_중복_입장_실패() throws Exception {
+        given(userReader.readUser(anyLong())).willReturn(mock(User.class));
+        given(chatRoomRepository.findById(any())).willReturn(Optional.ofNullable(mock(ChatRoom.class)));
+        given(participantRepository.findByUserIdAndChatRoomId(any(), any())).willReturn(Optional.ofNullable(mock(Participant.class)));
+
+        assertThatThrownBy(() -> chatRoomService.enterChatRoom(1L, 1L)).isInstanceOf(AlreadyParticipateException.class);
     }
 
     @Test
