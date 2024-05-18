@@ -217,6 +217,23 @@ include::{snippets}/update-fcm-token/request-fields.adoc[]
 
 include::{snippets}/update-fcm-token/http-response.adoc[]
 
+== 회원
+
+=== 회원 정보 조회
+
+`Request Header`
+
+include::{snippets}/get-member-profile/request-headers.adoc[]
+
+`Request`
+
+include::{snippets}/get-member-profile/request-parameters.adoc[]
+
+`Response`
+
+include::{snippets}/get-member-profile/response-fields.adoc[]
+include::{snippets}/get-member-profile/http-response.adoc[]
+
 == 도서
 
 === 도서 검색
