@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import toy.bookchat.bookchat.domain.user.api.dto.Token;
+import toy.bookchat.bookchat.domain.user.api.dto.response.Token;
 import toy.bookchat.bookchat.security.token.dto.RefreshTokenRequest;
 
 @RestController

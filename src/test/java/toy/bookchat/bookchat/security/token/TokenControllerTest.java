@@ -27,7 +27,7 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
-import toy.bookchat.bookchat.domain.user.api.dto.Token;
+import toy.bookchat.bookchat.domain.user.api.dto.response.Token;
 import toy.bookchat.bookchat.exception.unauthorized.DeniedTokenException;
 import toy.bookchat.bookchat.exception.unauthorized.ExpiredTokenException;
 import toy.bookchat.bookchat.security.SecurityConfig;
