@@ -14,6 +14,7 @@ import toy.bookchat.bookchat.domain.device.Device;
 import toy.bookchat.bookchat.domain.device.service.DeviceService;
 import toy.bookchat.bookchat.domain.storage.StorageService;
 import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.api.dto.response.MemberProfileResponse;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.domain.user.service.dto.request.ChangeUserNicknameRequest;
 import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignInRequest;
@@ -141,5 +142,11 @@ public class UserService {
     @Transactional
     public void deleteDevice(Long userId) {
         deviceService.deleteUserDevice(userId);
+    }
+
+    @Transactional(readOnly = true)
+    public MemberProfileResponse getMemberProfile(Long memberId) {
+        User user = userReader.readUser(memberId);
+        return MemberProfileResponse.of(user);
     }
 }

@@ -12,13 +12,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import toy.bookchat.bookchat.domain.common.RateLimit;
 import toy.bookchat.bookchat.domain.user.User;
-import toy.bookchat.bookchat.domain.user.api.dto.Token;
-import toy.bookchat.bookchat.domain.user.api.dto.UserProfileResponse;
+import toy.bookchat.bookchat.domain.user.api.dto.response.MemberProfileResponse;
+import toy.bookchat.bookchat.domain.user.api.dto.response.Token;
+import toy.bookchat.bookchat.domain.user.api.dto.response.UserProfileResponse;
 import toy.bookchat.bookchat.domain.user.service.UserService;
 import toy.bookchat.bookchat.domain.user.service.dto.request.ChangeUserNicknameRequest;
 import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignInRequest;
@@ -110,5 +112,10 @@ public class UserController {
     @DeleteMapping("/users")
     public void withdrawUser(@UserPayload TokenPayload tokenPayload) {
         userService.deleteUser(tokenPayload.getUserId());
+    }
+
+    @GetMapping("/members")
+    public MemberProfileResponse memberProfile(@RequestParam Long memberId) {
+        return userService.getMemberProfile(memberId);
     }
 }
