@@ -3,6 +3,7 @@ package toy.bookchat.bookchat.domain.user.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -27,6 +28,7 @@ import toy.bookchat.bookchat.domain.device.service.DeviceService;
 import toy.bookchat.bookchat.domain.storage.StorageService;
 import toy.bookchat.bookchat.domain.storage.image.ImageValidator;
 import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.api.dto.response.MemberProfileResponse;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.domain.user.service.dto.request.ChangeUserNicknameRequest;
 import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignInRequest;
@@ -216,5 +218,23 @@ class UserServiceTest {
         userService.deleteDevice(17L);
 
         verify(deviceService).deleteUserDevice(eq(17L));
+    }
+
+    @Test
+    void 회원_프로필_정보_조회_성공() throws Exception {
+        User user = User.builder()
+            .id(1L)
+            .nickname("user1")
+            .email("kKvTABYqa@test.com")
+            .profileImageUrl("profile-image-url")
+            .defaultProfileImageType(2)
+            .build();
+
+        given(userReader.readUser(anyLong())).willReturn(user);
+
+        MemberProfileResponse expectedMemberProfileResponse = MemberProfileResponse.of(user);
+        MemberProfileResponse memberProfileResponse = userService.getMemberProfile(1L);
+
+        assertThat(memberProfileResponse).isEqualTo(expectedMemberProfileResponse);
     }
 }

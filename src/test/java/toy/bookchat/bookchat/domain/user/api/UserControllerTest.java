@@ -5,6 +5,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
@@ -63,8 +64,9 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.Base64Utils;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
 import toy.bookchat.bookchat.domain.user.User;
-import toy.bookchat.bookchat.domain.user.api.dto.Token;
-import toy.bookchat.bookchat.domain.user.api.dto.UserProfileResponse;
+import toy.bookchat.bookchat.domain.user.api.dto.response.MemberProfileResponse;
+import toy.bookchat.bookchat.domain.user.api.dto.response.Token;
+import toy.bookchat.bookchat.domain.user.api.dto.response.UserProfileResponse;
 import toy.bookchat.bookchat.domain.user.service.UserService;
 import toy.bookchat.bookchat.domain.user.service.dto.request.ChangeUserNicknameRequest;
 import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignInRequest;
@@ -563,5 +565,39 @@ class UserControllerTest extends ControllerTestExtension {
                 requestHeaders(
                     headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
                 )));
+    }
+
+    @Test
+    void 회원정보_조회_요청_성공() throws Exception {
+        MemberProfileResponse response = MemberProfileResponse.builder()
+            .userId(1L)
+            .userNickname("test")
+            .userEmail("nkwksn1sse")
+            .userProfileImageUri("test")
+            .defaultProfileImageType(1)
+            .build();
+
+        given(userService.getMemberProfile(any())).willReturn(response);
+
+        mockMvc.perform(get("/v1/api/members")
+                .param("memberId", "1")
+                .header(AUTHORIZATION, JWT_TOKEN)
+                .with(user(getUserPrincipal())))
+            .andExpect(status().isOk())
+            .andDo(document("get-member-profile",
+                requestHeaders(
+                    headerWithName(AUTHORIZATION).description("Bearer [JWT token]")
+                ),
+                requestParameters(
+                    parameterWithName("memberId").description("회원 ID")
+                ),
+                responseFields(
+                    fieldWithPath("userId").type(NUMBER).description("사용자 ID"),
+                    fieldWithPath("userNickname").type(STRING).description("닉네임"),
+                    fieldWithPath("userEmail").type(STRING).description("이메일"),
+                    fieldWithPath("userProfileImageUri").type(STRING).description("프로필 사진 URI"),
+                    fieldWithPath("defaultProfileImageType").type(NUMBER).description("기본 이미지 타입")
+                )
+            ));
     }
 }
