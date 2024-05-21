@@ -234,7 +234,12 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
             .where(chatRoomHashTag.chatRoom.id.eq(roomId))
             .fetch();
 
-        return ChatRoomDetails.from(participants, roomTags);
+        Integer blockedUserExistence = queryFactory.selectOne()
+            .from(chatRoomBlockedUser)
+            .where(chatRoomBlockedUser.chatRoom.id.eq(roomId).and(chatRoomBlockedUser.user.id.eq(userId)))
+            .fetchFirst();
+
+        return ChatRoomDetails.from(participants, roomTags, blockedUserExistence != null);
     }
 
     @Override

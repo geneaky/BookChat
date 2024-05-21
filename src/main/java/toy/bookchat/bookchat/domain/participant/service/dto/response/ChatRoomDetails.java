@@ -25,13 +25,15 @@ public class ChatRoomDetails {
     private RoomHost roomHost;
     private List<RoomSubHost> roomSubHostList;
     private List<RoomGuest> roomGuestList;
+    private Boolean isBanned;
+    private Boolean isExploded;
 
     @Builder
     private ChatRoomDetails(Integer roomSize, List<String> roomTags, String roomName,
         String bookTitle,
         String bookCoverImageUrl, List<String> bookAuthors, RoomHost roomHost,
         List<RoomSubHost> roomSubHostList,
-        List<RoomGuest> roomGuestList) {
+        List<RoomGuest> roomGuestList, Boolean isBanned, Boolean isExploded) {
         this.roomSize = roomSize;
         this.roomTags = roomTags;
         this.roomName = roomName;
@@ -41,9 +43,11 @@ public class ChatRoomDetails {
         this.roomHost = roomHost;
         this.roomSubHostList = roomSubHostList;
         this.roomGuestList = roomGuestList;
+        this.isBanned = isBanned;
+        this.isExploded = isExploded;
     }
 
-    public static ChatRoomDetails from(List<Participant> participants, List<String> roomTags) {
+    public static ChatRoomDetails from(List<Participant> participants, List<String> roomTags, Boolean isBanned) {
         User host = getHost(participants);
         RoomHost roomHost = RoomHost.builder()
             .id(host.getId())
@@ -56,10 +60,9 @@ public class ChatRoomDetails {
         fillParticipantsResponse(participants, host, roomSubHostList, roomGuestList);
         ChatRoom chatRoom = getChatRoom(participants);
 
-        return new ChatRoomDetails(chatRoom.getRoomSize(), roomTags, chatRoom.getRoomName(),
-            chatRoom.getBookTitle(),
-            chatRoom.getBookCoverImageUrl(), chatRoom.getBookAuthors(), roomHost, roomSubHostList,
-            roomGuestList);
+        //isBanned 정보 추가
+        return new ChatRoomDetails(chatRoom.getRoomSize(), roomTags, chatRoom.getRoomName(), chatRoom.getBookTitle(), chatRoom.getBookCoverImageUrl(), chatRoom.getBookAuthors(), roomHost,
+            roomSubHostList, roomGuestList, isBanned, chatRoom.getIsDeleted());
     }
 
     private static ChatRoom getChatRoom(List<Participant> participants) {
