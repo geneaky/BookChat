@@ -228,6 +228,7 @@ include::{snippets}/get-member-profile/request-headers.adoc[]
 `Request`
 
 include::{snippets}/get-member-profile/request-parameters.adoc[]
+include::{snippets}/get-member-profile/http-request.adoc[]
 
 `Response`
 
