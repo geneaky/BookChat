@@ -200,18 +200,16 @@ class ChatRoomServiceTest {
             .roomName(chatRoom1.getRoomName())
             .roomMemberCount(1L)
             .defaultRoomImageType(chatRoom1.getDefaultRoomImageType())
+            .isBanned(false)
+            .isExploded(false)
             .build();
         List<UserChatRoomResponse> result = List.of(userChatRoomResponse);
         PageRequest pageRequest = PageRequest.of(0, 1, Sort.by("id").descending());
         Slice<UserChatRoomResponse> slice = new SliceImpl<>(result, pageRequest, true);
-        when(chatRoomRepository.findUserChatRoomsWithLastChat(any(), any(), any(),
-            any())).thenReturn(
-            slice);
-        UserChatRoomsResponseSlice userChatRoomsResponseSlice = chatRoomService.getUserChatRooms(
-            any(), any(), any(), any());
+        when(chatRoomRepository.findUserChatRoomsWithLastChat(any(), any(), any(), any())).thenReturn(slice);
+        UserChatRoomsResponseSlice userChatRoomsResponseSlice = chatRoomService.getUserChatRooms(any(), any(), any(), any());
 
-        assertThat(userChatRoomsResponseSlice).usingRecursiveComparison()
-            .isEqualTo(UserChatRoomsResponseSlice.of(slice));
+        assertThat(userChatRoomsResponseSlice).usingRecursiveComparison().isEqualTo(UserChatRoomsResponseSlice.of(slice));
     }
 
     @Test

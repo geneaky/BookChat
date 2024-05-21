@@ -102,6 +102,7 @@ class ChatRoomRepositoryTest {
             .roomSid("IwZrRxR5")
             .roomSize(110)
             .defaultRoomImageType(2)
+            .isDeleted(true)
             .build();
         ChatRoom chatRoom3 = ChatRoom.builder()
             .book(book1)
@@ -113,6 +114,12 @@ class ChatRoomRepositoryTest {
         chatRoomRepository.save(chatRoom1);
         chatRoomRepository.save(chatRoom2);
         chatRoomRepository.save(chatRoom3);
+
+        ChatRoomBlockedUser chatRoomBlockedUser = ChatRoomBlockedUser.builder()
+            .user(user1)
+            .chatRoom(chatRoom3)
+            .build();
+        chatRoomBlockedUserRepository.save(chatRoomBlockedUser);
 
         Participant participant1 = Participant.builder().user(user1).chatRoom(chatRoom1)
             .participantStatus(HOST).build();
@@ -167,6 +174,8 @@ class ChatRoomRepositoryTest {
             .lastChatId(chat4.getId())
             .lastChatContent(chat4.getMessage())
             .lastChatDispatchTime(chat4.getCreatedAt())
+            .isBanned(true)
+            .isExploded(false)
             .build();
 
         UserChatRoomResponse userChatRoomResponse2 = UserChatRoomResponse.builder()
@@ -184,14 +193,16 @@ class ChatRoomRepositoryTest {
             .lastChatId(chat2.getId())
             .lastChatContent(chat2.getMessage())
             .lastChatDispatchTime(chat2.getCreatedAt())
+            .isBanned(false)
+            .isExploded(true)
             .build();
 
         PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("id").descending());
         List<UserChatRoomResponse> contents = List.of(userChatRoomResponse1, userChatRoomResponse2);
         Slice<UserChatRoomResponse> result = toSlice(contents, pageRequest);
 
-        Slice<UserChatRoomResponse> slice = chatRoomRepository.findUserChatRoomsWithLastChat(
-            pageRequest, null, null, user1.getId());
+        Slice<UserChatRoomResponse> slice = chatRoomRepository.findUserChatRoomsWithLastChat(pageRequest, null, null, user1.getId());
+
         assertThat(slice.getContent()).usingRecursiveComparison()
             .ignoringFieldsOfTypes(LocalDateTime.class)
             .isEqualTo(result.getContent());
@@ -219,6 +230,7 @@ class ChatRoomRepositoryTest {
             .roomSid("4SyVX")
             .roomSize(77)
             .defaultRoomImageType(1)
+            .isDeleted(true)
             .build();
         ChatRoom chatRoom2 = ChatRoom.builder()
             .book(book2)
@@ -236,6 +248,12 @@ class ChatRoomRepositoryTest {
             .build();
         chatRoomRepository.saveAll(List.of(chatRoom1, chatRoom2, chatRoom3));
 
+        ChatRoomBlockedUser chatRoomBlockedUser = ChatRoomBlockedUser.builder()
+            .chatRoom(chatRoom1)
+            .user(user1)
+            .build();
+        chatRoomBlockedUserRepository.save(chatRoomBlockedUser);
+
         Participant participant1 = Participant.builder().user(user1).chatRoom(chatRoom1)
             .participantStatus(HOST).build();
         Participant participant2 = Participant.builder().user(user1).chatRoom(chatRoom2)
@@ -251,6 +269,8 @@ class ChatRoomRepositoryTest {
             .roomSid(chatRoom1.getRoomSid())
             .defaultRoomImageType(chatRoom1.getDefaultRoomImageType())
             .roomMemberCount(1L)
+            .isExploded(true)
+            .isBanned(true)
             .build();
 
         PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("id").ascending());

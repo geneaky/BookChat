@@ -253,7 +253,9 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                     fieldWithPath("userChatRoomResponseList[].senderDefaultProfileImageType").type(NUMBER).description("마지막 채팅 보낸 사람 기본 프로필 이미지 타입"),
                     fieldWithPath("userChatRoomResponseList[].lastChatId").type(NUMBER).description("마지막 채팅 ID"),
                     fieldWithPath("userChatRoomResponseList[].lastChatContent").type(STRING).description("마지막 채팅 내용"),
-                    fieldWithPath("userChatRoomResponseList[].lastChatDispatchTime").type(STRING).description("마지막 채팅 발송 시간")
+                    fieldWithPath("userChatRoomResponseList[].lastChatDispatchTime").type(STRING).description("마지막 채팅 발송 시간"),
+                    fieldWithPath("userChatRoomResponseList[].isBanned").type(BOOLEAN).description("사용자가 차단된 채팅방인지 여부"),
+                    fieldWithPath("userChatRoomResponseList[].isExploded").type(BOOLEAN).description("채팅방 폭파 여부")
                 ).and(getCursorField())));
     }
 
@@ -595,6 +597,8 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .lastChatId(chat.getId())
             .lastChatContent(chat.getMessage())
             .lastChatDispatchTime(LocalDateTime.now())
+            .isExploded(false)
+            .isBanned(false)
             .build();
     }
 }
