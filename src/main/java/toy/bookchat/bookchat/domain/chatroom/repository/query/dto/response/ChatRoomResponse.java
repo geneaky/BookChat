@@ -5,8 +5,10 @@ import java.util.List;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
+@ToString
 @EqualsAndHashCode
 public class ChatRoomResponse {
 
@@ -29,13 +31,15 @@ public class ChatRoomResponse {
     private Long lastChatId;
     private String lastChatMessage;
     private LocalDateTime lastChatDispatchTime;
+    private Boolean isEntered;
+    private Boolean isBanned;
 
     @Builder
     public ChatRoomResponse(Long roomId, String roomName, String roomSid,
         String bookTitle, String bookCoverImageUri, List<String> bookAuthors, Long hostId, String hostName,
         Integer hostDefaultProfileImageType, String hostProfileImageUri, Long roomMemberCount,
         Integer roomSize, Integer defaultRoomImageType,
-        String roomImageUri, String tags, Long lastChatSenderId, Long lastChatId, String lastChatMessage, LocalDateTime lastChatDispatchTime) {
+        String roomImageUri, String tags, Long lastChatSenderId, Long lastChatId, String lastChatMessage, LocalDateTime lastChatDispatchTime, Boolean isEntered, Boolean isBanned) {
         this.roomId = roomId;
         this.roomName = roomName;
         this.roomSid = roomSid;
@@ -55,6 +59,8 @@ public class ChatRoomResponse {
         this.lastChatId = lastChatId;
         this.lastChatMessage = lastChatMessage;
         this.lastChatDispatchTime = lastChatDispatchTime;
+        this.isEntered = isEntered;
+        this.isBanned = isBanned;
     }
 
     @Builder
@@ -62,7 +68,7 @@ public class ChatRoomResponse {
         String bookTitle, String bookCoverImageUri, Long hostId, String hostName,
         Integer hostDefaultProfileImageType, String hostProfileImageUri, Long roomMemberCount,
         Integer roomSize, Integer defaultRoomImageType,
-        String roomImageUri, String tags, Long lastChatSenderId, Long lastChatId, String lastChatMessage, LocalDateTime lastChatDispatchTime) {
+        String roomImageUri, String tags, Long lastChatSenderId, Long lastChatId, String lastChatMessage, LocalDateTime lastChatDispatchTime, Boolean isEntered, Boolean isBanned) {
         this.roomId = roomId;
         this.roomName = roomName;
         this.roomSid = roomSid;
@@ -81,6 +87,8 @@ public class ChatRoomResponse {
         this.lastChatId = lastChatId;
         this.lastChatMessage = lastChatMessage;
         this.lastChatDispatchTime = lastChatDispatchTime;
+        this.isEntered = isEntered;
+        this.isBanned = isBanned;
     }
 
     public void setBookAuthors(List<String> bookAuthors) {

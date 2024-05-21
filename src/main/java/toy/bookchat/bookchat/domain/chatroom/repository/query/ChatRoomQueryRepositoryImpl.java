@@ -5,12 +5,14 @@ import static java.util.stream.Collectors.toMap;
 import static toy.bookchat.bookchat.domain.book.QBook.book;
 import static toy.bookchat.bookchat.domain.chat.QChat.chat;
 import static toy.bookchat.bookchat.domain.chatroom.QChatRoom.chatRoom;
+import static toy.bookchat.bookchat.domain.chatroom.QChatRoomBlockedUser.chatRoomBlockedUser;
 import static toy.bookchat.bookchat.domain.chatroom.QChatRoomHashTag.chatRoomHashTag;
 import static toy.bookchat.bookchat.domain.chatroom.QHashTag.hashTag;
 import static toy.bookchat.bookchat.domain.common.RepositorySupport.toSlice;
 import static toy.bookchat.bookchat.domain.participant.QParticipant.participant;
 import static toy.bookchat.bookchat.domain.user.QUser.user;
 
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
@@ -123,7 +125,7 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
     }
 
     @Override
-    public Slice<ChatRoomResponse> findChatRooms(ChatRoomRequest chatRoomRequest,
+    public Slice<ChatRoomResponse> findChatRooms(Long userId, ChatRoomRequest chatRoomRequest,
         Pageable pageable) {
         QChat subChat = new QChat("subChat");
         QChatRoomHashTag subChatRoomHashTag = new QChatRoomHashTag("subChatRoomHashTag");
@@ -149,7 +151,10 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
                     chat.user.id,
                     chat.id,
                     chat.message,
-                    chat.createdAt))
+                    chat.createdAt,
+                    participant.id.isNotNull(),
+                    chatRoomBlockedUser.id.isNotNull()
+                ))
             .from(chatRoom)
             .join(user).on(chatRoom.host.id.eq(user.id))
             .join(book).on(chatRoom.book.id.eq(book.id))
@@ -159,6 +164,8 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
                     .where(subChatRoomHashTag.chatRoom.id.eq(chatRoom.id),
                         inTags(chatRoomRequest.getTags()))))
             .join(hashTag).on(hashTag.id.eq(chatRoomHashTag.hashTag.id))
+            .leftJoin(participant).on(chatRoom.id.eq(participant.chatRoom.id).and(participant.user.id.eq(userId)))
+            .leftJoin(chatRoomBlockedUser).on(chatRoomBlockedUser.chatRoom.id.eq(chatRoom.id).and(chatRoomBlockedUser.user.id.eq(userId)))
             .leftJoin(chat).on(chat.id.in(
                 JPAExpressions.select(subChat.id.max())
                     .from(subChat)
@@ -166,6 +173,7 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
                     .having(subChat.chatRoom.id.eq(chatRoom.id))))
             .groupBy(chatRoom.id, chat.id)
             .where(chat.chatRoom.id.eq(chatRoom.id),
+                notExplodedChatRoom(),
                 ltCursorId(chatRoomRequest.getPostCursorId()),
                 eqIsbn(chatRoomRequest.getIsbn()),
                 containsTitle(chatRoomRequest.getTitle()),
@@ -188,6 +196,10 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
         contents.forEach(c -> c.setBookAuthors(authorsMap.get(c.getRoomId())));
 
         return toSlice(contents, pageable);
+    }
+
+    private Predicate notExplodedChatRoom() {
+        return chatRoom.isDeleted.isFalse();
     }
 
     private BooleanExpression ltCursorId(Long cursorId) {

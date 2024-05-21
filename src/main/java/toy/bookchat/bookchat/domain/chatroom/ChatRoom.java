@@ -9,12 +9,14 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import lombok.Builder;
 import lombok.Getter;
+import org.hibernate.annotations.DynamicInsert;
 import toy.bookchat.bookchat.domain.BaseEntity;
 import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.user.User;
 
-@Entity
 @Getter
+@Entity
+@DynamicInsert
 public class ChatRoom extends BaseEntity {
 
     @Id
@@ -29,10 +31,10 @@ public class ChatRoom extends BaseEntity {
     private Book book;
     @ManyToOne(fetch = FetchType.LAZY)
     private User host;
+    private Boolean isDeleted;
 
     @Builder
-    private ChatRoom(Long id, String roomName, String roomSid, Integer roomSize,
-        Integer defaultRoomImageType, String roomImageUri, Book book, User host) {
+    private ChatRoom(Long id, String roomName, String roomSid, Integer roomSize, Integer defaultRoomImageType, String roomImageUri, Book book, User host, Boolean isDeleted) {
         this.id = id;
         this.roomName = roomName;
         this.roomSid = roomSid;
@@ -41,6 +43,7 @@ public class ChatRoom extends BaseEntity {
         this.roomImageUri = roomImageUri;
         this.book = book;
         this.host = host;
+        this.isDeleted = isDeleted;
     }
 
     protected ChatRoom() {
@@ -72,5 +75,9 @@ public class ChatRoom extends BaseEntity {
 
     public void changeRoomImageUri(String roomImageUri) {
         this.roomImageUri = roomImageUri;
+    }
+
+    public void explode() {
+        this.isDeleted = true;
     }
 }

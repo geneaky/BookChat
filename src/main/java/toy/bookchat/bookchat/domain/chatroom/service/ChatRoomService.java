@@ -135,8 +135,8 @@ public class ChatRoomService {
     }
 
     @Transactional(readOnly = true)
-    public ChatRoomsResponseSlice getChatRooms(ChatRoomRequest chatRoomRequest, Pageable pageable) {
-        return ChatRoomsResponseSlice.of(chatRoomRepository.findChatRooms(chatRoomRequest, pageable));
+    public ChatRoomsResponseSlice getChatRooms(Long userId, ChatRoomRequest chatRoomRequest, Pageable pageable) {
+        return ChatRoomsResponseSlice.of(chatRoomRepository.findChatRooms(userId, chatRoomRequest, pageable));
     }
 
     @Transactional(readOnly = true)
@@ -223,9 +223,7 @@ public class ChatRoomService {
         ChatRoom chatRoom = participant.getChatRoom();
 
         if (user == chatRoom.getHost()) {
-            chatRepository.deleteByChatRoom(chatRoom);
-            participantRepository.deleteByChatRoom(chatRoom);
-            chatRoomRepository.delete(chatRoom);
+            chatRoom.explode();
 
             messagePublisher.sendNotificationMessage(chatRoom.getRoomSid(), NotificationMessage.createHostExitMessage());
             return;
