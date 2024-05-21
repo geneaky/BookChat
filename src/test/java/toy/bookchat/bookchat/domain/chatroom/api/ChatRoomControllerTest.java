@@ -17,6 +17,7 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.multipart;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
+import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -312,6 +313,8 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .lastChatMessage("lastChatMessage")
             .tags("tag1,tag2,tag3")
             .lastChatDispatchTime(LocalDateTime.now())
+            .isEntered(true)
+            .isBanned(false)
             .build();
         ChatRoomResponse chatRoomResponse2 = ChatRoomResponse.builder()
             .roomId(2L)
@@ -333,6 +336,8 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .lastChatMessage("lastChatMessage2")
             .tags("tag4,tag2,tag3")
             .lastChatDispatchTime(LocalDateTime.now())
+            .isEntered(false)
+            .isBanned(true)
             .build();
         ChatRoomResponse chatRoomResponse3 = ChatRoomResponse.builder()
             .roomId(3L)
@@ -354,6 +359,8 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .lastChatMessage("lastChatMessage3")
             .tags("tag1,tag5,tag6")
             .lastChatDispatchTime(LocalDateTime.now())
+            .isEntered(false)
+            .isBanned(false)
             .build();
 
         List<ChatRoomResponse> contents = List.of(chatRoomResponse1, chatRoomResponse2,
@@ -364,7 +371,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
         Slice<ChatRoomResponse> chatRoomResponses = new SliceImpl<>(contents, pageable, true);
 
         ChatRoomsResponseSlice response = ChatRoomsResponseSlice.of(chatRoomResponses);
-        when(chatRoomService.getChatRooms(any(), any())).thenReturn(response);
+        when(chatRoomService.getChatRooms(any(), any(), any())).thenReturn(response);
 
         mockMvc.perform(get("/v1/api/chatrooms")
                 .header(AUTHORIZATION, JWT_TOKEN)
@@ -407,7 +414,9 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                     fieldWithPath("chatRoomResponseList[].lastChatSenderId").type(NUMBER).description("마지막 채팅 보낸 사람 ID"),
                     fieldWithPath("chatRoomResponseList[].lastChatId").type(NUMBER).description("마지막 채팅 ID"),
                     fieldWithPath("chatRoomResponseList[].lastChatMessage").type(STRING).description("마지막 채팅 내용"),
-                    fieldWithPath("chatRoomResponseList[].lastChatDispatchTime").type(STRING).description("마지막 채팅 발송 시간")
+                    fieldWithPath("chatRoomResponseList[].lastChatDispatchTime").type(STRING).description("마지막 채팅 발송 시간"),
+                    fieldWithPath("chatRoomResponseList[].isEntered").type(BOOLEAN).description("사용자가 참여한 채팅방인지 여부"),
+                    fieldWithPath("chatRoomResponseList[].isBanned").type(BOOLEAN).description("사용자가 차단된 채팅방인지 여부")
                 ).and(getCursorField())));
     }
 

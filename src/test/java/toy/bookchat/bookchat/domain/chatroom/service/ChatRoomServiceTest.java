@@ -280,9 +280,8 @@ class ChatRoomServiceTest {
         Pageable pageable = PageRequest.of(0, 3);
 
         Slice<ChatRoomResponse> chatRoomResponses = new SliceImpl<>(contents, pageable, true);
-        when(chatRoomRepository.findChatRooms(any(), any())).thenReturn(chatRoomResponses);
-        ChatRoomsResponseSlice result = chatRoomService.getChatRooms(mock(ChatRoomRequest.class),
-            mock(Pageable.class));
+        when(chatRoomRepository.findChatRooms(any(), any(), any())).thenReturn(chatRoomResponses);
+        ChatRoomsResponseSlice result = chatRoomService.getChatRooms(1L, mock(ChatRoomRequest.class), mock(Pageable.class));
 
         assertThat(result).isEqualTo(ChatRoomsResponseSlice.of(chatRoomResponses));
     }
@@ -495,11 +494,8 @@ class ChatRoomServiceTest {
             Optional.ofNullable(participant));
         chatRoomService.exitChatRoom(user.getId(), chatRoom.getId());
 
-        verify(chatRepository).deleteByChatRoom(any());
-        verify(participantRepository).deleteByChatRoom(any());
-        verify(chatRoomRepository).delete(any());
-        verify(messagePublisher).sendNotificationMessage(anyString(),
-            any(NotificationMessage.class));
+        assertThat(chatRoom.getIsDeleted()).isTrue();
+        verify(messagePublisher).sendNotificationMessage(anyString(), any(NotificationMessage.class));
     }
 
     @Test

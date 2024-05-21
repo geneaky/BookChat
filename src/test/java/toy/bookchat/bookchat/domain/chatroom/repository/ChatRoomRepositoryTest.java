@@ -22,6 +22,7 @@ import toy.bookchat.bookchat.domain.book.repository.BookRepository;
 import toy.bookchat.bookchat.domain.chat.Chat;
 import toy.bookchat.bookchat.domain.chat.repository.ChatRepository;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
+import toy.bookchat.bookchat.domain.chatroom.ChatRoomBlockedUser;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoomHashTag;
 import toy.bookchat.bookchat.domain.chatroom.HashTag;
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomResponse;
@@ -45,6 +46,8 @@ class ChatRoomRepositoryTest {
     HashTagRepository hashTagRepository;
     @Autowired
     ChatRoomHashTagRepository chatRoomHashTagRepository;
+    @Autowired
+    ChatRoomBlockedUserRepository chatRoomBlockedUserRepository;
     @Autowired
     ParticipantRepository participantRepository;
     @Autowired
@@ -360,8 +363,7 @@ class ChatRoomRepositoryTest {
             .tags(List.of("hashTag1"))
             .build();
 
-        Slice<ChatRoomResponse> result = chatRoomRepository.findChatRooms(
-            chatRoomRequest, pageable);
+        Slice<ChatRoomResponse> result = chatRoomRepository.findChatRooms(user1.getId(), chatRoomRequest, pageable);
 
         ChatRoomResponse expect = ChatRoomResponse.builder()
             .roomId(chatRoom1.getId())
@@ -383,6 +385,409 @@ class ChatRoomRepositoryTest {
             .lastChatId(chat5.getId())
             .lastChatMessage(chat5.getMessage())
             .lastChatDispatchTime(chat5.getCreatedAt())
+            .isEntered(true)
+            .isBanned(false)
+            .build();
+
+        assertThat(result.getContent()).isEqualTo(List.of(expect));
+    }
+
+    @Test
+    void 참여하지_않은_채팅방_조회_성공() throws Exception {
+        User user1 = User.builder()
+            .nickname("nickname1")
+            .profileImageUrl("profileImageUrl1")
+            .defaultProfileImageType(1)
+            .build();
+        User user2 = User.builder()
+            .nickname("nickname2")
+            .profileImageUrl("profileImageUrl2")
+            .defaultProfileImageType(2)
+            .build();
+        User user3 = User.builder()
+            .nickname("nickname3")
+            .profileImageUrl("profileImageUrl3")
+            .defaultProfileImageType(2)
+            .build();
+        userRepository.save(user1);
+        userRepository.save(user2);
+        userRepository.save(user3);
+
+        Book book = Book.builder()
+            .title("가나다 라마 바사")
+            .isbn("773898468")
+            .authors(List.of("author1", "author2"))
+            .bookCoverImageUrl("bookCoverImage")
+            .publishAt(LocalDate.now())
+            .build();
+        bookRepository.save(book);
+
+        ChatRoom chatRoom1 = ChatRoom.builder()
+            .book(book)
+            .host(user1)
+            .roomName("chatRoom1")
+            .roomSid("chatRoom1")
+            .roomSize(77)
+            .defaultRoomImageType(1)
+            .build();
+
+        ChatRoom chatRoom2 = ChatRoom.builder()
+            .book(book)
+            .host(user2)
+            .roomName("chatRoom2")
+            .roomSid("chatRoom2")
+            .roomSize(77)
+            .defaultRoomImageType(1)
+            .build();
+
+        chatRoomRepository.save(chatRoom1);
+        chatRoomRepository.save(chatRoom2);
+
+        HashTag tag1 = HashTag.of("hashTag1");
+        HashTag tag2 = HashTag.of("hashTag2");
+        HashTag tag3 = HashTag.of("hashTag3");
+        hashTagRepository.save(tag1);
+        hashTagRepository.save(tag2);
+        hashTagRepository.save(tag3);
+
+        chatRoomHashTagRepository.save(ChatRoomHashTag.of(chatRoom1, tag1));
+        chatRoomHashTagRepository.save(ChatRoomHashTag.of(chatRoom2, tag2));
+        chatRoomHashTagRepository.save(ChatRoomHashTag.of(chatRoom1, tag3));
+
+        Participant participant1 = Participant.builder().user(user1).chatRoom(chatRoom1)
+            .participantStatus(HOST).build();
+        Participant participant2 = Participant.builder().user(user2).chatRoom(chatRoom2)
+            .participantStatus(HOST).build();
+        Participant participant3 = Participant.builder().user(user2).chatRoom(chatRoom1)
+            .participantStatus(GUEST).build();
+        participantRepository.save(participant1);
+        participantRepository.save(participant2);
+        participantRepository.save(participant3);
+
+        Chat chat1 = Chat.builder()
+            .chatRoom(chatRoom1)
+            .user(user1)
+            .build();
+        Chat chat2 = Chat.builder()
+            .chatRoom(chatRoom1)
+            .user(user2)
+            .build();
+        Chat chat3 = Chat.builder()
+            .chatRoom(chatRoom2)
+            .user(user2)
+            .build();
+        Chat chat4 = Chat.builder()
+            .chatRoom(chatRoom1)
+            .user(user1)
+            .message("test chat5")
+            .build();
+        chatRepository.save(chat1);
+        chatRepository.save(chat2);
+        chatRepository.save(chat3);
+        chatRepository.save(chat4);
+
+        PageRequest pageable = PageRequest.of(0, 1);
+        ChatRoomRequest chatRoomRequest = ChatRoomRequest.builder()
+            .postCursorId(500L)
+            .tags(List.of("hashTag1"))
+            .build();
+
+        Slice<ChatRoomResponse> result = chatRoomRepository.findChatRooms(user3.getId(), chatRoomRequest, pageable);
+
+        ChatRoomResponse expect = ChatRoomResponse.builder()
+            .roomId(chatRoom1.getId())
+            .roomName(chatRoom1.getRoomName())
+            .roomSid(chatRoom1.getRoomSid())
+            .roomImageUri(chatRoom1.getRoomImageUri())
+            .roomMemberCount(2L)
+            .roomSize(chatRoom1.getRoomSize())
+            .defaultRoomImageType(chatRoom1.getDefaultRoomImageType())
+            .bookTitle(book.getTitle())
+            .bookCoverImageUri(book.getBookCoverImageUrl())
+            .bookAuthors(book.getAuthors())
+            .hostId(user1.getId())
+            .hostName(user1.getNickname())
+            .hostDefaultProfileImageType(user1.getDefaultProfileImageType())
+            .hostProfileImageUri(user1.getProfileImageUrl())
+            .tags("hashTag1,hashTag3")
+            .lastChatSenderId(chat4.getUserId())
+            .lastChatId(chat4.getId())
+            .lastChatMessage(chat4.getMessage())
+            .lastChatDispatchTime(chat4.getCreatedAt())
+            .isEntered(false)
+            .isBanned(false)
+            .build();
+
+        assertThat(result.getContent()).isEqualTo(List.of(expect));
+
+    }
+
+    @Test
+    void 강퇴당한_채팅방_조회_성공() throws Exception {
+        User user1 = User.builder()
+            .nickname("nickname1")
+            .profileImageUrl("profileImageUrl1")
+            .defaultProfileImageType(1)
+            .build();
+        User user2 = User.builder()
+            .nickname("nickname2")
+            .profileImageUrl("profileImageUrl2")
+            .defaultProfileImageType(2)
+            .build();
+        User user3 = User.builder()
+            .nickname("nickname3")
+            .profileImageUrl("profileImageUrl3")
+            .defaultProfileImageType(2)
+            .build();
+        userRepository.save(user1);
+        userRepository.save(user2);
+        userRepository.save(user3);
+
+        Book book = Book.builder()
+            .title("가나다 라마 바사")
+            .isbn("773898468")
+            .authors(List.of("author1", "author2"))
+            .bookCoverImageUrl("bookCoverImage")
+            .publishAt(LocalDate.now())
+            .build();
+        bookRepository.save(book);
+
+        ChatRoom chatRoom1 = ChatRoom.builder()
+            .book(book)
+            .host(user1)
+            .roomName("chatRoom1")
+            .roomSid("chatRoom1")
+            .roomSize(77)
+            .defaultRoomImageType(1)
+            .build();
+
+        ChatRoom chatRoom2 = ChatRoom.builder()
+            .book(book)
+            .host(user2)
+            .roomName("chatRoom2")
+            .roomSid("chatRoom2")
+            .roomSize(77)
+            .defaultRoomImageType(1)
+            .build();
+
+        chatRoomRepository.save(chatRoom1);
+        chatRoomRepository.save(chatRoom2);
+
+        ChatRoomBlockedUser chatRoomBlockedUser = ChatRoomBlockedUser.builder()
+            .chatRoom(chatRoom1)
+            .user(user3)
+            .build();
+        chatRoomBlockedUserRepository.save(chatRoomBlockedUser);
+
+        HashTag tag1 = HashTag.of("hashTag1");
+        HashTag tag2 = HashTag.of("hashTag2");
+        HashTag tag3 = HashTag.of("hashTag3");
+        hashTagRepository.save(tag1);
+        hashTagRepository.save(tag2);
+        hashTagRepository.save(tag3);
+
+        chatRoomHashTagRepository.save(ChatRoomHashTag.of(chatRoom1, tag1));
+        chatRoomHashTagRepository.save(ChatRoomHashTag.of(chatRoom2, tag2));
+        chatRoomHashTagRepository.save(ChatRoomHashTag.of(chatRoom1, tag3));
+
+        Participant participant1 = Participant.builder().user(user1).chatRoom(chatRoom1)
+            .participantStatus(HOST).build();
+        Participant participant2 = Participant.builder().user(user2).chatRoom(chatRoom2)
+            .participantStatus(HOST).build();
+        Participant participant3 = Participant.builder().user(user2).chatRoom(chatRoom1)
+            .participantStatus(GUEST).build();
+        participantRepository.save(participant1);
+        participantRepository.save(participant2);
+        participantRepository.save(participant3);
+
+        Chat chat1 = Chat.builder()
+            .chatRoom(chatRoom1)
+            .user(user1)
+            .build();
+        Chat chat2 = Chat.builder()
+            .chatRoom(chatRoom1)
+            .user(user2)
+            .build();
+        Chat chat3 = Chat.builder()
+            .chatRoom(chatRoom2)
+            .user(user2)
+            .build();
+        Chat chat4 = Chat.builder()
+            .chatRoom(chatRoom1)
+            .user(user1)
+            .message("test chat5")
+            .build();
+        chatRepository.save(chat1);
+        chatRepository.save(chat2);
+        chatRepository.save(chat3);
+        chatRepository.save(chat4);
+
+        PageRequest pageable = PageRequest.of(0, 1);
+        ChatRoomRequest chatRoomRequest = ChatRoomRequest.builder()
+            .postCursorId(500L)
+            .tags(List.of("hashTag1"))
+            .build();
+
+        Slice<ChatRoomResponse> result = chatRoomRepository.findChatRooms(user3.getId(), chatRoomRequest, pageable);
+
+        ChatRoomResponse expect = ChatRoomResponse.builder()
+            .roomId(chatRoom1.getId())
+            .roomName(chatRoom1.getRoomName())
+            .roomSid(chatRoom1.getRoomSid())
+            .roomImageUri(chatRoom1.getRoomImageUri())
+            .roomMemberCount(2L)
+            .roomSize(chatRoom1.getRoomSize())
+            .defaultRoomImageType(chatRoom1.getDefaultRoomImageType())
+            .bookTitle(book.getTitle())
+            .bookCoverImageUri(book.getBookCoverImageUrl())
+            .bookAuthors(book.getAuthors())
+            .hostId(user1.getId())
+            .hostName(user1.getNickname())
+            .hostDefaultProfileImageType(user1.getDefaultProfileImageType())
+            .hostProfileImageUri(user1.getProfileImageUrl())
+            .tags("hashTag1,hashTag3")
+            .lastChatSenderId(chat4.getUserId())
+            .lastChatId(chat4.getId())
+            .lastChatMessage(chat4.getMessage())
+            .lastChatDispatchTime(chat4.getCreatedAt())
+            .isEntered(false)
+            .isBanned(true)
+            .build();
+
+        assertThat(result.getContent()).isEqualTo(List.of(expect));
+    }
+
+    @Test
+    void 폭파된_채팅방은_제외되어_조회_성공() throws Exception {
+        User user1 = User.builder()
+            .nickname("nickname1")
+            .profileImageUrl("profileImageUrl1")
+            .defaultProfileImageType(1)
+            .build();
+        User user2 = User.builder()
+            .nickname("nickname2")
+            .profileImageUrl("profileImageUrl2")
+            .defaultProfileImageType(2)
+            .build();
+        User user3 = User.builder()
+            .nickname("nickname3")
+            .profileImageUrl("profileImageUrl3")
+            .defaultProfileImageType(2)
+            .build();
+        userRepository.save(user1);
+        userRepository.save(user2);
+        userRepository.save(user3);
+
+        Book book = Book.builder()
+            .title("가나다 라마 바사")
+            .isbn("773898468")
+            .authors(List.of("author1", "author2"))
+            .bookCoverImageUrl("bookCoverImage")
+            .publishAt(LocalDate.now())
+            .build();
+        bookRepository.save(book);
+
+        ChatRoom chatRoom1 = ChatRoom.builder()
+            .book(book)
+            .host(user1)
+            .roomName("chatRoom1")
+            .roomSid("chatRoom1")
+            .roomSize(77)
+            .defaultRoomImageType(1)
+            .isDeleted(true)
+            .build();
+
+        ChatRoom chatRoom2 = ChatRoom.builder()
+            .book(book)
+            .host(user2)
+            .roomName("chatRoom2")
+            .roomSid("chatRoom2")
+            .roomSize(77)
+            .defaultRoomImageType(1)
+            .build();
+
+        chatRoomRepository.save(chatRoom1);
+        chatRoomRepository.save(chatRoom2);
+
+        ChatRoomBlockedUser chatRoomBlockedUser = ChatRoomBlockedUser.builder()
+            .chatRoom(chatRoom2)
+            .user(user3)
+            .build();
+        chatRoomBlockedUserRepository.save(chatRoomBlockedUser);
+
+        HashTag tag1 = HashTag.of("hashTag1");
+        HashTag tag2 = HashTag.of("hashTag2");
+        HashTag tag3 = HashTag.of("hashTag3");
+        hashTagRepository.save(tag1);
+        hashTagRepository.save(tag2);
+        hashTagRepository.save(tag3);
+
+        chatRoomHashTagRepository.save(ChatRoomHashTag.of(chatRoom1, tag1));
+        chatRoomHashTagRepository.save(ChatRoomHashTag.of(chatRoom2, tag2));
+        chatRoomHashTagRepository.save(ChatRoomHashTag.of(chatRoom1, tag3));
+
+        Participant participant1 = Participant.builder().user(user1).chatRoom(chatRoom1)
+            .participantStatus(HOST).build();
+        Participant participant2 = Participant.builder().user(user2).chatRoom(chatRoom2)
+            .participantStatus(HOST).build();
+        Participant participant3 = Participant.builder().user(user2).chatRoom(chatRoom1)
+            .participantStatus(GUEST).build();
+        participantRepository.save(participant1);
+        participantRepository.save(participant2);
+        participantRepository.save(participant3);
+
+        Chat chat1 = Chat.builder()
+            .chatRoom(chatRoom1)
+            .user(user1)
+            .build();
+        Chat chat2 = Chat.builder()
+            .chatRoom(chatRoom1)
+            .user(user2)
+            .build();
+        Chat chat3 = Chat.builder()
+            .chatRoom(chatRoom2)
+            .user(user2)
+            .build();
+        Chat chat4 = Chat.builder()
+            .chatRoom(chatRoom1)
+            .user(user1)
+            .message("test chat5")
+            .build();
+        chatRepository.save(chat1);
+        chatRepository.save(chat2);
+        chatRepository.save(chat3);
+        chatRepository.save(chat4);
+
+        PageRequest pageable = PageRequest.of(0, 1);
+        ChatRoomRequest chatRoomRequest = ChatRoomRequest.builder()
+            .postCursorId(500L)
+            .tags(List.of("hashTag2"))
+            .build();
+
+        Slice<ChatRoomResponse> result = chatRoomRepository.findChatRooms(user3.getId(), chatRoomRequest, pageable);
+
+        ChatRoomResponse expect = ChatRoomResponse.builder()
+            .roomId(chatRoom2.getId())
+            .roomName(chatRoom2.getRoomName())
+            .roomSid(chatRoom2.getRoomSid())
+            .roomImageUri(chatRoom2.getRoomImageUri())
+            .roomMemberCount(1L)
+            .roomSize(chatRoom2.getRoomSize())
+            .defaultRoomImageType(chatRoom2.getDefaultRoomImageType())
+            .bookTitle(book.getTitle())
+            .bookCoverImageUri(book.getBookCoverImageUrl())
+            .bookAuthors(book.getAuthors())
+            .hostId(user2.getId())
+            .hostName(user2.getNickname())
+            .hostDefaultProfileImageType(user2.getDefaultProfileImageType())
+            .hostProfileImageUri(user2.getProfileImageUrl())
+            .tags("hashTag2")
+            .lastChatSenderId(chat3.getUserId())
+            .lastChatId(chat3.getId())
+            .lastChatMessage(chat3.getMessage())
+            .lastChatDispatchTime(chat3.getCreatedAt())
+            .isEntered(false)
+            .isBanned(true)
             .build();
 
         assertThat(result.getContent()).isEqualTo(List.of(expect));
