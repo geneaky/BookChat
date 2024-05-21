@@ -424,7 +424,6 @@ class ChatRoomControllerTest extends ControllerTestExtension {
 
     @Test
     void 채팅방_세부정보_조회() throws Exception {
-
         RoomHost roomHost = RoomHost.builder()
             .id(1L)
             .nickname("마스터")
@@ -468,10 +467,12 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .roomHost(roomHost)
             .roomSubHostList(List.of(roomSubHost1, roomSubHost2))
             .roomGuestList(List.of(roomGuest1, roomGuest2))
+            .isBanned(true)
+            .isExploded(false)
             .build();
 
-        when(chatRoomService.getChatRoomDetails(any(), any())).thenReturn(
-            chatRoomDetails);
+        when(chatRoomService.getChatRoomDetails(any(), any())).thenReturn(chatRoomDetails);
+
         mockMvc.perform(get("/v1/api/chatrooms/{roomId}", 1)
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal())))
@@ -492,22 +493,18 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                     fieldWithPath("bookAuthors").type(ARRAY).description("책 저자"),
                     fieldWithPath("roomHost.id").type(NUMBER).description("방장 Id"),
                     fieldWithPath("roomHost.nickname").type(STRING).description("방장 닉네임"),
-                    fieldWithPath("roomHost.profileImageUrl").type(STRING).optional()
-                        .description("방장 프로필 이미지 url"),
-                    fieldWithPath("roomHost.defaultProfileImageType").type(NUMBER)
-                        .description("방장 기본 프로필 이미지 타입"),
+                    fieldWithPath("roomHost.profileImageUrl").type(STRING).optional().description("방장 프로필 이미지 url"),
+                    fieldWithPath("roomHost.defaultProfileImageType").type(NUMBER).description("방장 기본 프로필 이미지 타입"),
                     fieldWithPath("roomSubHostList[].id").type(NUMBER).description("부방장 Id"),
                     fieldWithPath("roomSubHostList[].nickname").type(STRING).description("부방장 닉네임"),
-                    fieldWithPath("roomSubHostList[].profileImageUrl").type(STRING).optional()
-                        .description("부방장 프로필 이미지 url"),
-                    fieldWithPath("roomSubHostList[].defaultProfileImageType").type(NUMBER)
-                        .description("부방장 기본 프로필 이미지 타입"),
+                    fieldWithPath("roomSubHostList[].profileImageUrl").type(STRING).optional().description("부방장 프로필 이미지 url"),
+                    fieldWithPath("roomSubHostList[].defaultProfileImageType").type(NUMBER).description("부방장 기본 프로필 이미지 타입"),
                     fieldWithPath("roomGuestList[].id").type(NUMBER).description("참여자 Id"),
                     fieldWithPath("roomGuestList[].nickname").type(STRING).description("참여자 닉네임"),
-                    fieldWithPath("roomGuestList[].profileImageUrl").type(STRING).optional()
-                        .description("참여자 프로필 이미지 url"),
-                    fieldWithPath("roomGuestList[].defaultProfileImageType").type(NUMBER)
-                        .description("참여자 기본 프로필 이미지 타입")
+                    fieldWithPath("roomGuestList[].profileImageUrl").type(STRING).optional().description("참여자 프로필 이미지 url"),
+                    fieldWithPath("roomGuestList[].defaultProfileImageType").type(NUMBER).description("참여자 기본 프로필 이미지 타입"),
+                    fieldWithPath("isBanned").type(BOOLEAN).description("사용자가 차단된 채팅방인지 여부"),
+                    fieldWithPath("isExploded").type(BOOLEAN).description("채팅방 폭파 여부")
                 )));
     }
 

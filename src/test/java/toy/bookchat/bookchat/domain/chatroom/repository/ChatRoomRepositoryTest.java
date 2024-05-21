@@ -849,6 +849,12 @@ class ChatRoomRepositoryTest {
             .build();
         chatRoomRepository.save(chatRoom);
 
+        ChatRoomBlockedUser chatRoomBlockedUser = ChatRoomBlockedUser.builder()
+            .user(cUser)
+            .chatRoom(chatRoom)
+            .build();
+        chatRoomBlockedUserRepository.save(chatRoomBlockedUser);
+
         HashTag tag = HashTag.of("tag1");
         hashTagRepository.save(tag);
 
@@ -872,11 +878,9 @@ class ChatRoomRepositoryTest {
             .build();
         participantRepository.saveAll(List.of(participant1, participant2, participant3));
 
-        ChatRoomDetails real = chatRoomRepository.findChatRoomDetails(chatRoom.getId(),
-            cUser.getId());
+        ChatRoomDetails real = chatRoomRepository.findChatRoomDetails(chatRoom.getId(), cUser.getId());
 
-        ChatRoomDetails expect = ChatRoomDetails.from(
-            List.of(participant1, participant2, participant3), List.of(tag.getTagName()));
+        ChatRoomDetails expect = ChatRoomDetails.from(List.of(participant1, participant2, participant3), List.of(tag.getTagName()), true);
 
         assertThat(real).isEqualTo(expect);
     }
