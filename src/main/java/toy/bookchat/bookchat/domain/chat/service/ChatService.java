@@ -18,6 +18,7 @@ import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository
 import toy.bookchat.bookchat.exception.badrequest.participant.NotParticipatedException;
 import toy.bookchat.bookchat.infrastructure.broker.MessagePublisher;
 import toy.bookchat.bookchat.infrastructure.broker.message.CommonMessage;
+import toy.bookchat.bookchat.infrastructure.push.ChatMessageBody;
 import toy.bookchat.bookchat.infrastructure.push.PushMessageBody;
 import toy.bookchat.bookchat.infrastructure.push.service.PushService;
 
@@ -55,7 +56,13 @@ public class ChatService {
             .build());
 
         CommonMessage message = CommonMessage.from(participant.getUserId(), chat, messageDto);
-        PushMessageBody pushMessageBody = PushMessageBody.of(CHAT, chat.getId());
+
+        ChatMessageBody chatMessageBody = ChatMessageBody.builder()
+            .chatId(chat.getId())
+            .chatRoomId(roomId)
+            .build();
+
+        PushMessageBody pushMessageBody = PushMessageBody.of(CHAT, chatMessageBody);
         for (Device device : disconnectedUserDevice) {
             pushService.send(device.getFcmToken(), pushMessageBody);
         }
