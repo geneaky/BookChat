@@ -29,11 +29,13 @@ public class UserChatRoomResponse {
     private Long lastChatId;
     private String lastChatContent;
     private LocalDateTime lastChatDispatchTime;
+    private Boolean isBanned;
+    private Boolean isExploded;
 
     @Builder
     public UserChatRoomResponse(Long roomId, String roomName, String roomSid, Long roomMemberCount, Integer defaultRoomImageType, String roomImageUri, String bookTitle, String bookCoverImageUrl,
         List<String> bookAuthors, Long senderId, String senderNickname, String senderProfileImageUrl, Integer senderDefaultProfileImageType, Long lastChatId, String lastChatContent,
-        LocalDateTime lastChatDispatchTime) {
+        LocalDateTime lastChatDispatchTime, Boolean isBanned, Boolean isExploded) {
         this.roomId = roomId;
         this.roomName = roomName;
         this.roomSid = roomSid;
@@ -50,10 +52,13 @@ public class UserChatRoomResponse {
         this.lastChatId = lastChatId;
         this.lastChatContent = lastChatContent;
         this.lastChatDispatchTime = lastChatDispatchTime;
+        this.isBanned = isBanned;
+        this.isExploded = isExploded;
     }
 
     public UserChatRoomResponse(Long roomId, String roomName, String roomSid, Long roomMemberCount, Integer defaultRoomImageType, String roomImageUri, Long senderId, String senderNickname,
-        String senderProfileImageUrl, Integer senderDefaultProfileImageType, Long lastChatId, String lastChatContent, LocalDateTime lastChatDispatchTime) {
+        String senderProfileImageUrl, Integer senderDefaultProfileImageType, Long lastChatId, String lastChatContent, LocalDateTime lastChatDispatchTime, Boolean isBanned,
+        Boolean isExploded) {
         this.roomId = roomId;
         this.roomName = roomName;
         this.roomSid = roomSid;
@@ -67,6 +72,8 @@ public class UserChatRoomResponse {
         this.lastChatId = lastChatId;
         this.lastChatContent = lastChatContent;
         this.lastChatDispatchTime = lastChatDispatchTime;
+        this.isBanned = isBanned;
+        this.isExploded = isExploded;
     }
 
     public void setBookInfo(Book book) {

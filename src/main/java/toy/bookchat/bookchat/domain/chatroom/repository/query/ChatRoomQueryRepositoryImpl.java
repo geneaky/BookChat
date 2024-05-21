@@ -87,11 +87,14 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
                     user.defaultProfileImageType,
                     chat.id,
                     chat.message,
-                    chat.createdAt
+                    chat.createdAt,
+                    chatRoomBlockedUser.id.isNotNull(),
+                    chatRoom.isDeleted
                 ))
             .from(chatRoom)
             .join(participant).on(participant.chatRoom.eq(chatRoom).and(participant.user.id.eq(userId))) //사용자 채팅방
             .leftJoin(subParticipant).on(subParticipant.chatRoom.eq(chatRoom)) // 채팅방 인원수
+            .leftJoin(chatRoomBlockedUser).on(chatRoomBlockedUser.chatRoom.id.eq(chatRoom.id).and(chatRoomBlockedUser.user.id.eq(userId)))
             .leftJoin(chat).on(chat.id.eq( // 마지막 채팅, 채팅 내
                     JPAExpressions.select(subChat.id.max())
                         .from(subChat)
