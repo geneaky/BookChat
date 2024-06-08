@@ -64,6 +64,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.Base64Utils;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
 import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.UserProfile;
 import toy.bookchat.bookchat.domain.user.api.dto.response.MemberProfileResponse;
 import toy.bookchat.bookchat.domain.user.api.dto.response.Token;
 import toy.bookchat.bookchat.domain.user.api.dto.response.UserProfileResponse;
@@ -122,8 +123,9 @@ class UserControllerTest extends ControllerTestExtension {
 
     @Test
     void 사용자_프로필_정보_반환() throws Exception {
-
         User user = getUser();
+        UserProfile userProfile = UserProfile.from(user);
+
         String real = objectMapper.writeValueAsString(UserProfileResponse.builder()
             .userId(user.getId())
             .userEmail(user.getEmail())
@@ -131,6 +133,7 @@ class UserControllerTest extends ControllerTestExtension {
             .userProfileImageUri(user.getProfileImageUrl())
             .defaultProfileImageType(user.getDefaultProfileImageType())
             .build());
+        given(userService.findUser(any())).willReturn(userProfile);
 
         MvcResult mvcResult = mockMvc.perform(get("/v1/api/users/profile")
                 .with(user(getUserPrincipal()))

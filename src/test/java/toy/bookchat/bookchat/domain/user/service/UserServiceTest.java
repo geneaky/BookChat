@@ -28,6 +28,7 @@ import toy.bookchat.bookchat.domain.device.service.DeviceService;
 import toy.bookchat.bookchat.domain.storage.StorageService;
 import toy.bookchat.bookchat.domain.storage.image.ImageValidator;
 import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.UserProfile;
 import toy.bookchat.bookchat.domain.user.api.dto.response.MemberProfileResponse;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.domain.user.service.dto.request.ChangeUserNicknameRequest;
@@ -236,5 +237,21 @@ class UserServiceTest {
         MemberProfileResponse memberProfileResponse = userService.getMemberProfile(1L);
 
         assertThat(memberProfileResponse).isEqualTo(expectedMemberProfileResponse);
+    }
+
+    @Test
+    void 사용자_프로필_조회_성공() throws Exception {
+        User user = User.builder()
+            .id(1L)
+            .nickname("user1")
+            .email("kKvTABYqa@test.com")
+            .profileImageUrl("profile-image-url")
+            .defaultProfileImageType(2)
+            .build();
+        given(userReader.readUser(anyLong())).willReturn(user);
+
+        UserProfile userProfile = userService.findUser(1L);
+
+        verify(userReader).readUser(anyLong());
     }
 }
