@@ -2,7 +2,7 @@ package toy.bookchat.bookchat.domain.user.api.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
-import toy.bookchat.bookchat.security.user.TokenPayload;
+import toy.bookchat.bookchat.domain.user.UserProfile;
 
 @Getter
 @Builder
@@ -14,13 +14,13 @@ public class UserProfileResponse {
     private String userProfileImageUri;
     private Integer defaultProfileImageType;
 
-    public static UserProfileResponse of(TokenPayload tokenPayload) {
+    public static UserProfileResponse of(UserProfile userProfile) {
         return UserProfileResponse.builder()
-            .userId(tokenPayload.getUserId())
-            .userNickname(tokenPayload.getUserNickname())
-            .userEmail(tokenPayload.getUserEmail())
-            .userProfileImageUri(tokenPayload.getUserProfileImageUri())
-            .defaultProfileImageType(tokenPayload.getDefaultProfileImageType())
+            .userId(userProfile.getUserId())
+            .userNickname(userProfile.getUserNickname())
+            .userEmail(userProfile.getUserEmail())
+            .userProfileImageUri(userProfile.getUserProfileImageUri())
+            .defaultProfileImageType(userProfile.getDefaultProfileImageType())
             .build();
     }
 }

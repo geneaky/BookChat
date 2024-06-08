@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import toy.bookchat.bookchat.domain.common.RateLimit;
 import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.UserProfile;
 import toy.bookchat.bookchat.domain.user.api.dto.response.MemberProfileResponse;
 import toy.bookchat.bookchat.domain.user.api.dto.response.Token;
 import toy.bookchat.bookchat.domain.user.api.dto.response.UserProfileResponse;
@@ -53,8 +54,8 @@ public class UserController {
 
     @GetMapping("/users/profile")
     public UserProfileResponse userProfile(@UserPayload TokenPayload tokenPayload) {
-
-        return UserProfileResponse.of(tokenPayload);
+        UserProfile userProfile = userService.findUser(tokenPayload.getUserId());
+        return UserProfileResponse.of(userProfile);
     }
 
     @GetMapping("/users/profile/nickname")
