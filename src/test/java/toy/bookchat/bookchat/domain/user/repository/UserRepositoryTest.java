@@ -2,8 +2,10 @@ package toy.bookchat.bookchat.domain.user.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static toy.bookchat.bookchat.domain.common.Status.ACTIVE;
 
 import java.util.Optional;
+import javax.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -17,6 +19,8 @@ class UserRepositoryTest {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private EntityManager em;
 
     @Test
     void 사용자_이메일_OAuth2Provider를_구분으로_조회_성공() throws Exception {
@@ -136,5 +140,21 @@ class UserRepositoryTest {
             .build();
         assertThatThrownBy(() -> userRepository.save(user2))
             .isInstanceOf(DataIntegrityViolationException.class);
+    }
+
+    @Test
+    void 사용자_계정생성시_기본_상태값_active로_생성_성공() throws Exception {
+        User user = User.builder()
+            .nickname("user1")
+            .build();
+
+        userRepository.save(user);
+
+        em.flush();
+        em.clear();
+
+        User findUser = userRepository.findById(user.getId()).get();
+
+        assertThat(findUser.getStatus()).isEqualTo(ACTIVE);
     }
 }
