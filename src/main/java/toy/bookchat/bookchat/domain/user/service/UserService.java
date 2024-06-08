@@ -50,8 +50,7 @@ public class UserService {
     }
 
     @Transactional
-    public void registerNewUser(UserSignUpRequest userSignUpRequest,
-        MultipartFile userProfileImage, String userName, String userEmail) {
+    public void registerNewUser(UserSignUpRequest userSignUpRequest, MultipartFile userProfileImage, String userName, String userEmail) {
         if (imageExistent(userProfileImage)) {
             uploadWithImage(userSignUpRequest, userProfileImage, userName, userEmail);
             return;

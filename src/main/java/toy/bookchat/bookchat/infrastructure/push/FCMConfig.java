@@ -15,8 +15,7 @@ public class FCMConfig {
 
     @Bean
     public FirebaseMessaging firebaseMessaging() throws IOException {
-        ClassPathResource resource = new ClassPathResource(
-            "firebase/bookchat-firebase-private.json");
+        ClassPathResource resource = new ClassPathResource("firebase/bookchat-firebase-private.json");
         InputStream refreshToken = resource.getInputStream();
 
         FirebaseOptions options = FirebaseOptions.builder()

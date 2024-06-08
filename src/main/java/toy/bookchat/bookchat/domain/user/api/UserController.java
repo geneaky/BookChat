@@ -85,16 +85,14 @@ public class UserController {
         String userEmail = idTokenManager.getUserEmailFromToken(bearerToken,
             userSignUpRequest.getOauth2Provider());
 
-        userService.registerNewUser(userSignUpRequest, userProfileImage, oauth2MemberNumber,
-            userEmail);
+        userService.registerNewUser(userSignUpRequest, userProfileImage, oauth2MemberNumber, userEmail);
     }
 
     @PostMapping("/users/signin")
     public Token userSignIn(
         @RequestHeader(OIDC) @NotBlank @Pattern(regexp = "^(Bearer)\\s.+") String bearerToken,
         @Valid @RequestBody UserSignInRequest userSignInRequest) {
-        String userName = idTokenManager.getOAuth2MemberNumberFromIdToken(bearerToken,
-            userSignInRequest.getOauth2Provider());
+        String userName = idTokenManager.getOAuth2MemberNumberFromIdToken(bearerToken, userSignInRequest.getOauth2Provider());
 
         User user = userService.findUserByUsername(userName);
         userService.checkDevice(userSignInRequest, user);

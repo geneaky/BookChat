@@ -13,12 +13,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import lombok.Builder;
 import lombok.Getter;
+import org.hibernate.annotations.DynamicInsert;
 import toy.bookchat.bookchat.domain.BaseEntity;
 import toy.bookchat.bookchat.domain.common.Status;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
-@Entity
 @Getter
+@Entity
+@DynamicInsert
 public class User extends BaseEntity {
 
     @Id
