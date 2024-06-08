@@ -919,6 +919,7 @@ include::{snippets}/post-chatroom-info/request-headers.adoc[]
 include::{snippets}/post-chatroom-info/request-parts.adoc[]
 `reviseChatRoomRequest`
 include::{snippets}/post-chatroom-info/request-part-reviseChatRoomRequest-fields.adoc[]
+include::{snippets}/post-chatroom-info/http-request.adoc[]
 ****
 
 `Response`
