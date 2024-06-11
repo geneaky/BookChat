@@ -225,17 +225,24 @@ public class ChatRoomService {
         if (user == chatRoom.getHost()) {
             chatRoom.explode();
 
-            messagePublisher.sendNotificationMessage(chatRoom.getRoomSid(), NotificationMessage.createHostExitMessage());
+            Chat chat = createExitChat(chatRoom, user);
+
+            messagePublisher.sendNotificationMessage(chatRoom.getRoomSid(), NotificationMessage.createHostExitMessage(chat));
             return;
         }
 
+        Chat chat = createExitChat(chatRoom, user);
+
+        participantRepository.delete(participant);
+        messagePublisher.sendNotificationMessage(chatRoom.getRoomSid(), NotificationMessage.createExitMessage(chat, user.getId()));
+    }
+
+    private Chat createExitChat(ChatRoom chatRoom, User user) {
         Chat chat = chatRepository.save(Chat.builder()
             .chatRoom(chatRoom)
             .message("#" + user.getId() + "#님이 퇴장하셨습니다.")
             .build());
-
-        participantRepository.delete(participant);
-        messagePublisher.sendNotificationMessage(chatRoom.getRoomSid(), NotificationMessage.createExitMessage(chat, user.getId()));
+        return chat;
     }
 
 }
