@@ -457,8 +457,7 @@ class ChatRoomServiceTest {
             .build();
         chat.setCreatedAt(LocalDateTime.now());
 
-        when(participantRepository.findByUserIdAndChatRoomId(any(), any())).thenReturn(
-            Optional.ofNullable(participant));
+        when(participantRepository.findByUserIdAndChatRoomId(any(), any())).thenReturn(Optional.ofNullable(participant));
         when(chatRepository.save(any())).thenReturn(chat);
         chatRoomService.exitChatRoom(user.getId(), chatRoom.getId());
 
@@ -488,11 +487,18 @@ class ChatRoomServiceTest {
             .chatRoom(chatRoom)
             .build();
 
-        when(participantRepository.findByUserIdAndChatRoomId(any(), any())).thenReturn(
-            Optional.ofNullable(participant));
+        Chat chat = Chat.builder()
+            .id(1L)
+            .message("퇴장")
+            .build();
+        chat.setCreatedAt(LocalDateTime.now());
+
+        when(participantRepository.findByUserIdAndChatRoomId(any(), any())).thenReturn(Optional.ofNullable(participant));
+        given(chatRepository.save(any())).willReturn(chat);
         chatRoomService.exitChatRoom(user.getId(), chatRoom.getId());
 
         assertThat(chatRoom.getIsDeleted()).isTrue();
+        verify(chatRepository).save(any());
         verify(messagePublisher).sendNotificationMessage(anyString(), any(NotificationMessage.class));
     }
 
