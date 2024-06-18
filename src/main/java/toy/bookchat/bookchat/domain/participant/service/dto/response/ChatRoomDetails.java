@@ -60,7 +60,6 @@ public class ChatRoomDetails {
         fillParticipantsResponse(participants, host, roomSubHostList, roomGuestList);
         ChatRoom chatRoom = getChatRoom(participants);
 
-        //isBanned 정보 추가
         return new ChatRoomDetails(chatRoom.getRoomSize(), roomTags, chatRoom.getRoomName(), chatRoom.getBookTitle(), chatRoom.getBookCoverImageUrl(), chatRoom.getBookAuthors(), roomHost,
             roomSubHostList, roomGuestList, isBanned, chatRoom.getIsDeleted());
     }

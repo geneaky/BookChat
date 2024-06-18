@@ -17,4 +17,5 @@ public interface ParticipantRepository extends ParticipantQueryRepository,
     void deleteByChatRoom(ChatRoom chatRoom);
 
     Long countByChatRoom(ChatRoom chatroom);
+
 }

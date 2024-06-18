@@ -11,6 +11,8 @@ import java.util.Optional;
 import javax.persistence.LockModeType;
 import org.springframework.stereotype.Repository;
 import toy.bookchat.bookchat.domain.participant.Participant;
+import toy.bookchat.bookchat.domain.participant.QParticipant;
+import toy.bookchat.bookchat.exception.notfound.pariticipant.ParticipantNotFoundException;
 
 @Repository
 public class ParticipantQueryRepositoryImpl implements ParticipantQueryRepository {
@@ -68,14 +70,18 @@ public class ParticipantQueryRepositoryImpl implements ParticipantQueryRepositor
 
     @Override
     public void connect(Long userId, String roomSid) {
-        queryFactory.update(participant)
-            .set(participant.isConnected, true)
-            .where(participant.user.id.eq(userId)
-                .and(participant.chatRoom.id.eq(
-                    JPAExpressions.select(chatRoom.id)
-                        .from(chatRoom)
-                        .where(chatRoom.roomSid.eq(roomSid)))))
-            .execute();
+        Participant participant = queryFactory.select(QParticipant.participant)
+            .from(QParticipant.participant)
+            .join(QParticipant.participant.chatRoom, chatRoom)
+            .where(QParticipant.participant.user.id.eq(userId)
+                .and(chatRoom.roomSid.eq(roomSid)))
+            .fetchOne();
+
+        if (participant == null) {
+            throw new ParticipantNotFoundException();
+        }
+
+        participant.connect();
     }
 
     @Override

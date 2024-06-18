@@ -98,4 +98,8 @@ public class Participant {
     public boolean isNotSubHost() {
         return this.participantStatus != SUBHOST;
     }
+
+    public void connect() {
+        this.isConnected = true;
+    }
 }

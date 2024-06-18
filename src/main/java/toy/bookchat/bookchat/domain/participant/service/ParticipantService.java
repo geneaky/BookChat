@@ -120,8 +120,7 @@ public class ParticipantService {
             .chatRoom(adminParticipant.getChatRoom())
             .message("#" + participant.getUserId() + "#님을 내보냈습니다.")
             .build());
-        messagePublisher.sendNotificationMessage(adminParticipant.getChatRoomSid(),
-            NotificationMessage.createKickMessage(chat, participant.getUserId()));
+        messagePublisher.sendNotificationMessage(adminParticipant.getChatRoomSid(), NotificationMessage.createKickMessage(chat, participant.getUserId()));
     }
 
     private void kick(Participant adminParticipant, Participant targetParticipant,

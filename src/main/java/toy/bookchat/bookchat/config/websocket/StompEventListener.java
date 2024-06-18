@@ -5,6 +5,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
@@ -39,11 +40,13 @@ public class StompEventListener {
     }
 
     @EventListener
+    @Transactional
     public void handleStompSubscribeEvent(SessionSubscribeEvent event) {
         UsernamePasswordAuthenticationToken user = (UsernamePasswordAuthenticationToken) event.getUser();
         UserPrincipal userPrincipal = (UserPrincipal) user.getPrincipal();
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
-        participantRepository.connect(userPrincipal.getUserId(), accessor.getDestination().substring(TOPIC_NAME_LENGTH));
+        String roomSid = accessor.getDestination().substring(TOPIC_NAME_LENGTH);
+        participantRepository.connect(userPrincipal.getUserId(), roomSid);
         log.info("Stomp Subscribe Event :: {}", userPrincipal.getUsername());
     }
 
