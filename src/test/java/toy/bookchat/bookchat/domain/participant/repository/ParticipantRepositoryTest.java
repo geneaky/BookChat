@@ -16,6 +16,7 @@ import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomRepository;
 import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
+import toy.bookchat.bookchat.exception.notfound.pariticipant.ParticipantNotFoundException;
 
 @RepositoryTest
 class ParticipantRepositoryTest {
@@ -161,5 +162,41 @@ class ParticipantRepositoryTest {
 
         assertThatThrownBy(() -> participantRepository.save(duplicateParticipant))
             .isInstanceOf(DataIntegrityViolationException.class);
+    }
+
+    @Test
+    void 채팅방에_참여한_사용자라면_접속상태로_변경_성공() throws Exception {
+        User user = User.builder()
+            .nickname("AUser")
+            .defaultProfileImageType(1)
+            .build();
+
+        userRepository.save(user);
+
+        ChatRoom chatRoom = ChatRoom.builder()
+            .host(user)
+            .roomSid("KUor")
+            .roomSize(655)
+            .defaultRoomImageType(1)
+            .build();
+        chatRoomRepository.save(chatRoom);
+
+        Participant participant = Participant.builder()
+            .user(user)
+            .participantStatus(HOST)
+            .chatRoom(chatRoom)
+            .build();
+
+        participantRepository.save(participant);
+
+        participantRepository.connect(user.getId(), chatRoom.getRoomSid());
+
+        assertThat(participant.getIsConnected()).isTrue();
+    }
+
+    @Test
+    void 채팅방연결_시도시_참여하지않은_사용자라면_예외발생_성공() throws Exception {
+        assertThatThrownBy(() -> participantRepository.connect(1L, "KUor"))
+            .isInstanceOf(ParticipantNotFoundException.class);
     }
 }
