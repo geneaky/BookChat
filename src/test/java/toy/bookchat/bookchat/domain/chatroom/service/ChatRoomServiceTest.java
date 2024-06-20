@@ -283,7 +283,19 @@ class ChatRoomServiceTest {
     }
 
     @Test
+    void 차단당한_사용자라면_세부정보_조회_실패() throws Exception {
+        given(chatRoomBlockedUserRepository.findByUserIdAndChatRoomId(any(), any())).willReturn(Optional.ofNullable(mock(ChatRoomBlockedUser.class)));
+        assertThatThrownBy(() -> chatRoomService.getChatRoomDetails(1L, 1L)).isInstanceOf(BlockedUserInChatRoomException.class);
+    }
+
+    @Test
+    void 이미_폭파된_방의_세부정보_조회_실패() throws Exception {
+        assertThatThrownBy(() -> chatRoomService.getChatRoomDetails(1L, 1L)).isInstanceOf(ChatRoomNotFoundException.class);
+    }
+
+    @Test
     void 채팅방_세부정보_조회_성공() throws Exception {
+        given(chatRoomRepository.findById(any())).willReturn(Optional.ofNullable(mock(ChatRoom.class)));
         chatRoomService.getChatRoomDetails(1L, 1L);
         verify(chatRoomRepository).findChatRoomDetails(any(), any());
     }
