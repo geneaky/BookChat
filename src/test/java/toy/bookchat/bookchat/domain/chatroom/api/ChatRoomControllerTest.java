@@ -243,6 +243,10 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                     fieldWithPath("userChatRoomResponseList[].roomMemberCount").type(NUMBER).description("채팅방 현재 인원수"),
                     fieldWithPath("userChatRoomResponseList[].defaultRoomImageType").type(NUMBER).description("기본 이미지 타입 번호"),
                     fieldWithPath("userChatRoomResponseList[].roomImageUri").optional().type(STRING).description("채팅방 이미지 URI"),
+                    fieldWithPath("userChatRoomResponseList[].hostId").type(NUMBER).description("방장 ID"),
+                    fieldWithPath("userChatRoomResponseList[].hostNickname").type(STRING).description("방장 닉네임"),
+                    fieldWithPath("userChatRoomResponseList[].hostProfileImageUrl").optional().type(STRING).description("방장 프로필 이미지"),
+                    fieldWithPath("userChatRoomResponseList[].hostDefaultProfileImageType").type(NUMBER).description("방장 기본 프로필 이미지 타입"),
                     fieldWithPath("userChatRoomResponseList[].bookTitle").type(STRING).description("책 제목"),
                     fieldWithPath("userChatRoomResponseList[].bookCoverImageUrl").type(STRING).description("책 커버 이미지"),
                     fieldWithPath("userChatRoomResponseList[].bookAuthors[]").type(ARRAY).description("책 저자"),
@@ -569,6 +573,10 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .roomName(chatRoom.getRoomName())
             .roomMemberCount(2L)
             .defaultRoomImageType(1)
+            .hostId(1L)
+            .hostNickname("host 별명")
+            .hostProfileImageUrl("host Profile Image Url")
+            .hostDefaultProfileImageType(1)
             .bookTitle(chatRoom.getBookTitle())
             .bookCoverImageUrl(chatRoom.getBookCoverImageUrl())
             .bookAuthors(chatRoom.getBookAuthors())
