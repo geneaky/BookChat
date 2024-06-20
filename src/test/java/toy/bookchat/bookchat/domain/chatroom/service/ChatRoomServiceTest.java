@@ -467,6 +467,7 @@ class ChatRoomServiceTest {
             .build();
         chat.setCreatedAt(LocalDateTime.now());
 
+        given(chatRoomRepository.findById(any())).willReturn(Optional.ofNullable(chatRoom));
         when(participantRepository.findByUserIdAndChatRoomId(any(), any())).thenReturn(Optional.ofNullable(participant));
         when(chatRepository.save(any())).thenReturn(chat);
         chatRoomService.exitChatRoom(user.getId(), chatRoom.getId());
@@ -503,12 +504,18 @@ class ChatRoomServiceTest {
             .build();
         chat.setCreatedAt(LocalDateTime.now());
 
+        given(chatRoomRepository.findById(any())).willReturn(Optional.ofNullable(chatRoom));
         when(participantRepository.findByUserIdAndChatRoomId(any(), any())).thenReturn(Optional.ofNullable(participant));
         given(chatRepository.save(any())).willReturn(chat);
         chatRoomService.exitChatRoom(user.getId(), chatRoom.getId());
 
         verify(chatRepository).save(any());
         verify(messagePublisher).sendNotificationMessage(anyString(), any(NotificationMessage.class));
+    }
+   
+    @Test
+    void 존재하지_않는_채팅방에서_나가기_실패() throws Exception {
+        assertThatThrownBy(() -> chatRoomService.exitChatRoom(1L, 1L)).isInstanceOf(ChatRoomNotFoundException.class);
     }
 
     @Test
