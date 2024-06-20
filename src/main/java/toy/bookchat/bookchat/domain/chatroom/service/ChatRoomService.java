@@ -223,10 +223,9 @@ public class ChatRoomService {
         ChatRoom chatRoom = participant.getChatRoom();
 
         if (user == chatRoom.getHost()) {
-            chatRoom.explode();
-
             Chat chat = createExitChat(chatRoom, user);
-
+            participantRepository.deleteByChatRoom(chatRoom);
+            chatRoomRepository.delete(chatRoom);
             messagePublisher.sendNotificationMessage(chatRoom.getRoomSid(), NotificationMessage.createHostExitMessage(chat));
             return;
         }

@@ -31,10 +31,9 @@ public class ChatRoom extends BaseEntity {
     private Book book;
     @ManyToOne(fetch = FetchType.LAZY)
     private User host;
-    private Boolean isDeleted;
 
     @Builder
-    private ChatRoom(Long id, String roomName, String roomSid, Integer roomSize, Integer defaultRoomImageType, String roomImageUri, Book book, User host, Boolean isDeleted) {
+    private ChatRoom(Long id, String roomName, String roomSid, Integer roomSize, Integer defaultRoomImageType, String roomImageUri, Book book, User host) {
         this.id = id;
         this.roomName = roomName;
         this.roomSid = roomSid;
@@ -43,7 +42,6 @@ public class ChatRoom extends BaseEntity {
         this.roomImageUri = roomImageUri;
         this.book = book;
         this.host = host;
-        this.isDeleted = isDeleted;
     }
 
     protected ChatRoom() {
@@ -75,9 +73,5 @@ public class ChatRoom extends BaseEntity {
 
     public void changeRoomImageUri(String roomImageUri) {
         this.roomImageUri = roomImageUri;
-    }
-
-    public void explode() {
-        this.isDeleted = true;
     }
 }
