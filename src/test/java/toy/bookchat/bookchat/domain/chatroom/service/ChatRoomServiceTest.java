@@ -495,7 +495,6 @@ class ChatRoomServiceTest {
         given(chatRepository.save(any())).willReturn(chat);
         chatRoomService.exitChatRoom(user.getId(), chatRoom.getId());
 
-        assertThat(chatRoom.getIsDeleted()).isTrue();
         verify(chatRepository).save(any());
         verify(messagePublisher).sendNotificationMessage(anyString(), any(NotificationMessage.class));
     }

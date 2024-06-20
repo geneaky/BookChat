@@ -102,7 +102,6 @@ class ChatRoomRepositoryTest {
             .roomSid("IwZrRxR5")
             .roomSize(110)
             .defaultRoomImageType(2)
-            .isDeleted(true)
             .build();
         ChatRoom chatRoom3 = ChatRoom.builder()
             .book(book1)
@@ -237,7 +236,6 @@ class ChatRoomRepositoryTest {
             .roomSid("IwZrRxR5")
             .roomSize(110)
             .defaultRoomImageType(2)
-            .isDeleted(true)
             .build();
         ChatRoom chatRoom3 = ChatRoom.builder()
             .book(book1)
@@ -354,7 +352,6 @@ class ChatRoomRepositoryTest {
             .roomSid("4SyVX")
             .roomSize(77)
             .defaultRoomImageType(1)
-            .isDeleted(true)
             .build();
         ChatRoom chatRoom2 = ChatRoom.builder()
             .book(book2)
@@ -527,8 +524,6 @@ class ChatRoomRepositoryTest {
             .lastChatId(chat5.getId())
             .lastChatMessage(chat5.getMessage())
             .lastChatDispatchTime(chat5.getCreatedAt())
-            .isEntered(true)
-            .isBanned(false)
             .build();
 
         assertThat(result.getContent()).isEqualTo(List.of(expect));
@@ -656,8 +651,6 @@ class ChatRoomRepositoryTest {
             .lastChatId(chat4.getId())
             .lastChatMessage(chat4.getMessage())
             .lastChatDispatchTime(chat4.getCreatedAt())
-            .isEntered(false)
-            .isBanned(false)
             .build();
 
         assertThat(result.getContent()).isEqualTo(List.of(expect));
@@ -792,8 +785,6 @@ class ChatRoomRepositoryTest {
             .lastChatId(chat4.getId())
             .lastChatMessage(chat4.getMessage())
             .lastChatDispatchTime(chat4.getCreatedAt())
-            .isEntered(false)
-            .isBanned(true)
             .build();
 
         assertThat(result.getContent()).isEqualTo(List.of(expect));
@@ -836,7 +827,6 @@ class ChatRoomRepositoryTest {
             .roomSid("chatRoom1")
             .roomSize(77)
             .defaultRoomImageType(1)
-            .isDeleted(true)
             .build();
 
         ChatRoom chatRoom2 = ChatRoom.builder()
@@ -928,8 +918,6 @@ class ChatRoomRepositoryTest {
             .lastChatId(chat3.getId())
             .lastChatMessage(chat3.getMessage())
             .lastChatDispatchTime(chat3.getCreatedAt())
-            .isEntered(false)
-            .isBanned(true)
             .build();
 
         assertThat(result.getContent()).isEqualTo(List.of(expect));
@@ -1002,7 +990,7 @@ class ChatRoomRepositoryTest {
 
         ChatRoomDetails real = chatRoomRepository.findChatRoomDetails(chatRoom.getId(), cUser.getId());
 
-        ChatRoomDetails expect = ChatRoomDetails.from(List.of(participant1, participant2, participant3), List.of(tag.getTagName()), true);
+        ChatRoomDetails expect = ChatRoomDetails.from(List.of(participant1, participant2, participant3), List.of(tag.getTagName()));
 
         assertThat(real).isEqualTo(expect);
     }

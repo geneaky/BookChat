@@ -17,7 +17,6 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.multipart;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
-import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -313,8 +312,6 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .lastChatMessage("lastChatMessage")
             .tags("tag1,tag2,tag3")
             .lastChatDispatchTime(LocalDateTime.now())
-            .isEntered(true)
-            .isBanned(false)
             .build();
         ChatRoomResponse chatRoomResponse2 = ChatRoomResponse.builder()
             .roomId(2L)
@@ -336,8 +333,6 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .lastChatMessage("lastChatMessage2")
             .tags("tag4,tag2,tag3")
             .lastChatDispatchTime(LocalDateTime.now())
-            .isEntered(false)
-            .isBanned(true)
             .build();
         ChatRoomResponse chatRoomResponse3 = ChatRoomResponse.builder()
             .roomId(3L)
@@ -359,8 +354,6 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .lastChatMessage("lastChatMessage3")
             .tags("tag1,tag5,tag6")
             .lastChatDispatchTime(LocalDateTime.now())
-            .isEntered(false)
-            .isBanned(false)
             .build();
 
         List<ChatRoomResponse> contents = List.of(chatRoomResponse1, chatRoomResponse2,
@@ -414,9 +407,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                     fieldWithPath("chatRoomResponseList[].lastChatSenderId").type(NUMBER).description("마지막 채팅 보낸 사람 ID"),
                     fieldWithPath("chatRoomResponseList[].lastChatId").type(NUMBER).description("마지막 채팅 ID"),
                     fieldWithPath("chatRoomResponseList[].lastChatMessage").type(STRING).description("마지막 채팅 내용"),
-                    fieldWithPath("chatRoomResponseList[].lastChatDispatchTime").type(STRING).description("마지막 채팅 발송 시간"),
-                    fieldWithPath("chatRoomResponseList[].isEntered").type(BOOLEAN).description("사용자가 참여한 채팅방인지 여부"),
-                    fieldWithPath("chatRoomResponseList[].isBanned").type(BOOLEAN).description("사용자가 차단된 채팅방인지 여부")
+                    fieldWithPath("chatRoomResponseList[].lastChatDispatchTime").type(STRING).description("마지막 채팅 발송 시간")
                 ).and(getCursorField())));
     }
 
@@ -465,8 +456,6 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .roomHost(roomHost)
             .roomSubHostList(List.of(roomSubHost1, roomSubHost2))
             .roomGuestList(List.of(roomGuest1, roomGuest2))
-            .isBanned(true)
-            .isExploded(false)
             .build();
 
         when(chatRoomService.getChatRoomDetails(any(), any())).thenReturn(chatRoomDetails);
@@ -500,9 +489,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                     fieldWithPath("roomGuestList[].id").type(NUMBER).description("참여자 Id"),
                     fieldWithPath("roomGuestList[].nickname").type(STRING).description("참여자 닉네임"),
                     fieldWithPath("roomGuestList[].profileImageUrl").type(STRING).optional().description("참여자 프로필 이미지 url"),
-                    fieldWithPath("roomGuestList[].defaultProfileImageType").type(NUMBER).description("참여자 기본 프로필 이미지 타입"),
-                    fieldWithPath("isBanned").type(BOOLEAN).description("사용자가 차단된 채팅방인지 여부"),
-                    fieldWithPath("isExploded").type(BOOLEAN).description("채팅방 폭파 여부")
+                    fieldWithPath("roomGuestList[].defaultProfileImageType").type(NUMBER).description("참여자 기본 프로필 이미지 타입")
                 )));
     }
 
