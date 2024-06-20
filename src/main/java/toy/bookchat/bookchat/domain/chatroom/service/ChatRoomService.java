@@ -222,6 +222,7 @@ public class ChatRoomService {
 
     @Transactional
     public void exitChatRoom(Long userId, Long roomId) {
+        chatRoomRepository.findById(roomId).orElseThrow(ChatRoomNotFoundException::new);
         Participant participant = participantRepository.findByUserIdAndChatRoomId(userId, roomId)
             .orElseThrow(ParticipantNotFoundException::new);
 
