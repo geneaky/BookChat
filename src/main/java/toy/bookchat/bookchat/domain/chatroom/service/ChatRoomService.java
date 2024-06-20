@@ -141,6 +141,12 @@ public class ChatRoomService {
 
     @Transactional(readOnly = true)
     public ChatRoomDetails getChatRoomDetails(Long roomId, Long userId) {
+        chatRoomBlockedUserRepository.findByUserIdAndChatRoomId(userId, roomId)
+            .ifPresent(b -> {
+                throw new BlockedUserInChatRoomException();
+            });
+        chatRoomRepository.findById(roomId).orElseThrow(ChatRoomNotFoundException::new);
+
         return chatRoomRepository.findChatRoomDetails(roomId, userId);
     }
 
