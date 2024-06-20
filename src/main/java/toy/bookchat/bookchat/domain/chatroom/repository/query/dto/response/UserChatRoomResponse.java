@@ -19,6 +19,10 @@ public class UserChatRoomResponse {
     private Long roomMemberCount;
     private Integer defaultRoomImageType;
     private String roomImageUri;
+    private Long hostId;
+    private String hostNickname;
+    private String hostProfileImageUrl;
+    private Integer hostDefaultProfileImageType;
     private String bookTitle;
     private String bookCoverImageUrl;
     private List<String> bookAuthors;
@@ -31,7 +35,8 @@ public class UserChatRoomResponse {
     private LocalDateTime lastChatDispatchTime;
 
     @Builder
-    public UserChatRoomResponse(Long roomId, String roomName, String roomSid, Long roomMemberCount, Integer defaultRoomImageType, String roomImageUri, String bookTitle, String bookCoverImageUrl,
+    public UserChatRoomResponse(Long roomId, String roomName, String roomSid, Long roomMemberCount, Integer defaultRoomImageType, String roomImageUri, Long hostId, String hostNickname,
+        String hostProfileImageUrl, Integer hostDefaultProfileImageType, String bookTitle, String bookCoverImageUrl,
         List<String> bookAuthors, Long senderId, String senderNickname, String senderProfileImageUrl, Integer senderDefaultProfileImageType, Long lastChatId, String lastChatContent,
         LocalDateTime lastChatDispatchTime) {
         this.roomId = roomId;
@@ -40,6 +45,10 @@ public class UserChatRoomResponse {
         this.roomMemberCount = roomMemberCount;
         this.defaultRoomImageType = defaultRoomImageType;
         this.roomImageUri = roomImageUri;
+        this.hostId = hostId;
+        this.hostNickname = hostNickname;
+        this.hostProfileImageUrl = hostProfileImageUrl;
+        this.hostDefaultProfileImageType = hostDefaultProfileImageType;
         this.bookTitle = bookTitle;
         this.bookCoverImageUrl = bookCoverImageUrl;
         this.bookAuthors = bookAuthors;
@@ -52,7 +61,8 @@ public class UserChatRoomResponse {
         this.lastChatDispatchTime = lastChatDispatchTime;
     }
 
-    public UserChatRoomResponse(Long roomId, String roomName, String roomSid, Long roomMemberCount, Integer defaultRoomImageType, String roomImageUri, Long senderId, String senderNickname,
+    public UserChatRoomResponse(Long roomId, String roomName, String roomSid, Long roomMemberCount, Integer defaultRoomImageType, String roomImageUri, Long hostId, String hostNickname,
+        String hostProfileImageUrl, Integer hostDefaultProfileImageType, Long senderId, String senderNickname,
         String senderProfileImageUrl, Integer senderDefaultProfileImageType, Long lastChatId, String lastChatContent, LocalDateTime lastChatDispatchTime) {
         this.roomId = roomId;
         this.roomName = roomName;
@@ -60,6 +70,10 @@ public class UserChatRoomResponse {
         this.roomMemberCount = roomMemberCount;
         this.defaultRoomImageType = defaultRoomImageType;
         this.roomImageUri = roomImageUri;
+        this.hostId = hostId;
+        this.hostNickname = hostNickname;
+        this.hostProfileImageUrl = hostProfileImageUrl;
+        this.hostDefaultProfileImageType = hostDefaultProfileImageType;
         this.senderId = senderId;
         this.senderNickname = senderNickname;
         this.senderProfileImageUrl = senderProfileImageUrl;

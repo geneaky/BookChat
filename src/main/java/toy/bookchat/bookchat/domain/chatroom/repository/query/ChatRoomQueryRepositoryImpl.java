@@ -32,6 +32,7 @@ import toy.bookchat.bookchat.domain.chatroom.service.dto.request.ChatRoomRequest
 import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.participant.QParticipant;
 import toy.bookchat.bookchat.domain.participant.service.dto.response.ChatRoomDetails;
+import toy.bookchat.bookchat.domain.user.QUser;
 import toy.bookchat.bookchat.exception.notfound.pariticipant.ParticipantNotFoundException;
 
 @Repository
@@ -70,6 +71,7 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
     public Slice<UserChatRoomResponse> findUserChatRoomsWithLastChat(Pageable pageable, Long bookId, Long postCursorId, Long userId) {
         QChat subChat = new QChat("subChat");
         QParticipant subParticipant = new QParticipant("subParticipant1");
+        QUser subUser = new QUser("subUser");
 
         List<UserChatRoomResponse> contents = queryFactory.select(
                 Projections.constructor(UserChatRoomResponse.class,
@@ -79,6 +81,10 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
                     subParticipant.count(),
                     chatRoom.defaultRoomImageType,
                     chatRoom.roomImageUri,
+                    subUser.id,
+                    subUser.nickname,
+                    subUser.profileImageUrl,
+                    subUser.defaultProfileImageType,
                     user.id,
                     user.nickname,
                     user.profileImageUrl,
@@ -88,6 +94,7 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
                     chat.createdAt
                 ))
             .from(chatRoom)
+            .join(subUser).on(subUser.id.eq(chatRoom.host.id))
             .join(participant).on(participant.chatRoom.eq(chatRoom).and(participant.user.id.eq(userId))) //사용자 채팅방
             .leftJoin(subParticipant).on(subParticipant.chatRoom.eq(chatRoom)) // 채팅방 인원수
             .leftJoin(chat).on(chat.id.eq( // 마지막 채팅, 채팅 내
