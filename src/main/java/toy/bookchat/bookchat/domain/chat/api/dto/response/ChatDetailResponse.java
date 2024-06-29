@@ -3,7 +3,7 @@ package toy.bookchat.bookchat.domain.chat.api.dto.response;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
-import toy.bookchat.bookchat.domain.chat.ChatEntity;
+import toy.bookchat.bookchat.db_module.chat.ChatEntity;
 
 @Getter
 public class ChatDetailResponse {

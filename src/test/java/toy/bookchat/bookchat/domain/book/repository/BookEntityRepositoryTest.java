@@ -7,8 +7,9 @@ import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import toy.bookchat.bookchat.db_module.book.BookEntity;
+import toy.bookchat.bookchat.db_module.book.repository.BookRepository;
 import toy.bookchat.bookchat.domain.RepositoryTest;
-import toy.bookchat.bookchat.domain.book.BookEntity;
 
 class BookEntityRepositoryTest extends RepositoryTest {
 

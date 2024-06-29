@@ -5,12 +5,12 @@ import java.util.List;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import toy.bookchat.bookchat.domain.chatroom.ChatRoomEntity;
-import toy.bookchat.bookchat.domain.participant.ParticipantEntity;
+import toy.bookchat.bookchat.db_module.chatroom.ChatRoomEntity;
+import toy.bookchat.bookchat.db_module.participant.ParticipantEntity;
 import toy.bookchat.bookchat.domain.participant.service.dto.RoomGuest;
 import toy.bookchat.bookchat.domain.participant.service.dto.RoomHost;
 import toy.bookchat.bookchat.domain.participant.service.dto.RoomSubHost;
-import toy.bookchat.bookchat.domain.user.UserEntity;
+import toy.bookchat.bookchat.db_module.user.UserEntity;
 
 @Getter
 @EqualsAndHashCode

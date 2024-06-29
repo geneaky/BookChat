@@ -4,10 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import toy.bookchat.bookchat.db_module.chatroom.repository.ChatRoomHashTagRepository;
+import toy.bookchat.bookchat.db_module.chatroom.repository.ChatRoomRepository;
+import toy.bookchat.bookchat.db_module.chatroom.repository.HashTagRepository;
 import toy.bookchat.bookchat.domain.RepositoryTest;
-import toy.bookchat.bookchat.domain.chatroom.ChatRoomEntity;
-import toy.bookchat.bookchat.domain.chatroom.ChatRoomHashTagEntity;
-import toy.bookchat.bookchat.domain.chatroom.HashTagEntity;
+import toy.bookchat.bookchat.db_module.chatroom.ChatRoomEntity;
+import toy.bookchat.bookchat.db_module.chatroom.ChatRoomHashTagEntity;
+import toy.bookchat.bookchat.db_module.chatroom.HashTagEntity;
 
 class ChatRoomHashTagEntityRepositoryTest extends RepositoryTest {
 

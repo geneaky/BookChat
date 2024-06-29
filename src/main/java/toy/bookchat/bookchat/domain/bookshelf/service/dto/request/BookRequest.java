@@ -9,7 +9,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import toy.bookchat.bookchat.domain.book.BookEntity;
+import toy.bookchat.bookchat.db_module.book.BookEntity;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)

@@ -3,8 +3,8 @@ package toy.bookchat.bookchat.domain.user.service;
 import static toy.bookchat.bookchat.domain.common.Status.ACTIVE;
 
 import org.springframework.stereotype.Component;
-import toy.bookchat.bookchat.domain.user.UserEntity;
-import toy.bookchat.bookchat.domain.user.repository.UserRepository;
+import toy.bookchat.bookchat.db_module.user.UserEntity;
+import toy.bookchat.bookchat.db_module.user.repository.UserRepository;
 import toy.bookchat.bookchat.exception.notfound.user.UserNotFoundException;
 
 @Component

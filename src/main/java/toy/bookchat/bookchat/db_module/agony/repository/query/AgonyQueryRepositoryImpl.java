@@ -1,7 +1,7 @@
 package toy.bookchat.bookchat.db_module.agony.repository.query;
 
 import static toy.bookchat.bookchat.db_module.agony.QAgonyEntity.agonyEntity;
-import static toy.bookchat.bookchat.domain.bookshelf.QBookShelfEntity.bookShelfEntity;
+import static toy.bookchat.bookchat.db_module.bookshelf.QBookShelfEntity.bookShelfEntity;
 import static toy.bookchat.bookchat.domain.common.RepositorySupport.extractOrderSpecifierFrom;
 import static toy.bookchat.bookchat.domain.common.RepositorySupport.numberBasedPagination;
 import static toy.bookchat.bookchat.domain.common.RepositorySupport.toSlice;

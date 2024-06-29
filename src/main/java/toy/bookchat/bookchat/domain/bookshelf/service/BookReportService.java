@@ -2,8 +2,8 @@ package toy.bookchat.bookchat.domain.bookshelf.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import toy.bookchat.bookchat.domain.bookshelf.BookReportEntity;
-import toy.bookchat.bookchat.domain.bookshelf.BookShelfEntity;
+import toy.bookchat.bookchat.db_module.bookreport.BookReportEntity;
+import toy.bookchat.bookchat.db_module.bookshelf.BookShelfEntity;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ReviseBookReportRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.WriteBookReportRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.BookReportResponse;

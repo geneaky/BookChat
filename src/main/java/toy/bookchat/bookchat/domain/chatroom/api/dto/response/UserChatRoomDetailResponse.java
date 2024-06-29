@@ -2,7 +2,7 @@ package toy.bookchat.bookchat.domain.chatroom.api.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
-import toy.bookchat.bookchat.domain.chatroom.ChatRoomEntity;
+import toy.bookchat.bookchat.db_module.chatroom.ChatRoomEntity;
 
 @Getter
 public class UserChatRoomDetailResponse {

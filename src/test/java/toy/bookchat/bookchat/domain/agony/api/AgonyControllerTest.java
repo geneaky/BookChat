@@ -39,13 +39,13 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.db_module.agony.AgonyEntity;
+import toy.bookchat.bookchat.db_module.bookshelf.BookShelfEntity;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
 import toy.bookchat.bookchat.domain.agony.api.v1.request.CreateBookAgonyRequest;
 import toy.bookchat.bookchat.domain.agony.api.v1.request.ReviseAgonyRequest;
 import toy.bookchat.bookchat.domain.agony.api.v1.response.AgonyResponse;
 import toy.bookchat.bookchat.domain.agony.api.v1.response.SliceOfAgoniesResponse;
 import toy.bookchat.bookchat.domain.agony.service.AgonyService;
-import toy.bookchat.bookchat.domain.bookshelf.BookShelfEntity;
 
 @AgonyPresentationTest
 class AgonyControllerTest extends ControllerTestExtension {

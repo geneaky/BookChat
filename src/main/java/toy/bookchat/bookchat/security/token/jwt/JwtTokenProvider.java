@@ -8,7 +8,7 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import toy.bookchat.bookchat.config.token.JwtTokenProperties;
-import toy.bookchat.bookchat.domain.user.UserEntity;
+import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.domain.user.api.dto.response.Token;
 
 @Slf4j

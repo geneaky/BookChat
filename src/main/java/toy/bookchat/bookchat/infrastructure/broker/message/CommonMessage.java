@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import toy.bookchat.bookchat.domain.chat.ChatEntity;
+import toy.bookchat.bookchat.db_module.chat.ChatEntity;
 import toy.bookchat.bookchat.domain.chat.api.dto.request.MessageDto;
 
 @Getter

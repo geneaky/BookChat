@@ -17,10 +17,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
-import toy.bookchat.bookchat.domain.bookshelf.BookShelfEntity;
-import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
-import toy.bookchat.bookchat.domain.scrap.ScrapEntity;
-import toy.bookchat.bookchat.domain.scrap.repository.ScrapRepository;
+import toy.bookchat.bookchat.db_module.bookshelf.BookShelfEntity;
+import toy.bookchat.bookchat.db_module.bookshelf.repository.BookShelfRepository;
+import toy.bookchat.bookchat.db_module.scrap.ScrapEntity;
+import toy.bookchat.bookchat.db_module.scrap.repository.ScrapRepository;
 import toy.bookchat.bookchat.domain.scrap.service.dto.request.CreateScrapRequest;
 import toy.bookchat.bookchat.domain.scrap.service.dto.response.ScrapResponse;
 

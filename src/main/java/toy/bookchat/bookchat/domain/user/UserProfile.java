@@ -3,6 +3,7 @@ package toy.bookchat.bookchat.domain.user;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import toy.bookchat.bookchat.db_module.user.UserEntity;
 
 @Getter
 @EqualsAndHashCode

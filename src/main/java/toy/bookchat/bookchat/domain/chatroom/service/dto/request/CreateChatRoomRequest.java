@@ -12,10 +12,10 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import toy.bookchat.bookchat.domain.book.BookEntity;
+import toy.bookchat.bookchat.db_module.book.BookEntity;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookRequest;
-import toy.bookchat.bookchat.domain.chatroom.ChatRoomEntity;
-import toy.bookchat.bookchat.domain.user.UserEntity;
+import toy.bookchat.bookchat.db_module.chatroom.ChatRoomEntity;
+import toy.bookchat.bookchat.db_module.user.UserEntity;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)

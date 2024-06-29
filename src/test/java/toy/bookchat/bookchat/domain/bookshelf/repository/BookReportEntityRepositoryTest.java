@@ -4,9 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import toy.bookchat.bookchat.db_module.bookreport.BookReportEntity;
+import toy.bookchat.bookchat.db_module.bookreport.repository.BookReportRepository;
+import toy.bookchat.bookchat.db_module.bookshelf.BookShelfEntity;
+import toy.bookchat.bookchat.db_module.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.domain.RepositoryTest;
-import toy.bookchat.bookchat.domain.bookshelf.BookReportEntity;
-import toy.bookchat.bookchat.domain.bookshelf.BookShelfEntity;
 
 class BookReportEntityRepositoryTest extends RepositoryTest {
 

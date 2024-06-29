@@ -27,13 +27,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.web.servlet.MockMvc;
+import toy.bookchat.bookchat.db_module.chat.ChatEntity;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
-import toy.bookchat.bookchat.domain.chat.ChatEntity;
 import toy.bookchat.bookchat.domain.chat.api.dto.response.ChatDetailResponse;
 import toy.bookchat.bookchat.domain.chat.api.dto.response.ChatSender;
 import toy.bookchat.bookchat.domain.chat.service.ChatService;
 import toy.bookchat.bookchat.domain.chat.service.dto.response.ChatRoomChatsResponse;
-import toy.bookchat.bookchat.domain.user.UserEntity;
+import toy.bookchat.bookchat.db_module.user.UserEntity;
 
 @ChatPresentationTest
 class ChatControllerTest extends ControllerTestExtension {

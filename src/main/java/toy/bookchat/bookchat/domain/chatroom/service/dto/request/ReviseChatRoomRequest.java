@@ -8,8 +8,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.util.StringUtils;
-import toy.bookchat.bookchat.domain.chatroom.ChatRoomEntity;
-import toy.bookchat.bookchat.domain.chatroom.HashTagEntity;
+import toy.bookchat.bookchat.db_module.chatroom.ChatRoomEntity;
+import toy.bookchat.bookchat.db_module.chatroom.HashTagEntity;
 import toy.bookchat.bookchat.exception.badrequest.chatroom.NotEnoughRoomSizeException;
 
 @Getter

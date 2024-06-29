@@ -12,13 +12,13 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import toy.bookchat.bookchat.db_module.agony.AgonyEntity;
 import toy.bookchat.bookchat.db_module.agony.repository.AgonyRepository;
+import toy.bookchat.bookchat.db_module.book.BookEntity;
+import toy.bookchat.bookchat.db_module.book.repository.BookRepository;
+import toy.bookchat.bookchat.db_module.bookshelf.BookShelfEntity;
+import toy.bookchat.bookchat.db_module.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.domain.RepositoryTest;
-import toy.bookchat.bookchat.domain.book.BookEntity;
-import toy.bookchat.bookchat.domain.book.repository.BookRepository;
-import toy.bookchat.bookchat.domain.bookshelf.BookShelfEntity;
-import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
-import toy.bookchat.bookchat.domain.user.UserEntity;
-import toy.bookchat.bookchat.domain.user.repository.UserRepository;
+import toy.bookchat.bookchat.db_module.user.UserEntity;
+import toy.bookchat.bookchat.db_module.user.repository.UserRepository;
 import toy.bookchat.bookchat.exception.badrequest.NotSupportedPagingConditionException;
 
 class AgonyEntityRepositoryTest extends RepositoryTest {

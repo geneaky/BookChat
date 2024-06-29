@@ -1,7 +1,7 @@
 package toy.bookchat.bookchat.domain.bookshelf.service.dto.response;
 
 import lombok.Getter;
-import toy.bookchat.bookchat.domain.bookshelf.BookReportEntity;
+import toy.bookchat.bookchat.db_module.bookreport.BookReportEntity;
 
 @Getter
 public class BookReportResponse {

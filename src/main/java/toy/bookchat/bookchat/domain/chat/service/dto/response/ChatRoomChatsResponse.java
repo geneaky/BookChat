@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.springframework.data.domain.Slice;
-import toy.bookchat.bookchat.domain.chat.ChatEntity;
+import toy.bookchat.bookchat.db_module.chat.ChatEntity;
 import toy.bookchat.bookchat.domain.common.CursorMeta;
 
 @Getter

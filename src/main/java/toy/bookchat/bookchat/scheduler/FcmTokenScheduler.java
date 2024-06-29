@@ -3,7 +3,7 @@ package toy.bookchat.bookchat.scheduler;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import toy.bookchat.bookchat.domain.device.repository.DeviceRepository;
+import toy.bookchat.bookchat.db_module.device.repository.DeviceRepository;
 
 @Component
 public class FcmTokenScheduler {

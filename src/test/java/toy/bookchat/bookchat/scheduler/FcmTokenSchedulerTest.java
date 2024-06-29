@@ -7,7 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import toy.bookchat.bookchat.domain.device.repository.DeviceRepository;
+import toy.bookchat.bookchat.db_module.device.repository.DeviceRepository;
 
 @ExtendWith(MockitoExtension.class)
 class FcmTokenSchedulerTest {

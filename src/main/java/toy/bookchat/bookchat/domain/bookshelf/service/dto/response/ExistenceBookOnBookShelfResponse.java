@@ -2,7 +2,7 @@ package toy.bookchat.bookchat.domain.bookshelf.service.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
-import toy.bookchat.bookchat.domain.bookshelf.BookShelfEntity;
+import toy.bookchat.bookchat.db_module.bookshelf.BookShelfEntity;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 
 @Getter

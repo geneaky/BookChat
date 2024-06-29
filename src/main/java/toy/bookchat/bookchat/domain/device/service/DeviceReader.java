@@ -1,9 +1,9 @@
 package toy.bookchat.bookchat.domain.device.service;
 
 import org.springframework.stereotype.Component;
-import toy.bookchat.bookchat.domain.device.DeviceEntity;
-import toy.bookchat.bookchat.domain.device.repository.DeviceRepository;
-import toy.bookchat.bookchat.domain.user.UserEntity;
+import toy.bookchat.bookchat.db_module.device.DeviceEntity;
+import toy.bookchat.bookchat.db_module.device.repository.DeviceRepository;
+import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.exception.notfound.device.DeviceNotFoundException;
 
 @Component

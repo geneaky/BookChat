@@ -10,12 +10,13 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import toy.bookchat.bookchat.db_module.participant.repository.ParticipantRepository;
 import toy.bookchat.bookchat.domain.RepositoryTest;
-import toy.bookchat.bookchat.domain.chatroom.ChatRoomEntity;
-import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomRepository;
-import toy.bookchat.bookchat.domain.participant.ParticipantEntity;
-import toy.bookchat.bookchat.domain.user.UserEntity;
-import toy.bookchat.bookchat.domain.user.repository.UserRepository;
+import toy.bookchat.bookchat.db_module.chatroom.ChatRoomEntity;
+import toy.bookchat.bookchat.db_module.chatroom.repository.ChatRoomRepository;
+import toy.bookchat.bookchat.db_module.participant.ParticipantEntity;
+import toy.bookchat.bookchat.db_module.user.UserEntity;
+import toy.bookchat.bookchat.db_module.user.repository.UserRepository;
 import toy.bookchat.bookchat.exception.notfound.pariticipant.ParticipantNotFoundException;
 
 class ParticipantEntityRepositoryTest extends RepositoryTest {

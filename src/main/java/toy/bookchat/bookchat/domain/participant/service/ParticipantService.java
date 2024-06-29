@@ -6,15 +6,15 @@ import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.SUBHOST
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import toy.bookchat.bookchat.domain.chat.ChatEntity;
-import toy.bookchat.bookchat.domain.chat.repository.ChatRepository;
-import toy.bookchat.bookchat.domain.chatroom.ChatRoomBlockedUserEntity;
-import toy.bookchat.bookchat.domain.chatroom.ChatRoomEntity;
-import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomBlockedUserRepository;
-import toy.bookchat.bookchat.domain.participant.ParticipantEntity;
+import toy.bookchat.bookchat.db_module.chat.ChatEntity;
+import toy.bookchat.bookchat.db_module.chat.repository.ChatRepository;
+import toy.bookchat.bookchat.db_module.chatroom.ChatRoomBlockedUserEntity;
+import toy.bookchat.bookchat.db_module.chatroom.ChatRoomEntity;
+import toy.bookchat.bookchat.db_module.chatroom.repository.ChatRoomBlockedUserRepository;
+import toy.bookchat.bookchat.db_module.participant.ParticipantEntity;
 import toy.bookchat.bookchat.domain.participant.ParticipantStatus;
-import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
-import toy.bookchat.bookchat.domain.user.UserEntity;
+import toy.bookchat.bookchat.db_module.participant.repository.ParticipantRepository;
+import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.exception.forbidden.participant.NoPermissionParticipantException;
 import toy.bookchat.bookchat.exception.notfound.pariticipant.ParticipantNotFoundException;
 import toy.bookchat.bookchat.infrastructure.broker.MessagePublisher;

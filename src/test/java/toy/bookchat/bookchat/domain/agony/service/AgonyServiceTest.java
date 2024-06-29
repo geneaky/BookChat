@@ -22,12 +22,12 @@ import org.springframework.data.domain.Sort;
 import toy.bookchat.bookchat.db_module.agony.AgonyEntity;
 import toy.bookchat.bookchat.db_module.agony.repository.AgonyRepository;
 import toy.bookchat.bookchat.db_module.agonyrecord.repository.AgonyRecordRepository;
+import toy.bookchat.bookchat.db_module.bookshelf.BookShelfEntity;
+import toy.bookchat.bookchat.db_module.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.domain.agony.api.v1.request.CreateBookAgonyRequest;
 import toy.bookchat.bookchat.domain.agony.api.v1.request.ReviseAgonyRequest;
 import toy.bookchat.bookchat.domain.agony.api.v1.response.AgonyResponse;
 import toy.bookchat.bookchat.domain.agony.api.v1.response.SliceOfAgoniesResponse;
-import toy.bookchat.bookchat.domain.bookshelf.BookShelfEntity;
-import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.exception.notfound.book.BookNotFoundException;
 
 @ExtendWith(MockitoExtension.class)

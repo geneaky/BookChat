@@ -10,8 +10,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
+import toy.bookchat.bookchat.db_module.BaseEntity;
 import toy.bookchat.bookchat.db_module.agony.AgonyEntity;
-import toy.bookchat.bookchat.domain.BaseEntity;
 
 @Getter
 @Entity
