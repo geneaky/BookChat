@@ -17,9 +17,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
-import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
+import toy.bookchat.bookchat.domain.bookshelf.BookShelfEntity;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
-import toy.bookchat.bookchat.domain.scrap.Scrap;
+import toy.bookchat.bookchat.domain.scrap.ScrapEntity;
 import toy.bookchat.bookchat.domain.scrap.repository.ScrapRepository;
 import toy.bookchat.bookchat.domain.scrap.service.dto.request.CreateScrapRequest;
 import toy.bookchat.bookchat.domain.scrap.service.dto.response.ScrapResponse;
@@ -73,14 +73,14 @@ class ScrapServiceTest {
 
     @Test
     void 스크랩_단_건_조회_성공() throws Exception {
-        Scrap scrap = Scrap.builder()
+        ScrapEntity scrapEntity = ScrapEntity.builder()
             .id(100L)
             .scrapContent("1BGKFmFC1Wj")
             .build();
-        given(scrapRepository.findUserScrap(any(), any())).willReturn(Optional.of(scrap));
+        given(scrapRepository.findUserScrap(any(), any())).willReturn(Optional.of(scrapEntity));
 
         ScrapResponse actual = scrapService.getScrap(1L, 1L);
-        ScrapResponse expected = ScrapResponse.from(scrap);
+        ScrapResponse expected = ScrapResponse.from(scrapEntity);
 
         assertThat(actual).isEqualTo(expected);
     }
@@ -106,19 +106,19 @@ class ScrapServiceTest {
                 .build();
         }
 
-        private static Optional<BookShelf> mockBookShelf() {
-            return Optional.of(BookShelf.builder().build());
+        private static Optional<BookShelfEntity> mockBookShelf() {
+            return Optional.of(BookShelfEntity.builder().build());
         }
 
-        private static List<Scrap> getScrapList() {
-            Scrap scrap1 = Scrap.builder()
+        private static List<ScrapEntity> getScrapList() {
+            ScrapEntity scrapEntity1 = ScrapEntity.builder()
                 .scrapContent("scrap content1")
                 .build();
-            Scrap scrap2 = Scrap.builder()
+            ScrapEntity scrapEntity2 = ScrapEntity.builder()
                 .scrapContent("scrap content2")
                 .build();
 
-            return List.of(scrap1, scrap2);
+            return List.of(scrapEntity1, scrapEntity2);
         }
     }
 }

@@ -1,8 +1,8 @@
 package toy.bookchat.bookchat.domain.bookshelf.repository.query;
 
-import static toy.bookchat.bookchat.domain.book.QBook.book;
-import static toy.bookchat.bookchat.domain.bookshelf.QBookReport.bookReport;
-import static toy.bookchat.bookchat.domain.bookshelf.QBookShelf.bookShelf;
+import static toy.bookchat.bookchat.domain.book.QBookEntity.bookEntity;
+import static toy.bookchat.bookchat.domain.bookshelf.QBookReportEntity.bookReportEntity;
+import static toy.bookchat.bookchat.domain.bookshelf.QBookShelfEntity.bookShelfEntity;
 import static toy.bookchat.bookchat.domain.common.RepositorySupport.extractOrderSpecifierFrom;
 
 import com.querydsl.jpa.impl.JPAQuery;
@@ -14,7 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
-import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
+import toy.bookchat.bookchat.domain.bookshelf.BookShelfEntity;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 
 @Repository
@@ -27,23 +27,23 @@ public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
     }
 
     @Override
-    public Page<BookShelf> findSpecificStatusBookByUserId(
+    public Page<BookShelfEntity> findSpecificStatusBookByUserId(
         ReadingStatus readingStatus, Pageable pageable, Long userId) {
 
-        JPAQuery<BookShelf> jpaQuery = queryFactory.select(bookShelf)
-            .from(bookShelf).join(bookShelf.book, book).fetchJoin()
-            .where(bookShelf.readingStatus.eq(readingStatus)
-                .and(bookShelf.user.id.eq(userId)));
+        JPAQuery<BookShelfEntity> jpaQuery = queryFactory.select(bookShelfEntity)
+            .from(bookShelfEntity).join(bookShelfEntity.bookEntity, bookEntity).fetchJoin()
+            .where(bookShelfEntity.readingStatus.eq(readingStatus)
+                .and(bookShelfEntity.userEntity.id.eq(userId)));
 
-        List<BookShelf> bookShelves = jpaQuery.offset(pageable.getOffset())
+        List<BookShelfEntity> bookShelves = jpaQuery.offset(pageable.getOffset())
             .limit(pageable.getPageSize())
-            .orderBy(extractOrderSpecifierFrom(bookShelf, pageable))
+            .orderBy(extractOrderSpecifierFrom(bookShelfEntity, pageable))
             .fetch();
 
-        Long size = queryFactory.select(bookShelf.count())
-            .from(bookShelf)
-            .where(bookShelf.readingStatus.eq(readingStatus)
-                .and(bookShelf.user.id.eq(userId)))
+        Long size = queryFactory.select(bookShelfEntity.count())
+            .from(bookShelfEntity)
+            .where(bookShelfEntity.readingStatus.eq(readingStatus)
+                .and(bookShelfEntity.userEntity.id.eq(userId)))
             .fetchOne();
 
         return new PageImpl<>(bookShelves, pageable, size);
@@ -51,45 +51,45 @@ public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
 
     @Override
     public void deleteBookShelfByIdAndUserId(Long bookShelfId, Long userId) {
-        queryFactory.delete(bookShelf)
-            .where(bookShelf.id.eq(bookShelfId)
-                .and(bookShelf.user.id.eq(userId)))
+        queryFactory.delete(bookShelfEntity)
+            .where(bookShelfEntity.id.eq(bookShelfId)
+                .and(bookShelfEntity.userEntity.id.eq(userId)))
             .execute();
     }
 
     @Override
     public void deleteAllByUserId(Long userId) {
-        queryFactory.delete(bookShelf)
-            .where(bookShelf.user.id.eq(userId)).execute();
+        queryFactory.delete(bookShelfEntity)
+            .where(bookShelfEntity.userEntity.id.eq(userId)).execute();
     }
 
     @Override
-    public Optional<BookShelf> findByUserIdAndIsbnAndPublishAt(Long userId, String isbn,
+    public Optional<BookShelfEntity> findByUserIdAndIsbnAndPublishAt(Long userId, String isbn,
         LocalDate publishAt) {
-        return Optional.ofNullable(queryFactory.select(bookShelf)
-            .from(bookShelf).join(bookShelf.book, book).fetchJoin()
-            .where(bookShelf.user.id.eq(userId)
-                .and(bookShelf.book.isbn.eq(isbn))
-                .and(bookShelf.book.publishAt.eq(publishAt)))
+        return Optional.ofNullable(queryFactory.select(bookShelfEntity)
+            .from(bookShelfEntity).join(bookShelfEntity.bookEntity, bookEntity).fetchJoin()
+            .where(bookShelfEntity.userEntity.id.eq(userId)
+                .and(bookShelfEntity.bookEntity.isbn.eq(isbn))
+                .and(bookShelfEntity.bookEntity.publishAt.eq(publishAt)))
             .fetchOne());
     }
 
     @Override
-    public Optional<BookShelf> findByIdAndUserId(Long bookShelfId, Long userId) {
-        return Optional.ofNullable(queryFactory.select(bookShelf)
-            .from(bookShelf)
-            .where(bookShelf.id.eq(bookShelfId)
-                .and(bookShelf.user.id.eq(userId)))
+    public Optional<BookShelfEntity> findByIdAndUserId(Long bookShelfId, Long userId) {
+        return Optional.ofNullable(queryFactory.select(bookShelfEntity)
+            .from(bookShelfEntity)
+            .where(bookShelfEntity.id.eq(bookShelfId)
+                .and(bookShelfEntity.userEntity.id.eq(userId)))
             .fetchOne());
     }
 
     @Override
-    public Optional<BookShelf> findWithReportByIdAndUserId(Long bookShelfId, Long userId) {
-        return Optional.ofNullable(queryFactory.select(bookShelf)
-            .from(bookShelf)
-            .join(bookShelf.bookReport, bookReport).fetchJoin()
-            .where(bookShelf.id.eq(bookShelfId)
-                .and(bookShelf.user.id.eq(userId)))
+    public Optional<BookShelfEntity> findWithReportByIdAndUserId(Long bookShelfId, Long userId) {
+        return Optional.ofNullable(queryFactory.select(bookShelfEntity)
+            .from(bookShelfEntity)
+            .join(bookShelfEntity.bookReportEntity, bookReportEntity).fetchJoin()
+            .where(bookShelfEntity.id.eq(bookShelfId)
+                .and(bookShelfEntity.userEntity.id.eq(userId)))
             .fetchOne());
 
     }

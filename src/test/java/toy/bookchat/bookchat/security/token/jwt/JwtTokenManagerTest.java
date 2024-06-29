@@ -17,7 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import toy.bookchat.bookchat.config.token.JwtTokenProperties;
 import toy.bookchat.bookchat.domain.user.ReadingTaste;
-import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.UserEntity;
 import toy.bookchat.bookchat.domain.user.api.dto.response.Token;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.user.TokenPayload;
@@ -32,8 +32,8 @@ class JwtTokenManagerTest {
     @InjectMocks
     JwtTokenManagerImpl jwtTokenManager;
 
-    private User getUser() {
-        return User.builder()
+    private UserEntity getUser() {
+        return UserEntity.builder()
             .id(1L)
             .email("test@gmail.com")
             .nickname("nickname")
@@ -46,22 +46,22 @@ class JwtTokenManagerTest {
             .build();
     }
 
-    private TokenPayload getTokenPayload(User user) {
-        return TokenPayload.of(user.getId(), user.getName(),
-            user.getNickname(),
-            user.getEmail(), user.getProfileImageUrl(), user.getDefaultProfileImageType(),
-            user.getRole());
+    private TokenPayload getTokenPayload(UserEntity userEntity) {
+        return TokenPayload.of(userEntity.getId(), userEntity.getName(),
+            userEntity.getNickname(),
+            userEntity.getEmail(), userEntity.getProfileImageUrl(), userEntity.getDefaultProfileImageType(),
+            userEntity.getRole());
     }
 
     @Test
     void 토큰에서_사용자_이름_추출_성공() throws Exception {
         generalTokenConfigContext();
-        User user = getUser();
+        UserEntity userEntity = getUser();
         Token token = jwtTokenProvider.createToken(getUser());
         String findUserName = jwtTokenManager.getOAuth2MemberNumberFromToken(
             token.getAccessToken());
 
-        assertThat(user.getName()).isEqualTo(findUserName);
+        assertThat(userEntity.getName()).isEqualTo(findUserName);
     }
 
     private void generalTokenConfigContext() {
@@ -73,18 +73,18 @@ class JwtTokenManagerTest {
     @Test
     void 토큰에서_사용자_이메일_추출_성공() throws Exception {
         generalTokenConfigContext();
-        User user = getUser();
+        UserEntity userEntity = getUser();
         Token token = jwtTokenProvider.createToken(getUser());
         String findUserEmail = jwtTokenManager.getUserEmailFromToken(token.getAccessToken());
 
-        assertThat(user.getEmail()).isEqualTo(findUserEmail);
+        assertThat(userEntity.getEmail()).isEqualTo(findUserEmail);
     }
 
     @Test
     void 토큰에서_provider_type_추출_성공() throws Exception {
-        User user = getUser();
+        UserEntity userEntity = getUser();
 
-        assertThat(user.getProvider()).isEqualTo(OAuth2Provider.KAKAO);
+        assertThat(userEntity.getProvider()).isEqualTo(OAuth2Provider.KAKAO);
     }
 
     @Test
@@ -123,11 +123,11 @@ class JwtTokenManagerTest {
     @Test
     void 토큰에서_TokenPayload_반환_성공() throws Exception {
         generalTokenConfigContext();
-        User user = getUser();
+        UserEntity userEntity = getUser();
         Token token = jwtTokenProvider.createToken(getUser());
         TokenPayload result = jwtTokenManager.getTokenPayloadFromToken(
             token.getAccessToken());
-        TokenPayload expect = getTokenPayload(user);
+        TokenPayload expect = getTokenPayload(userEntity);
 
         assertThat(result).isEqualTo(expect);
     }

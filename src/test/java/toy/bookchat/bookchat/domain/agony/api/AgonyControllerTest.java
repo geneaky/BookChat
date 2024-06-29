@@ -38,14 +38,14 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.web.servlet.MockMvc;
+import toy.bookchat.bookchat.db_module.agony.AgonyEntity;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
-import toy.bookchat.bookchat.domain.agony.Agony;
+import toy.bookchat.bookchat.domain.agony.api.v1.request.CreateBookAgonyRequest;
+import toy.bookchat.bookchat.domain.agony.api.v1.request.ReviseAgonyRequest;
+import toy.bookchat.bookchat.domain.agony.api.v1.response.AgonyResponse;
+import toy.bookchat.bookchat.domain.agony.api.v1.response.SliceOfAgoniesResponse;
 import toy.bookchat.bookchat.domain.agony.service.AgonyService;
-import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateBookAgonyRequest;
-import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRequest;
-import toy.bookchat.bookchat.domain.agony.service.dto.response.AgonyResponse;
-import toy.bookchat.bookchat.domain.agony.service.dto.response.SliceOfAgoniesResponse;
-import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
+import toy.bookchat.bookchat.domain.bookshelf.BookShelfEntity;
 
 @AgonyPresentationTest
 class AgonyControllerTest extends ControllerTestExtension {
@@ -59,22 +59,22 @@ class AgonyControllerTest extends ControllerTestExtension {
     @Autowired
     private MockMvc mockMvc;
 
-    private List<Agony> getAgonies() {
-        Agony agony1 = Agony.builder()
+    private List<AgonyEntity> getAgonies() {
+        AgonyEntity agonyEntity1 = AgonyEntity.builder()
             .id(1L)
             .title("고민1")
             .hexColorCode("빨강")
-            .bookShelf(mock(BookShelf.class))
+            .bookShelfEntity(mock(BookShelfEntity.class))
             .build();
 
-        Agony agony2 = Agony.builder()
+        AgonyEntity agonyEntity2 = AgonyEntity.builder()
             .id(2L)
             .title("고민2")
             .hexColorCode("파랑")
-            .bookShelf(mock(BookShelf.class))
+            .bookShelfEntity(mock(BookShelfEntity.class))
             .build();
 
-        return List.of(agony1, agony2);
+        return List.of(agonyEntity1, agonyEntity2);
     }
 
     @Test
@@ -141,9 +141,9 @@ class AgonyControllerTest extends ControllerTestExtension {
 
     @Test
     void 고민_조회_성공() throws Exception {
-        List<Agony> agonies = getAgonies();
+        List<AgonyEntity> agonies = getAgonies();
         PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("id").descending());
-        Slice<Agony> slice = new SliceImpl<>(agonies, pageRequest, true);
+        Slice<AgonyEntity> slice = new SliceImpl<>(agonies, pageRequest, true);
         SliceOfAgoniesResponse pageOfAgoniesResponse = new SliceOfAgoniesResponse(slice);
         when(agonyService.searchSliceOfAgonies(any(), any(), any(), any())).thenReturn(
             pageOfAgoniesResponse);

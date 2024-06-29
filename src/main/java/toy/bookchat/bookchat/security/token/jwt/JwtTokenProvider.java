@@ -8,7 +8,7 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import toy.bookchat.bookchat.config.token.JwtTokenProperties;
-import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.UserEntity;
 import toy.bookchat.bookchat.domain.user.api.dto.response.Token;
 
 @Slf4j
@@ -31,46 +31,46 @@ public class JwtTokenProvider {
         this.jwtTokenProperties = jwtTokenProperties;
     }
 
-    public Token createToken(User user) {
+    public Token createToken(UserEntity userEntity) {
         return Token.builder()
-            .accessToken(createAccessToken(user))
-            .refreshToken(createRefreshToken(user))
+            .accessToken(createAccessToken(userEntity))
+            .refreshToken(createRefreshToken(userEntity))
             .build();
     }
 
-    public String createRefreshToken(User user) {
+    public String createRefreshToken(UserEntity userEntity) {
         Date date = new Date();
         date.setTime(date.getTime() + jwtTokenProperties.getRefreshTokenExpiredTime());
 
         return Jwts.builder()
-            .setClaims(createClaims(user))
+            .setClaims(createClaims(userEntity))
             .setExpiration(date)
             .signWith(SignatureAlgorithm.HS256, jwtTokenProperties.getSecret())
             .compact();
     }
 
-    public String createAccessToken(User user) {
+    public String createAccessToken(UserEntity userEntity) {
         Date date = new Date();
         date.setTime(date.getTime() + jwtTokenProperties.getAccessTokenExpiredTime());
 
         return Jwts.builder()
-            .setClaims(createClaims(user))
+            .setClaims(createClaims(userEntity))
             .setExpiration(date)
             .signWith(SignatureAlgorithm.HS256, jwtTokenProperties.getSecret())
             .compact();
     }
 
-    private Map<String, Object> createClaims(User user) {
+    private Map<String, Object> createClaims(UserEntity userEntity) {
         Map<String, Object> claims = new HashMap<>();
         claims.put(SUB, "BookChat");
-        claims.put(PROVIDER, user.getProvider());
-        claims.put(USER_ID, user.getId().toString());
-        claims.put(USER_NAME, user.getName());
-        claims.put(USER_NICKNAME, user.getNickname());
-        claims.put(EMAIL, user.getEmail());
-        claims.put(USER_PROFILE_IMAGE_URI, user.getProfileImageUrl());
-        claims.put(DEFAULT_PROFILE_IMAGE_TYPE, user.getDefaultProfileImageType());
-        claims.put(USER_ROLE, user.getRoleName());
+        claims.put(PROVIDER, userEntity.getProvider());
+        claims.put(USER_ID, userEntity.getId().toString());
+        claims.put(USER_NAME, userEntity.getName());
+        claims.put(USER_NICKNAME, userEntity.getNickname());
+        claims.put(EMAIL, userEntity.getEmail());
+        claims.put(USER_PROFILE_IMAGE_URI, userEntity.getProfileImageUrl());
+        claims.put(DEFAULT_PROFILE_IMAGE_TYPE, userEntity.getDefaultProfileImageType());
+        claims.put(USER_ROLE, userEntity.getRoleName());
         return claims;
     }
 }

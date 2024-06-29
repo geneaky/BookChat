@@ -7,6 +7,7 @@ import java.lang.annotation.Target;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import toy.bookchat.bookchat.domain.agony.api.v1.AgonyController;
 import toy.bookchat.bookchat.security.SecurityConfig;
 
 @Retention(RetentionPolicy.RUNTIME)

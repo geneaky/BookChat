@@ -6,8 +6,8 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
-import toy.bookchat.bookchat.domain.scrap.Scrap;
+import toy.bookchat.bookchat.domain.bookshelf.BookShelfEntity;
+import toy.bookchat.bookchat.domain.scrap.ScrapEntity;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -24,9 +24,9 @@ public class CreateScrapRequest {
         this.scrapContent = scrapContent;
     }
 
-    public Scrap create(BookShelf bookShelf) {
-        return Scrap.builder()
-            .bookShelf(bookShelf)
+    public ScrapEntity create(BookShelfEntity bookShelfEntity) {
+        return ScrapEntity.builder()
+            .bookShelfEntity(bookShelfEntity)
             .scrapContent(this.scrapContent)
             .build();
     }

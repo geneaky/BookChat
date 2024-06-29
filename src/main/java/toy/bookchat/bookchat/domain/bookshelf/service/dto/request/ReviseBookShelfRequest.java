@@ -9,7 +9,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
+import toy.bookchat.bookchat.domain.bookshelf.BookShelfEntity;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.Star;
 
@@ -30,23 +30,23 @@ public class ReviseBookShelfRequest {
         this.star = star;
     }
 
-    public void applyChanges(BookShelf bookShelf) {
-        if (bookShelf.isCompleteReading() && starPresent()) { //독서완료한 상태에서만 별점 변경 가능
-            bookShelf.updateStar(this.star);
+    public void applyChanges(BookShelfEntity bookShelfEntity) {
+        if (bookShelfEntity.isCompleteReading() && starPresent()) { //독서완료한 상태에서만 별점 변경 가능
+            bookShelfEntity.updateStar(this.star);
         }
-        if (bookShelf.isReading() && pagePresent()) { //독서중 상태에서만 페이지 쪽수 지정
-            bookShelf.updatePage(this.pages);
-            changeReadingStatusToComplete(bookShelf);
+        if (bookShelfEntity.isReading() && pagePresent()) { //독서중 상태에서만 페이지 쪽수 지정
+            bookShelfEntity.updatePage(this.pages);
+            changeReadingStatusToComplete(bookShelfEntity);
         }
-        if (bookShelf.isWish() && this.readingStatus == READING) { // 독서예정 상태에서 독서중으로 변경
-            bookShelf.updateReadingStatus(this.readingStatus);
+        if (bookShelfEntity.isWish() && this.readingStatus == READING) { // 독서예정 상태에서 독서중으로 변경
+            bookShelfEntity.updateReadingStatus(this.readingStatus);
         }
     }
 
-    private void changeReadingStatusToComplete(BookShelf bookShelf) {
+    private void changeReadingStatusToComplete(BookShelfEntity bookShelfEntity) {
         if (this.readingStatus == COMPLETE && starPresent()) { //독서중에서 독서 완료로 변경시 별점이 필수
-            bookShelf.updateReadingStatus(this.readingStatus);
-            bookShelf.updateStar(this.star);
+            bookShelfEntity.updateReadingStatus(this.readingStatus);
+            bookShelfEntity.updateStar(this.star);
         }
     }
 

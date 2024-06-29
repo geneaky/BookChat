@@ -30,13 +30,13 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
-import toy.bookchat.bookchat.domain.book.Book;
+import toy.bookchat.bookchat.domain.book.BookEntity;
 import toy.bookchat.bookchat.domain.book.repository.BookRepository;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookRequest;
-import toy.bookchat.bookchat.domain.chat.Chat;
+import toy.bookchat.bookchat.domain.chat.ChatEntity;
 import toy.bookchat.bookchat.domain.chat.repository.ChatRepository;
-import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
-import toy.bookchat.bookchat.domain.chatroom.ChatRoomBlockedUser;
+import toy.bookchat.bookchat.domain.chatroom.ChatRoomBlockedUserEntity;
+import toy.bookchat.bookchat.domain.chatroom.ChatRoomEntity;
 import toy.bookchat.bookchat.domain.chatroom.api.dto.response.UserChatRoomDetailResponse;
 import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomBlockedUserRepository;
 import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomHashTagRepository;
@@ -49,10 +49,10 @@ import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.UserC
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.ChatRoomRequest;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.CreateChatRoomRequest;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.ReviseChatRoomRequest;
-import toy.bookchat.bookchat.domain.participant.Participant;
+import toy.bookchat.bookchat.domain.participant.ParticipantEntity;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
 import toy.bookchat.bookchat.domain.storage.ChatRoomStorageService;
-import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.UserEntity;
 import toy.bookchat.bookchat.domain.user.service.UserReader;
 import toy.bookchat.bookchat.exception.badrequest.chatroom.ChatRoomIsFullException;
 import toy.bookchat.bookchat.exception.badrequest.chatroom.NotEnoughRoomSizeException;
@@ -111,16 +111,16 @@ class ChatRoomServiceTest {
         BookRequest bookRequest = getBookRequest();
         CreateChatRoomRequest createChatRoomRequest = getCreateChatRoomRequest(bookRequest);
 
-        ChatRoom chatRoom = ChatRoom.builder()
+        ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
             .id(1L)
             .roomSid("7D6")
             .roomImageUri("3wVp")
             .build();
 
         when(bookRepository.findByIsbnAndPublishAt(any(), any())).thenReturn(
-            Optional.ofNullable(mock(Book.class)));
-        when(userReader.readUser(anyLong())).thenReturn(mock(User.class));
-        when(chatRoomRepository.save(any())).thenReturn(chatRoom);
+            Optional.ofNullable(mock(BookEntity.class)));
+        when(userReader.readUser(anyLong())).thenReturn(mock(UserEntity.class));
+        when(chatRoomRepository.save(any())).thenReturn(chatRoomEntity);
 
         chatRoomService.createChatRoom(createChatRoomRequest, null, 1L);
 
@@ -135,16 +135,16 @@ class ChatRoomServiceTest {
         CreateChatRoomRequest createChatRoomRequest = getCreateChatRoomRequest(bookRequest);
         MultipartFile image = mock(MultipartFile.class);
 
-        ChatRoom chatRoom = ChatRoom.builder()
+        ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
             .id(1L)
             .roomSid("7D6")
             .roomImageUri("3wVp")
             .build();
 
         when(bookRepository.findByIsbnAndPublishAt(any(), any())).thenReturn(
-            Optional.ofNullable(mock(Book.class)));
-        when(userReader.readUser(anyLong())).thenReturn(mock(User.class));
-        when(chatRoomRepository.save(any())).thenReturn(chatRoom);
+            Optional.ofNullable(mock(BookEntity.class)));
+        when(userReader.readUser(anyLong())).thenReturn(mock(UserEntity.class));
+        when(chatRoomRepository.save(any())).thenReturn(chatRoomEntity);
 
         chatRoomService.createChatRoom(createChatRoomRequest, image, 1L);
 
@@ -160,14 +160,14 @@ class ChatRoomServiceTest {
         BookRequest bookRequest = getBookRequest();
         CreateChatRoomRequest createChatRoomRequest = getCreateChatRoomRequest(bookRequest);
 
-        ChatRoom chatRoom = ChatRoom.builder()
+        ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
             .id(1L)
             .roomSid("7D6")
             .roomImageUri("3wVp")
             .build();
 
-        when(userReader.readUser(anyLong())).thenReturn(mock(User.class));
-        when(chatRoomRepository.save(any())).thenReturn(chatRoom);
+        when(userReader.readUser(anyLong())).thenReturn(mock(UserEntity.class));
+        when(chatRoomRepository.save(any())).thenReturn(chatRoomEntity);
 
         chatRoomService.createChatRoom(createChatRoomRequest, null, 1L);
 
@@ -179,7 +179,7 @@ class ChatRoomServiceTest {
 
     @Test
     void 사용자_채팅방_조회_성공() throws Exception {
-        ChatRoom chatRoom1 = ChatRoom.builder()
+        ChatRoomEntity chatRoomEntity1 = ChatRoomEntity.builder()
             .id(1L)
             .roomName("이펙티브 자바 부수는 방")
             .roomSid("secret1")
@@ -187,19 +187,19 @@ class ChatRoomServiceTest {
             .defaultRoomImageType(1)
             .roomImageUri(null)
             .build();
-        chatRoom1.setCreatedAt(LocalDateTime.now());
-        Chat chat1 = Chat.builder()
+        chatRoomEntity1.setCreatedAt(LocalDateTime.now());
+        ChatEntity chatEntity1 = ChatEntity.builder()
             .id(1L)
             .message("안녕")
-            .chatRoom(chatRoom1)
+            .chatRoomEntity(chatRoomEntity1)
             .build();
-        chat1.setCreatedAt(LocalDateTime.now());
+        chatEntity1.setCreatedAt(LocalDateTime.now());
         UserChatRoomResponse userChatRoomResponse = UserChatRoomResponse.builder()
-            .roomId(chatRoom1.getId())
-            .roomSid(chatRoom1.getRoomSid())
-            .roomName(chatRoom1.getRoomName())
+            .roomId(chatRoomEntity1.getId())
+            .roomSid(chatRoomEntity1.getRoomSid())
+            .roomName(chatRoomEntity1.getRoomName())
             .roomMemberCount(1L)
-            .defaultRoomImageType(chatRoom1.getDefaultRoomImageType())
+            .defaultRoomImageType(chatRoomEntity1.getDefaultRoomImageType())
             .build();
         List<UserChatRoomResponse> result = List.of(userChatRoomResponse);
         PageRequest pageRequest = PageRequest.of(0, 1, Sort.by("id").descending());
@@ -284,7 +284,7 @@ class ChatRoomServiceTest {
 
     @Test
     void 차단당한_사용자라면_세부정보_조회_실패() throws Exception {
-        given(chatRoomBlockedUserRepository.findByUserIdAndChatRoomId(any(), any())).willReturn(Optional.ofNullable(mock(ChatRoomBlockedUser.class)));
+        given(chatRoomBlockedUserRepository.findByUserIdAndChatRoomId(any(), any())).willReturn(Optional.ofNullable(mock(ChatRoomBlockedUserEntity.class)));
         assertThatThrownBy(() -> chatRoomService.getChatRoomDetails(1L, 1L)).isInstanceOf(BlockedUserInChatRoomException.class);
     }
 
@@ -295,7 +295,7 @@ class ChatRoomServiceTest {
 
     @Test
     void 채팅방_세부정보_조회_성공() throws Exception {
-        given(chatRoomRepository.findById(any())).willReturn(Optional.ofNullable(mock(ChatRoom.class)));
+        given(chatRoomRepository.findById(any())).willReturn(Optional.ofNullable(mock(ChatRoomEntity.class)));
         chatRoomService.getChatRoomDetails(1L, 1L);
         verify(chatRoomRepository).findChatRoomDetails(any(), any());
     }
@@ -304,18 +304,18 @@ class ChatRoomServiceTest {
     void 채팅방_이미지를_포함한_정보_수정() throws Exception {
         ReviseChatRoomRequest reviseChatRoomRequest = ChatRoomServiceTestFixture.createReviseChatRoomRequest(
             100);
-        ChatRoom chatRoom = ChatRoomServiceTestFixture.getChatRoom();
+        ChatRoomEntity chatRoomEntity = ChatRoomServiceTestFixture.getChatRoom();
         MockMultipartFile chatRoomImage = new MockMultipartFile("newImageFile", "newImageFile",
             "image/webp", "content".getBytes());
 
         when(chatRoomRepository.findChatRoomByIdAndHostId(any(), any())).thenReturn(
-            Optional.of(chatRoom));
+            Optional.of(chatRoomEntity));
         when(storageService.upload(eq(chatRoomImage), anyString(), anyString())).thenReturn(
             "newRoomImageUri");
 
         chatRoomService.reviseChatRoom(reviseChatRoomRequest, chatRoomImage, 763L);
 
-        assertThat(chatRoom.getRoomImageUri()).isEqualTo("newRoomImageUri");
+        assertThat(chatRoomEntity.getRoomImageUri()).isEqualTo("newRoomImageUri");
     }
 
     @Test
@@ -323,14 +323,14 @@ class ChatRoomServiceTest {
         ReviseChatRoomRequest chatRoomRequest = ChatRoomServiceTestFixture.createReviseChatRoomRequest(
             100);
 
-        ChatRoom chatRoom = ChatRoomServiceTestFixture.getChatRoom();
+        ChatRoomEntity chatRoomEntity = ChatRoomServiceTestFixture.getChatRoom();
 
         when(chatRoomRepository.findChatRoomByIdAndHostId(any(), any())).thenReturn(
-            Optional.of(chatRoom));
+            Optional.of(chatRoomEntity));
 
         chatRoomService.reviseChatRoom(chatRoomRequest, null, 125L);
 
-        assertThat(chatRoom).extracting(ChatRoom::getRoomName, ChatRoom::getRoomSize)
+        assertThat(chatRoomEntity).extracting(ChatRoomEntity::getRoomName, ChatRoomEntity::getRoomSize)
             .containsExactly(chatRoomRequest.getRoomName(), chatRoomRequest.getRoomSize());
     }
 
@@ -339,10 +339,10 @@ class ChatRoomServiceTest {
         ReviseChatRoomRequest chatRoomRequest = ChatRoomServiceTestFixture.createReviseChatRoomRequest(
             50);
 
-        ChatRoom chatRoom = ChatRoomServiceTestFixture.getChatRoom();
+        ChatRoomEntity chatRoomEntity = ChatRoomServiceTestFixture.getChatRoom();
 
         when(chatRoomRepository.findChatRoomByIdAndHostId(any(), any())).thenReturn(
-            Optional.of(chatRoom));
+            Optional.of(chatRoomEntity));
 
         assertThatThrownBy(() -> {
             chatRoomService.reviseChatRoom(chatRoomRequest, null, 125L);
@@ -351,12 +351,12 @@ class ChatRoomServiceTest {
 
     @Test
     void 차단된_사용자가_입장시도시_예외발생() throws Exception {
-        User user = mock(User.class);
-        ChatRoom chatRoom = mock(ChatRoom.class);
-        ChatRoomBlockedUser blockedUser = mock(ChatRoomBlockedUser.class);
+        UserEntity userEntity = mock(UserEntity.class);
+        ChatRoomEntity chatRoomEntity = mock(ChatRoomEntity.class);
+        ChatRoomBlockedUserEntity blockedUser = mock(ChatRoomBlockedUserEntity.class);
 
-        when(userReader.readUser(anyLong())).thenReturn(user);
-        when(chatRoomRepository.findById(any())).thenReturn(Optional.ofNullable(chatRoom));
+        when(userReader.readUser(anyLong())).thenReturn(userEntity);
+        when(chatRoomRepository.findById(any())).thenReturn(Optional.ofNullable(chatRoomEntity));
         when(chatRoomBlockedUserRepository.findByUserIdAndChatRoomId(any(), any())).thenReturn(
             Optional.ofNullable(blockedUser));
 
@@ -367,7 +367,7 @@ class ChatRoomServiceTest {
 
     @Test
     void 채팅방_인원수_가득_찼을_경우_예외발생() throws Exception {
-        User user = User.builder()
+        UserEntity userEntity = UserEntity.builder()
             .id(1L)
             .nickname("testNick")
             .profileImageUrl("testImage")
@@ -375,65 +375,65 @@ class ChatRoomServiceTest {
             .status(ACTIVE)
             .build();
 
-        ChatRoom chatRoom = ChatRoom.builder()
+        ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
             .id(1L)
             .roomSid("testRoomSid")
             .roomSize(3)
             .build();
 
-        Chat chat = Chat.builder()
-            .user(user)
-            .chatRoom(chatRoom)
+        ChatEntity chatEntity = ChatEntity.builder()
+            .userEntity(userEntity)
+            .chatRoomEntity(chatRoomEntity)
             .message("test")
             .build();
-        chat.setCreatedAt(LocalDateTime.now());
+        chatEntity.setCreatedAt(LocalDateTime.now());
 
-        when(userReader.readUser(anyLong())).thenReturn(user);
-        when(chatRoomRepository.findById(any())).thenReturn(Optional.ofNullable(chatRoom));
-        when(participantRepository.findWithPessimisticLockByChatRoom(any())).thenReturn(
-            List.of(mock(Participant.class), mock(Participant.class), mock(Participant.class)));
+        when(userReader.readUser(anyLong())).thenReturn(userEntity);
+        when(chatRoomRepository.findById(any())).thenReturn(Optional.ofNullable(chatRoomEntity));
+        when(participantRepository.findWithPessimisticLockByChatRoomEntity(any())).thenReturn(
+            List.of(mock(ParticipantEntity.class), mock(ParticipantEntity.class), mock(ParticipantEntity.class)));
         assertThatThrownBy(() -> {
-            chatRoomService.enterChatRoom(user.getId(), chatRoom.getId());
+            chatRoomService.enterChatRoom(userEntity.getId(), chatRoomEntity.getId());
         }).isInstanceOf(ChatRoomIsFullException.class);
     }
 
     @Test
     void 이미_입장한_사용자는_중복_입장_실패() throws Exception {
-        given(userReader.readUser(anyLong())).willReturn(mock(User.class));
-        given(chatRoomRepository.findById(any())).willReturn(Optional.ofNullable(mock(ChatRoom.class)));
-        given(participantRepository.findByUserIdAndChatRoomId(any(), any())).willReturn(Optional.ofNullable(mock(Participant.class)));
+        given(userReader.readUser(anyLong())).willReturn(mock(UserEntity.class));
+        given(chatRoomRepository.findById(any())).willReturn(Optional.ofNullable(mock(ChatRoomEntity.class)));
+        given(participantRepository.findByUserIdAndChatRoomId(any(), any())).willReturn(Optional.ofNullable(mock(ParticipantEntity.class)));
 
         assertThatThrownBy(() -> chatRoomService.enterChatRoom(1L, 1L)).isInstanceOf(AlreadyParticipateException.class);
     }
 
     @Test
     void 채팅방_입장_성공() throws Exception {
-        User user = User.builder()
+        UserEntity userEntity = UserEntity.builder()
             .id(1L)
             .nickname("testNick")
             .profileImageUrl("testImage")
             .defaultProfileImageType(1)
             .build();
 
-        ChatRoom chatRoom = ChatRoom.builder()
+        ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
             .id(1L)
             .roomSid("testRoomSid")
             .roomSize(3)
             .build();
 
-        Chat chat = Chat.builder()
-            .user(user)
-            .chatRoom(chatRoom)
+        ChatEntity chatEntity = ChatEntity.builder()
+            .userEntity(userEntity)
+            .chatRoomEntity(chatRoomEntity)
             .message("test")
             .build();
-        chat.setCreatedAt(LocalDateTime.now());
+        chatEntity.setCreatedAt(LocalDateTime.now());
 
-        when(userReader.readUser(anyLong())).thenReturn(user);
-        when(chatRoomRepository.findById(any())).thenReturn(Optional.ofNullable(chatRoom));
-        when(participantRepository.findWithPessimisticLockByChatRoom(any())).thenReturn(
+        when(userReader.readUser(anyLong())).thenReturn(userEntity);
+        when(chatRoomRepository.findById(any())).thenReturn(Optional.ofNullable(chatRoomEntity));
+        when(participantRepository.findWithPessimisticLockByChatRoomEntity(any())).thenReturn(
             new ArrayList<>());
-        when(chatRepository.save(any())).thenReturn(chat);
-        chatRoomService.enterChatRoom(user.getId(), chatRoom.getId());
+        when(chatRepository.save(any())).thenReturn(chatEntity);
+        chatRoomService.enterChatRoom(userEntity.getId(), chatRoomEntity.getId());
 
         verify(participantRepository).save(any());
         verify(chatRepository).save(any());
@@ -443,34 +443,34 @@ class ChatRoomServiceTest {
 
     @Test
     void 방장이아닌_참가자_채팅방_퇴장_성공() throws Exception {
-        User user = User.builder()
+        UserEntity userEntity = UserEntity.builder()
             .id(1L)
             .nickname("testNick")
             .profileImageUrl("testImage")
             .defaultProfileImageType(1)
             .build();
 
-        ChatRoom chatRoom = ChatRoom.builder()
+        ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
             .id(1L)
             .roomSid("testRoomSid")
             .build();
 
-        Participant participant = Participant.builder()
+        ParticipantEntity participantEntity = ParticipantEntity.builder()
             .id(1L)
-            .chatRoom(chatRoom)
-            .user(user)
+            .chatRoomEntity(chatRoomEntity)
+            .userEntity(userEntity)
             .build();
 
-        Chat chat = Chat.builder()
+        ChatEntity chatEntity = ChatEntity.builder()
             .id(1L)
             .message("퇴장")
             .build();
-        chat.setCreatedAt(LocalDateTime.now());
+        chatEntity.setCreatedAt(LocalDateTime.now());
 
-        given(chatRoomRepository.findById(any())).willReturn(Optional.ofNullable(chatRoom));
-        when(participantRepository.findByUserIdAndChatRoomId(any(), any())).thenReturn(Optional.ofNullable(participant));
-        when(chatRepository.save(any())).thenReturn(chat);
-        chatRoomService.exitChatRoom(user.getId(), chatRoom.getId());
+        given(chatRoomRepository.findById(any())).willReturn(Optional.ofNullable(chatRoomEntity));
+        when(participantRepository.findByUserIdAndChatRoomId(any(), any())).thenReturn(Optional.ofNullable(participantEntity));
+        when(chatRepository.save(any())).thenReturn(chatEntity);
+        chatRoomService.exitChatRoom(userEntity.getId(), chatRoomEntity.getId());
 
         verify(chatRepository).save(any());
         verify(participantRepository).delete(any());
@@ -480,39 +480,39 @@ class ChatRoomServiceTest {
 
     @Test
     void 방장의_채팅방_퇴장_성공() throws Exception {
-        User user = User.builder()
+        UserEntity userEntity = UserEntity.builder()
             .id(1L)
             .nickname("testNick")
             .profileImageUrl("testImage")
             .defaultProfileImageType(1)
             .build();
 
-        ChatRoom chatRoom = ChatRoom.builder()
+        ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
             .id(1L)
             .roomSid("testRoomSid")
-            .host(user)
+            .host(userEntity)
             .build();
 
-        Participant participant = Participant.builder()
-            .user(user)
-            .chatRoom(chatRoom)
+        ParticipantEntity participantEntity = ParticipantEntity.builder()
+            .userEntity(userEntity)
+            .chatRoomEntity(chatRoomEntity)
             .build();
 
-        Chat chat = Chat.builder()
+        ChatEntity chatEntity = ChatEntity.builder()
             .id(1L)
             .message("퇴장")
             .build();
-        chat.setCreatedAt(LocalDateTime.now());
+        chatEntity.setCreatedAt(LocalDateTime.now());
 
-        given(chatRoomRepository.findById(any())).willReturn(Optional.ofNullable(chatRoom));
-        when(participantRepository.findByUserIdAndChatRoomId(any(), any())).thenReturn(Optional.ofNullable(participant));
-        given(chatRepository.save(any())).willReturn(chat);
-        chatRoomService.exitChatRoom(user.getId(), chatRoom.getId());
+        given(chatRoomRepository.findById(any())).willReturn(Optional.ofNullable(chatRoomEntity));
+        when(participantRepository.findByUserIdAndChatRoomId(any(), any())).thenReturn(Optional.ofNullable(participantEntity));
+        given(chatRepository.save(any())).willReturn(chatEntity);
+        chatRoomService.exitChatRoom(userEntity.getId(), chatRoomEntity.getId());
 
         verify(chatRepository).save(any());
         verify(messagePublisher).sendNotificationMessage(anyString(), any(NotificationMessage.class));
     }
-   
+
     @Test
     void 존재하지_않는_채팅방에서_나가기_실패() throws Exception {
         assertThatThrownBy(() -> chatRoomService.exitChatRoom(1L, 1L)).isInstanceOf(ChatRoomNotFoundException.class);
@@ -525,7 +525,7 @@ class ChatRoomServiceTest {
 
     @Test
     void 사용자_채팅방_상세정보_조회_성공() throws Exception {
-        ChatRoom chatRoom = ChatRoom.builder()
+        ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
             .id(1L)
             .roomSid("WGmILQSqkZ")
             .roomName("Xo07yxaT")
@@ -533,8 +533,8 @@ class ChatRoomServiceTest {
             .defaultRoomImageType(1)
             .build();
 
-        given(chatRoomRepository.findUserChatRoom(any(), any())).willReturn(Optional.of(chatRoom));
-        given(participantRepository.countByChatRoom(any())).willReturn(10L);
+        given(chatRoomRepository.findUserChatRoom(any(), any())).willReturn(Optional.of(chatRoomEntity));
+        given(participantRepository.countByChatRoomEntity(any())).willReturn(10L);
 
         UserChatRoomDetailResponse userChatRoomDetailResponse = chatRoomService.getUserChatRoomDetails(1L, 1L);
 
@@ -546,12 +546,12 @@ class ChatRoomServiceTest {
             UserChatRoomDetailResponse::getRoomImageUri,
             UserChatRoomDetailResponse::getDefaultRoomImageType
         ).containsExactly(
-            chatRoom.getId(),
-            chatRoom.getRoomName(),
-            chatRoom.getRoomSid(),
+            chatRoomEntity.getId(),
+            chatRoomEntity.getRoomName(),
+            chatRoomEntity.getRoomSid(),
             10L,
-            chatRoom.getRoomImageUri(),
-            chatRoom.getDefaultRoomImageType()
+            chatRoomEntity.getRoomImageUri(),
+            chatRoomEntity.getDefaultRoomImageType()
         );
     }
 
@@ -566,8 +566,8 @@ class ChatRoomServiceTest {
                 .build();
         }
 
-        public static ChatRoom getChatRoom() {
-            return ChatRoom.builder()
+        public static ChatRoomEntity getChatRoom() {
+            return ChatRoomEntity.builder()
                 .roomName("beforeRoomName")
                 .roomSize(100)
                 .build();

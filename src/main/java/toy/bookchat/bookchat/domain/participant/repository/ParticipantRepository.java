@@ -4,18 +4,18 @@ import java.util.List;
 import javax.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
-import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
-import toy.bookchat.bookchat.domain.participant.Participant;
+import toy.bookchat.bookchat.domain.chatroom.ChatRoomEntity;
+import toy.bookchat.bookchat.domain.participant.ParticipantEntity;
 import toy.bookchat.bookchat.domain.participant.repository.query.ParticipantQueryRepository;
 
 public interface ParticipantRepository extends ParticipantQueryRepository,
-    JpaRepository<Participant, Long> {
+    JpaRepository<ParticipantEntity, Long> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    List<Participant> findWithPessimisticLockByChatRoom(ChatRoom chatRoom);
+    List<ParticipantEntity> findWithPessimisticLockByChatRoomEntity(ChatRoomEntity chatRoomEntity);
 
-    void deleteByChatRoom(ChatRoom chatRoom);
+    void deleteByChatRoomEntity(ChatRoomEntity chatRoomEntity);
 
-    Long countByChatRoom(ChatRoom chatroom);
+    Long countByChatRoomEntity(ChatRoomEntity chatroom);
 
 }

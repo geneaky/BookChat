@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import toy.bookchat.bookchat.domain.book.Book;
+import toy.bookchat.bookchat.domain.book.BookEntity;
 
 @Getter
 @EqualsAndHashCode
@@ -83,9 +83,9 @@ public class UserChatRoomResponse {
         this.lastChatDispatchTime = lastChatDispatchTime;
     }
 
-    public void setBookInfo(Book book) {
-        this.bookTitle = book.getTitle();
-        this.bookCoverImageUrl = book.getBookCoverImageUrl();
-        this.bookAuthors = book.getAuthors();
+    public void setBookInfo(BookEntity bookEntity) {
+        this.bookTitle = bookEntity.getTitle();
+        this.bookCoverImageUrl = bookEntity.getBookCoverImageUrl();
+        this.bookAuthors = bookEntity.getAuthors();
     }
 }

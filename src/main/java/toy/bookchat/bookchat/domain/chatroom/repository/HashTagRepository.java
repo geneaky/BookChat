@@ -2,9 +2,9 @@ package toy.bookchat.bookchat.domain.chatroom.repository;
 
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
-import toy.bookchat.bookchat.domain.chatroom.HashTag;
+import toy.bookchat.bookchat.domain.chatroom.HashTagEntity;
 
-public interface HashTagRepository extends JpaRepository<HashTag, Long> {
+public interface HashTagRepository extends JpaRepository<HashTagEntity, Long> {
 
-    Optional<HashTag> findByTagName(String tagName);
+    Optional<HashTagEntity> findByTagName(String tagName);
 }

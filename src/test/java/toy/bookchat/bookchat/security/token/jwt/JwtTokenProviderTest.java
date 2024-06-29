@@ -12,7 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import toy.bookchat.bookchat.config.token.JwtTokenProperties;
 import toy.bookchat.bookchat.domain.user.ReadingTaste;
-import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.UserEntity;
 import toy.bookchat.bookchat.domain.user.api.dto.response.Token;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
@@ -26,8 +26,8 @@ class JwtTokenProviderTest {
     @InjectMocks
     JwtTokenProvider tokenProvider;
 
-    private User getUser() {
-        return User.builder()
+    private UserEntity getUser() {
+        return UserEntity.builder()
             .id(1L)
             .email("test@gmail.com")
             .nickname("nickname")

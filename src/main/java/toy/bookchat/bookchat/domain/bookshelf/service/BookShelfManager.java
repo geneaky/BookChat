@@ -2,10 +2,10 @@ package toy.bookchat.bookchat.domain.bookshelf.service;
 
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import toy.bookchat.bookchat.domain.agony.repository.AgonyRecordRepository;
-import toy.bookchat.bookchat.domain.agony.repository.AgonyRepository;
-import toy.bookchat.bookchat.domain.bookshelf.BookReport;
-import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
+import toy.bookchat.bookchat.db_module.agony.repository.AgonyRepository;
+import toy.bookchat.bookchat.db_module.agonyrecord.repository.AgonyRecordRepository;
+import toy.bookchat.bookchat.domain.bookshelf.BookReportEntity;
+import toy.bookchat.bookchat.domain.bookshelf.BookShelfEntity;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookReportRepository;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
 
@@ -26,13 +26,13 @@ public class BookShelfManager {
     }
 
     @Transactional
-    public void append(BookShelf bookShelf, BookReport bookReport) {
-        bookReportRepository.save(bookReport);
-        bookShelf.writeReportInStateOfCompleteReading(bookReport);
+    public void append(BookShelfEntity bookShelfEntity, BookReportEntity bookReportEntity) {
+        bookReportRepository.save(bookReportEntity);
+        bookShelfEntity.writeReportInStateOfCompleteReading(bookReportEntity);
     }
 
-    public void store(BookShelf bookShelf) {
-        bookShelfRepository.save(bookShelf);
+    public void store(BookShelfEntity bookShelfEntity) {
+        bookShelfRepository.save(bookShelfEntity);
     }
 
     public void vacate(Long bookShelfId, Long userId) {

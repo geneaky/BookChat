@@ -23,13 +23,13 @@ public class UserProfile {
         this.defaultProfileImageType = defaultProfileImageType;
     }
 
-    public static UserProfile from(User user) {
+    public static UserProfile from(UserEntity userEntity) {
         return UserProfile.builder()
-            .userId(user.getId())
-            .userNickname(user.getNickname())
-            .userEmail(user.getEmail())
-            .userProfileImageUri(user.getProfileImageUrl())
-            .defaultProfileImageType(user.getDefaultProfileImageType())
+            .userId(userEntity.getId())
+            .userNickname(userEntity.getNickname())
+            .userEmail(userEntity.getEmail())
+            .userProfileImageUri(userEntity.getProfileImageUrl())
+            .defaultProfileImageType(userEntity.getDefaultProfileImageType())
             .build();
     }
 }

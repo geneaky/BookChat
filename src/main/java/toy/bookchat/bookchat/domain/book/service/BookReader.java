@@ -2,7 +2,7 @@ package toy.bookchat.bookchat.domain.book.service;
 
 import java.time.LocalDate;
 import org.springframework.stereotype.Component;
-import toy.bookchat.bookchat.domain.book.Book;
+import toy.bookchat.bookchat.domain.book.BookEntity;
 import toy.bookchat.bookchat.domain.book.repository.BookRepository;
 
 @Component
@@ -14,8 +14,8 @@ public class BookReader {
         this.bookRepository = bookRepository;
     }
 
-    public Book readBook(String isbn, LocalDate publishAt, Book book) {
+    public BookEntity readBook(String isbn, LocalDate publishAt, BookEntity bookEntity) {
         return bookRepository.findByIsbnAndPublishAt(isbn, publishAt)
-            .orElseGet(() -> bookRepository.save(book));
+            .orElseGet(() -> bookRepository.save(bookEntity));
     }
 }

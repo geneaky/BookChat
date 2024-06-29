@@ -1,7 +1,7 @@
 package toy.bookchat.bookchat.domain.bookshelf.service.dto.response;
 
 import lombok.Getter;
-import toy.bookchat.bookchat.domain.bookshelf.BookReport;
+import toy.bookchat.bookchat.domain.bookshelf.BookReportEntity;
 
 @Getter
 public class BookReportResponse {
@@ -17,8 +17,8 @@ public class BookReportResponse {
         this.reportCreatedAt = reportCreatedAt;
     }
 
-    public static BookReportResponse from(BookReport bookReport) {
-        return new BookReportResponse(bookReport.getTitle(), bookReport.getContent(),
-            bookReport.getCreateTimeInYearMonthDayFormat());
+    public static BookReportResponse from(BookReportEntity bookReportEntity) {
+        return new BookReportResponse(bookReportEntity.getTitle(), bookReportEntity.getContent(),
+            bookReportEntity.getCreateTimeInYearMonthDayFormat());
     }
 }

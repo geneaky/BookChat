@@ -5,12 +5,12 @@ import java.util.List;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
-import toy.bookchat.bookchat.domain.participant.Participant;
+import toy.bookchat.bookchat.domain.chatroom.ChatRoomEntity;
+import toy.bookchat.bookchat.domain.participant.ParticipantEntity;
 import toy.bookchat.bookchat.domain.participant.service.dto.RoomGuest;
 import toy.bookchat.bookchat.domain.participant.service.dto.RoomHost;
 import toy.bookchat.bookchat.domain.participant.service.dto.RoomSubHost;
-import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.UserEntity;
 
 @Getter
 @EqualsAndHashCode
@@ -40,8 +40,8 @@ public class ChatRoomDetails {
         this.roomGuestList = roomGuestList;
     }
 
-    public static ChatRoomDetails from(List<Participant> participants, List<String> roomTags) {
-        User host = getHost(participants);
+    public static ChatRoomDetails from(List<ParticipantEntity> participantEntities, List<String> roomTags) {
+        UserEntity host = getHost(participantEntities);
         RoomHost roomHost = RoomHost.builder()
             .id(host.getId())
             .nickname(host.getNickname())
@@ -50,24 +50,25 @@ public class ChatRoomDetails {
             .build();
         List<RoomSubHost> roomSubHostList = new ArrayList<>();
         List<RoomGuest> roomGuestList = new ArrayList<>();
-        fillParticipantsResponse(participants, host, roomSubHostList, roomGuestList);
-        ChatRoom chatRoom = getChatRoom(participants);
+        fillParticipantsResponse(participantEntities, host, roomSubHostList, roomGuestList);
+        ChatRoomEntity chatRoomEntity = getChatRoom(participantEntities);
 
-        return new ChatRoomDetails(chatRoom.getRoomSize(), roomTags, chatRoom.getRoomName(), chatRoom.getBookTitle(), chatRoom.getBookCoverImageUrl(), chatRoom.getBookAuthors(), roomHost,
+        return new ChatRoomDetails(chatRoomEntity.getRoomSize(), roomTags, chatRoomEntity.getRoomName(), chatRoomEntity.getBookTitle(), chatRoomEntity.getBookCoverImageUrl(),
+            chatRoomEntity.getBookAuthors(), roomHost,
             roomSubHostList, roomGuestList);
     }
 
-    private static ChatRoom getChatRoom(List<Participant> participants) {
-        return participants.get(0).getChatRoom();
+    private static ChatRoomEntity getChatRoom(List<ParticipantEntity> participantEntities) {
+        return participantEntities.get(0).getChatRoomEntity();
     }
 
-    private static User getHost(List<Participant> participants) {
-        return participants.get(0).getChatRoom().getHost();
+    private static UserEntity getHost(List<ParticipantEntity> participantEntities) {
+        return participantEntities.get(0).getChatRoomEntity().getHost();
     }
 
-    private static void fillParticipantsResponse(List<Participant> participants, User host,
+    private static void fillParticipantsResponse(List<ParticipantEntity> participantEntities, UserEntity host,
         List<RoomSubHost> roomSubHostList, List<RoomGuest> roomGuestList) {
-        participants.stream().filter(participant -> !participant.getUser().equals(host))
+        participantEntities.stream().filter(participant -> !participant.getUserEntity().equals(host))
             .forEach(participant -> {
                 if (participant.isSubHost()) {
                     roomSubHostList.add(RoomSubHost.builder()

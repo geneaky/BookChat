@@ -2,12 +2,12 @@ package toy.bookchat.bookchat.domain.chatroom.repository;
 
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
-import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
-import toy.bookchat.bookchat.domain.chatroom.ChatRoomHashTag;
+import toy.bookchat.bookchat.domain.chatroom.ChatRoomEntity;
+import toy.bookchat.bookchat.domain.chatroom.ChatRoomHashTagEntity;
 
-public interface ChatRoomHashTagRepository extends JpaRepository<ChatRoomHashTag, Long> {
+public interface ChatRoomHashTagRepository extends JpaRepository<ChatRoomHashTagEntity, Long> {
 
-    List<ChatRoomHashTag> findByChatRoom(ChatRoom chatRoom);
+    List<ChatRoomHashTagEntity> findByChatRoomEntity(ChatRoomEntity chatRoomEntity);
 
-    void deleteAllByChatRoom(ChatRoom chatRoom);
+    void deleteAllByChatRoomEntity(ChatRoomEntity chatRoomEntity);
 }

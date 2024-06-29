@@ -5,9 +5,9 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
+import toy.bookchat.bookchat.domain.bookshelf.BookShelfEntity;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
-import toy.bookchat.bookchat.domain.scrap.Scrap;
+import toy.bookchat.bookchat.domain.scrap.ScrapEntity;
 import toy.bookchat.bookchat.domain.scrap.repository.ScrapRepository;
 import toy.bookchat.bookchat.domain.scrap.service.dto.request.CreateScrapRequest;
 import toy.bookchat.bookchat.domain.scrap.service.dto.response.ScrapResponse;
@@ -29,11 +29,11 @@ public class ScrapService {
 
     @Transactional
     public Long scrap(CreateScrapRequest createScrapRequest, Long userId) {
-        BookShelf bookShelf = bookShelfRepository.findByIdAndUserId(createScrapRequest.getBookShelfId(), userId).orElseThrow(BookNotFoundException::new);
-        Scrap scrap = createScrapRequest.create(bookShelf);
-        scrapRepository.save(scrap);
+        BookShelfEntity bookShelfEntity = bookShelfRepository.findByIdAndUserId(createScrapRequest.getBookShelfId(), userId).orElseThrow(BookNotFoundException::new);
+        ScrapEntity scrapEntity = createScrapRequest.create(bookShelfEntity);
+        scrapRepository.save(scrapEntity);
 
-        return scrap.getId();
+        return scrapEntity.getId();
     }
 
     @Transactional(readOnly = true)
@@ -43,18 +43,18 @@ public class ScrapService {
 
     @Transactional(readOnly = true)
     public ScrapResponse getScrap(Long scrapId, Long userId) {
-        Scrap scrap = scrapRepository.findUserScrap(scrapId, userId).orElseThrow(ScrapNotFoundException::new);
-        return ScrapResponse.from(scrap);
+        ScrapEntity scrapEntity = scrapRepository.findUserScrap(scrapId, userId).orElseThrow(ScrapNotFoundException::new);
+        return ScrapResponse.from(scrapEntity);
     }
 
     public void deleteScraps(Long bookShelfId, List<Long> scrapIds, Long userId) {
-        BookShelf bookShelf = bookShelfRepository.findByIdAndUserId(bookShelfId, userId).orElseThrow(BookNotFoundException::new);
+        BookShelfEntity bookShelfEntity = bookShelfRepository.findByIdAndUserId(bookShelfId, userId).orElseThrow(BookNotFoundException::new);
 
-        List<Scrap> scrapList = scrapRepository.findAllById(scrapIds)
+        List<ScrapEntity> scrapEntityList = scrapRepository.findAllById(scrapIds)
             .stream()
-            .filter(scrap -> scrap.getBookShelf() == bookShelf)
+            .filter(scrap -> scrap.getBookShelfEntity() == bookShelfEntity)
             .collect(Collectors.toList());
 
-        scrapRepository.deleteAllInBatch(scrapList);
+        scrapRepository.deleteAllInBatch(scrapEntityList);
     }
 }

@@ -3,7 +3,7 @@ package toy.bookchat.bookchat.domain.chat.api.dto.response;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
-import toy.bookchat.bookchat.domain.chat.Chat;
+import toy.bookchat.bookchat.domain.chat.ChatEntity;
 
 @Getter
 public class ChatDetailResponse {
@@ -23,13 +23,13 @@ public class ChatDetailResponse {
         this.sender = sender;
     }
 
-    public static ChatDetailResponse from(Chat chat) {
+    public static ChatDetailResponse from(ChatEntity chatEntity) {
         return ChatDetailResponse.builder()
-            .chatId(chat.getId())
-            .chatRoomId(chat.getChatRoom().getId())
-            .message(chat.getMessage())
-            .dispatchTime(chat.getCreatedAt())
-            .sender(ChatSender.from(chat.getUser()))
+            .chatId(chatEntity.getId())
+            .chatRoomId(chatEntity.getChatRoomEntity().getId())
+            .message(chatEntity.getMessage())
+            .dispatchTime(chatEntity.getCreatedAt())
+            .sender(ChatSender.from(chatEntity.getUserEntity()))
             .build();
     }
 }

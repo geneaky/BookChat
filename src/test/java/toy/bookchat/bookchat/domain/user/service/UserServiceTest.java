@@ -23,11 +23,11 @@ import org.springframework.web.multipart.MultipartFile;
 import toy.bookchat.bookchat.domain.agony.service.AgonyService;
 import toy.bookchat.bookchat.domain.bookshelf.service.BookShelfService;
 import toy.bookchat.bookchat.domain.common.Status;
-import toy.bookchat.bookchat.domain.device.Device;
+import toy.bookchat.bookchat.domain.device.DeviceEntity;
 import toy.bookchat.bookchat.domain.device.service.DeviceService;
 import toy.bookchat.bookchat.domain.storage.StorageService;
 import toy.bookchat.bookchat.domain.storage.image.ImageValidator;
-import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.UserEntity;
 import toy.bookchat.bookchat.domain.user.UserProfile;
 import toy.bookchat.bookchat.domain.user.api.dto.response.MemberProfileResponse;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
@@ -78,24 +78,24 @@ class UserServiceTest {
     @Test
     void 처음_가입하는_회원의_경우_회원가입_성공() throws Exception {
         UserSignUpRequest userSignUpRequest = mock(UserSignUpRequest.class);
-        User mockUser = mock(User.class);
+        UserEntity mockUserEntity = mock(UserEntity.class);
         MultipartFile multipartFile = mock(MultipartFile.class);
 
-        when(userSignUpRequest.getUser(any(), any(), any())).thenReturn(mockUser);
+        when(userSignUpRequest.getUser(any(), any(), any())).thenReturn(mockUserEntity);
 
         userService.registerNewUser(userSignUpRequest, multipartFile, "memberNumber",
             "test@gmail.com");
 
-        verify(userRepository).save(any(User.class));
+        verify(userRepository).save(any(UserEntity.class));
         verify(storageService).upload(any(), any(), any());
     }
 
     @Test
     void 이미_가입된_사용자일경우_예외발생() throws Exception {
         UserSignUpRequest userSignUpRequest = mock(UserSignUpRequest.class);
-        User mockUser = mock(User.class);
+        UserEntity mockUserEntity = mock(UserEntity.class);
 
-        when(userRepository.findByName(any())).thenReturn(Optional.of(mockUser));
+        when(userRepository.findByName(any())).thenReturn(Optional.of(mockUserEntity));
 
         assertThatThrownBy(() -> {
             userService.registerNewUser(userSignUpRequest, null,
@@ -107,19 +107,19 @@ class UserServiceTest {
 
     @Test
     void 사용자_회원탈퇴_요청시_삭제_성공() throws Exception {
-        User user = User.builder()
+        UserEntity userEntity = UserEntity.builder()
             .status(ACTIVE)
             .build();
 
-        given(userReader.readUser(eq(1L))).willReturn(user);
+        given(userReader.readUser(eq(1L))).willReturn(userEntity);
         userService.deleteUser(1L);
 
-        assertThat(user.getStatus()).isEqualTo(Status.INACTIVE);
+        assertThat(userEntity.getStatus()).isEqualTo(Status.INACTIVE);
     }
 
     @Test
     void 사용자_닉네임_프로필사진_변경_성공() throws Exception {
-        User user = User.builder()
+        UserEntity userEntity = UserEntity.builder()
             .id(1L)
             .nickname("user1")
             .profileImageUrl("profile-image-url")
@@ -128,17 +128,17 @@ class UserServiceTest {
             "user2");
         MultipartFile multipartFile = mock(MultipartFile.class);
 
-        when(userReader.readUser(user.getId())).thenReturn(user);
+        when(userReader.readUser(userEntity.getId())).thenReturn(userEntity);
         when(storageService.upload(any(), any(), any())).thenReturn("test-s3-image-url");
-        userService.updateUserProfile(changeUserNicknameRequest, multipartFile, user.getId());
+        userService.updateUserProfile(changeUserNicknameRequest, multipartFile, userEntity.getId());
 
-        assertThat(user).extracting(User::getNickname, User::getProfileImageUrl)
+        assertThat(userEntity).extracting(UserEntity::getNickname, UserEntity::getProfileImageUrl)
             .containsExactly("user2", "test-s3-image-url");
     }
 
     @Test
     void 사용자_닉네임만_변경_성공() throws Exception {
-        User user = User.builder()
+        UserEntity userEntity = UserEntity.builder()
             .id(1L)
             .nickname("user1")
             .profileImageUrl("profile-image-url")
@@ -147,10 +147,10 @@ class UserServiceTest {
         ChangeUserNicknameRequest changeUserNicknameRequest = new ChangeUserNicknameRequest(
             "user2");
 
-        when(userReader.readUser(user.getId())).thenReturn(user);
-        userService.updateUserProfile(changeUserNicknameRequest, null, user.getId());
+        when(userReader.readUser(userEntity.getId())).thenReturn(userEntity);
+        userService.updateUserProfile(changeUserNicknameRequest, null, userEntity.getId());
 
-        String nickname = user.getNickname();
+        String nickname = userEntity.getNickname();
         assertThat(nickname).isEqualTo("user2");
         verify(storageService, noInteractions()).upload(any(), any(), any());
     }
@@ -162,9 +162,9 @@ class UserServiceTest {
             .fcmToken("w0teX6P")
             .build();
 
-        User user = User.builder().build();
+        UserEntity userEntity = UserEntity.builder().build();
 
-        userService.checkDevice(userSignInRequest, user);
+        userService.checkDevice(userSignInRequest, userEntity);
 
         verify(deviceService).registerDevice(any());
     }
@@ -177,20 +177,20 @@ class UserServiceTest {
             .approveChangingDevice(true)
             .build();
 
-        User user = User.builder().build();
+        UserEntity userEntity = UserEntity.builder().build();
 
-        Device device = Device.builder()
+        DeviceEntity deviceEntity = DeviceEntity.builder()
             .deviceToken("18P1xu8")
             .fcmToken("nMhp5")
             .build();
 
-        String oldDeviceFcmToken = device.getFcmToken();
+        String oldDeviceFcmToken = deviceEntity.getFcmToken();
 
-        when(deviceService.findUserDevice(eq(user))).thenReturn(Optional.of(device));
-        userService.checkDevice(userSignInRequest, user);
+        when(deviceService.findUserDevice(eq(userEntity))).thenReturn(Optional.of(deviceEntity));
+        userService.checkDevice(userSignInRequest, userEntity);
 
-        assertThat(device.getDeviceToken()).isEqualTo(userSignInRequest.getDeviceToken());
-        assertThat(device.getFcmToken()).isEqualTo(userSignInRequest.getFcmToken());
+        assertThat(deviceEntity.getDeviceToken()).isEqualTo(userSignInRequest.getDeviceToken());
+        assertThat(deviceEntity.getFcmToken()).isEqualTo(userSignInRequest.getFcmToken());
         verify(pushService).send(eq(oldDeviceFcmToken), any());
     }
 
@@ -201,16 +201,16 @@ class UserServiceTest {
             .fcmToken("w0teX6P")
             .build();
 
-        User user = User.builder().build();
+        UserEntity userEntity = UserEntity.builder().build();
 
-        Device device = Device.builder()
+        DeviceEntity deviceEntity = DeviceEntity.builder()
             .deviceToken("N8vD8hy")
             .fcmToken("nMhp5")
             .build();
 
-        when(deviceService.findUserDevice(user)).thenReturn(Optional.of(device));
+        when(deviceService.findUserDevice(userEntity)).thenReturn(Optional.of(deviceEntity));
         assertThatThrownBy(() -> {
-            userService.checkDevice(userSignInRequest, user);
+            userService.checkDevice(userSignInRequest, userEntity);
         }).isInstanceOf(DeviceAlreadyRegisteredException.class);
     }
 
@@ -223,7 +223,7 @@ class UserServiceTest {
 
     @Test
     void 회원_프로필_정보_조회_성공() throws Exception {
-        User user = User.builder()
+        UserEntity userEntity = UserEntity.builder()
             .id(1L)
             .nickname("user1")
             .email("kKvTABYqa@test.com")
@@ -231,9 +231,9 @@ class UserServiceTest {
             .defaultProfileImageType(2)
             .build();
 
-        given(userReader.readUser(anyLong())).willReturn(user);
+        given(userReader.readUser(anyLong())).willReturn(userEntity);
 
-        MemberProfileResponse expectedMemberProfileResponse = MemberProfileResponse.of(user);
+        MemberProfileResponse expectedMemberProfileResponse = MemberProfileResponse.of(userEntity);
         MemberProfileResponse memberProfileResponse = userService.getMemberProfile(1L);
 
         assertThat(memberProfileResponse).isEqualTo(expectedMemberProfileResponse);
@@ -241,14 +241,14 @@ class UserServiceTest {
 
     @Test
     void 사용자_프로필_조회_성공() throws Exception {
-        User user = User.builder()
+        UserEntity userEntity = UserEntity.builder()
             .id(1L)
             .nickname("user1")
             .email("kKvTABYqa@test.com")
             .profileImageUrl("profile-image-url")
             .defaultProfileImageType(2)
             .build();
-        given(userReader.readUser(anyLong())).willReturn(user);
+        given(userReader.readUser(anyLong())).willReturn(userEntity);
 
         UserProfile userProfile = userService.findUser(1L);
 

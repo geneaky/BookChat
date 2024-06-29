@@ -33,12 +33,12 @@ import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
-import toy.bookchat.bookchat.domain.chat.Chat;
+import toy.bookchat.bookchat.domain.chat.ChatEntity;
 import toy.bookchat.bookchat.domain.chat.repository.ChatRepository;
-import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
+import toy.bookchat.bookchat.domain.chatroom.ChatRoomEntity;
 import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomRepository;
 import toy.bookchat.bookchat.domain.device.repository.DeviceRepository;
-import toy.bookchat.bookchat.domain.participant.Participant;
+import toy.bookchat.bookchat.domain.participant.ParticipantEntity;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.infrastructure.broker.message.CommonMessage;
@@ -134,64 +134,64 @@ class ChatControllerMessagingTest extends ControllerTestExtension {
         StompHeaders subscribeHeader = stompSubscribeHeaders("/topic/heho");
         StompHeaders sendHeader = stompSendHeaders("/subscriptions/send/chatrooms/1");
 
-        ChatRoom chatRoom = ChatRoom.builder()
+        ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
             .id(1L)
             .roomSize(3)
             .roomSid("heho")
             .build();
 
-        Chat chat1 = Chat.builder()
+        ChatEntity chatEntity1 = ChatEntity.builder()
             .id(1L)
             .message("test")
-            .user(getUser())
-            .chatRoom(chatRoom)
+            .userEntity(getUser())
+            .chatRoomEntity(chatRoomEntity)
             .build();
-        chat1.setCreatedAt(LocalDateTime.now());
+        chatEntity1.setCreatedAt(LocalDateTime.now());
 
-        Chat chat2 = Chat.builder()
+        ChatEntity chatEntity2 = ChatEntity.builder()
             .id(2L)
             .message("test test")
-            .user(getUser())
-            .chatRoom(chatRoom)
+            .userEntity(getUser())
+            .chatRoomEntity(chatRoomEntity)
             .build();
-        chat2.setCreatedAt(LocalDateTime.now());
+        chatEntity2.setCreatedAt(LocalDateTime.now());
 
-        Chat chat3 = Chat.builder()
+        ChatEntity chatEntity3 = ChatEntity.builder()
             .id(3L)
             .message("test test test")
-            .user(getUser())
-            .chatRoom(chatRoom)
+            .userEntity(getUser())
+            .chatRoomEntity(chatRoomEntity)
             .build();
-        chat3.setCreatedAt(LocalDateTime.now());
+        chatEntity3.setCreatedAt(LocalDateTime.now());
 
-        Participant participant = Participant.builder()
-            .chatRoom(chatRoom)
-            .user(getUser())
+        ParticipantEntity participantEntity = ParticipantEntity.builder()
+            .chatRoomEntity(chatRoomEntity)
+            .userEntity(getUser())
             .id(1L)
             .build();
 
         CommonMessage dto1 = CommonMessage.builder()
             .senderId(getUserId())
-            .chatId(chat1.getId())
+            .chatId(chatEntity1.getId())
             .receiptId(1)
-            .dispatchTime(chat1.getDispatchTime())
-            .message(chat1.getMessage())
+            .dispatchTime(chatEntity1.getDispatchTime())
+            .message(chatEntity1.getMessage())
             .build();
 
         CommonMessage dto2 = CommonMessage.builder()
             .senderId(getUserId())
-            .chatId(chat2.getId())
+            .chatId(chatEntity2.getId())
             .receiptId(2)
-            .dispatchTime(chat2.getDispatchTime())
-            .message(chat2.getMessage())
+            .dispatchTime(chatEntity2.getDispatchTime())
+            .message(chatEntity2.getMessage())
             .build();
 
         CommonMessage dto3 = CommonMessage.builder()
             .senderId(getUserId())
-            .chatId(chat3.getId())
+            .chatId(chatEntity3.getId())
             .receiptId(3)
-            .dispatchTime(chat3.getDispatchTime())
-            .message(chat3.getMessage())
+            .dispatchTime(chatEntity3.getDispatchTime())
+            .message(chatEntity3.getMessage())
             .build();
 
         Runnable[] chatActions = {
@@ -201,8 +201,8 @@ class ChatControllerMessagingTest extends ControllerTestExtension {
         };
 
         when(participantRepository.findByUserIdAndChatRoomId(any(), any())).thenReturn(
-            Optional.ofNullable(participant));
-        when(chatRepository.save(any())).thenReturn(chat1, chat2, chat3);
+            Optional.ofNullable(participantEntity));
+        when(chatRepository.save(any())).thenReturn(chatEntity1, chatEntity2, chatEntity3);
 
         CountDownLatch chatAttemptCountLatch = new CountDownLatch(chatActions.length);
 

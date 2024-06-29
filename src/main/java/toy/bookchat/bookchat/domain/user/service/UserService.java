@@ -10,10 +10,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import toy.bookchat.bookchat.domain.device.Device;
+import toy.bookchat.bookchat.domain.device.DeviceEntity;
 import toy.bookchat.bookchat.domain.device.service.DeviceService;
 import toy.bookchat.bookchat.domain.storage.StorageService;
-import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.UserEntity;
 import toy.bookchat.bookchat.domain.user.UserProfile;
 import toy.bookchat.bookchat.domain.user.api.dto.response.MemberProfileResponse;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
@@ -71,25 +71,25 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public User findUserByUsername(String oauth2MemberNumber) {
+    public UserEntity findUserByUsername(String oauth2MemberNumber) {
         return userReader.readUser(oauth2MemberNumber);
     }
 
     @Transactional
     public void deleteUser(Long userId) {
-        User user = userReader.readUser(userId);
-        user.inactive();
+        UserEntity userEntity = userReader.readUser(userId);
+        userEntity.inactive();
     }
 
     @Transactional
     public void updateUserProfile(ChangeUserNicknameRequest changeUserNicknameRequest,
         MultipartFile userProfileImage, Long userId) {
-        User user = userReader.readUser(userId);
+        UserEntity userEntity = userReader.readUser(userId);
         if (imageExistent(userProfileImage)) {
-            updateNicknameWithProfileImage(changeUserNicknameRequest, userProfileImage, user);
+            updateNicknameWithProfileImage(changeUserNicknameRequest, userProfileImage, userEntity);
             return;
         }
-        user.changeUserNickname(changeUserNicknameRequest.getNickname());
+        userEntity.changeUserNickname(changeUserNicknameRequest.getNickname());
     }
 
     private boolean imageExistent(MultipartFile userProfileImage) {
@@ -97,11 +97,11 @@ public class UserService {
     }
 
     private void updateNicknameWithProfileImage(ChangeUserNicknameRequest changeUserNicknameRequest,
-        MultipartFile userProfileImage, User user) {
+        MultipartFile userProfileImage, UserEntity userEntity) {
         String uploadFileUrl = storageService.upload(userProfileImage, UUID.randomUUID().toString(),
             LocalDateTime.now().format(dateTimeFormatter));
-        user.changeUserNickname(changeUserNicknameRequest.getNickname());
-        user.changeProfileImageUrl(uploadFileUrl);
+        userEntity.changeUserNickname(changeUserNicknameRequest.getNickname());
+        userEntity.changeProfileImageUrl(uploadFileUrl);
     }
 
     private void saveUser(UserSignUpRequest userSignUpRequest, String userName,
@@ -109,23 +109,23 @@ public class UserService {
         userRepository.findByName(userName).ifPresentOrElse(user -> {
             throw new UserAlreadySignUpException();
         }, () -> {
-            User user = userSignUpRequest.getUser(userName, email, profileImageUrl);
-            userRepository.save(user);
+            UserEntity userEntity = userSignUpRequest.getUser(userName, email, profileImageUrl);
+            userRepository.save(userEntity);
         });
     }
 
     @Transactional
-    public void checkDevice(UserSignInRequest userSignInRequest, User user) {
-        deviceService.findUserDevice(user)
+    public void checkDevice(UserSignInRequest userSignInRequest, UserEntity userEntity) {
+        deviceService.findUserDevice(userEntity)
             .ifPresentOrElse(changeDeviceIfApproved(userSignInRequest),
-                registerUserDevice(userSignInRequest, user));
+                registerUserDevice(userSignInRequest, userEntity));
     }
 
-    private Runnable registerUserDevice(UserSignInRequest userSignInRequest, User user) {
-        return () -> deviceService.registerDevice(userSignInRequest.createDevice(user));
+    private Runnable registerUserDevice(UserSignInRequest userSignInRequest, UserEntity userEntity) {
+        return () -> deviceService.registerDevice(userSignInRequest.createDevice(userEntity));
     }
 
-    private Consumer<Device> changeDeviceIfApproved(UserSignInRequest userSignInRequest) {
+    private Consumer<DeviceEntity> changeDeviceIfApproved(UserSignInRequest userSignInRequest) {
         return device -> {
             if (userSignInRequest.approved()) {
                 String oldDeviceFcmToken = device.getFcmToken();
@@ -146,13 +146,13 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public MemberProfileResponse getMemberProfile(Long memberId) {
-        User user = userReader.readUser(memberId);
-        return MemberProfileResponse.of(user);
+        UserEntity userEntity = userReader.readUser(memberId);
+        return MemberProfileResponse.of(userEntity);
     }
 
     @Transactional(readOnly = true)
     public UserProfile findUser(Long userId) {
-        User user = userReader.readUser(userId);
-        return UserProfile.from(user);
+        UserEntity userEntity = userReader.readUser(userId);
+        return UserProfile.from(userEntity);
     }
 }

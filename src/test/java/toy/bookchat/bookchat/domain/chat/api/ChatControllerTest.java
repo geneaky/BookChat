@@ -28,12 +28,12 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
-import toy.bookchat.bookchat.domain.chat.Chat;
+import toy.bookchat.bookchat.domain.chat.ChatEntity;
 import toy.bookchat.bookchat.domain.chat.api.dto.response.ChatDetailResponse;
 import toy.bookchat.bookchat.domain.chat.api.dto.response.ChatSender;
 import toy.bookchat.bookchat.domain.chat.service.ChatService;
 import toy.bookchat.bookchat.domain.chat.service.dto.response.ChatRoomChatsResponse;
-import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.UserEntity;
 
 @ChatPresentationTest
 class ChatControllerTest extends ControllerTestExtension {
@@ -47,33 +47,33 @@ class ChatControllerTest extends ControllerTestExtension {
     @Test
     void 현재_채팅방_채팅내역_조회_성공() throws Exception {
 
-        User aUser = User.builder()
+        UserEntity aUserEntity = UserEntity.builder()
             .id(1L)
             .build();
-        User bUser = User.builder()
+        UserEntity bUserEntity = UserEntity.builder()
             .id(2L)
             .build();
 
-        Chat chat1 = Chat.builder()
+        ChatEntity chatEntity1 = ChatEntity.builder()
             .id(1L)
-            .user(aUser)
+            .userEntity(aUserEntity)
             .message("first chat")
             .build();
-        chat1.setCreatedAt(LocalDateTime.now());
-        Chat chat2 = Chat.builder()
+        chatEntity1.setCreatedAt(LocalDateTime.now());
+        ChatEntity chatEntity2 = ChatEntity.builder()
             .id(2L)
-            .user(bUser)
+            .userEntity(bUserEntity)
             .message("second chat")
             .build();
-        chat2.setCreatedAt(LocalDateTime.now());
-        Chat chat3 = Chat.builder()
+        chatEntity2.setCreatedAt(LocalDateTime.now());
+        ChatEntity chatEntity3 = ChatEntity.builder()
             .id(3L)
-            .user(aUser)
+            .userEntity(aUserEntity)
             .message("welcome")
             .build();
-        chat3.setCreatedAt(LocalDateTime.now());
+        chatEntity3.setCreatedAt(LocalDateTime.now());
         PageRequest pageRequest = PageRequest.of(0, 3, Sort.by("id").descending());
-        SliceImpl<Chat> chatSlice = new SliceImpl<>(List.of(chat1, chat2, chat3), pageRequest,
+        SliceImpl<ChatEntity> chatSlice = new SliceImpl<>(List.of(chatEntity1, chatEntity2, chatEntity3), pageRequest,
             true);
         ChatRoomChatsResponse chatRoomChatsResponse = new ChatRoomChatsResponse(chatSlice);
         when(chatService.getChatRoomChats(any(), any(), any(), any())).thenReturn(

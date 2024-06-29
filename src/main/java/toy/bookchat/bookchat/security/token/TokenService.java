@@ -3,7 +3,7 @@ package toy.bookchat.bookchat.security.token;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.UserEntity;
 import toy.bookchat.bookchat.domain.user.api.dto.response.Token;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.exception.notfound.user.UserNotFoundException;
@@ -73,7 +73,7 @@ public class TokenService {
         return jwtTokenManager.shouldRefreshTokenBeRenew(refreshToken);
     }
 
-    private User getUserFromRefreshToken(RefreshTokenRequest refreshTokenRequest) {
+    private UserEntity getUserFromRefreshToken(RefreshTokenRequest refreshTokenRequest) {
         return userRepository.findById(
                 jwtTokenManager.getUserIdFromToken(refreshTokenRequest.getRefreshToken()))
             .orElseThrow(UserNotFoundException::new);

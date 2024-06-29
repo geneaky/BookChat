@@ -2,7 +2,7 @@ package toy.bookchat.bookchat.domain.chatroom.api.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
-import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
+import toy.bookchat.bookchat.domain.chatroom.ChatRoomEntity;
 
 @Getter
 public class UserChatRoomDetailResponse {
@@ -24,7 +24,7 @@ public class UserChatRoomDetailResponse {
         this.roomMemberCount = roomMemberCount;
     }
 
-    public static UserChatRoomDetailResponse from(ChatRoom chatroom, Long roomMemberCount) {
+    public static UserChatRoomDetailResponse from(ChatRoomEntity chatroom, Long roomMemberCount) {
         return UserChatRoomDetailResponse.builder()
             .roomId(chatroom.getId())
             .roomName(chatroom.getRoomName())

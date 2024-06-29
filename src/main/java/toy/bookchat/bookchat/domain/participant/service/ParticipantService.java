@@ -6,15 +6,15 @@ import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.SUBHOST
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import toy.bookchat.bookchat.domain.chat.Chat;
+import toy.bookchat.bookchat.domain.chat.ChatEntity;
 import toy.bookchat.bookchat.domain.chat.repository.ChatRepository;
-import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
-import toy.bookchat.bookchat.domain.chatroom.ChatRoomBlockedUser;
+import toy.bookchat.bookchat.domain.chatroom.ChatRoomBlockedUserEntity;
+import toy.bookchat.bookchat.domain.chatroom.ChatRoomEntity;
 import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomBlockedUserRepository;
-import toy.bookchat.bookchat.domain.participant.Participant;
+import toy.bookchat.bookchat.domain.participant.ParticipantEntity;
 import toy.bookchat.bookchat.domain.participant.ParticipantStatus;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
-import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.UserEntity;
 import toy.bookchat.bookchat.exception.forbidden.participant.NoPermissionParticipantException;
 import toy.bookchat.bookchat.exception.notfound.pariticipant.ParticipantNotFoundException;
 import toy.bookchat.bookchat.infrastructure.broker.MessagePublisher;
@@ -42,103 +42,103 @@ public class ParticipantService {
     @Transactional
     public void changeParticipantRights(Long roomId, Long userId,
         ParticipantStatus participantStatus, Long requesterId) {
-        Participant host = participantRepository.findWithPessimisticLockByUserIdAndChatRoomId(
+        ParticipantEntity host = participantRepository.findWithPessimisticLockByUserIdAndChatRoomId(
             requesterId, roomId).orElseThrow(NoPermissionParticipantException::new);
 
-        validateIsHost(host.getUser(), host.getChatRoom());
+        validateIsHost(host.getUserEntity(), host.getChatRoomEntity());
 
-        Participant participant = participantRepository.findByUserIdAndChatRoomId(userId, roomId)
+        ParticipantEntity participantEntity = participantRepository.findByUserIdAndChatRoomId(userId, roomId)
             .orElseThrow(ParticipantNotFoundException::new);
 
-        delegateSubHost(participantStatus, participant, roomId);
-        dismissSubHost(participantStatus, participant);
-        delegateHost(participantStatus, host, participant);
+        delegateSubHost(participantStatus, participantEntity, roomId);
+        dismissSubHost(participantStatus, participantEntity);
+        delegateHost(participantStatus, host, participantEntity);
     }
 
-    private void validateIsHost(User user, ChatRoom chatRoom) {
-        if (chatRoom.getHost() != user) {
+    private void validateIsHost(UserEntity userEntity, ChatRoomEntity chatRoomEntity) {
+        if (chatRoomEntity.getHost() != userEntity) {
             throw new NoPermissionParticipantException();
         }
     }
 
-    private void delegateHost(ParticipantStatus participantStatus, Participant host,
-        Participant participant) {
+    private void delegateHost(ParticipantStatus participantStatus, ParticipantEntity host,
+        ParticipantEntity participantEntity) {
         if (participantStatus == HOST) {
             host.toGuest();
-            participant.toHost();
-            participant.getChatRoom().changeHost(participant.getUser());
-            Chat chat = chatRepository.save(Chat.builder()
-                .chatRoom(participant.getChatRoom())
-                .message("#" + participant.getUserId() + "#님이 방장이 되었습니다.")
+            participantEntity.toHost();
+            participantEntity.getChatRoomEntity().changeHost(participantEntity.getUserEntity());
+            ChatEntity chatEntity = chatRepository.save(ChatEntity.builder()
+                .chatRoomEntity(participantEntity.getChatRoomEntity())
+                .message("#" + participantEntity.getUserId() + "#님이 방장이 되었습니다.")
                 .build());
-            messagePublisher.sendNotificationMessage(participant.getChatRoomSid(),
-                NotificationMessage.createHostDelegateMessage(chat, participant.getUserId()));
+            messagePublisher.sendNotificationMessage(participantEntity.getChatRoomSid(),
+                NotificationMessage.createHostDelegateMessage(chatEntity, participantEntity.getUserId()));
         }
     }
 
-    private void dismissSubHost(ParticipantStatus participantStatus, Participant participant) {
-        if (participant.isSubHost() && participantStatus == GUEST) {
-            participant.toGuest();
-            Chat chat = chatRepository.save(Chat.builder()
-                .chatRoom(participant.getChatRoom())
-                .message("#" + participant.getUserId() + "#님이 부방장에서 해제되었습니다.")
+    private void dismissSubHost(ParticipantStatus participantStatus, ParticipantEntity participantEntity) {
+        if (participantEntity.isSubHost() && participantStatus == GUEST) {
+            participantEntity.toGuest();
+            ChatEntity chatEntity = chatRepository.save(ChatEntity.builder()
+                .chatRoomEntity(participantEntity.getChatRoomEntity())
+                .message("#" + participantEntity.getUserId() + "#님이 부방장에서 해제되었습니다.")
                 .build());
-            messagePublisher.sendNotificationMessage(participant.getChatRoomSid(),
-                NotificationMessage.createSubHostDismissMessage(chat, participant.getUserId()));
+            messagePublisher.sendNotificationMessage(participantEntity.getChatRoomSid(),
+                NotificationMessage.createSubHostDismissMessage(chatEntity, participantEntity.getUserId()));
         }
     }
 
-    private void delegateSubHost(ParticipantStatus participantStatus, Participant participant,
+    private void delegateSubHost(ParticipantStatus participantStatus, ParticipantEntity participantEntity,
         Long roomId) {
-        if (participantStatus == SUBHOST && participant.isNotSubHost()
+        if (participantStatus == SUBHOST && participantEntity.isNotSubHost()
             && participantRepository.countSubHostByRoomId(roomId) < SUB_HOST_COUNT) {
-            participant.toSubHost();
-            Chat chat = chatRepository.save(Chat.builder()
-                .chatRoom(participant.getChatRoom())
-                .message("#" + participant.getUserId() + "#님이 부방장이 되었습니다.")
+            participantEntity.toSubHost();
+            ChatEntity chatEntity = chatRepository.save(ChatEntity.builder()
+                .chatRoomEntity(participantEntity.getChatRoomEntity())
+                .message("#" + participantEntity.getUserId() + "#님이 부방장이 되었습니다.")
                 .build());
-            messagePublisher.sendNotificationMessage(participant.getChatRoomSid(),
-                NotificationMessage.createSubHostDelegateMessage(chat, participant.getUserId()));
+            messagePublisher.sendNotificationMessage(participantEntity.getChatRoomSid(),
+                NotificationMessage.createSubHostDelegateMessage(chatEntity, participantEntity.getUserId()));
         }
     }
 
     @Transactional
     public void kickParticipant(Long roomId, Long userId, Long adminId) {
-        Participant adminParticipant = participantRepository.findByUserIdAndChatRoomId(adminId,
+        ParticipantEntity adminParticipantEntity = participantRepository.findByUserIdAndChatRoomId(adminId,
             roomId).orElseThrow(ParticipantNotFoundException::new);
-        Participant participant = participantRepository.findByUserIdAndChatRoomId(userId, roomId)
+        ParticipantEntity participantEntity = participantRepository.findByUserIdAndChatRoomId(userId, roomId)
             .orElseThrow(ParticipantNotFoundException::new);
 
-        ChatRoomBlockedUser blockedUser = ChatRoomBlockedUser.builder()
-            .user(participant.getUser())
-            .chatRoom(participant.getChatRoom())
+        ChatRoomBlockedUserEntity blockedUser = ChatRoomBlockedUserEntity.builder()
+            .userEntity(participantEntity.getUserEntity())
+            .chatRoomEntity(participantEntity.getChatRoomEntity())
             .build();
 
-        kick(adminParticipant, participant, blockedUser);
+        kick(adminParticipantEntity, participantEntity, blockedUser);
 
-        Chat chat = chatRepository.save(Chat.builder()
-            .chatRoom(adminParticipant.getChatRoom())
-            .message("#" + participant.getUserId() + "#님을 내보냈습니다.")
+        ChatEntity chatEntity = chatRepository.save(ChatEntity.builder()
+            .chatRoomEntity(adminParticipantEntity.getChatRoomEntity())
+            .message("#" + participantEntity.getUserId() + "#님을 내보냈습니다.")
             .build());
-        messagePublisher.sendNotificationMessage(adminParticipant.getChatRoomSid(), NotificationMessage.createKickMessage(chat, participant.getUserId()));
+        messagePublisher.sendNotificationMessage(adminParticipantEntity.getChatRoomSid(), NotificationMessage.createKickMessage(chatEntity, participantEntity.getUserId()));
     }
 
-    private void kick(Participant adminParticipant, Participant targetParticipant,
-        ChatRoomBlockedUser blockedUser) {
-        if (adminParticipant.isSubHost() && targetParticipant.isGuest()) {
-            deleteParticipant(targetParticipant, blockedUser);
+    private void kick(ParticipantEntity adminParticipantEntity, ParticipantEntity targetParticipantEntity,
+        ChatRoomBlockedUserEntity blockedUser) {
+        if (adminParticipantEntity.isSubHost() && targetParticipantEntity.isGuest()) {
+            deleteParticipant(targetParticipantEntity, blockedUser);
             return;
         }
-        if (adminParticipant.isHost() && targetParticipant.isNotHost()) {
-            deleteParticipant(targetParticipant, blockedUser);
+        if (adminParticipantEntity.isHost() && targetParticipantEntity.isNotHost()) {
+            deleteParticipant(targetParticipantEntity, blockedUser);
             return;
         }
 
         throw new NoPermissionParticipantException();
     }
 
-    private void deleteParticipant(Participant targetParticipant, ChatRoomBlockedUser blockedUser) {
-        participantRepository.delete(targetParticipant);
+    private void deleteParticipant(ParticipantEntity targetParticipantEntity, ChatRoomBlockedUserEntity blockedUser) {
+        participantRepository.delete(targetParticipantEntity);
         chatRoomBlockedUserRepository.save(blockedUser);
     }
 }

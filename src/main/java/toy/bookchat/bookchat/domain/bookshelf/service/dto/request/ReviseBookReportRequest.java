@@ -5,7 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import toy.bookchat.bookchat.domain.bookshelf.BookReport;
+import toy.bookchat.bookchat.domain.bookshelf.BookReportEntity;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -22,8 +22,8 @@ public class ReviseBookReportRequest {
         this.content = content;
     }
 
-    public void revise(BookReport bookReport) {
-        bookReport.reviseTitle(title);
-        bookReport.reviseContent(content);
+    public void revise(BookReportEntity bookReportEntity) {
+        bookReportEntity.reviseTitle(title);
+        bookReportEntity.reviseContent(content);
     }
 }

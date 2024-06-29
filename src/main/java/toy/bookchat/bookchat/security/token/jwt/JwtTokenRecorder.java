@@ -16,7 +16,7 @@ public class JwtTokenRecorder {
     public void record(Long userId, String refreshToken) {
         refreshTokenRepository.findByUserId(userId)
             .ifPresentOrElse(r -> r.changeRefreshToken(refreshToken), () -> {
-                RefreshToken token = new RefreshToken(userId, refreshToken);
+                RefreshTokenEntity token = new RefreshTokenEntity(userId, refreshToken);
                 refreshTokenRepository.save(token);
             });
     }

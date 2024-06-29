@@ -6,14 +6,14 @@ import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import toy.bookchat.bookchat.domain.chat.Chat;
+import toy.bookchat.bookchat.domain.chat.ChatEntity;
 import toy.bookchat.bookchat.domain.chat.api.dto.request.MessageDto;
 import toy.bookchat.bookchat.domain.chat.api.dto.response.ChatDetailResponse;
 import toy.bookchat.bookchat.domain.chat.repository.ChatRepository;
 import toy.bookchat.bookchat.domain.chat.service.dto.response.ChatRoomChatsResponse;
-import toy.bookchat.bookchat.domain.device.Device;
+import toy.bookchat.bookchat.domain.device.DeviceEntity;
 import toy.bookchat.bookchat.domain.device.repository.DeviceRepository;
-import toy.bookchat.bookchat.domain.participant.Participant;
+import toy.bookchat.bookchat.domain.participant.ParticipantEntity;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
 import toy.bookchat.bookchat.exception.badrequest.participant.NotParticipatedException;
 import toy.bookchat.bookchat.infrastructure.broker.MessagePublisher;
@@ -44,30 +44,30 @@ public class ChatService {
 
     @Transactional
     public void sendMessage(Long userId, Long roomId, MessageDto messageDto) {
-        Participant participant = participantRepository.findByUserIdAndChatRoomId(userId, roomId)
+        ParticipantEntity participantEntity = participantRepository.findByUserIdAndChatRoomId(userId, roomId)
             .orElseThrow(NotParticipatedException::new);
 
-        List<Device> disconnectedUserDevice = deviceRepository.getDisconnectedUserDevice(roomId);
+        List<DeviceEntity> disconnectedUserDeviceEntity = deviceRepository.getDisconnectedUserDevice(roomId);
 
-        Chat chat = chatRepository.save(Chat.builder()
-            .user(participant.getUser())
-            .chatRoom(participant.getChatRoom())
+        ChatEntity chatEntity = chatRepository.save(ChatEntity.builder()
+            .userEntity(participantEntity.getUserEntity())
+            .chatRoomEntity(participantEntity.getChatRoomEntity())
             .message(messageDto.getMessage())
             .build());
 
-        CommonMessage message = CommonMessage.from(participant.getUserId(), chat, messageDto);
+        CommonMessage message = CommonMessage.from(participantEntity.getUserId(), chatEntity, messageDto);
 
         ChatMessageBody chatMessageBody = ChatMessageBody.builder()
-            .chatId(chat.getId())
+            .chatId(chatEntity.getId())
             .chatRoomId(roomId)
             .build();
 
         PushMessageBody pushMessageBody = PushMessageBody.of(CHAT, chatMessageBody);
-        for (Device device : disconnectedUserDevice) {
-            pushService.send(device.getFcmToken(), pushMessageBody);
+        for (DeviceEntity deviceEntity : disconnectedUserDeviceEntity) {
+            pushService.send(deviceEntity.getFcmToken(), pushMessageBody);
         }
 
-        messagePublisher.sendCommonMessage(participant.getChatRoomSid(), message);
+        messagePublisher.sendCommonMessage(participantEntity.getChatRoomSid(), message);
     }
 
     @Transactional(readOnly = true)
@@ -79,7 +79,7 @@ public class ChatService {
 
     @Transactional(readOnly = true)
     public ChatDetailResponse getChatDetail(Long chatId, Long userId) {
-        Chat chat = chatRepository.getUserChatRoomChat(chatId, userId).orElseThrow(NotParticipatedException::new);
-        return ChatDetailResponse.from(chat);
+        ChatEntity chatEntity = chatRepository.getUserChatRoomChat(chatId, userId).orElseThrow(NotParticipatedException::new);
+        return ChatDetailResponse.from(chatEntity);
     }
 }

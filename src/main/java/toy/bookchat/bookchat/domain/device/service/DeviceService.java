@@ -3,9 +3,9 @@ package toy.bookchat.bookchat.domain.device.service;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import toy.bookchat.bookchat.domain.device.Device;
+import toy.bookchat.bookchat.domain.device.DeviceEntity;
 import toy.bookchat.bookchat.domain.device.repository.DeviceRepository;
-import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.UserEntity;
 import toy.bookchat.bookchat.domain.user.service.UserReader;
 
 @Service
@@ -23,13 +23,13 @@ public class DeviceService {
 
 
     @Transactional(readOnly = true)
-    public Optional<Device> findUserDevice(User user) {
-        return deviceRepository.findByUser(user);
+    public Optional<DeviceEntity> findUserDevice(UserEntity userEntity) {
+        return deviceRepository.findByUserEntity(userEntity);
     }
 
     @Transactional
-    public void registerDevice(Device device) {
-        deviceRepository.save(device);
+    public void registerDevice(DeviceEntity deviceEntity) {
+        deviceRepository.save(deviceEntity);
     }
 
     @Transactional
@@ -39,8 +39,8 @@ public class DeviceService {
 
     @Transactional
     public void updateFcmToken(Long userId, String fcmToken) {
-        User user = userReader.readUser(userId);
-        Device device = deviceReader.readUserDevice(user);
-        device.changeFcmToken(fcmToken);
+        UserEntity userEntity = userReader.readUser(userId);
+        DeviceEntity deviceEntity = deviceReader.readUserDevice(userEntity);
+        deviceEntity.changeFcmToken(fcmToken);
     }
 }

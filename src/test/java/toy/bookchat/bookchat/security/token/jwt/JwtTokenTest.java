@@ -13,7 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import toy.bookchat.bookchat.config.token.JwtTokenProperties;
 import toy.bookchat.bookchat.domain.user.ReadingTaste;
-import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.UserEntity;
 import toy.bookchat.bookchat.domain.user.api.dto.response.Token;
 import toy.bookchat.bookchat.exception.unauthorized.DeniedTokenException;
 import toy.bookchat.bookchat.exception.unauthorized.ExpiredTokenException;
@@ -28,8 +28,8 @@ class JwtTokenTest {
     @InjectMocks
     JwtTokenProvider jwtTokenProvider;
 
-    private User getUser() {
-        return User.builder()
+    private UserEntity getUser() {
+        return UserEntity.builder()
             .id(1L)
             .email("test@gmail.com")
             .nickname("nickname")
@@ -42,11 +42,11 @@ class JwtTokenTest {
             .build();
     }
 
-    private TokenPayload getTokenPayload(User user) {
-        return TokenPayload.of(user.getId(), user.getName(),
-            user.getNickname(),
-            user.getEmail(), user.getProfileImageUrl(), user.getDefaultProfileImageType(),
-            user.getRole());
+    private TokenPayload getTokenPayload(UserEntity userEntity) {
+        return TokenPayload.of(userEntity.getId(), userEntity.getName(),
+            userEntity.getNickname(),
+            userEntity.getEmail(), userEntity.getProfileImageUrl(), userEntity.getDefaultProfileImageType(),
+            userEntity.getRole());
     }
 
     @Test
@@ -55,9 +55,9 @@ class JwtTokenTest {
         when(jwtTokenProperties.getAccessTokenExpiredTime()).thenReturn(0L);
         when(jwtTokenProperties.getRefreshTokenExpiredTime()).thenReturn(0L);
 
-        User user = getUser();
+        UserEntity userEntity = getUser();
 
-        Token token = jwtTokenProvider.createToken(user);
+        Token token = jwtTokenProvider.createToken(userEntity);
 
         assertThatThrownBy(() -> {
             JwtToken jwtToken = JwtToken.of(token.getAccessToken());

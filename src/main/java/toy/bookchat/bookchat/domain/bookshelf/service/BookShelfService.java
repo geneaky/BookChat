@@ -5,16 +5,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import toy.bookchat.bookchat.domain.book.Book;
+import toy.bookchat.bookchat.domain.book.BookEntity;
 import toy.bookchat.bookchat.domain.book.service.BookReader;
-import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
+import toy.bookchat.bookchat.domain.bookshelf.BookShelfEntity;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookShelfRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ReviseBookShelfRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.BookShelfResponse;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.ExistenceBookOnBookShelfResponse;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.SearchBookShelfByReadingStatus;
-import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.UserEntity;
 import toy.bookchat.bookchat.domain.user.service.UserReader;
 
 @Service
@@ -35,34 +35,34 @@ public class BookShelfService {
 
     @Transactional(readOnly = true)
     public BookShelfResponse getBookOnBookShelf(Long bookShelfId, Long userId) {
-        BookShelf bookShelf = bookShelfReader.readBookShelf(bookShelfId, userId);
-        return BookShelfResponse.from(bookShelf);
+        BookShelfEntity bookShelfEntity = bookShelfReader.readBookShelf(bookShelfId, userId);
+        return BookShelfResponse.from(bookShelfEntity);
     }
 
     @Transactional
     public Long putBookOnBookShelf(BookShelfRequest bookShelfRequest, Long userId) {
-        Book book = bookReader.readBook(bookShelfRequest.getIsbn(), bookShelfRequest.getPublishAt(), bookShelfRequest.extractBookEntity());
-        User user = userReader.readUser(userId);
-        BookShelf bookShelf = bookShelfRequest.createBookShelfByReadingStatus(book, user);
-        bookShelfManager.store(bookShelf);
+        BookEntity bookEntity = bookReader.readBook(bookShelfRequest.getIsbn(), bookShelfRequest.getPublishAt(), bookShelfRequest.extractBookEntity());
+        UserEntity userEntity = userReader.readUser(userId);
+        BookShelfEntity bookShelfEntity = bookShelfRequest.createBookShelfByReadingStatus(bookEntity, userEntity);
+        bookShelfManager.store(bookShelfEntity);
 
-        return bookShelf.getId();
+        return bookShelfEntity.getId();
     }
 
     public SearchBookShelfByReadingStatus takeBooksOutOfBookShelves(ReadingStatus readingStatus, Pageable pageable, Long userId) {
-        Page<BookShelf> pagingBookShelves = bookShelfReader.readBookShelf(userId, readingStatus, pageable);
+        Page<BookShelfEntity> pagingBookShelves = bookShelfReader.readBookShelf(userId, readingStatus, pageable);
         return new SearchBookShelfByReadingStatus(pagingBookShelves);
     }
 
     public ExistenceBookOnBookShelfResponse getBookIfExisted(String isbn, LocalDate publishAt, Long userId) {
-        BookShelf bookShelf = bookShelfReader.readBookShelf(userId, isbn, publishAt);
-        return ExistenceBookOnBookShelfResponse.from(bookShelf);
+        BookShelfEntity bookShelfEntity = bookShelfReader.readBookShelf(userId, isbn, publishAt);
+        return ExistenceBookOnBookShelfResponse.from(bookShelfEntity);
     }
 
     @Transactional
     public void reviseBookShelf(Long bookShelfId, ReviseBookShelfRequest reviseBookShelfRequest, Long userId) {
-        BookShelf bookShelf = bookShelfReader.readBookShelf(bookShelfId, userId);
-        reviseBookShelfRequest.applyChanges(bookShelf);
+        BookShelfEntity bookShelfEntity = bookShelfReader.readBookShelf(bookShelfId, userId);
+        reviseBookShelfRequest.applyChanges(bookShelfEntity);
     }
 
     @Transactional

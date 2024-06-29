@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import toy.bookchat.bookchat.domain.common.RateLimit;
-import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.UserEntity;
 import toy.bookchat.bookchat.domain.user.UserProfile;
 import toy.bookchat.bookchat.domain.user.api.dto.response.MemberProfileResponse;
 import toy.bookchat.bookchat.domain.user.api.dto.response.Token;
@@ -94,11 +94,11 @@ public class UserController {
         @Valid @RequestBody UserSignInRequest userSignInRequest) {
         String userName = idTokenManager.getOAuth2MemberNumberFromIdToken(bearerToken, userSignInRequest.getOauth2Provider());
 
-        User user = userService.findUserByUsername(userName);
-        userService.checkDevice(userSignInRequest, user);
+        UserEntity userEntity = userService.findUserByUsername(userName);
+        userService.checkDevice(userSignInRequest, userEntity);
 
-        Token token = jwtTokenProvider.createToken(user);
-        jwtTokenRecorder.record(user.getId(), token.getRefreshToken());
+        Token token = jwtTokenProvider.createToken(userEntity);
+        jwtTokenRecorder.record(userEntity.getId(), token.getRefreshToken());
 
         return token;
     }

@@ -21,14 +21,14 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import toy.bookchat.bookchat.domain.user.ReadingTaste;
-import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.UserEntity;
 import toy.bookchat.bookchat.domain.user.api.dto.response.Token;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.token.dto.RefreshTokenRequest;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenManager;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenProvider;
-import toy.bookchat.bookchat.security.token.jwt.RefreshToken;
+import toy.bookchat.bookchat.security.token.jwt.RefreshTokenEntity;
 import toy.bookchat.bookchat.security.token.jwt.RefreshTokenRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -45,8 +45,8 @@ class TokenServiceTest {
     @InjectMocks
     TokenService tokenService;
 
-    private User getUser() {
-        return User.builder()
+    private UserEntity getUser() {
+        return UserEntity.builder()
             .id(1L)
             .email("test@gmail.com")
             .nickname("nickname")
@@ -81,7 +81,7 @@ class TokenServiceTest {
             .refreshToken(refreshToken)
             .build();
 
-        RefreshToken reNewedRefreshToken = RefreshToken.builder()
+        RefreshTokenEntity reNewedRefreshTokenEntity = RefreshTokenEntity.builder()
             .refreshToken(getRefreshToken())
             .userId(1L)
             .build();
@@ -89,7 +89,7 @@ class TokenServiceTest {
         when(userRepository.findById(any())).thenReturn(Optional.of(getUser()));
         when(jwtTokenManager.shouldRefreshTokenBeRenew(any())).thenReturn(true);
         when(refreshTokenRepository.findByUserId(any())).thenReturn(
-            Optional.of(reNewedRefreshToken));
+            Optional.of(reNewedRefreshTokenEntity));
 
         Token token = tokenService.generateToken(refreshTokenRequest);
 

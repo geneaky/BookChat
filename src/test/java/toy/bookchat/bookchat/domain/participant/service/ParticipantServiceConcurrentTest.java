@@ -18,14 +18,14 @@ import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import toy.bookchat.bookchat.domain.book.Book;
+import toy.bookchat.bookchat.domain.book.BookEntity;
 import toy.bookchat.bookchat.domain.book.repository.BookRepository;
-import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
+import toy.bookchat.bookchat.domain.chatroom.ChatRoomEntity;
 import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomRepository;
-import toy.bookchat.bookchat.domain.participant.Participant;
+import toy.bookchat.bookchat.domain.participant.ParticipantEntity;
 import toy.bookchat.bookchat.domain.participant.ParticipantStatus;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
-import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.UserEntity;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.infrastructure.broker.MessagePublisher;
 import toy.bookchat.bookchat.infrastructure.push.service.PushService;
@@ -73,9 +73,9 @@ class ParticipantServiceConcurrentTest {
         CountDownLatch countDownLatch = new CountDownLatch(count);
         ExecutorService executorService = Executors.newFixedThreadPool(10);
 
-        List<User> userList = new ArrayList<>();
+        List<UserEntity> userEntityList = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            userList.add(User.builder()
+            userEntityList.add(UserEntity.builder()
                 .nickname(i + "nickname")
                 .defaultProfileImageType(1)
                 .provider(OAuth2Provider.KAKAO)
@@ -83,50 +83,50 @@ class ParticipantServiceConcurrentTest {
                 .name(i + "name")
                 .build());
         }
-        userRepository.saveAll(userList);
+        userRepository.saveAll(userEntityList);
 
-        Book book = Book.builder()
+        BookEntity bookEntity = BookEntity.builder()
             .isbn("4640485366")
             .publishAt(LocalDate.now())
             .build();
-        bookRepository.save(book);
+        bookRepository.save(bookEntity);
 
-        ChatRoom chatRoom = ChatRoom.builder()
-            .host(userList.get(0))
-            .book(book)
+        ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
+            .host(userEntityList.get(0))
+            .bookEntity(bookEntity)
             .defaultRoomImageType(1)
             .roomSize(200)
             .roomSid("HNsIG51b")
             .roomName("RtzE")
             .build();
-        chatRoomRepository.save(chatRoom);
+        chatRoomRepository.save(chatRoomEntity);
 
-        List<Participant> participantList = new ArrayList<>();
+        List<ParticipantEntity> participantEntityList = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             if (i == 0) {
-                participantList.add(Participant.builder()
-                    .user(userList.get(i))
-                    .chatRoom(chatRoom)
+                participantEntityList.add(ParticipantEntity.builder()
+                    .userEntity(userEntityList.get(i))
+                    .chatRoomEntity(chatRoomEntity)
                     .participantStatus(ParticipantStatus.HOST)
                     .build());
                 continue;
             }
-            participantList.add(Participant.builder()
-                .user(userList.get(i))
-                .chatRoom(chatRoom)
+            participantEntityList.add(ParticipantEntity.builder()
+                .userEntity(userEntityList.get(i))
+                .chatRoomEntity(chatRoomEntity)
                 .participantStatus(ParticipantStatus.GUEST)
                 .build());
         }
-        participantRepository.saveAll(participantList);
+        participantRepository.saveAll(participantEntityList);
 
         countDownLatch.countDown();
         for (int i = 1; i < count; i++) {
             final int idx = i;
             executorService.execute(() -> {
                 try {
-                    participantService.changeParticipantRights(chatRoom.getId(),
-                        participantList.get(idx).getUserId(), ParticipantStatus.HOST,
-                        participantList.get(0).getUserId());
+                    participantService.changeParticipantRights(chatRoomEntity.getId(),
+                        participantEntityList.get(idx).getUserId(), ParticipantStatus.HOST,
+                        participantEntityList.get(0).getUserId());
                 } catch (Exception exception) {
                     log.info(exception.getMessage());
                 }
@@ -136,7 +136,7 @@ class ParticipantServiceConcurrentTest {
 
         countDownLatch.await();
 
-        long hostCount = participantList.stream()
+        long hostCount = participantEntityList.stream()
             .filter(p -> p.getParticipantStatus() == ParticipantStatus.HOST).count();
 
         assertThat(hostCount).isOne();

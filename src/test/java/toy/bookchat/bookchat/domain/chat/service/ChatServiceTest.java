@@ -21,17 +21,17 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
-import toy.bookchat.bookchat.domain.chat.Chat;
+import toy.bookchat.bookchat.domain.chat.ChatEntity;
 import toy.bookchat.bookchat.domain.chat.api.dto.request.MessageDto;
 import toy.bookchat.bookchat.domain.chat.api.dto.response.ChatDetailResponse;
 import toy.bookchat.bookchat.domain.chat.api.dto.response.ChatSender;
 import toy.bookchat.bookchat.domain.chat.repository.ChatRepository;
 import toy.bookchat.bookchat.domain.chat.service.dto.response.ChatRoomChatsResponse;
-import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
+import toy.bookchat.bookchat.domain.chatroom.ChatRoomEntity;
 import toy.bookchat.bookchat.domain.device.repository.DeviceRepository;
-import toy.bookchat.bookchat.domain.participant.Participant;
+import toy.bookchat.bookchat.domain.participant.ParticipantEntity;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
-import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.UserEntity;
 import toy.bookchat.bookchat.exception.badrequest.participant.NotParticipatedException;
 import toy.bookchat.bookchat.infrastructure.broker.MessagePublisher;
 import toy.bookchat.bookchat.infrastructure.broker.message.CommonMessage;
@@ -55,40 +55,40 @@ class ChatServiceTest {
 
     @Test
     void 메시지_전송_성공() throws Exception {
-        User user = User.builder()
+        UserEntity userEntity = UserEntity.builder()
             .id(1L)
             .nickname("testNick")
             .profileImageUrl("testImage")
             .defaultProfileImageType(1)
             .build();
 
-        ChatRoom chatRoom = ChatRoom.builder()
+        ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
             .id(1L)
             .roomSid("testRoomSid")
             .build();
 
-        Participant participant = Participant.builder()
+        ParticipantEntity participantEntity = ParticipantEntity.builder()
             .id(1L)
-            .chatRoom(chatRoom)
-            .user(user)
+            .chatRoomEntity(chatRoomEntity)
+            .userEntity(userEntity)
             .build();
 
-        Chat chat = Chat.builder()
+        ChatEntity chatEntity = ChatEntity.builder()
             .id(1L)
-            .chatRoom(chatRoom)
+            .chatRoomEntity(chatRoomEntity)
             .message("test message")
             .build();
-        chat.setCreatedAt(LocalDateTime.now());
+        chatEntity.setCreatedAt(LocalDateTime.now());
 
         MessageDto messageDto = MessageDto.builder()
             .receiptId(1)
-            .message(chat.getMessage())
+            .message(chatEntity.getMessage())
             .build();
 
         when(participantRepository.findByUserIdAndChatRoomId(any(), any())).thenReturn(
-            Optional.ofNullable(participant));
-        when(chatRepository.save(any())).thenReturn(chat);
-        chatService.sendMessage(user.getId(), chatRoom.getId(), messageDto);
+            Optional.ofNullable(participantEntity));
+        when(chatRepository.save(any())).thenReturn(chatEntity);
+        chatService.sendMessage(userEntity.getId(), chatRoomEntity.getId(), messageDto);
 
         verify(chatRepository).save(any());
         verify(messagingTemplate).sendCommonMessage(anyString(), any(CommonMessage.class));
@@ -96,38 +96,38 @@ class ChatServiceTest {
 
     @Test
     void 채팅_내역_조회_성공() throws Exception {
-        User aUser = User.builder()
+        UserEntity aUserEntity = UserEntity.builder()
             .id(1L)
             .nickname("AUser")
             .defaultProfileImageType(1)
             .build();
-        User bUser = User.builder()
+        UserEntity bUserEntity = UserEntity.builder()
             .id(2L)
             .nickname("BUser")
             .profileImageUrl("bUser@s3.com")
             .defaultProfileImageType(1)
             .build();
 
-        Chat chat1 = Chat.builder()
+        ChatEntity chatEntity1 = ChatEntity.builder()
             .id(1L)
-            .user(aUser)
+            .userEntity(aUserEntity)
             .message("first chat")
             .build();
-        chat1.setCreatedAt(LocalDateTime.now());
-        Chat chat2 = Chat.builder()
+        chatEntity1.setCreatedAt(LocalDateTime.now());
+        ChatEntity chatEntity2 = ChatEntity.builder()
             .id(2L)
-            .user(bUser)
+            .userEntity(bUserEntity)
             .message("second chat")
             .build();
-        chat2.setCreatedAt(LocalDateTime.now());
-        Chat chat3 = Chat.builder()
+        chatEntity2.setCreatedAt(LocalDateTime.now());
+        ChatEntity chatEntity3 = ChatEntity.builder()
             .id(3L)
-            .user(aUser)
+            .userEntity(aUserEntity)
             .message("welcome")
             .build();
-        chat3.setCreatedAt(LocalDateTime.now());
+        chatEntity3.setCreatedAt(LocalDateTime.now());
         PageRequest pageRequest = PageRequest.of(0, 3, Sort.by("id").descending());
-        SliceImpl<Chat> chatSlice = new SliceImpl<>(List.of(chat1, chat2, chat3), pageRequest,
+        SliceImpl<ChatEntity> chatSlice = new SliceImpl<>(List.of(chatEntity1, chatEntity2, chatEntity3), pageRequest,
             true);
         when(chatRepository.getChatRoomChats(any(), any(), any(), any())).thenReturn(chatSlice);
         chatService.getChatRoomChats(1L, null, mock(Pageable.class), 1L);
@@ -137,45 +137,45 @@ class ChatServiceTest {
 
     @Test
     void 채팅_내역_조회시_공지채팅과_일반채팅_구분하여_응답생성_성공() throws Exception {
-        User aUser = User.builder()
+        UserEntity aUserEntity = UserEntity.builder()
             .id(1L)
             .nickname("AUser")
             .defaultProfileImageType(1)
             .build();
-        User bUser = User.builder()
+        UserEntity bUserEntity = UserEntity.builder()
             .id(2L)
             .nickname("BUser")
             .profileImageUrl("bUser@s3.com")
             .defaultProfileImageType(1)
             .build();
 
-        Chat chat1 = Chat.builder()
+        ChatEntity chatEntity1 = ChatEntity.builder()
             .id(1L)
-            .user(aUser)
+            .userEntity(aUserEntity)
             .message("first chat")
             .build();
-        chat1.setCreatedAt(LocalDateTime.now());
-        Chat chat2 = Chat.builder()
+        chatEntity1.setCreatedAt(LocalDateTime.now());
+        ChatEntity chatEntity2 = ChatEntity.builder()
             .id(2L)
-            .user(bUser)
+            .userEntity(bUserEntity)
             .message("second chat")
             .build();
-        chat2.setCreatedAt(LocalDateTime.now());
-        Chat chat3 = Chat.builder()
+        chatEntity2.setCreatedAt(LocalDateTime.now());
+        ChatEntity chatEntity3 = ChatEntity.builder()
             .id(3L)
-            .user(aUser)
+            .userEntity(aUserEntity)
             .message("welcome")
             .build();
-        chat3.setCreatedAt(LocalDateTime.now());
-        Chat chat4 = Chat.builder()
+        chatEntity3.setCreatedAt(LocalDateTime.now());
+        ChatEntity chatEntity4 = ChatEntity.builder()
             .id(4L)
-            .user(null)
+            .userEntity(null)
             .message("announcement chat")
             .build();
-        chat4.setCreatedAt(LocalDateTime.now());
+        chatEntity4.setCreatedAt(LocalDateTime.now());
 
         PageRequest pageRequest = PageRequest.of(0, 4, Sort.by("id").descending());
-        SliceImpl<Chat> chatSlice = new SliceImpl<>(List.of(chat1, chat2, chat3, chat4),
+        SliceImpl<ChatEntity> chatSlice = new SliceImpl<>(List.of(chatEntity1, chatEntity2, chatEntity3, chatEntity4),
             pageRequest, true);
         when(chatRepository.getChatRoomChats(any(), any(), any(), any())).thenReturn(chatSlice);
         ChatRoomChatsResponse chatRoomChatsResponse = chatService.getChatRoomChats(1L, null,
@@ -192,23 +192,23 @@ class ChatServiceTest {
 
     @Test
     void 채팅_채팅방_발신자정보를_조회_성공() throws Exception {
-        User user = User.builder()
+        UserEntity userEntity = UserEntity.builder()
             .id(1L)
             .nickname("EWNrSKNRR")
             .profileImageUrl("Dv1TTe0uJn")
             .defaultProfileImageType(1)
             .build();
-        ChatRoom chatRoom = ChatRoom.builder().id(1L).build();
-        Chat chat = Chat.builder()
-            .user(user)
-            .chatRoom(chatRoom)
+        ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder().id(1L).build();
+        ChatEntity chatEntity = ChatEntity.builder()
+            .userEntity(userEntity)
+            .chatRoomEntity(chatRoomEntity)
             .message("TTuaihiP")
             .build();
-        given(chatRepository.getUserChatRoomChat(any(), any())).willReturn(Optional.of(chat));
+        given(chatRepository.getUserChatRoomChat(any(), any())).willReturn(Optional.of(chatEntity));
 
         ChatDetailResponse chatDetail = chatService.getChatDetail(1L, 1L);
 
         assertThat(chatDetail).extracting(ChatDetailResponse::getChatId, ChatDetailResponse::getChatRoomId, ChatDetailResponse::getMessage, ChatDetailResponse::getSender)
-            .containsExactly(chat.getId(), chatRoom.getId(), chat.getMessage(), ChatSender.from(user));
+            .containsExactly(chatEntity.getId(), chatRoomEntity.getId(), chatEntity.getMessage(), ChatSender.from(userEntity));
     }
 }

@@ -19,14 +19,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
-import toy.bookchat.bookchat.domain.agony.Agony;
-import toy.bookchat.bookchat.domain.agony.repository.AgonyRecordRepository;
-import toy.bookchat.bookchat.domain.agony.repository.AgonyRepository;
-import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateBookAgonyRequest;
-import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRequest;
-import toy.bookchat.bookchat.domain.agony.service.dto.response.AgonyResponse;
-import toy.bookchat.bookchat.domain.agony.service.dto.response.SliceOfAgoniesResponse;
-import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
+import toy.bookchat.bookchat.db_module.agony.AgonyEntity;
+import toy.bookchat.bookchat.db_module.agony.repository.AgonyRepository;
+import toy.bookchat.bookchat.db_module.agonyrecord.repository.AgonyRecordRepository;
+import toy.bookchat.bookchat.domain.agony.api.v1.request.CreateBookAgonyRequest;
+import toy.bookchat.bookchat.domain.agony.api.v1.request.ReviseAgonyRequest;
+import toy.bookchat.bookchat.domain.agony.api.v1.response.AgonyResponse;
+import toy.bookchat.bookchat.domain.agony.api.v1.response.SliceOfAgoniesResponse;
+import toy.bookchat.bookchat.domain.bookshelf.BookShelfEntity;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.exception.notfound.book.BookNotFoundException;
 
@@ -42,25 +42,25 @@ class AgonyServiceTest {
     @InjectMocks
     private AgonyService agonyService;
 
-    private static Agony getAgony(Long id, String title, String color) {
-        return Agony.builder()
+    private static AgonyEntity getAgony(Long id, String title, String color) {
+        return AgonyEntity.builder()
             .id(id)
             .title(title)
             .hexColorCode(color)
-            .bookShelf(mock(BookShelf.class))
+            .bookShelfEntity(mock(BookShelfEntity.class))
             .build();
     }
 
     @Test
     void 고민_생성_성공() throws Exception {
-        BookShelf bookShelf = mock(BookShelf.class);
+        BookShelfEntity bookShelfEntity = mock(BookShelfEntity.class);
         CreateBookAgonyRequest createBookAgonyRequest = CreateBookAgonyRequest.builder()
             .title("title")
             .hexColorCode("color")
             .build();
 
         when(bookShelfRepository.findByIdAndUserId(any(), any())).thenReturn(
-            Optional.of(bookShelf));
+            Optional.of(bookShelfEntity));
 
         agonyService.storeBookShelfAgony(createBookAgonyRequest, 1L, 1L);
 
@@ -78,10 +78,10 @@ class AgonyServiceTest {
 
     @Test
     void 서재에_등록된_고민_단_건_조회_성공() throws Exception {
-        Agony agony = getAgony(1L, "고민", "파랑");
-        given(agonyRepository.findUserBookShelfAgony(1L, 1L, 1L)).willReturn(Optional.of(agony));
+        AgonyEntity agonyEntity = getAgony(1L, "고민", "파랑");
+        given(agonyRepository.findUserBookShelfAgony(1L, 1L, 1L)).willReturn(Optional.of(agonyEntity));
         AgonyResponse actual = agonyService.searchAgony(1L, 1L, 1L);
-        AgonyResponse expect = AgonyResponse.from(agony);
+        AgonyResponse expect = AgonyResponse.from(agonyEntity);
         assertThat(actual).isEqualTo(expect);
     }
 
@@ -89,11 +89,11 @@ class AgonyServiceTest {
     void 사용자_서재에_등록된_고민_조회_성공() throws Exception {
         PageRequest pageRequest = PageRequest.of(0, 1, Sort.by("id").descending());
 
-        Agony agony1 = getAgony(1L, "agony1", "blue");
-        Agony agony2 = getAgony(2L, "agony2", "red");
+        AgonyEntity agonyEntity1 = getAgony(1L, "agony1", "blue");
+        AgonyEntity agonyEntity2 = getAgony(2L, "agony2", "red");
 
-        List<Agony> contents = List.of(agony1, agony2);
-        Slice<Agony> page = new SliceImpl<>(contents, pageRequest, true);
+        List<AgonyEntity> contents = List.of(agonyEntity1, agonyEntity2);
+        Slice<AgonyEntity> page = new SliceImpl<>(contents, pageRequest, true);
         when(agonyRepository.findUserBookShelfSliceOfAgonies(1L, 1L, pageRequest, 1L)).thenReturn(
             page);
         SliceOfAgoniesResponse pageOfAgoniesResponse = agonyService.searchSliceOfAgonies(1L, 1L,
@@ -113,18 +113,18 @@ class AgonyServiceTest {
 
     @Test
     void 고민폴더_수정_성공() throws Exception {
-        Agony agony = getAgony(1L, "폴더", "파랑");
+        AgonyEntity agonyEntity = getAgony(1L, "폴더", "파랑");
 
         ReviseAgonyRequest reviseAgonyRequest = ReviseAgonyRequest.builder()
             .title("폴더 이름 바꾸기")
             .hexColorCode("보라색")
             .build();
         when(agonyRepository.findUserBookShelfAgony(any(), any(), any())).thenReturn(
-            Optional.of(agony));
+            Optional.of(agonyEntity));
 
         agonyService.reviseAgony(1L, 1L, 1L, reviseAgonyRequest);
 
-        String result = agony.getHexColorCode();
+        String result = agonyEntity.getHexColorCode();
         assertThat(result).isEqualTo("보라색");
     }
 }

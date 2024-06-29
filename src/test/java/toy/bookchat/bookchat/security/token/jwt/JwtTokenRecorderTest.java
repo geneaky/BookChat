@@ -22,6 +22,6 @@ class JwtTokenRecorderTest {
     void 리프레시토큰_저장_성공() throws Exception {
         jwtTokenRecorder.record(1L, "refreshToken");
 
-        verify(refreshTokenRepository).save(any(RefreshToken.class));
+        verify(refreshTokenRepository).save(any(RefreshTokenEntity.class));
     }
 }

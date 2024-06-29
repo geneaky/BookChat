@@ -10,11 +10,11 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import toy.bookchat.bookchat.domain.book.Book;
-import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
+import toy.bookchat.bookchat.domain.book.BookEntity;
+import toy.bookchat.bookchat.domain.bookshelf.BookShelfEntity;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.Star;
-import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.UserEntity;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -34,7 +34,7 @@ public class BookShelfRequest {
         this.star = star;
     }
 
-    public Book extractBookEntity() {
+    public BookEntity extractBookEntity() {
         return this.bookRequest.extractBookEntity();
     }
 
@@ -64,19 +64,19 @@ public class BookShelfRequest {
         return this.bookRequest.getPublishAt();
     }
 
-    public BookShelf createBookShelfByReadingStatus(Book book, User user) {
+    public BookShelfEntity createBookShelfByReadingStatus(BookEntity bookEntity, UserEntity userEntity) {
         if (this.isCompleteReading()) {
-            return BookShelf.builder()
-                .book(book)
+            return BookShelfEntity.builder()
+                .bookEntity(bookEntity)
                 .readingStatus(this.getReadingStatus())
-                .user(user)
+                .userEntity(userEntity)
                 .star(this.getStar())
                 .build();
         }
-        return BookShelf.builder()
-            .book(book)
+        return BookShelfEntity.builder()
+            .bookEntity(bookEntity)
             .readingStatus(this.getReadingStatus())
-            .user(user)
+            .userEntity(userEntity)
             .build();
     }
 }

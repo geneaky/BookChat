@@ -4,14 +4,14 @@ import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import toy.bookchat.bookchat.domain.agony.Agony;
-import toy.bookchat.bookchat.domain.agony.repository.AgonyRecordRepository;
-import toy.bookchat.bookchat.domain.agony.repository.AgonyRepository;
-import toy.bookchat.bookchat.domain.agony.service.dto.request.CreateBookAgonyRequest;
-import toy.bookchat.bookchat.domain.agony.service.dto.request.ReviseAgonyRequest;
-import toy.bookchat.bookchat.domain.agony.service.dto.response.AgonyResponse;
-import toy.bookchat.bookchat.domain.agony.service.dto.response.SliceOfAgoniesResponse;
-import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
+import toy.bookchat.bookchat.db_module.agony.AgonyEntity;
+import toy.bookchat.bookchat.db_module.agony.repository.AgonyRepository;
+import toy.bookchat.bookchat.db_module.agonyrecord.repository.AgonyRecordRepository;
+import toy.bookchat.bookchat.domain.agony.api.v1.request.CreateBookAgonyRequest;
+import toy.bookchat.bookchat.domain.agony.api.v1.request.ReviseAgonyRequest;
+import toy.bookchat.bookchat.domain.agony.api.v1.response.AgonyResponse;
+import toy.bookchat.bookchat.domain.agony.api.v1.response.SliceOfAgoniesResponse;
+import toy.bookchat.bookchat.domain.bookshelf.BookShelfEntity;
 import toy.bookchat.bookchat.domain.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.exception.notfound.agony.AgonyNotFoundException;
 import toy.bookchat.bookchat.exception.notfound.book.BookNotFoundException;
@@ -19,22 +19,24 @@ import toy.bookchat.bookchat.exception.notfound.book.BookNotFoundException;
 @Service
 public class AgonyService {
 
+    private final AgonyAppender agonyAppender;
     private final BookShelfRepository bookShelfRepository;
     private final AgonyRepository agonyRepository;
     private final AgonyRecordRepository agonyRecordRepository;
 
-    public AgonyService(BookShelfRepository bookShelfRepository, AgonyRepository agonyRepository, AgonyRecordRepository agonyRecordRepository) {
+    public AgonyService(AgonyAppender agonyAppender, BookShelfRepository bookShelfRepository, AgonyRepository agonyRepository, AgonyRecordRepository agonyRecordRepository) {
+        this.agonyAppender = agonyAppender;
         this.bookShelfRepository = bookShelfRepository;
         this.agonyRepository = agonyRepository;
         this.agonyRecordRepository = agonyRecordRepository;
     }
 
     @Transactional
-    public Long storeBookShelfAgony(CreateBookAgonyRequest createBookAgonyRequest, Long userId, Long bookShelfId) {
-        BookShelf bookShelf = bookShelfRepository.findByIdAndUserId(bookShelfId, userId).orElseThrow(BookNotFoundException::new);
-        Agony agony = createBookAgonyRequest.getAgony(bookShelf);
-        agonyRepository.save(agony);
-        return agony.getId();
+    public Long storeBookShelfAgony(CreateBookAgonyRequest request, Long userId, Long bookShelfId) {
+        BookShelfEntity bookShelfEntity = bookShelfRepository.findByIdAndUserId(bookShelfId, userId).orElseThrow(BookNotFoundException::new);
+        AgonyEntity agonyEntity = request.getAgony(bookShelfEntity);
+        agonyRepository.save(agonyEntity);
+        return agonyEntity.getId();
     }
 
     @Transactional(readOnly = true)
@@ -50,10 +52,10 @@ public class AgonyService {
 
     @Transactional
     public void reviseAgony(Long bookShelfId, Long agonyId, Long userId, ReviseAgonyRequest reviseAgonyRequest) {
-        Agony agony = agonyRepository.findUserBookShelfAgony(bookShelfId, agonyId, userId)
+        AgonyEntity agonyEntity = agonyRepository.findUserBookShelfAgony(bookShelfId, agonyId, userId)
             .orElseThrow(AgonyNotFoundException::new);
-        agony.changeTitle(reviseAgonyRequest.getTitle());
-        agony.changeHexColorCode(reviseAgonyRequest.getHexColorCode());
+        agonyEntity.changeTitle(reviseAgonyRequest.getTitle());
+        agonyEntity.changeHexColorCode(reviseAgonyRequest.getHexColorCode());
     }
 
     @Transactional
@@ -64,7 +66,7 @@ public class AgonyService {
 
     @Transactional(readOnly = true)
     public AgonyResponse searchAgony(Long bookShelfId, Long agonyId, Long userId) {
-        Agony agony = agonyRepository.findUserBookShelfAgony(bookShelfId, agonyId, userId).orElseThrow(AgonyNotFoundException::new);
-        return AgonyResponse.from(agony);
+        AgonyEntity agonyEntity = agonyRepository.findUserBookShelfAgony(bookShelfId, agonyId, userId).orElseThrow(AgonyNotFoundException::new);
+        return AgonyResponse.from(agonyEntity);
     }
 }

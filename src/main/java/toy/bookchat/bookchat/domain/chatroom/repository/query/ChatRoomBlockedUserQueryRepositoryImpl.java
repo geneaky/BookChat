@@ -1,11 +1,12 @@
 package toy.bookchat.bookchat.domain.chatroom.repository.query;
 
-import static toy.bookchat.bookchat.domain.chatroom.QChatRoomBlockedUser.chatRoomBlockedUser;
+
+import static toy.bookchat.bookchat.domain.chatroom.QChatRoomBlockedUserEntity.chatRoomBlockedUserEntity;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.Optional;
 import org.springframework.stereotype.Repository;
-import toy.bookchat.bookchat.domain.chatroom.ChatRoomBlockedUser;
+import toy.bookchat.bookchat.domain.chatroom.ChatRoomBlockedUserEntity;
 
 @Repository
 public class ChatRoomBlockedUserQueryRepositoryImpl implements ChatRoomBlockedUserQueryRepository {
@@ -17,12 +18,12 @@ public class ChatRoomBlockedUserQueryRepositoryImpl implements ChatRoomBlockedUs
     }
 
     @Override
-    public Optional<ChatRoomBlockedUser> findByUserIdAndChatRoomId(Long userId, Long chatRoomId) {
+    public Optional<ChatRoomBlockedUserEntity> findByUserIdAndChatRoomId(Long userId, Long chatRoomId) {
         return Optional.ofNullable(
-            queryFactory.select(chatRoomBlockedUser)
-                .from(chatRoomBlockedUser)
-                .where(chatRoomBlockedUser.user.id.eq(userId)
-                    .and(chatRoomBlockedUser.chatRoom.id.eq(chatRoomId)))
+            queryFactory.select(chatRoomBlockedUserEntity)
+                .from(chatRoomBlockedUserEntity)
+                .where(chatRoomBlockedUserEntity.userEntity.id.eq(userId)
+                    .and(chatRoomBlockedUserEntity.chatRoomEntity.id.eq(chatRoomId)))
                 .fetchOne()
         );
     }

@@ -12,10 +12,10 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import toy.bookchat.bookchat.domain.book.Book;
+import toy.bookchat.bookchat.domain.book.BookEntity;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookRequest;
-import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
-import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.chatroom.ChatRoomEntity;
+import toy.bookchat.bookchat.domain.user.UserEntity;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -43,9 +43,9 @@ public class CreateChatRoomRequest {
         this.bookRequest = bookRequest;
     }
 
-    public ChatRoom makeChatRoom(Book book, User host, String fileUrl) {
-        return ChatRoom.builder()
-            .book(book)
+    public ChatRoomEntity makeChatRoom(BookEntity bookEntity, UserEntity host, String fileUrl) {
+        return ChatRoomEntity.builder()
+            .bookEntity(bookEntity)
             .roomSid(UUID.randomUUID().toString())
             .roomName(this.roomName)
             .roomSize(this.roomSize)
@@ -55,7 +55,7 @@ public class CreateChatRoomRequest {
             .build();
     }
 
-    public Book createBook() {
+    public BookEntity createBook() {
         return this.bookRequest.extractBookEntity();
     }
 

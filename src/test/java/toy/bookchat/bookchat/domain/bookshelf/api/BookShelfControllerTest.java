@@ -47,8 +47,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
-import toy.bookchat.bookchat.domain.book.Book;
-import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
+import toy.bookchat.bookchat.domain.book.BookEntity;
+import toy.bookchat.bookchat.domain.bookshelf.BookShelfEntity;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.service.BookShelfService;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookRequest;
@@ -57,7 +57,7 @@ import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ReviseBookShel
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.BookShelfResponse;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.ExistenceBookOnBookShelfResponse;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.SearchBookShelfByReadingStatus;
-import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.UserEntity;
 
 @BookShelfPresentationTest
 class BookShelfControllerTest extends ControllerTestExtension {
@@ -148,7 +148,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
 
     @Test
     void 읽고_있는_책_등록_성공() throws Exception {
-        BookShelf bookShelf = BookShelf.builder()
+        BookShelfEntity bookShelfEntity = BookShelfEntity.builder()
             .id(234L)
             .build();
         given(bookShelfService.putBookOnBookShelf(any(), any())).willReturn(456L);
@@ -182,7 +182,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
 
     @Test
     void 읽은_책_등록_성공() throws Exception {
-        BookShelf bookShelf = BookShelf.builder()
+        BookShelfEntity bookShelfEntity = BookShelfEntity.builder()
             .id(234L)
             .build();
         given(bookShelfService.putBookOnBookShelf(any(), any())).willReturn(343L);
@@ -218,7 +218,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
 
     @Test
     void 읽을_책_등록_성공() throws Exception {
-        BookShelf bookShelf = BookShelf.builder()
+        BookShelfEntity bookShelfEntity = BookShelfEntity.builder()
             .id(234L)
             .build();
         given(bookShelfService.putBookOnBookShelf(any(), any())).willReturn(847L);
@@ -455,10 +455,10 @@ class BookShelfControllerTest extends ControllerTestExtension {
 
     @Test
     void 읽고있는_책_조회_성공() throws Exception {
-        List<BookShelf> result = new ArrayList<>();
+        List<BookShelfEntity> result = new ArrayList<>();
 
-        User user = User.builder().build();
-        Book book = Book.builder()
+        UserEntity userEntity = UserEntity.builder().build();
+        BookEntity bookEntity = BookEntity.builder()
             .id(1L)
             .isbn("12345")
             .title("effectiveJava")
@@ -468,19 +468,19 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .publishAt(LocalDate.now())
             .build();
 
-        BookShelf bookShelf = BookShelf.builder()
+        BookShelfEntity bookShelfEntity = BookShelfEntity.builder()
             .id(1L)
-            .book(book)
-            .user(user)
+            .bookEntity(bookEntity)
+            .userEntity(userEntity)
             .pages(152)
             .readingStatus(READING)
             .build();
-        bookShelf.setUpdatedAt(LocalDateTime.now());
+        bookShelfEntity.setUpdatedAt(LocalDateTime.now());
 
-        result.add(bookShelf);
+        result.add(bookShelfEntity);
 
         PageRequest pageRequest = PageRequest.of(0, 1, Sort.by("id").descending());
-        PageImpl<BookShelf> bookShelves = new PageImpl<>(result, pageRequest, 1);
+        PageImpl<BookShelfEntity> bookShelves = new PageImpl<>(result, pageRequest, 1);
         SearchBookShelfByReadingStatus searchBookShelfByReadingStatus = new SearchBookShelfByReadingStatus(
             bookShelves);
 
@@ -529,11 +529,11 @@ class BookShelfControllerTest extends ControllerTestExtension {
 
     @Test
     void 읽은_책_조회_성공() throws Exception {
-        List<BookShelf> result = new ArrayList<>();
+        List<BookShelfEntity> result = new ArrayList<>();
 
-        User user = User.builder().build();
+        UserEntity userEntity = UserEntity.builder().build();
 
-        Book book = Book.builder()
+        BookEntity bookEntity = BookEntity.builder()
             .id(1L)
             .isbn("12345")
             .title("effectiveJava")
@@ -543,20 +543,20 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .publishAt(LocalDate.now())
             .build();
 
-        BookShelf bookShelf = BookShelf.builder()
+        BookShelfEntity bookShelfEntity = BookShelfEntity.builder()
             .id(1L)
-            .book(book)
-            .user(user)
+            .bookEntity(bookEntity)
+            .userEntity(userEntity)
             .pages(0)
             .readingStatus(READING)
             .star(FOUR_HALF)
             .build();
-        bookShelf.setUpdatedAt(LocalDateTime.now());
+        bookShelfEntity.setUpdatedAt(LocalDateTime.now());
 
-        result.add(bookShelf);
+        result.add(bookShelfEntity);
 
         PageRequest pageRequest = PageRequest.of(0, 1, Sort.by("id").descending());
-        PageImpl<BookShelf> bookShelves = new PageImpl<>(result, pageRequest, 1);
+        PageImpl<BookShelfEntity> bookShelves = new PageImpl<>(result, pageRequest, 1);
         SearchBookShelfByReadingStatus searchBookShelfByReadingStatus = new SearchBookShelfByReadingStatus(
             bookShelves);
 
@@ -605,10 +605,10 @@ class BookShelfControllerTest extends ControllerTestExtension {
 
     @Test
     void 읽을_책_조회_성공() throws Exception {
-        List<BookShelf> result = new ArrayList<>();
+        List<BookShelfEntity> result = new ArrayList<>();
 
-        User user = User.builder().build();
-        Book book = Book.builder()
+        UserEntity userEntity = UserEntity.builder().build();
+        BookEntity bookEntity = BookEntity.builder()
             .id(1L)
             .isbn("12345")
             .title("effectiveJava")
@@ -618,20 +618,20 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .publishAt(LocalDate.now())
             .build();
 
-        BookShelf bookShelf = BookShelf.builder()
+        BookShelfEntity bookShelfEntity = BookShelfEntity.builder()
             .id(1L)
-            .book(book)
-            .user(user)
+            .bookEntity(bookEntity)
+            .userEntity(userEntity)
             .pages(0)
             .readingStatus(WISH)
             .star(null)
             .build();
-        bookShelf.setUpdatedAt(LocalDateTime.now());
+        bookShelfEntity.setUpdatedAt(LocalDateTime.now());
 
-        result.add(bookShelf);
+        result.add(bookShelfEntity);
 
         PageRequest pageRequest = PageRequest.of(0, 1, Sort.by("id").descending());
-        PageImpl<BookShelf> bookShelves = new PageImpl<>(result, pageRequest, 1);
+        PageImpl<BookShelfEntity> bookShelves = new PageImpl<>(result, pageRequest, 1);
         SearchBookShelfByReadingStatus searchBookShelfByReadingStatus = new SearchBookShelfByReadingStatus(
             bookShelves);
 

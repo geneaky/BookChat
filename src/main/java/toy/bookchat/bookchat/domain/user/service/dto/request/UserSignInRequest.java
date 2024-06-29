@@ -7,8 +7,8 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import toy.bookchat.bookchat.domain.device.Device;
-import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.device.DeviceEntity;
+import toy.bookchat.bookchat.domain.user.UserEntity;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
 @Getter
@@ -33,11 +33,11 @@ public class UserSignInRequest {
         this.approveChangingDevice = approveChangingDevice;
     }
 
-    public Device createDevice(User user) {
-        return Device.builder()
+    public DeviceEntity createDevice(UserEntity userEntity) {
+        return DeviceEntity.builder()
             .deviceToken(this.deviceToken)
             .fcmToken(this.fcmToken)
-            .user(user)
+            .userEntity(userEntity)
             .build();
     }
 

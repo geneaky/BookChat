@@ -1,11 +1,11 @@
 package toy.bookchat.bookchat.domain.chat.repository.query;
 
-import static toy.bookchat.bookchat.domain.chat.QChat.chat;
+import static toy.bookchat.bookchat.domain.chat.QChatEntity.chatEntity;
 import static toy.bookchat.bookchat.domain.common.RepositorySupport.extractOrderSpecifierFrom;
 import static toy.bookchat.bookchat.domain.common.RepositorySupport.numberBasedPagination;
 import static toy.bookchat.bookchat.domain.common.RepositorySupport.toSlice;
-import static toy.bookchat.bookchat.domain.participant.QParticipant.participant;
-import static toy.bookchat.bookchat.domain.user.QUser.user;
+import static toy.bookchat.bookchat.domain.participant.QParticipantEntity.participantEntity;
+import static toy.bookchat.bookchat.domain.user.QUserEntity.userEntity;
 
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -13,7 +13,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
-import toy.bookchat.bookchat.domain.chat.Chat;
+import toy.bookchat.bookchat.domain.chat.ChatEntity;
 
 @Repository
 public class ChatQueryRepositoryImpl implements ChatQueryRepository {
@@ -25,30 +25,30 @@ public class ChatQueryRepositoryImpl implements ChatQueryRepository {
     }
 
     @Override
-    public Slice<Chat> getChatRoomChats(Long roomId, Long postCursorId, Pageable pageable,
+    public Slice<ChatEntity> getChatRoomChats(Long roomId, Long postCursorId, Pageable pageable,
         Long userId) {
-        return toSlice(queryFactory.select(chat)
-            .from(chat)
-            .where(chat.chatRoom.id.eq(JPAExpressions.select(participant.chatRoom.id)
-                    .from(participant)
-                    .where(participant.user.id.eq(userId)
-                        .and(participant.chatRoom.id.eq(roomId)))),
-                numberBasedPagination(chat, chat.id, postCursorId, pageable)
+        return toSlice(queryFactory.select(chatEntity)
+            .from(chatEntity)
+            .where(chatEntity.chatRoomEntity.id.eq(JPAExpressions.select(participantEntity.chatRoomEntity.id)
+                    .from(participantEntity)
+                    .where(participantEntity.userEntity.id.eq(userId)
+                        .and(participantEntity.chatRoomEntity.id.eq(roomId)))),
+                numberBasedPagination(chatEntity, chatEntity.id, postCursorId, pageable)
             )
             .limit(pageable.getPageSize())
-            .orderBy(extractOrderSpecifierFrom(chat, pageable)).fetch(), pageable);
+            .orderBy(extractOrderSpecifierFrom(chatEntity, pageable)).fetch(), pageable);
     }
 
     @Override
-    public Optional<Chat> getUserChatRoomChat(Long chatId, Long userId) {
-        return Optional.ofNullable(queryFactory.select(chat)
-            .from(chat)
-            .join(chat.user, user).fetchJoin()
-            .where(chat.id.eq(chatId)
-                .and(chat.chatRoom.id.in(
-                    JPAExpressions.select(participant.chatRoom.id)
-                        .from(participant)
-                        .where(participant.user.id.eq(userId)))
+    public Optional<ChatEntity> getUserChatRoomChat(Long chatId, Long userId) {
+        return Optional.ofNullable(queryFactory.select(chatEntity)
+            .from(chatEntity)
+            .join(chatEntity.userEntity, userEntity).fetchJoin()
+            .where(chatEntity.id.eq(chatId)
+                .and(chatEntity.chatRoomEntity.id.in(
+                    JPAExpressions.select(participantEntity.chatRoomEntity.id)
+                        .from(participantEntity)
+                        .where(participantEntity.userEntity.id.eq(userId)))
                 ))
             .fetchOne());
     }

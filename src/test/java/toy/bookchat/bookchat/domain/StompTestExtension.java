@@ -16,7 +16,7 @@ import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import toy.bookchat.bookchat.domain.user.ReadingTaste;
-import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.UserEntity;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenManager;
 import toy.bookchat.bookchat.security.user.TokenPayload;
@@ -37,7 +37,7 @@ public class StompTestExtension {
 
     @MockBean
     JwtTokenManager jwtTokenManager;
-    private User testUser = User.builder()
+    private UserEntity testUserEntity = UserEntity.builder()
         .id(1L)
         .email("test@gmail.com")
         .nickname("nickname")
@@ -54,36 +54,36 @@ public class StompTestExtension {
         doReturn(getTokenPayload(getUser())).when(jwtTokenManager).getTokenPayloadFromToken(any());
     }
 
-    protected User getUser() {
-        return this.testUser;
+    protected UserEntity getUser() {
+        return this.testUserEntity;
     }
 
     protected Long getUserId() {
-        return this.testUser.getId();
+        return this.testUserEntity.getId();
     }
 
     protected String getUserName() {
-        return this.testUser.getName();
+        return this.testUserEntity.getName();
     }
 
     protected String getUserNickname() {
-        return this.testUser.getNickname();
+        return this.testUserEntity.getNickname();
     }
 
     protected String getUserProfileImageUrl() {
-        return this.testUser.getProfileImageUrl();
+        return this.testUserEntity.getProfileImageUrl();
     }
 
     protected Integer getUserDefaultProfileImageType() {
-        return this.testUser.getDefaultProfileImageType();
+        return this.testUserEntity.getDefaultProfileImageType();
     }
 
 
-    private TokenPayload getTokenPayload(User user) {
-        return TokenPayload.of(user.getId(), user.getName(),
-            user.getNickname(),
-            user.getEmail(), user.getProfileImageUrl(), user.getDefaultProfileImageType(),
-            user.getRole());
+    private TokenPayload getTokenPayload(UserEntity userEntity) {
+        return TokenPayload.of(userEntity.getId(), userEntity.getName(),
+            userEntity.getNickname(),
+            userEntity.getEmail(), userEntity.getProfileImageUrl(), userEntity.getDefaultProfileImageType(),
+            userEntity.getRole());
     }
 
     protected String getTestToken() {

@@ -20,14 +20,14 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import toy.bookchat.bookchat.domain.book.Book;
+import toy.bookchat.bookchat.domain.book.BookEntity;
 import toy.bookchat.bookchat.domain.book.repository.BookRepository;
-import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
+import toy.bookchat.bookchat.domain.chatroom.ChatRoomEntity;
 import toy.bookchat.bookchat.domain.chatroom.repository.ChatRoomRepository;
 import toy.bookchat.bookchat.domain.chatroom.service.ChatRoomService;
-import toy.bookchat.bookchat.domain.participant.Participant;
+import toy.bookchat.bookchat.domain.participant.ParticipantEntity;
 import toy.bookchat.bookchat.domain.participant.repository.ParticipantRepository;
-import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.UserEntity;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.infrastructure.broker.MessagePublisher;
 import toy.bookchat.bookchat.infrastructure.push.service.PushService;
@@ -36,7 +36,7 @@ import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 @Slf4j
 @SpringBootTest
 @TestInstance(Lifecycle.PER_CLASS)
-public class ChatServiceConcurrentTest {
+class ChatServiceConcurrentTest {
 
     @Autowired
     private UserRepository userRepository;
@@ -77,9 +77,9 @@ public class ChatServiceConcurrentTest {
 
         ExecutorService executorService = Executors.newFixedThreadPool(10);
 
-        List<User> userList = new ArrayList<>();
+        List<UserEntity> userEntityList = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            userList.add(User.builder()
+            userEntityList.add(UserEntity.builder()
                 .nickname(i + "nickname")
                 .defaultProfileImageType(1)
                 .provider(OAuth2Provider.KAKAO)
@@ -88,29 +88,29 @@ public class ChatServiceConcurrentTest {
                 .status(ACTIVE)
                 .build());
         }
-        userRepository.saveAll(userList);
+        userRepository.saveAll(userEntityList);
 
-        Book book = Book.builder()
+        BookEntity bookEntity = BookEntity.builder()
             .isbn("4640485366")
             .publishAt(LocalDate.now())
             .build();
-        bookRepository.save(book);
+        bookRepository.save(bookEntity);
 
-        ChatRoom chatRoom = ChatRoom.builder()
-            .host(userList.get(0))
-            .book(book)
+        ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
+            .host(userEntityList.get(0))
+            .bookEntity(bookEntity)
             .defaultRoomImageType(1)
             .roomSize(roomSize)
             .roomSid("HNsIG51b")
             .roomName("RtzE")
             .build();
-        chatRoomRepository.save(chatRoom);
+        chatRoomRepository.save(chatRoomEntity);
 
-        for (User user : userList) {
+        for (UserEntity userEntity : userEntityList) {
             executorService.execute(() -> {
                 try {
-                    log.info(user.getId().toString());
-                    chatRoomService.enterChatRoom(user.getId(), chatRoom.getId());
+                    log.info(userEntity.getId().toString());
+                    chatRoomService.enterChatRoom(userEntity.getId(), chatRoomEntity.getId());
                 } catch (Exception exception) {
                     log.info(exception.getMessage());
                 }
@@ -120,8 +120,8 @@ public class ChatServiceConcurrentTest {
 
         countDownLatch.await();
 
-        List<Participant> participants = participantRepository.findAll();
-        assertThat(participants.size()).isEqualTo(roomSize);
+        List<ParticipantEntity> participantEntities = participantRepository.findAll();
+        assertThat(participantEntities.size()).isEqualTo(roomSize);
     }
 
 }

@@ -9,19 +9,25 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import toy.bookchat.bookchat.domain.book.Book;
+import toy.bookchat.bookchat.domain.book.BookEntity;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BookRequest {
 
-    @NotBlank String isbn;
-    @NotBlank String title;
+    @NotBlank
+    String isbn;
+    @NotBlank
+    String title;
     @Valid
-    @NotNull List<@NotBlank String> authors;
-    @NotBlank String publisher;
-    @NotBlank String bookCoverImageUrl;
-    @NotNull LocalDate publishAt;
+    @NotNull
+    List<@NotBlank String> authors;
+    @NotBlank
+    String publisher;
+    @NotBlank
+    String bookCoverImageUrl;
+    @NotNull
+    LocalDate publishAt;
 
     @Builder
     private BookRequest(String isbn, String title, List<String> authors, String publisher,
@@ -35,8 +41,8 @@ public class BookRequest {
     }
 
 
-    public Book extractBookEntity() {
-        return Book.builder()
+    public BookEntity extractBookEntity() {
+        return BookEntity.builder()
             .isbn(this.isbn)
             .title(this.title)
             .authors(this.authors)

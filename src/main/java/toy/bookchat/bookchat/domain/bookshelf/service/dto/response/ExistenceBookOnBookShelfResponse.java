@@ -2,7 +2,7 @@ package toy.bookchat.bookchat.domain.bookshelf.service.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
-import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
+import toy.bookchat.bookchat.domain.bookshelf.BookShelfEntity;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 
 @Getter
@@ -18,7 +18,7 @@ public class ExistenceBookOnBookShelfResponse {
         this.readingStatus = readingStatus;
     }
 
-    public static ExistenceBookOnBookShelfResponse from(BookShelf bookShelf) {
-        return new ExistenceBookOnBookShelfResponse(bookShelf.getId(), bookShelf.getReadingStatus());
+    public static ExistenceBookOnBookShelfResponse from(BookShelfEntity bookShelfEntity) {
+        return new ExistenceBookOnBookShelfResponse(bookShelfEntity.getId(), bookShelfEntity.getReadingStatus());
     }
 }

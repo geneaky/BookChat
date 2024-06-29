@@ -46,10 +46,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
-import toy.bookchat.bookchat.domain.book.Book;
+import toy.bookchat.bookchat.domain.book.BookEntity;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookRequest;
-import toy.bookchat.bookchat.domain.chat.Chat;
-import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
+import toy.bookchat.bookchat.domain.chat.ChatEntity;
+import toy.bookchat.bookchat.domain.chatroom.ChatRoomEntity;
 import toy.bookchat.bookchat.domain.chatroom.api.dto.response.UserChatRoomDetailResponse;
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomResponse;
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomsResponseSlice;
@@ -143,75 +143,75 @@ class ChatRoomControllerTest extends ControllerTestExtension {
 
     @Test
     void 사용자의_채팅방_목록_조회_성공() throws Exception {
-        Book book1 = Book.builder()
+        BookEntity bookEntity1 = BookEntity.builder()
             .title("effective java")
             .bookCoverImageUrl("effectivejava@s3.com")
             .authors(List.of("Joshua", "JJU"))
             .build();
 
-        Book book2 = Book.builder()
+        BookEntity bookEntity2 = BookEntity.builder()
             .title("effective kotlin")
             .bookCoverImageUrl("effectivekotlin@s3.com")
             .authors(List.of("marcin mosckala"))
             .build();
 
-        Book book3 = Book.builder()
+        BookEntity bookEntity3 = BookEntity.builder()
             .title("toby spring")
             .bookCoverImageUrl("tobyspring@s3.com")
             .authors(List.of("21min"))
             .build();
 
-        ChatRoom chatRoom1 = ChatRoom.builder()
+        ChatRoomEntity chatRoomEntity1 = ChatRoomEntity.builder()
             .id(1L)
-            .book(book1)
+            .bookEntity(bookEntity1)
             .roomName("이펙티브 자바 부수는 방")
             .roomSid("secret1")
             .roomSize(100)
             .defaultRoomImageType(1)
             .roomImageUri(null)
             .build();
-        chatRoom1.setCreatedAt(LocalDateTime.now());
-        ChatRoom chatRoom2 = ChatRoom.builder()
+        chatRoomEntity1.setCreatedAt(LocalDateTime.now());
+        ChatRoomEntity chatRoomEntity2 = ChatRoomEntity.builder()
             .id(2L)
-            .book(book2)
+            .bookEntity(bookEntity2)
             .roomName("이펙티브 코틀린 부수는 방")
             .roomSid("secret2")
             .roomSize(10)
             .defaultRoomImageType(4)
             .roomImageUri("testRoomImageUri")
             .build();
-        chatRoom2.setCreatedAt(LocalDateTime.now());
-        ChatRoom chatRoom3 = ChatRoom.builder()
+        chatRoomEntity2.setCreatedAt(LocalDateTime.now());
+        ChatRoomEntity chatRoomEntity3 = ChatRoomEntity.builder()
             .id(3L)
-            .book(book3)
+            .bookEntity(bookEntity3)
             .roomName("토비의 스프링 부수는 방")
             .roomSid("secret3")
             .roomSize(5)
             .defaultRoomImageType(3)
             .roomImageUri(null)
             .build();
-        chatRoom3.setCreatedAt(LocalDateTime.now());
+        chatRoomEntity3.setCreatedAt(LocalDateTime.now());
 
-        Chat chat1 = Chat.builder()
+        ChatEntity chatEntity1 = ChatEntity.builder()
             .id(1L)
-            .chatRoom(chatRoom1)
+            .chatRoomEntity(chatRoomEntity1)
             .message("이펙티브 자바 부수는 방 입니다.")
             .build();
 
-        Chat chat2 = Chat.builder()
+        ChatEntity chatEntity2 = ChatEntity.builder()
             .id(2L)
-            .chatRoom(chatRoom2)
+            .chatRoomEntity(chatRoomEntity2)
             .message("이펙티브 코틀린 부수는 방 입니다.")
             .build();
 
-        Chat chat3 = Chat.builder()
+        ChatEntity chatEntity3 = ChatEntity.builder()
             .id(3L)
-            .chatRoom(chatRoom3)
+            .chatRoomEntity(chatRoomEntity3)
             .message("토비의 스프링 부수는 방 입니다.")
             .build();
 
-        List<UserChatRoomResponse> result = List.of(getChatRoomResponse(chatRoom1, chat1),
-            getChatRoomResponse(chatRoom2, chat2), getChatRoomResponse(chatRoom3, chat3));
+        List<UserChatRoomResponse> result = List.of(getChatRoomResponse(chatRoomEntity1, chatEntity1),
+            getChatRoomResponse(chatRoomEntity2, chatEntity2), getChatRoomResponse(chatRoomEntity3, chatEntity3));
 
         PageRequest pageRequest = PageRequest.of(0, 3, Sort.by("id").descending());
         Slice<UserChatRoomResponse> slice = new SliceImpl<>(result, pageRequest, true);
@@ -566,26 +566,26 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                 )));
     }
 
-    private UserChatRoomResponse getChatRoomResponse(ChatRoom chatRoom, Chat chat) {
+    private UserChatRoomResponse getChatRoomResponse(ChatRoomEntity chatRoomEntity, ChatEntity chatEntity) {
         return UserChatRoomResponse.builder()
-            .roomId(chatRoom.getId())
-            .roomSid(chatRoom.getRoomSid())
-            .roomName(chatRoom.getRoomName())
+            .roomId(chatRoomEntity.getId())
+            .roomSid(chatRoomEntity.getRoomSid())
+            .roomName(chatRoomEntity.getRoomName())
             .roomMemberCount(2L)
             .defaultRoomImageType(1)
             .hostId(1L)
             .hostNickname("host 별명")
             .hostProfileImageUrl("host Profile Image Url")
             .hostDefaultProfileImageType(1)
-            .bookTitle(chatRoom.getBookTitle())
-            .bookCoverImageUrl(chatRoom.getBookCoverImageUrl())
-            .bookAuthors(chatRoom.getBookAuthors())
+            .bookTitle(chatRoomEntity.getBookTitle())
+            .bookCoverImageUrl(chatRoomEntity.getBookCoverImageUrl())
+            .bookAuthors(chatRoomEntity.getBookAuthors())
             .senderId(1L)
             .senderNickname("sender Nickname")
             .senderProfileImageUrl("sender Profile Image Url")
             .senderDefaultProfileImageType(3)
-            .lastChatId(chat.getId())
-            .lastChatContent(chat.getMessage())
+            .lastChatId(chatEntity.getId())
+            .lastChatContent(chatEntity.getMessage())
             .lastChatDispatchTime(LocalDateTime.now())
             .build();
     }

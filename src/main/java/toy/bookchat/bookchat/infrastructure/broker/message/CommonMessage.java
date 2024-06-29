@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import toy.bookchat.bookchat.domain.chat.Chat;
+import toy.bookchat.bookchat.domain.chat.ChatEntity;
 import toy.bookchat.bookchat.domain.chat.api.dto.request.MessageDto;
 
 @Getter
@@ -32,26 +32,26 @@ public class CommonMessage {
         this.dispatchTime = dispatchTime;
     }
 
-    public static CommonMessage from(Long senderId, Chat chat, MessageDto messageDto) {
+    public static CommonMessage from(Long senderId, ChatEntity chatEntity, MessageDto messageDto) {
         return CommonMessage.builder()
-            .chatRoomId(chat.getChatRoomId())
-            .chatId(chat.getId())
+            .chatRoomId(chatEntity.getChatRoomId())
+            .chatId(chatEntity.getId())
             .senderId(senderId)
             .receiptId(messageDto.getReceiptId())
             .message(messageDto.getMessage())
-            .dispatchTime(chat.getDispatchTime())
+            .dispatchTime(chatEntity.getDispatchTime())
             .build();
     }
 
-    public static CommonMessage from(Long senderId, Chat chat, MessageDto messageDto,
+    public static CommonMessage from(Long senderId, ChatEntity chatEntity, MessageDto messageDto,
         String subMessage) {
         return CommonMessage.builder()
-            .chatRoomId(chat.getChatRoomId())
-            .chatId(chat.getId())
+            .chatRoomId(chatEntity.getChatRoomId())
+            .chatId(chatEntity.getId())
             .senderId(senderId)
             .receiptId(messageDto.getReceiptId())
             .message(subMessage)
-            .dispatchTime(chat.getDispatchTime())
+            .dispatchTime(chatEntity.getDispatchTime())
             .build();
     }
 }

@@ -28,7 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
-import toy.bookchat.bookchat.domain.bookshelf.BookReport;
+import toy.bookchat.bookchat.domain.bookshelf.BookReportEntity;
 import toy.bookchat.bookchat.domain.bookshelf.service.BookReportService;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ReviseBookReportRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.WriteBookReportRequest;
@@ -77,12 +77,12 @@ class BookReportControllerTest extends ControllerTestExtension {
     @Test
     void 읽은책_독후감_조회_성공() throws Exception {
 
-        BookReport bookReport = BookReport.builder()
+        BookReportEntity bookReportEntity = BookReportEntity.builder()
             .title("재미있네")
             .content("다 읽은 후기 알려드립니다")
             .build();
-        bookReport.setCreatedAt(LocalDateTime.now());
-        BookReportResponse bookReportResponse = BookReportResponse.from(bookReport);
+        bookReportEntity.setCreatedAt(LocalDateTime.now());
+        BookReportResponse bookReportResponse = BookReportResponse.from(bookReportEntity);
         when(bookReportService.getBookReportResponse(any(), any())).thenReturn(bookReportResponse);
         mockMvc.perform(get("/v1/api/bookshelves/{bookShelfId}/report", 1L)
                 .header(AUTHORIZATION, JWT_TOKEN)

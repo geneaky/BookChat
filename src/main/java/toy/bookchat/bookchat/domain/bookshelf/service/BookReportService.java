@@ -2,8 +2,8 @@ package toy.bookchat.bookchat.domain.bookshelf.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import toy.bookchat.bookchat.domain.bookshelf.BookReport;
-import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
+import toy.bookchat.bookchat.domain.bookshelf.BookReportEntity;
+import toy.bookchat.bookchat.domain.bookshelf.BookShelfEntity;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ReviseBookReportRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.WriteBookReportRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.BookReportResponse;
@@ -22,27 +22,27 @@ public class BookReportService {
     @Transactional
     public void writeReport(WriteBookReportRequest writeBookReportRequest, Long bookShelfId,
         Long userId) {
-        BookShelf bookShelf = bookShelfReader.readBookShelf(bookShelfId, userId);
-        BookReport bookReport = writeBookReportRequest.getBookReport(bookShelf);
-        bookShelfManager.append(bookShelf, bookReport);
+        BookShelfEntity bookShelfEntity = bookShelfReader.readBookShelf(bookShelfId, userId);
+        BookReportEntity bookReportEntity = writeBookReportRequest.getBookReport(bookShelfEntity);
+        bookShelfManager.append(bookShelfEntity, bookReportEntity);
     }
 
     @Transactional(readOnly = true)
     public BookReportResponse getBookReportResponse(Long bookShelfId, Long userId) {
-        BookShelf bookShelf = bookShelfReader.readBookShelf(bookShelfId, userId);
-        return BookReportResponse.from(bookShelf.getBookReport());
+        BookShelfEntity bookShelfEntity = bookShelfReader.readBookShelf(bookShelfId, userId);
+        return BookReportResponse.from(bookShelfEntity.getBookReportEntity());
     }
 
     @Transactional
     public void deleteBookReport(Long bookShelfId, Long userId) {
-        BookShelf bookShelf = bookShelfReader.readBookShelf(bookShelfId, userId);
-        bookShelf.deleteBookReport();
+        BookShelfEntity bookShelfEntity = bookShelfReader.readBookShelf(bookShelfId, userId);
+        bookShelfEntity.deleteBookReport();
     }
 
     @Transactional
     public void reviseBookReport(Long bookShelfId, Long userId,
         ReviseBookReportRequest reviseBookReportRequest) {
-        BookShelf bookShelf = bookShelfReader.readBookShelf(bookShelfId, userId);
-        reviseBookReportRequest.revise(bookShelf.getBookReport());
+        BookShelfEntity bookShelfEntity = bookShelfReader.readBookShelf(bookShelfId, userId);
+        reviseBookReportRequest.revise(bookShelfEntity.getBookReportEntity());
     }
 }

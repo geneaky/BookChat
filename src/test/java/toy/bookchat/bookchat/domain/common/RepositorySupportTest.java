@@ -13,8 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import toy.bookchat.bookchat.domain.RepositoryTest;
 
-@RepositoryTest
-class RepositorySupportTest {
+class RepositorySupportTest extends RepositoryTest {
 
     @Test
     void DESC_정렬조건_조회_성공() throws Exception {

@@ -2,14 +2,14 @@ package toy.bookchat.bookchat.domain.chatroom.repository.query;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
-import static toy.bookchat.bookchat.domain.book.QBook.book;
-import static toy.bookchat.bookchat.domain.chat.QChat.chat;
-import static toy.bookchat.bookchat.domain.chatroom.QChatRoom.chatRoom;
-import static toy.bookchat.bookchat.domain.chatroom.QChatRoomHashTag.chatRoomHashTag;
-import static toy.bookchat.bookchat.domain.chatroom.QHashTag.hashTag;
+import static toy.bookchat.bookchat.domain.book.QBookEntity.bookEntity;
+import static toy.bookchat.bookchat.domain.chat.QChatEntity.chatEntity;
+import static toy.bookchat.bookchat.domain.chatroom.QChatRoomEntity.chatRoomEntity;
+import static toy.bookchat.bookchat.domain.chatroom.QChatRoomHashTagEntity.chatRoomHashTagEntity;
+import static toy.bookchat.bookchat.domain.chatroom.QHashTagEntity.hashTagEntity;
 import static toy.bookchat.bookchat.domain.common.RepositorySupport.toSlice;
-import static toy.bookchat.bookchat.domain.participant.QParticipant.participant;
-import static toy.bookchat.bookchat.domain.user.QUser.user;
+import static toy.bookchat.bookchat.domain.participant.QParticipantEntity.participantEntity;
+import static toy.bookchat.bookchat.domain.user.QUserEntity.userEntity;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -22,17 +22,17 @@ import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
-import toy.bookchat.bookchat.domain.book.Book;
-import toy.bookchat.bookchat.domain.chat.QChat;
-import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
-import toy.bookchat.bookchat.domain.chatroom.QChatRoomHashTag;
+import toy.bookchat.bookchat.domain.book.BookEntity;
+import toy.bookchat.bookchat.domain.chat.QChatEntity;
+import toy.bookchat.bookchat.domain.chatroom.ChatRoomEntity;
+import toy.bookchat.bookchat.domain.chatroom.QChatRoomHashTagEntity;
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.ChatRoomResponse;
 import toy.bookchat.bookchat.domain.chatroom.repository.query.dto.response.UserChatRoomResponse;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.ChatRoomRequest;
-import toy.bookchat.bookchat.domain.participant.Participant;
-import toy.bookchat.bookchat.domain.participant.QParticipant;
+import toy.bookchat.bookchat.domain.participant.ParticipantEntity;
+import toy.bookchat.bookchat.domain.participant.QParticipantEntity;
 import toy.bookchat.bookchat.domain.participant.service.dto.response.ChatRoomDetails;
-import toy.bookchat.bookchat.domain.user.QUser;
+import toy.bookchat.bookchat.domain.user.QUserEntity;
 import toy.bookchat.bookchat.exception.notfound.pariticipant.ParticipantNotFoundException;
 
 @Repository
@@ -48,195 +48,194 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
         if (tags.isEmpty()) {
             return null;
         }
-        return hashTag.tagName.in(tags);
+        return hashTagEntity.tagName.in(tags);
     }
 
     private BooleanExpression eqIsbn(String isbn) {
-        return isbn == null ? null : book.isbn.eq(isbn);
+        return isbn == null ? null : bookEntity.isbn.eq(isbn);
     }
 
     private BooleanExpression containsTitle(String title) {
-        return title == null ? null : book.title.contains(title);
+        return title == null ? null : bookEntity.title.contains(title);
     }
 
     private BooleanExpression containsRoomName(String roomName) {
-        return roomName == null ? null : chatRoom.roomName.contains(roomName);
+        return roomName == null ? null : chatRoomEntity.roomName.contains(roomName);
     }
 
     private BooleanExpression afterChatRoomId(Long postCursorId) {
-        return postCursorId == null ? null : chatRoom.id.lt(postCursorId);
+        return postCursorId == null ? null : chatRoomEntity.id.lt(postCursorId);
     }
 
     @Override
     public Slice<UserChatRoomResponse> findUserChatRoomsWithLastChat(Pageable pageable, Long bookId, Long postCursorId, Long userId) {
-        QChat subChat = new QChat("subChat");
-        QParticipant subParticipant = new QParticipant("subParticipant1");
-        QUser subUser = new QUser("subUser");
+        QChatEntity subChat = new QChatEntity("subChat");
+        QParticipantEntity subParticipant = new QParticipantEntity("subParticipant1");
+        QUserEntity subUser = new QUserEntity("subUser");
 
         List<UserChatRoomResponse> contents = queryFactory.select(
                 Projections.constructor(UserChatRoomResponse.class,
-                    chatRoom.id,
-                    chatRoom.roomName,
-                    chatRoom.roomSid,
+                    chatRoomEntity.id,
+                    chatRoomEntity.roomName,
+                    chatRoomEntity.roomSid,
                     subParticipant.count(),
-                    chatRoom.defaultRoomImageType,
-                    chatRoom.roomImageUri,
+                    chatRoomEntity.defaultRoomImageType,
+                    chatRoomEntity.roomImageUri,
                     subUser.id,
                     subUser.nickname,
                     subUser.profileImageUrl,
                     subUser.defaultProfileImageType,
-                    user.id,
-                    user.nickname,
-                    user.profileImageUrl,
-                    user.defaultProfileImageType,
-                    chat.id,
-                    chat.message,
-                    chat.createdAt
+                    userEntity.id,
+                    userEntity.nickname,
+                    userEntity.profileImageUrl,
+                    userEntity.defaultProfileImageType,
+                    chatEntity.id,
+                    chatEntity.message,
+                    chatEntity.createdAt
                 ))
-            .from(chatRoom)
-            .join(subUser).on(subUser.id.eq(chatRoom.host.id))
-            .join(participant).on(participant.chatRoom.eq(chatRoom).and(participant.user.id.eq(userId))) //사용자 채팅방
-            .leftJoin(subParticipant).on(subParticipant.chatRoom.eq(chatRoom)) // 채팅방 인원수
-            .leftJoin(chat).on(chat.id.eq( // 마지막 채팅, 채팅 내
+            .from(chatRoomEntity)
+            .join(subUser).on(subUser.id.eq(chatRoomEntity.host.id))
+            .join(participantEntity).on(participantEntity.chatRoomEntity.eq(chatRoomEntity).and(participantEntity.userEntity.id.eq(userId))) //사용자 채팅방
+            .leftJoin(subParticipant).on(subParticipant.chatRoomEntity.eq(chatRoomEntity)) // 채팅방 인원수
+            .leftJoin(chatEntity).on(chatEntity.id.eq( // 마지막 채팅, 채팅 내
                     JPAExpressions.select(subChat.id.max())
                         .from(subChat)
-                        .where(subChat.chatRoom.eq(chatRoom))
+                        .where(subChat.chatRoomEntity.eq(chatRoomEntity))
                 )
             )
-            .leftJoin(user).on(user.eq(chat.user))
-            .groupBy(chatRoom.id, chat.id)
+            .leftJoin(userEntity).on(userEntity.eq(chatEntity.userEntity))
+            .groupBy(chatRoomEntity.id, chatEntity.id)
             .where(afterChatRoomId(postCursorId), eqBookId(bookId))
-            .orderBy(chat.id.desc())
+            .orderBy(chatEntity.id.desc())
             .limit(pageable.getPageSize())
             .fetch();
 
         List<Long> chatRoomIds = contents.stream().map(UserChatRoomResponse::getRoomId)
             .collect(toList());
-        List<ChatRoom> chatRooms = queryFactory.select(chatRoom)
-            .from(chatRoom)
-            .join(chatRoom.book, book).fetchJoin()
-            .where(chatRoom.id.in(chatRoomIds))
+        List<ChatRoomEntity> chatRoomEntities = queryFactory.select(chatRoomEntity)
+            .from(chatRoomEntity)
+            .join(chatRoomEntity.bookEntity, bookEntity).fetchJoin()
+            .where(chatRoomEntity.id.in(chatRoomIds))
             .fetch();
 
-        Map<Long, Book> mapBooksByChatRoomId = chatRooms.stream()
-            .collect(toMap(ChatRoom::getId, ChatRoom::getBook));
+        Map<Long, BookEntity> mapBooksByChatRoomId = chatRoomEntities.stream()
+            .collect(toMap(ChatRoomEntity::getId, ChatRoomEntity::getBookEntity));
         contents.forEach(c -> c.setBookInfo(mapBooksByChatRoomId.get(c.getRoomId())));
 
         return toSlice(contents, pageable);
     }
 
     private BooleanExpression eqBookId(Long bookId) {
-        return bookId == null ? null : chatRoom.book.id.eq(bookId);
+        return bookId == null ? null : chatRoomEntity.bookEntity.id.eq(bookId);
     }
 
     @Override
-    public Slice<ChatRoomResponse> findChatRooms(Long userId, ChatRoomRequest chatRoomRequest,
-        Pageable pageable) {
-        QChat subChat = new QChat("subChat");
-        QChatRoomHashTag subChatRoomHashTag = new QChatRoomHashTag("subChatRoomHashTag");
+    public Slice<ChatRoomResponse> findChatRooms(Long userId, ChatRoomRequest chatRoomRequest, Pageable pageable) {
+        QChatEntity subChat = new QChatEntity("subChat");
+        QChatRoomHashTagEntity subChatRoomHashTag = new QChatRoomHashTagEntity("subChatRoomHashTag");
 
         List<ChatRoomResponse> contents = queryFactory.select(
                 Projections.constructor(ChatRoomResponse.class,
-                    chatRoom.id,
-                    chatRoom.roomName,
-                    chatRoom.roomSid,
-                    book.title,
-                    book.bookCoverImageUrl,
-                    chatRoom.host.id,
-                    chatRoom.host.nickname,
-                    chatRoom.host.defaultProfileImageType,
-                    chatRoom.host.profileImageUrl,
+                    chatRoomEntity.id,
+                    chatRoomEntity.roomName,
+                    chatRoomEntity.roomSid,
+                    bookEntity.title,
+                    bookEntity.bookCoverImageUrl,
+                    chatRoomEntity.host.id,
+                    chatRoomEntity.host.nickname,
+                    chatRoomEntity.host.defaultProfileImageType,
+                    chatRoomEntity.host.profileImageUrl,
                     // TODO: 2023/03/19 scalar subquery 성능 문제가 있다면 대체 방법 고려
-                    JPAExpressions.select(participant.count()).from(participant)
-                        .where(participant.chatRoom.id.eq(chatRoom.id)),
-                    chatRoom.roomSize,
-                    chatRoom.defaultRoomImageType,
-                    chatRoom.roomImageUri,
-                    Expressions.stringTemplate("group_concat({0})", hashTag.tagName),
-                    chat.user.id,
-                    chat.id,
-                    chat.message,
-                    chat.createdAt
+                    JPAExpressions.select(participantEntity.count()).from(participantEntity)
+                        .where(participantEntity.chatRoomEntity.id.eq(chatRoomEntity.id)),
+                    chatRoomEntity.roomSize,
+                    chatRoomEntity.defaultRoomImageType,
+                    chatRoomEntity.roomImageUri,
+                    Expressions.stringTemplate("group_concat({0})", hashTagEntity.tagName),
+                    chatEntity.userEntity.id,
+                    chatEntity.id,
+                    chatEntity.message,
+                    chatEntity.createdAt
                 ))
-            .from(chatRoom)
-            .join(user).on(chatRoom.host.id.eq(user.id))
-            .join(book).on(chatRoom.book.id.eq(book.id))
-            .join(chatRoomHashTag).on(chatRoomHashTag.chatRoom.id.in(
-                JPAExpressions.select(subChatRoomHashTag.chatRoom.id)
+            .from(chatRoomEntity)
+            .join(userEntity).on(chatRoomEntity.host.id.eq(userEntity.id))
+            .join(bookEntity).on(chatRoomEntity.bookEntity.id.eq(bookEntity.id))
+            .join(chatRoomHashTagEntity).on(chatRoomHashTagEntity.chatRoomEntity.id.in(
+                JPAExpressions.select(subChatRoomHashTag.chatRoomEntity.id)
                     .from(subChatRoomHashTag)
-                    .where(subChatRoomHashTag.chatRoom.id.eq(chatRoom.id),
+                    .where(subChatRoomHashTag.chatRoomEntity.id.eq(chatRoomEntity.id),
                         inTags(chatRoomRequest.getTags()))))
-            .join(hashTag).on(hashTag.id.eq(chatRoomHashTag.hashTag.id))
-            .leftJoin(participant).on(chatRoom.id.eq(participant.chatRoom.id).and(participant.user.id.eq(userId)))
-            .leftJoin(chat).on(chat.id.in(
+            .join(hashTagEntity).on(hashTagEntity.id.eq(chatRoomHashTagEntity.hashTagEntity.id))
+            .leftJoin(participantEntity).on(chatRoomEntity.id.eq(participantEntity.chatRoomEntity.id).and(participantEntity.userEntity.id.eq(userId)))
+            .leftJoin(chatEntity).on(chatEntity.id.in(
                 JPAExpressions.select(subChat.id.max())
                     .from(subChat)
-                    .groupBy(subChat.chatRoom)
-                    .having(subChat.chatRoom.id.eq(chatRoom.id))))
-            .groupBy(chatRoom.id, chat.id)
-            .where(chat.chatRoom.id.eq(chatRoom.id),
+                    .groupBy(subChat.chatRoomEntity)
+                    .having(subChat.chatRoomEntity.id.eq(chatRoomEntity.id))))
+            .groupBy(chatRoomEntity.id, chatEntity.id)
+            .where(chatEntity.chatRoomEntity.id.eq(chatRoomEntity.id),
                 ltCursorId(chatRoomRequest.getPostCursorId()),
                 eqIsbn(chatRoomRequest.getIsbn()),
                 containsTitle(chatRoomRequest.getTitle()),
                 containsRoomName(chatRoomRequest.getRoomName())
             )
             .limit(pageable.getPageSize())
-            .orderBy(chat.id.desc(), chatRoom.id.desc())
+            .orderBy(chatEntity.id.desc(), chatRoomEntity.id.desc())
             .fetch();
 
         List<Long> chatRoomIds = contents.stream().map(ChatRoomResponse::getRoomId)
             .collect(toList());
-        List<ChatRoom> chatRooms = queryFactory.select(chatRoom)
-            .from(chatRoom)
-            .join(chatRoom.book, book).fetchJoin()
-            .where(chatRoom.id.in(chatRoomIds))
+        List<ChatRoomEntity> chatRoomEntities = queryFactory.select(chatRoomEntity)
+            .from(chatRoomEntity)
+            .join(chatRoomEntity.bookEntity, bookEntity).fetchJoin()
+            .where(chatRoomEntity.id.in(chatRoomIds))
             .fetch();
 
-        Map<Long, List<String>> authorsMap = chatRooms.stream()
-            .collect(toMap(ChatRoom::getId, ChatRoom::getBookAuthors));
+        Map<Long, List<String>> authorsMap = chatRoomEntities.stream()
+            .collect(toMap(ChatRoomEntity::getId, ChatRoomEntity::getBookAuthors));
         contents.forEach(c -> c.setBookAuthors(authorsMap.get(c.getRoomId())));
 
         return toSlice(contents, pageable);
     }
 
     private BooleanExpression ltCursorId(Long cursorId) {
-        return cursorId == null ? null : chatRoom.id.lt(cursorId);
+        return cursorId == null ? null : chatRoomEntity.id.lt(cursorId);
     }
 
     @Override
     public ChatRoomDetails findChatRoomDetails(Long roomId, Long userId) {
-        QParticipant subParticipant = new QParticipant("subParticipant");
+        QParticipantEntity subParticipant = new QParticipantEntity("subParticipant");
 
-        List<Participant> participants = queryFactory.select(participant)
-            .from(participant)
-            .join(participant.user, user).fetchJoin()
-            .join(participant.chatRoom, chatRoom).fetchJoin()
-            .join(chatRoom.book, book).fetchJoin()
-            .where(participant.chatRoom.id.eq(JPAExpressions.select(subParticipant.chatRoom.id)
+        List<ParticipantEntity> participantEntities = queryFactory.select(participantEntity)
+            .from(participantEntity)
+            .join(participantEntity.userEntity, userEntity).fetchJoin()
+            .join(participantEntity.chatRoomEntity, chatRoomEntity).fetchJoin()
+            .join(chatRoomEntity.bookEntity, bookEntity).fetchJoin()
+            .where(participantEntity.chatRoomEntity.id.eq(JPAExpressions.select(subParticipant.chatRoomEntity.id)
                 .from(subParticipant)
-                .where(subParticipant.chatRoom.id.eq(roomId)
-                    .and(subParticipant.user.id.eq(userId)))))
+                .where(subParticipant.chatRoomEntity.id.eq(roomId)
+                    .and(subParticipant.userEntity.id.eq(userId)))))
             .fetch();
 
-        if (participants.isEmpty()) {
+        if (participantEntities.isEmpty()) {
             throw new ParticipantNotFoundException();
         }
 
-        List<String> roomTags = queryFactory.select(hashTag.tagName)
-            .from(hashTag)
-            .join(chatRoomHashTag).on(chatRoomHashTag.hashTag.id.eq(hashTag.id))
-            .where(chatRoomHashTag.chatRoom.id.eq(roomId))
+        List<String> roomTags = queryFactory.select(hashTagEntity.tagName)
+            .from(hashTagEntity)
+            .join(chatRoomHashTagEntity).on(chatRoomHashTagEntity.hashTagEntity.id.eq(hashTagEntity.id))
+            .where(chatRoomHashTagEntity.chatRoomEntity.id.eq(roomId))
             .fetch();
 
-        return ChatRoomDetails.from(participants, roomTags);
+        return ChatRoomDetails.from(participantEntities, roomTags);
     }
 
     @Override
-    public Optional<ChatRoom> findUserChatRoom(Long roomId, Long userId) {
-        return Optional.ofNullable(queryFactory.select(chatRoom)
-            .from(chatRoom)
-            .join(participant).on(participant.chatRoom.eq(chatRoom).and(participant.user.id.eq(userId)))
-            .where(chatRoom.id.eq(roomId))
+    public Optional<ChatRoomEntity> findUserChatRoom(Long roomId, Long userId) {
+        return Optional.ofNullable(queryFactory.select(chatRoomEntity)
+            .from(chatRoomEntity)
+            .join(participantEntity).on(participantEntity.chatRoomEntity.eq(chatRoomEntity).and(participantEntity.userEntity.id.eq(userId)))
+            .where(chatRoomEntity.id.eq(roomId))
             .fetchOne());
     }
 }

@@ -2,10 +2,10 @@ package toy.bookchat.bookchat.domain.chatroom.repository;
 
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
-import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
+import toy.bookchat.bookchat.domain.chatroom.ChatRoomEntity;
 import toy.bookchat.bookchat.domain.chatroom.repository.query.ChatRoomQueryRepository;
 
-public interface ChatRoomRepository extends ChatRoomQueryRepository, JpaRepository<ChatRoom, Long> {
+public interface ChatRoomRepository extends ChatRoomQueryRepository, JpaRepository<ChatRoomEntity, Long> {
 
-    Optional<ChatRoom> findChatRoomByIdAndHostId(Long id, Long hostId);
+    Optional<ChatRoomEntity> findChatRoomByIdAndHostId(Long id, Long hostId);
 }

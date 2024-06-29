@@ -11,9 +11,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import toy.bookchat.bookchat.domain.device.Device;
+import toy.bookchat.bookchat.domain.device.DeviceEntity;
 import toy.bookchat.bookchat.domain.device.repository.DeviceRepository;
-import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.UserEntity;
 import toy.bookchat.bookchat.domain.user.service.UserReader;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,18 +30,18 @@ class DeviceServiceTest {
 
     @Test
     void 디바이스_조회() throws Exception {
-        User user = User.builder().build();
-        deviceService.findUserDevice(user);
+        UserEntity userEntity = UserEntity.builder().build();
+        deviceService.findUserDevice(userEntity);
 
-        verify(deviceRepository).findByUser(eq(user));
+        verify(deviceRepository).findByUserEntity(eq(userEntity));
     }
 
     @Test
     void 디바이스_등록() throws Exception {
-        Device device = Device.builder().build();
-        deviceService.registerDevice(device);
+        DeviceEntity deviceEntity = DeviceEntity.builder().build();
+        deviceService.registerDevice(deviceEntity);
 
-        verify(deviceRepository).save(eq(device));
+        verify(deviceRepository).save(eq(deviceEntity));
     }
 
     @Test
@@ -53,14 +53,14 @@ class DeviceServiceTest {
 
     @Test
     void 디바이스_fcm_token_갱신() throws Exception {
-        Device device = Device.builder()
+        DeviceEntity deviceEntity = DeviceEntity.builder()
             .fcmToken("old fcm token")
             .build();
 
-        given(deviceReader.readUserDevice(any())).willReturn(device);
+        given(deviceReader.readUserDevice(any())).willReturn(deviceEntity);
 
         deviceService.updateFcmToken(1L, "new fcm token");
 
-        assertThat(device.getFcmToken()).isEqualTo("new fcm token");
+        assertThat(deviceEntity.getFcmToken()).isEqualTo("new fcm token");
     }
 }

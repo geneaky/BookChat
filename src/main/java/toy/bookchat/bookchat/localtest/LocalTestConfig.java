@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import toy.bookchat.bookchat.domain.user.ROLE;
 import toy.bookchat.bookchat.domain.user.ReadingTaste;
-import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.UserEntity;
 import toy.bookchat.bookchat.domain.user.repository.UserRepository;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenManager;
@@ -24,7 +24,7 @@ public class LocalTestConfig implements JwtTokenManager {
 
     private final UserRepository userRepository;
     private final Flyway flyway;
-    private User user;
+    private UserEntity userEntity;
 
     public LocalTestConfig(UserRepository userRepository, Flyway flyway) {
         this.userRepository = userRepository;
@@ -35,7 +35,7 @@ public class LocalTestConfig implements JwtTokenManager {
     public void init() {
         flyway.clean();
         flyway.migrate();
-        user = User.builder()
+        userEntity = UserEntity.builder()
             .name("google123")
             .nickname("geneaky")
             .email("kaktus41@gmail.com")
@@ -46,7 +46,7 @@ public class LocalTestConfig implements JwtTokenManager {
             .role(ROLE.USER)
             .status(ACTIVE)
             .build();
-        userRepository.save(user);
+        userRepository.save(userEntity);
     }
 
     @PreDestroy
@@ -61,17 +61,17 @@ public class LocalTestConfig implements JwtTokenManager {
 
     @Override
     public Long getUserIdFromToken(String token) {
-        return this.user.getId();
+        return this.userEntity.getId();
     }
 
     @Override
     public String getOAuth2MemberNumberFromToken(String token) {
-        return this.user.getName();
+        return this.userEntity.getName();
     }
 
     @Override
     public String getUserEmailFromToken(String token) {
-        return this.user.getEmail();
+        return this.userEntity.getEmail();
     }
 
     @Override
@@ -81,7 +81,7 @@ public class LocalTestConfig implements JwtTokenManager {
 
     @Override
     public TokenPayload getTokenPayloadFromToken(String token) {
-        return TokenPayload.of(user.getId(), user.getName(), user.getNickname(), user.getEmail(),
-            user.getProfileImageUrl(), user.getDefaultProfileImageType(), user.getRole());
+        return TokenPayload.of(userEntity.getId(), userEntity.getName(), userEntity.getNickname(), userEntity.getEmail(),
+            userEntity.getProfileImageUrl(), userEntity.getDefaultProfileImageType(), userEntity.getRole());
     }
 }

@@ -3,7 +3,7 @@ package toy.bookchat.bookchat.domain.chat.api.dto.response;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.UserEntity;
 
 @Getter
 @EqualsAndHashCode
@@ -22,12 +22,12 @@ public class ChatSender {
         this.defaultProfileImageType = defaultProfileImageType;
     }
 
-    public static ChatSender from(User user) {
+    public static ChatSender from(UserEntity userEntity) {
         return ChatSender.builder()
-            .id(user.getId())
-            .nickname(user.getNickname())
-            .profileImageUrl(user.getProfileImageUrl())
-            .defaultProfileImageType(user.getDefaultProfileImageType())
+            .id(userEntity.getId())
+            .nickname(userEntity.getNickname())
+            .profileImageUrl(userEntity.getProfileImageUrl())
+            .defaultProfileImageType(userEntity.getDefaultProfileImageType())
             .build();
     }
 }
