@@ -26,13 +26,13 @@ class BookShelfReaderTest {
 
     @Test
     void 사용자id_서재id와_일치하는_서재가없다면_예외_발생() throws Exception {
-        assertThatThrownBy(() -> bookShelfReader.readBookShelf(488L, 897L))
+        assertThatThrownBy(() -> bookShelfReader.readBookShelfEntity(488L, 897L))
             .isInstanceOf(BookNotFoundException.class);
     }
 
     @Test
     void 사용자id_읽음상태조건과_일치하는_서재를_조회한다() throws Exception {
-        bookShelfReader.readBookShelf(705L, ReadingStatus.COMPLETE, mock(Pageable.class));
+        bookShelfReader.readBookShelfEntity(705L, ReadingStatus.COMPLETE, mock(Pageable.class));
 
         verify(bookShelfRepository).findSpecificStatusBookByUserId(any(), any(), any());
     }
@@ -40,7 +40,7 @@ class BookShelfReaderTest {
     @Test
     void 사용자id_isbn_발행일자와_일치하는_서재를_조회한다() throws Exception {
         assertThatThrownBy(() -> {
-            bookShelfReader.readBookShelf(705L, "isbn", LocalDate.now());
+            bookShelfReader.readBookShelfEntity(705L, "isbn", LocalDate.now());
         }).isInstanceOf(BookNotFoundException.class);
     }
 }

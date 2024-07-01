@@ -27,6 +27,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import toy.bookchat.bookchat.db_module.book.BookEntity;
 import toy.bookchat.bookchat.db_module.bookshelf.BookShelfEntity;
+import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.domain.book.service.BookReader;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.Star;
@@ -36,7 +37,6 @@ import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ReviseBookShel
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.BookShelfResponse;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.ExistenceBookOnBookShelfResponse;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.SearchBookShelfByReadingStatus;
-import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.domain.user.service.UserReader;
 
 @ExtendWith(MockitoExtension.class)
@@ -104,7 +104,7 @@ class BookShelfServiceTest {
             .star(null)
             .build();
 
-        given(bookShelfReader.readBookShelf(1L, 1L)).willReturn(bookShelfEntity);
+        given(bookShelfReader.readBookShelfEntity(1L, 1L)).willReturn(bookShelfEntity);
 
         BookShelfResponse result = bookShelfService.getBookOnBookShelf(1L, 1L);
         BookShelfResponse expect = BookShelfResponse.from(bookShelfEntity);
@@ -140,7 +140,7 @@ class BookShelfServiceTest {
             .build();
 
         Page<BookShelfEntity> bookShelves = new PageImpl<>(List.of(bookShelfEntity), pageable, 1);
-        when(bookShelfReader.readBookShelf(userEntity.getId(), WISH, pageable)).thenReturn(bookShelves);
+        when(bookShelfReader.readBookShelfEntity(userEntity.getId(), WISH, pageable)).thenReturn(bookShelves);
 
         SearchBookShelfByReadingStatus searchBookShelfByReadingStatus = bookShelfService.takeBooksOutOfBookShelves(
             WISH, pageable, userEntity.getId());
@@ -157,7 +157,7 @@ class BookShelfServiceTest {
             .readingStatus(WISH)
             .build();
 
-        when(bookShelfReader.readBookShelf(anyLong(), anyString(), any(LocalDate.class))).thenReturn(bookShelfEntity);
+        when(bookShelfReader.readBookShelfEntity(anyLong(), anyString(), any(LocalDate.class))).thenReturn(bookShelfEntity);
 
         ExistenceBookOnBookShelfResponse result = bookShelfService.getBookIfExisted(bookEntity.getIsbn(), bookEntity.getPublishAt(), bookEntity.getId());
 
@@ -180,7 +180,7 @@ class BookShelfServiceTest {
             .star(null)
             .build();
 
-        when(bookShelfReader.readBookShelf(any(), any())).thenReturn(bookShelfEntity);
+        when(bookShelfReader.readBookShelfEntity(any(), any())).thenReturn(bookShelfEntity);
 
         bookShelfService.reviseBookShelf(1L, reviseBookShelfRequest, 1L);
 
@@ -200,7 +200,7 @@ class BookShelfServiceTest {
             .readingStatus(WISH)
             .build();
 
-        when(bookShelfReader.readBookShelf(any(), any())).thenReturn(bookShelfEntity);
+        when(bookShelfReader.readBookShelfEntity(any(), any())).thenReturn(bookShelfEntity);
 
         bookShelfService.reviseBookShelf(1L, reviseBookShelfRequest, 1L);
 
@@ -221,7 +221,7 @@ class BookShelfServiceTest {
             .readingStatus(COMPLETE)
             .build();
 
-        when(bookShelfReader.readBookShelf(any(), any())).thenReturn(bookShelfEntity);
+        when(bookShelfReader.readBookShelfEntity(any(), any())).thenReturn(bookShelfEntity);
         bookShelfService.reviseBookShelf(1L, reviseBookShelfRequest, 1L);
 
         Star result = bookShelfEntity.getStar();

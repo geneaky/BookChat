@@ -15,10 +15,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import toy.bookchat.bookchat.db_module.bookreport.BookReportEntity;
 import toy.bookchat.bookchat.db_module.bookshelf.BookShelfEntity;
+import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ReviseBookReportRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.WriteBookReportRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.BookReportResponse;
-import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.exception.notfound.bookshelf.BookReportNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
@@ -53,7 +53,7 @@ class BookReportServiceTest {
         BookShelfEntity bookShelfEntity = mock(BookShelfEntity.class);
 
         when(userEntity.getId()).thenReturn(1L);
-        when(bookShelfReader.readBookShelf(any(), any())).thenReturn(bookShelfEntity);
+        when(bookShelfReader.readBookShelfEntity(any(), any())).thenReturn(bookShelfEntity);
 
         bookReportService.writeReport(writeBookReportRequest, 1L, userEntity.getId());
 
@@ -71,7 +71,7 @@ class BookReportServiceTest {
             .bookReportEntity(bookReportEntity)
             .build();
 
-        when(bookShelfReader.readBookShelf(any(), any())).thenReturn(bookShelfEntity);
+        when(bookShelfReader.readBookShelfEntity(any(), any())).thenReturn(bookShelfEntity);
         BookReportResponse bookReportResponse = bookReportService.getBookReportResponse(1L, 1L);
 
         assertThat(bookReportResponse.getReportTitle()).isEqualTo(bookReportEntity.getTitle());
@@ -87,7 +87,7 @@ class BookReportServiceTest {
             .bookReportEntity(bookReportEntity)
             .build();
 
-        when(bookShelfReader.readBookShelf(any(), any())).thenReturn(bookShelfEntity);
+        when(bookShelfReader.readBookShelfEntity(any(), any())).thenReturn(bookShelfEntity);
 
         bookReportService.deleteBookReport(1L, 1L);
 
@@ -109,7 +109,7 @@ class BookReportServiceTest {
             .bookReportEntity(bookReportEntity)
             .build();
 
-        when(bookShelfReader.readBookShelf(any(), any())).thenReturn(bookShelfEntity);
+        when(bookShelfReader.readBookShelfEntity(any(), any())).thenReturn(bookShelfEntity);
         bookReportService.reviseBookReport(1L, 1L, reviseBookReportRequest);
 
         assertThat(bookReportEntity.getTitle()).isEqualTo(reviseBookReportRequest.getTitle());

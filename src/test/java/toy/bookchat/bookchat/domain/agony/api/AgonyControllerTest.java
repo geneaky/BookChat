@@ -2,7 +2,6 @@ package toy.bookchat.bookchat.domain.agony.api;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -39,12 +38,10 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.db_module.agony.AgonyEntity;
-import toy.bookchat.bookchat.db_module.bookshelf.BookShelfEntity;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
+import toy.bookchat.bookchat.domain.agony.Agony;
 import toy.bookchat.bookchat.domain.agony.api.v1.request.CreateBookAgonyRequest;
 import toy.bookchat.bookchat.domain.agony.api.v1.request.ReviseAgonyRequest;
-import toy.bookchat.bookchat.domain.agony.api.v1.response.AgonyResponse;
-import toy.bookchat.bookchat.domain.agony.api.v1.response.SliceOfAgoniesResponse;
 import toy.bookchat.bookchat.domain.agony.service.AgonyService;
 
 @AgonyPresentationTest
@@ -64,14 +61,14 @@ class AgonyControllerTest extends ControllerTestExtension {
             .id(1L)
             .title("고민1")
             .hexColorCode("빨강")
-            .bookShelfEntity(mock(BookShelfEntity.class))
+            .bookShelfId(519L)
             .build();
 
         AgonyEntity agonyEntity2 = AgonyEntity.builder()
             .id(2L)
             .title("고민2")
             .hexColorCode("파랑")
-            .bookShelfEntity(mock(BookShelfEntity.class))
+            .bookShelfId(639L)
             .build();
 
         return List.of(agonyEntity1, agonyEntity2);
@@ -79,17 +76,16 @@ class AgonyControllerTest extends ControllerTestExtension {
 
     @Test
     void 고민_생성_성공() throws Exception {
-        CreateBookAgonyRequest createBookAgonyRequest = CreateBookAgonyRequest.builder()
+        CreateBookAgonyRequest request = CreateBookAgonyRequest.builder()
             .title("title")
             .hexColorCode("#062498")
             .build();
-        given(agonyService.storeBookShelfAgony(any(), any(), any())).willReturn(1L);
 
         mockMvc.perform(post("/v1/api/bookshelves/{bookShelfId}/agonies", 1)
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
                 .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(createBookAgonyRequest)))
+                .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isCreated())
             .andDo(document("post-agony",
                 requestHeaders(
@@ -112,12 +108,14 @@ class AgonyControllerTest extends ControllerTestExtension {
 
     @Test
     void 고민_조회_단_건_성공() throws Exception {
-        AgonyResponse response = AgonyResponse.builder()
-            .agonyId(1L)
-            .title("고민1")
-            .hexColorCode("빨강")
-            .build();
-        given(agonyService.searchAgony(any(), any(), any())).willReturn(response);
+        given(agonyService.searchAgony(any(), any(), any()))
+            .willReturn(
+                Agony.builder()
+                    .id(1L)
+                    .title("고민1")
+                    .hexColorCode("빨강")
+                    .build()
+            );
 
         mockMvc.perform(get("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}", 1, 1)
                 .header(AUTHORIZATION, JWT_TOKEN)
@@ -141,12 +139,23 @@ class AgonyControllerTest extends ControllerTestExtension {
 
     @Test
     void 고민_조회_성공() throws Exception {
-        List<AgonyEntity> agonies = getAgonies();
+        Agony agony1 = Agony.builder()
+            .id(1L)
+            .title("고민1")
+            .hexColorCode("빨강")
+            .build();
+
+        Agony agony2 = Agony.builder()
+            .id(2L)
+            .title("고민2")
+            .hexColorCode("파랑")
+            .build();
+        List<Agony> agonies = List.of(agony1, agony2);
         PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("id").descending());
-        Slice<AgonyEntity> slice = new SliceImpl<>(agonies, pageRequest, true);
-        SliceOfAgoniesResponse pageOfAgoniesResponse = new SliceOfAgoniesResponse(slice);
-        when(agonyService.searchSliceOfAgonies(any(), any(), any(), any())).thenReturn(
-            pageOfAgoniesResponse);
+        Slice<Agony> agonyEntitySlice = new SliceImpl<>(agonies, pageRequest, true);
+
+        when(agonyService.searchSliceOfAgonies(any(), any(), any(), any())).thenReturn(agonyEntitySlice);
+
         mockMvc.perform(get("/v1/api/bookshelves/{bookShelfId}/agonies", 1)
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))

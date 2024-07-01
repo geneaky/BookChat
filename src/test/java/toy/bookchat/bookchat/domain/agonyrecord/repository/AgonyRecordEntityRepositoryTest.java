@@ -21,9 +21,9 @@ import toy.bookchat.bookchat.db_module.book.BookEntity;
 import toy.bookchat.bookchat.db_module.book.repository.BookRepository;
 import toy.bookchat.bookchat.db_module.bookshelf.BookShelfEntity;
 import toy.bookchat.bookchat.db_module.bookshelf.repository.BookShelfRepository;
-import toy.bookchat.bookchat.domain.RepositoryTest;
 import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.db_module.user.repository.UserRepository;
+import toy.bookchat.bookchat.domain.RepositoryTest;
 import toy.bookchat.bookchat.exception.badrequest.NotSupportedPagingConditionException;
 
 class AgonyRecordEntityRepositoryTest extends RepositoryTest {
@@ -68,7 +68,7 @@ class AgonyRecordEntityRepositoryTest extends RepositoryTest {
         return AgonyEntity.builder()
             .title("title")
             .hexColorCode("blue")
-            .bookShelfEntity(bookShelfEntity)
+            .bookShelfId(bookShelfEntity.getId())
             .build();
     }
 
@@ -76,7 +76,7 @@ class AgonyRecordEntityRepositoryTest extends RepositoryTest {
         return AgonyRecordEntity.builder()
             .title("recordTitle")
             .content("recordContent")
-            .agonyEntity(agonyEntity)
+            .agonyId(agonyEntity.getId())
             .build();
     }
 
