@@ -1,13 +1,13 @@
 package toy.bookchat.bookchat.domain.agony;
 
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
+@EqualsAndHashCode
 public class Agony {
 
-    @Setter
     private Long id;
     private String title;
     private String hexColorCode;
@@ -19,4 +19,8 @@ public class Agony {
         this.hexColorCode = hexColorCode;
     }
 
+    public void change(AgonyTitleAndColorCode agonyTitleAndColorCode) {
+        this.title = agonyTitleAndColorCode.getTitle();
+        this.hexColorCode = agonyTitleAndColorCode.getHexColorCode();
+    }
 }

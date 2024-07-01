@@ -1,38 +1,35 @@
 package toy.bookchat.bookchat.db_module.agonyrecord;
 
+import static javax.persistence.GenerationType.IDENTITY;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import toy.bookchat.bookchat.db_module.BaseEntity;
-import toy.bookchat.bookchat.db_module.agony.AgonyEntity;
 
 @Getter
 @Entity
 @Table(name = "agony_record")
 public class AgonyRecordEntity extends BaseEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "agony_id")
-    AgonyEntity agonyEntity;
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = IDENTITY)
     private Long id;
     private String title;
     private String content;
+    @Column(name = "agony_id", nullable = false)
+    private Long agonyId;
 
     @Builder
-    private AgonyRecordEntity(Long id, String title, String content, AgonyEntity agonyEntity) {
+    private AgonyRecordEntity(Long id, String title, String content, Long agonyId) {
         this.id = id;
         this.title = title;
         this.content = content;
-        this.agonyEntity = agonyEntity;
+        this.agonyId = agonyId;
     }
 
     protected AgonyRecordEntity() {

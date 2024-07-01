@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import toy.bookchat.bookchat.db_module.book.BookEntity;
 import toy.bookchat.bookchat.db_module.bookshelf.BookShelfEntity;
+import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.domain.book.service.BookReader;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookShelfRequest;
@@ -14,7 +15,6 @@ import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ReviseBookShel
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.BookShelfResponse;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.ExistenceBookOnBookShelfResponse;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.SearchBookShelfByReadingStatus;
-import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.domain.user.service.UserReader;
 
 @Service
@@ -35,7 +35,7 @@ public class BookShelfService {
 
     @Transactional(readOnly = true)
     public BookShelfResponse getBookOnBookShelf(Long bookShelfId, Long userId) {
-        BookShelfEntity bookShelfEntity = bookShelfReader.readBookShelf(bookShelfId, userId);
+        BookShelfEntity bookShelfEntity = bookShelfReader.readBookShelfEntity(bookShelfId, userId);
         return BookShelfResponse.from(bookShelfEntity);
     }
 
@@ -50,18 +50,18 @@ public class BookShelfService {
     }
 
     public SearchBookShelfByReadingStatus takeBooksOutOfBookShelves(ReadingStatus readingStatus, Pageable pageable, Long userId) {
-        Page<BookShelfEntity> pagingBookShelves = bookShelfReader.readBookShelf(userId, readingStatus, pageable);
+        Page<BookShelfEntity> pagingBookShelves = bookShelfReader.readBookShelfEntity(userId, readingStatus, pageable);
         return new SearchBookShelfByReadingStatus(pagingBookShelves);
     }
 
     public ExistenceBookOnBookShelfResponse getBookIfExisted(String isbn, LocalDate publishAt, Long userId) {
-        BookShelfEntity bookShelfEntity = bookShelfReader.readBookShelf(userId, isbn, publishAt);
+        BookShelfEntity bookShelfEntity = bookShelfReader.readBookShelfEntity(userId, isbn, publishAt);
         return ExistenceBookOnBookShelfResponse.from(bookShelfEntity);
     }
 
     @Transactional
     public void reviseBookShelf(Long bookShelfId, ReviseBookShelfRequest reviseBookShelfRequest, Long userId) {
-        BookShelfEntity bookShelfEntity = bookShelfReader.readBookShelf(bookShelfId, userId);
+        BookShelfEntity bookShelfEntity = bookShelfReader.readBookShelfEntity(bookShelfId, userId);
         reviseBookShelfRequest.applyChanges(bookShelfEntity);
     }
 

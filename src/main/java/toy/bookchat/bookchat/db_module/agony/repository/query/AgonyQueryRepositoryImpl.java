@@ -26,13 +26,19 @@ public class AgonyQueryRepositoryImpl implements AgonyQueryRepository {
 
     @Override
     public Optional<AgonyEntity> findUserBookShelfAgony(Long bookShelfId, Long agonyId, Long userId) {
-        return Optional.ofNullable(queryFactory.select(agonyEntity)
-            .from(agonyEntity)
-            .join(agonyEntity.bookShelfEntity, bookShelfEntity)
-            .on(bookShelfEntity.id.eq(bookShelfId)
-                .and(bookShelfEntity.userEntity.id.eq(userId)))
-            .where(agonyEntity.id.eq(agonyId))
-            .fetchOne());
+        return Optional.ofNullable(
+            queryFactory.select(agonyEntity)
+                .from(agonyEntity)
+                .join(bookShelfEntity)
+                .on(
+                    bookShelfEntity.id.eq(agonyEntity.bookShelfId)
+                        .and(bookShelfEntity.userEntity.id.eq(userId))
+                )
+                .where(
+                    agonyEntity.id.eq(agonyId)
+                        .and(agonyEntity.bookShelfId.eq(bookShelfId))
+                )
+                .fetchOne());
     }
 
     @Override
@@ -41,8 +47,12 @@ public class AgonyQueryRepositoryImpl implements AgonyQueryRepository {
         Long postCursorId) {
         List<AgonyEntity> contents = queryFactory.select(agonyEntity)
             .from(agonyEntity)
-            .join(agonyEntity.bookShelfEntity, bookShelfEntity)
-            .on(bookShelfEntity.id.eq(bookShelfId).and(bookShelfEntity.userEntity.id.eq(userId)))
+            .join(bookShelfEntity)
+            .on(
+                agonyEntity.bookShelfId.eq(bookShelfEntity.id)
+                    .and(bookShelfEntity.id.eq(bookShelfId))
+                    .and(bookShelfEntity.userEntity.id.eq(userId))
+            )
             .where(numberBasedPagination(agonyEntity, agonyEntity.id, postCursorId, pageable))
             .limit(pageable.getPageSize())
             .orderBy(extractOrderSpecifierFrom(agonyEntity, pageable))
@@ -54,7 +64,7 @@ public class AgonyQueryRepositoryImpl implements AgonyQueryRepository {
     @Override
     public void deleteByAgoniesIds(Long bookShelfId, Long userId, List<Long> agoniesIds) {
         queryFactory.delete(agonyEntity)
-            .where(agonyEntity.bookShelfEntity.id.in(
+            .where(agonyEntity.bookShelfId.in(
                     JPAExpressions.select(bookShelfEntity.id)
                         .from(bookShelfEntity)
                         .where(bookShelfEntity.userEntity.id.eq(userId))),
@@ -65,7 +75,7 @@ public class AgonyQueryRepositoryImpl implements AgonyQueryRepository {
     @Override
     public void deleteAllByUserId(Long userId) {
         queryFactory.delete(agonyEntity)
-            .where(agonyEntity.bookShelfEntity.id.in(
+            .where(agonyEntity.bookShelfId.in(
                 JPAExpressions.select(bookShelfEntity.id)
                     .from(bookShelfEntity)
                     .where(bookShelfEntity.userEntity.id.eq(userId))
@@ -75,7 +85,7 @@ public class AgonyQueryRepositoryImpl implements AgonyQueryRepository {
     @Override
     public void deleteByBookShelfIdAndUserId(Long bookShelfId, Long userId) {
         queryFactory.delete(agonyEntity)
-            .where(agonyEntity.bookShelfEntity.id.in(
+            .where(agonyEntity.bookShelfId.in(
                 JPAExpressions.select(bookShelfEntity.id)
                     .from(bookShelfEntity)
                     .where(bookShelfEntity.id.eq(bookShelfId)

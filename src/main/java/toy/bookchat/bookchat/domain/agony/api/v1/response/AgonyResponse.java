@@ -3,7 +3,7 @@ package toy.bookchat.bookchat.domain.agony.api.v1.response;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import toy.bookchat.bookchat.db_module.agony.AgonyEntity;
+import toy.bookchat.bookchat.domain.agony.Agony;
 
 @Getter
 @EqualsAndHashCode
@@ -20,7 +20,7 @@ public class AgonyResponse {
         this.hexColorCode = hexColorCode;
     }
 
-    public static AgonyResponse from(AgonyEntity agonyEntity) {
-        return new AgonyResponse(agonyEntity.getId(), agonyEntity.getTitle(), agonyEntity.getHexColorCode());
+    public static AgonyResponse from(Agony agony) {
+        return new AgonyResponse(agony.getId(), agony.getTitle(), agony.getHexColorCode());
     }
 }

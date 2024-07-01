@@ -1,17 +1,14 @@
 package toy.bookchat.bookchat.db_module.agony;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import toy.bookchat.bookchat.db_module.BaseEntity;
-import toy.bookchat.bookchat.db_module.bookshelf.BookShelfEntity;
 
 @Getter
 @Entity
@@ -23,16 +20,15 @@ public class AgonyEntity extends BaseEntity {
     private Long id;
     private String title;
     private String hexColorCode;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_shelf_id")
-    private BookShelfEntity bookShelfEntity;
+    @Column(name = "book_shelf_id", nullable = false)
+    private Long bookShelfId;
 
     @Builder
-    private AgonyEntity(Long id, String title, String hexColorCode, BookShelfEntity bookShelfEntity) {
+    private AgonyEntity(Long id, String title, String hexColorCode, Long bookShelfId) {
         this.id = id;
         this.title = title;
         this.hexColorCode = hexColorCode;
-        this.bookShelfEntity = bookShelfEntity;
+        this.bookShelfId = bookShelfId;
     }
 
     protected AgonyEntity() {

@@ -29,8 +29,8 @@ public class AgonyRecordQueryRepositoryImpl implements AgonyRecordQueryRepositor
     public Optional<AgonyRecordEntity> findUserAgonyRecord(Long bookShelfId, Long agonyId, Long recordId, Long userId) {
         return Optional.ofNullable(queryFactory.select(agonyRecordEntity)
             .from(agonyRecordEntity)
-            .join(agonyRecordEntity.agonyEntity, agonyEntity).on(agonyEntity.id.eq(agonyId))
-            .join(agonyEntity.bookShelfEntity, bookShelfEntity).on(bookShelfEntity.id.eq(bookShelfId)
+            .join(agonyEntity).on(agonyRecordEntity.agonyId.eq(agonyEntity.id).and(agonyEntity.id.eq(agonyId)))
+            .join(bookShelfEntity).on(agonyEntity.bookShelfId.eq(bookShelfEntity.id).and(bookShelfEntity.id.eq(bookShelfId))
                 .and(bookShelfEntity.userEntity.id.eq(userId)))
             .where(agonyRecordEntity.id.eq(recordId))
             .fetchOne());
@@ -41,8 +41,8 @@ public class AgonyRecordQueryRepositoryImpl implements AgonyRecordQueryRepositor
     public Slice<AgonyRecordEntity> findSliceOfUserAgonyRecords(Long bookShelfId, Long agonyId, Long userId, Pageable pageable, Long postCursorId) {
         List<AgonyRecordEntity> contents = queryFactory.select(agonyRecordEntity)
             .from(agonyRecordEntity)
-            .join(agonyRecordEntity.agonyEntity, agonyEntity).on(agonyEntity.id.eq(agonyId))
-            .join(agonyEntity.bookShelfEntity, bookShelfEntity).on(bookShelfEntity.id.eq(bookShelfId)
+            .join(agonyEntity).on(agonyRecordEntity.agonyId.eq(agonyEntity.id).and(agonyEntity.id.eq(agonyId)))
+            .join(bookShelfEntity).on(agonyEntity.bookShelfId.eq(bookShelfEntity.id).and(bookShelfEntity.id.eq(bookShelfId))
                 .and(bookShelfEntity.userEntity.id.eq(userId)))
             .where(numberBasedPagination(agonyRecordEntity, agonyRecordEntity.id, postCursorId, pageable))
             .limit(pageable.getPageSize())
@@ -79,8 +79,8 @@ public class AgonyRecordQueryRepositoryImpl implements AgonyRecordQueryRepositor
          */
         return queryFactory.select(agonyRecordEntity.id)
             .from(agonyRecordEntity)
-            .join(agonyRecordEntity.agonyEntity, agonyEntity).on(agonyEntity.id.eq(agonyId))
-            .join(agonyEntity.bookShelfEntity, bookShelfEntity).on(bookShelfEntity.id.eq(bookShelfId)
+            .join(agonyEntity).on(agonyRecordEntity.agonyId.eq(agonyEntity.id).and(agonyEntity.id.eq(agonyId)))
+            .join(bookShelfEntity).on(agonyEntity.bookShelfId.eq(bookShelfEntity.id).and(bookShelfEntity.id.eq(bookShelfId))
                 .and(bookShelfEntity.userEntity.id.eq(userId)))
             .where(agonyRecordEntity.id.eq(recordId))
             .fetchOne();
@@ -89,11 +89,11 @@ public class AgonyRecordQueryRepositoryImpl implements AgonyRecordQueryRepositor
     @Override
     public void deleteByAgoniesIds(Long bookShelfId, Long userId, List<Long> agoniesIds) {
         queryFactory.delete(agonyRecordEntity)
-            .where(agonyRecordEntity.agonyEntity.id.in(
+            .where(agonyRecordEntity.agonyId.in(
                 JPAExpressions.select(agonyEntity.id)
                     .from(agonyEntity)
-                    .join(agonyEntity.bookShelfEntity, bookShelfEntity)
-                    .on(bookShelfEntity.id.eq(bookShelfId)
+                    .join(bookShelfEntity)
+                    .on(agonyEntity.bookShelfId.eq(bookShelfEntity.id).and(bookShelfEntity.id.eq(bookShelfId))
                         .and(bookShelfEntity.userEntity.id.eq(userId)))
                     .where(agonyEntity.id.in(agoniesIds))
             )).execute();
@@ -102,22 +102,22 @@ public class AgonyRecordQueryRepositoryImpl implements AgonyRecordQueryRepositor
     @Override
     public void deleteAllByUserId(Long userId) {
         queryFactory.delete(agonyRecordEntity)
-            .where(agonyRecordEntity.agonyEntity.id.in(
+            .where(agonyRecordEntity.agonyId.in(
                 JPAExpressions.select(agonyEntity.id)
                     .from(agonyEntity)
-                    .join(agonyEntity.bookShelfEntity, bookShelfEntity)
-                    .on(bookShelfEntity.userEntity.id.eq(userId))
+                    .join(bookShelfEntity)
+                    .on(agonyEntity.bookShelfId.eq(bookShelfEntity.id).and(bookShelfEntity.userEntity.id.eq(userId)))
             )).execute();
     }
 
     @Override
     public void deleteByBookShelfIdAndUserId(Long bookShelfId, Long userId) {
         queryFactory.delete(agonyRecordEntity)
-            .where(agonyRecordEntity.agonyEntity.id.in(
+            .where(agonyRecordEntity.agonyId.in(
                 JPAExpressions.select(agonyEntity.id)
                     .from(agonyEntity)
-                    .join(agonyEntity.bookShelfEntity, bookShelfEntity)
-                    .on(bookShelfEntity.id.eq(bookShelfId)
+                    .join(bookShelfEntity)
+                    .on(agonyEntity.bookShelfId.eq(bookShelfEntity.id).and(bookShelfEntity.id.eq(bookShelfId))
                         .and(bookShelfEntity.userEntity.id.eq(userId)))
             )).execute();
     }

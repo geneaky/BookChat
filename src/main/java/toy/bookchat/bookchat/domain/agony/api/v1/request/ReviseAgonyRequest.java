@@ -10,7 +10,7 @@ import toy.bookchat.bookchat.domain.agony.AgonyTitleAndColorCode;
 
 @Getter
 @NoArgsConstructor(access = PRIVATE)
-public class ReviseAgonyRequestV2 {
+public class ReviseAgonyRequest {
 
     @NotBlank
     private String title;
@@ -18,7 +18,7 @@ public class ReviseAgonyRequestV2 {
     private String hexColorCode;
 
     @Builder
-    private ReviseAgonyRequestV2(String title, String hexColorCode) {
+    private ReviseAgonyRequest(String title, String hexColorCode) {
         this.title = title;
         this.hexColorCode = hexColorCode;
     }

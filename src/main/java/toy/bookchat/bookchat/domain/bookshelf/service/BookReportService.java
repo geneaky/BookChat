@@ -20,29 +20,27 @@ public class BookReportService {
     }
 
     @Transactional
-    public void writeReport(WriteBookReportRequest writeBookReportRequest, Long bookShelfId,
-        Long userId) {
-        BookShelfEntity bookShelfEntity = bookShelfReader.readBookShelf(bookShelfId, userId);
+    public void writeReport(WriteBookReportRequest writeBookReportRequest, Long bookShelfId, Long userId) {
+        BookShelfEntity bookShelfEntity = bookShelfReader.readBookShelfEntity(bookShelfId, userId);
         BookReportEntity bookReportEntity = writeBookReportRequest.getBookReport(bookShelfEntity);
         bookShelfManager.append(bookShelfEntity, bookReportEntity);
     }
 
     @Transactional(readOnly = true)
     public BookReportResponse getBookReportResponse(Long bookShelfId, Long userId) {
-        BookShelfEntity bookShelfEntity = bookShelfReader.readBookShelf(bookShelfId, userId);
+        BookShelfEntity bookShelfEntity = bookShelfReader.readBookShelfEntity(bookShelfId, userId);
         return BookReportResponse.from(bookShelfEntity.getBookReportEntity());
     }
 
     @Transactional
     public void deleteBookReport(Long bookShelfId, Long userId) {
-        BookShelfEntity bookShelfEntity = bookShelfReader.readBookShelf(bookShelfId, userId);
+        BookShelfEntity bookShelfEntity = bookShelfReader.readBookShelfEntity(bookShelfId, userId);
         bookShelfEntity.deleteBookReport();
     }
 
     @Transactional
-    public void reviseBookReport(Long bookShelfId, Long userId,
-        ReviseBookReportRequest reviseBookReportRequest) {
-        BookShelfEntity bookShelfEntity = bookShelfReader.readBookShelf(bookShelfId, userId);
+    public void reviseBookReport(Long bookShelfId, Long userId, ReviseBookReportRequest reviseBookReportRequest) {
+        BookShelfEntity bookShelfEntity = bookShelfReader.readBookShelfEntity(bookShelfId, userId);
         reviseBookReportRequest.revise(bookShelfEntity.getBookReportEntity());
     }
 }

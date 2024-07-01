@@ -2,71 +2,60 @@ package toy.bookchat.bookchat.domain.agony.service;
 
 import java.util.List;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import toy.bookchat.bookchat.db_module.agony.AgonyEntity;
-import toy.bookchat.bookchat.db_module.agony.repository.AgonyRepository;
-import toy.bookchat.bookchat.db_module.agonyrecord.repository.AgonyRecordRepository;
-import toy.bookchat.bookchat.db_module.bookshelf.BookShelfEntity;
-import toy.bookchat.bookchat.db_module.bookshelf.repository.BookShelfRepository;
-import toy.bookchat.bookchat.domain.agony.api.v1.request.CreateBookAgonyRequest;
-import toy.bookchat.bookchat.domain.agony.api.v1.request.ReviseAgonyRequest;
-import toy.bookchat.bookchat.domain.agony.api.v1.response.AgonyResponse;
-import toy.bookchat.bookchat.domain.agony.api.v1.response.SliceOfAgoniesResponse;
-import toy.bookchat.bookchat.exception.notfound.agony.AgonyNotFoundException;
-import toy.bookchat.bookchat.exception.notfound.book.BookNotFoundException;
+import toy.bookchat.bookchat.domain.agony.Agony;
+import toy.bookchat.bookchat.domain.agony.AgonyTitleAndColorCode;
+import toy.bookchat.bookchat.domain.agonyrecord.service.AgonyRecordCleaner;
+import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
+import toy.bookchat.bookchat.domain.bookshelf.service.BookShelfReader;
 
 @Service
 public class AgonyService {
 
+    private final BookShelfReader bookShelfReader;
+    private final AgonyManager agonyManager;
+    private final AgonyReader agonyReader;
     private final AgonyAppender agonyAppender;
-    private final BookShelfRepository bookShelfRepository;
-    private final AgonyRepository agonyRepository;
-    private final AgonyRecordRepository agonyRecordRepository;
+    private final AgonyCleaner agonyCleaner;
+    private final AgonyRecordCleaner agonyRecordCleaner;
 
-    public AgonyService(AgonyAppender agonyAppender, BookShelfRepository bookShelfRepository, AgonyRepository agonyRepository, AgonyRecordRepository agonyRecordRepository) {
+    public AgonyService(AgonyReader agonyReader, BookShelfReader bookShelfReader, AgonyAppender agonyAppender, AgonyCleaner agonyCleaner, AgonyRecordCleaner agonyRecordCleaner,
+        AgonyManager agonyManager) {
+        this.agonyReader = agonyReader;
+        this.bookShelfReader = bookShelfReader;
         this.agonyAppender = agonyAppender;
-        this.bookShelfRepository = bookShelfRepository;
-        this.agonyRepository = agonyRepository;
-        this.agonyRecordRepository = agonyRecordRepository;
+        this.agonyCleaner = agonyCleaner;
+        this.agonyRecordCleaner = agonyRecordCleaner;
+        this.agonyManager = agonyManager;
     }
 
     @Transactional
-    public Long storeBookShelfAgony(CreateBookAgonyRequest request, Long userId, Long bookShelfId) {
-        BookShelfEntity bookShelfEntity = bookShelfRepository.findByIdAndUserId(bookShelfId, userId).orElseThrow(BookNotFoundException::new);
-        AgonyEntity agonyEntity = request.getAgony(bookShelfEntity);
-        agonyRepository.save(agonyEntity);
-        return agonyEntity.getId();
+    public Long storeBookShelfAgony(Agony agony, Long userId, Long bookShelfId) {
+        BookShelf BookShelf = bookShelfReader.readBookShelf(bookShelfId, userId);
+        Long agonyId = agonyAppender.append(agony, BookShelf);
+        return agonyId;
     }
 
     @Transactional(readOnly = true)
-    public SliceOfAgoniesResponse searchSliceOfAgonies(Long bookShelfId, Long userId, Pageable pageable, Long postCursorId) {
-        return new SliceOfAgoniesResponse(agonyRepository.findUserBookShelfSliceOfAgonies(bookShelfId, userId, pageable, postCursorId));
+    public Agony searchAgony(Long bookShelfId, Long agonyId, Long userId) {
+        return agonyReader.readAgony(userId, bookShelfId, agonyId);
+    }
+
+    @Transactional(readOnly = true)
+    public Slice<Agony> searchSliceOfAgonies(Long bookShelfId, Long userId, Pageable pageable, Long postCursorId) {
+        return agonyReader.readSlicedAgony(bookShelfId, userId, pageable, postCursorId);
     }
 
     @Transactional
     public void deleteAgony(Long bookShelfId, List<Long> agoniesIds, Long userId) {
-        agonyRecordRepository.deleteByAgoniesIds(bookShelfId, userId, agoniesIds);
-        agonyRepository.deleteByAgoniesIds(bookShelfId, userId, agoniesIds);
+        agonyRecordCleaner.clean(userId, bookShelfId, agoniesIds);
+        agonyCleaner.clean(userId, bookShelfId, agoniesIds);
     }
 
     @Transactional
-    public void reviseAgony(Long bookShelfId, Long agonyId, Long userId, ReviseAgonyRequest reviseAgonyRequest) {
-        AgonyEntity agonyEntity = agonyRepository.findUserBookShelfAgony(bookShelfId, agonyId, userId)
-            .orElseThrow(AgonyNotFoundException::new);
-        agonyEntity.changeTitle(reviseAgonyRequest.getTitle());
-        agonyEntity.changeHexColorCode(reviseAgonyRequest.getHexColorCode());
-    }
-
-    @Transactional
-    public void deleteAllUserAgony(Long userId) {
-        agonyRecordRepository.deleteAllByUserId(userId);
-        agonyRepository.deleteAllByUserId(userId);
-    }
-
-    @Transactional(readOnly = true)
-    public AgonyResponse searchAgony(Long bookShelfId, Long agonyId, Long userId) {
-        AgonyEntity agonyEntity = agonyRepository.findUserBookShelfAgony(bookShelfId, agonyId, userId).orElseThrow(AgonyNotFoundException::new);
-        return AgonyResponse.from(agonyEntity);
+    public void reviseAgony(Long bookShelfId, Long agonyId, Long userId, AgonyTitleAndColorCode agonyTitleAndColorCode) {
+        agonyManager.modify(userId, bookShelfId, agonyId, agonyTitleAndColorCode);
     }
 }

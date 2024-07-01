@@ -32,8 +32,8 @@ public class AgonyController {
     }
 
     @PostMapping("/v1/api/bookshelves/{bookShelfId}/agonies")
-    public ResponseEntity<Void> makeBookAgony(@PathVariable Long bookShelfId, @Valid @RequestBody CreateBookAgonyRequest createBookAgonyRequest, @UserPayload TokenPayload tokenPayload) {
-        Long agonyId = agonyService.storeBookShelfAgony(createBookAgonyRequest, tokenPayload.getUserId(), bookShelfId);
+    public ResponseEntity<Void> makeBookAgony(@PathVariable Long bookShelfId, @Valid @RequestBody CreateBookAgonyRequest request, @UserPayload TokenPayload tokenPayload) {
+        Long agonyId = agonyService.storeBookShelfAgony(request.toTarget(), tokenPayload.getUserId(), bookShelfId);
 
         return ResponseEntity.status(CREATED)
             .headers(hs -> hs.setLocation(URI.create("/v1/api/bookshelves/" + bookShelfId + "/agonies/" + agonyId)))
@@ -42,13 +42,13 @@ public class AgonyController {
 
     @GetMapping("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}")
     public AgonyResponse searchAgony(@PathVariable Long bookShelfId, @PathVariable Long agonyId, @UserPayload TokenPayload tokenPayload) {
-        return agonyService.searchAgony(bookShelfId, agonyId, tokenPayload.getUserId());
+
+        return AgonyResponse.from(agonyService.searchAgony(bookShelfId, agonyId, tokenPayload.getUserId()));
     }
 
     @GetMapping("/v1/api/bookshelves/{bookShelfId}/agonies")
     public SliceOfAgoniesResponse searchSliceOfAgonies(@PathVariable Long bookShelfId, Long postCursorId, Pageable pageable, @UserPayload TokenPayload tokenPayload) {
-
-        return agonyService.searchSliceOfAgonies(bookShelfId, tokenPayload.getUserId(), pageable, postCursorId);
+        return new SliceOfAgoniesResponse(agonyService.searchSliceOfAgonies(bookShelfId, tokenPayload.getUserId(), pageable, postCursorId));
     }
 
     @DeleteMapping("/v1/api/bookshelves/{bookShelfId}/agonies/{agoniesIds}")
@@ -58,8 +58,7 @@ public class AgonyController {
     }
 
     @PutMapping("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}")
-    public void reviseAgony(@PathVariable Long bookShelfId, @PathVariable Long agonyId, @Valid @RequestBody ReviseAgonyRequest reviseAgonyRequest, @UserPayload TokenPayload tokenPayload) {
-
-        agonyService.reviseAgony(bookShelfId, agonyId, tokenPayload.getUserId(), reviseAgonyRequest);
+    public void reviseAgony(@PathVariable Long bookShelfId, @PathVariable Long agonyId, @Valid @RequestBody ReviseAgonyRequest request, @UserPayload TokenPayload tokenPayload) {
+        agonyService.reviseAgony(bookShelfId, agonyId, tokenPayload.getUserId(), request.toTarget());
     }
 }

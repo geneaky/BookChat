@@ -25,7 +25,7 @@ public class CreateAgonyRecordRequest {
         return AgonyRecordEntity.builder()
             .title(this.title)
             .content(this.content)
-            .agonyEntity(agonyEntity)
+            .agonyId(agonyEntity.getId())
             .build();
     }
 }
