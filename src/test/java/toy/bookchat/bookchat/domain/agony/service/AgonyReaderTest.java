@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 
 import java.util.List;
 import java.util.Optional;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
 import toy.bookchat.bookchat.db_module.agony.AgonyEntity;
 import toy.bookchat.bookchat.db_module.agony.repository.AgonyRepository;
+import toy.bookchat.bookchat.exception.notfound.agony.AgonyNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class AgonyReaderTest {
@@ -33,6 +35,12 @@ class AgonyReaderTest {
         agonyReader.readAgony(1L, 1L, 1L);
 
         verify(agonyRepository).findUserBookShelfAgony(any(), any(), any());
+    }
+
+    @Test
+    void 사용자의_고민이_아닌경우_조회_실패() throws Exception {
+        Assertions.assertThatThrownBy(() -> agonyReader.readAgony(1L, 1L, 1L))
+            .isInstanceOf(AgonyNotFoundException.class);
     }
 
     @Test

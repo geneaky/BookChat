@@ -3,7 +3,6 @@ package toy.bookchat.bookchat.domain.agonyrecord.api;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpHeaders.LOCATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -37,12 +36,10 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.web.servlet.MockMvc;
-import toy.bookchat.bookchat.db_module.agonyrecord.AgonyRecordEntity;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
+import toy.bookchat.bookchat.domain.agonyrecord.AgonyRecord;
 import toy.bookchat.bookchat.domain.agonyrecord.api.v1.request.CreateAgonyRecordRequest;
 import toy.bookchat.bookchat.domain.agonyrecord.api.v1.request.ReviseAgonyRecordRequest;
-import toy.bookchat.bookchat.domain.agonyrecord.api.v1.response.AgonyRecordResponse;
-import toy.bookchat.bookchat.domain.agonyrecord.api.v1.response.SliceOfAgonyRecordsResponse;
 import toy.bookchat.bookchat.domain.agonyrecord.service.AgonyRecordService;
 
 @AgonyRecordPresentationTest
@@ -90,14 +87,13 @@ class AgonyRecordControllerTest extends ControllerTestExtension {
 
     @Test
     void 고민_기록_단_건_조회_성공() throws Exception {
-        given(agonyRecordService.searchAgonyRecord(any(), any(), any(), any())).willReturn(
-            AgonyRecordResponse.builder()
-                .agonyRecordId(1L)
-                .agonyRecordTitle("title")
-                .agonyRecordContent("content")
-                .createdAt(LocalDateTime.now().toString())
-                .build()
-        );
+        AgonyRecord agonyRecord = AgonyRecord.builder()
+            .id(1L)
+            .title("title")
+            .content("content")
+            .createdAt(LocalDateTime.now())
+            .build();
+        given(agonyRecordService.searchAgonyRecord(any(), any(), any(), any())).willReturn(agonyRecord);
 
         mockMvc.perform(get("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records/{recordId}", 1, 1, 1)
                 .header(AUTHORIZATION, JWT_TOKEN)
@@ -125,28 +121,25 @@ class AgonyRecordControllerTest extends ControllerTestExtension {
 
     @Test
     void 고민_기록_조회_성공() throws Exception {
-        AgonyRecordEntity agonyRecordEntity1 = AgonyRecordEntity.builder()
+        AgonyRecord agonyRecord1 = AgonyRecord.builder()
             .id(2L)
             .title("title1")
             .content("content1")
+            .createdAt(LocalDateTime.now())
             .build();
-        agonyRecordEntity1.setCreatedAt(LocalDateTime.now());
-        AgonyRecordEntity agonyRecordEntity2 = AgonyRecordEntity.builder()
+        AgonyRecord agonyRecord2 = AgonyRecord.builder()
             .id(3L)
             .title("title2")
             .content("content2")
+            .createdAt(LocalDateTime.now())
             .build();
-        agonyRecordEntity2.setCreatedAt(LocalDateTime.now());
 
-        List<AgonyRecordEntity> list = List.of(agonyRecordEntity1, agonyRecordEntity2);
+        List<AgonyRecord> list = List.of(agonyRecord1, agonyRecord2);
         PageRequest pageRequest = PageRequest.of(0, 2, Sort.by("id").ascending());
-        Slice<AgonyRecordEntity> slice = new SliceImpl<>(list, pageRequest, false);
-        SliceOfAgonyRecordsResponse pageOfAgonyRecordsResponse = new SliceOfAgonyRecordsResponse(
-            slice);
+        Slice<AgonyRecord> slicedAgonyRecord = new SliceImpl<>(list, pageRequest, false);
 
-        when(agonyRecordService.searchPageOfAgonyRecords(any(), any(), any(), any(),
-            any())).thenReturn(
-            pageOfAgonyRecordsResponse);
+        given(agonyRecordService.searchPageOfAgonyRecords(any(), any(), any(), any(), any())).willReturn(slicedAgonyRecord);
+
         mockMvc.perform(get("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records", 1, 1)
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))

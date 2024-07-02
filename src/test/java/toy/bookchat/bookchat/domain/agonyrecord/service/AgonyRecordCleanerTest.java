@@ -20,9 +20,16 @@ class AgonyRecordCleanerTest {
     private AgonyRecordCleaner agonyRecordCleaner;
 
     @Test
-    void 고민_기록_삭제_성공() throws Exception {
+    void 각_고민폴더에_저장된_고민_기록_삭제_성공() throws Exception {
         agonyRecordCleaner.clean(1L, 1L, List.of(1L, 2L, 3L));
 
         verify(agonyRecordRepository).deleteByAgoniesIds(any(), any(), any());
+    }
+
+    @Test
+    void 고민_기록_삭제_성공() throws Exception {
+        agonyRecordCleaner.clean(1L, 1L, 1L, 1L);
+
+        verify(agonyRecordRepository).deleteAgonyRecord(any(), any(), any(), any());
     }
 }
