@@ -16,4 +16,8 @@ public class AgonyRecordCleaner {
     public void clean(Long userId, Long bookShelfId, List<Long> agoniesIds) {
         agonyRecordRepository.deleteByAgoniesIds(bookShelfId, userId, agoniesIds);
     }
+
+    public void clean(Long userId, Long bookShelfId, Long agonyId, Long recordId) {
+        agonyRecordRepository.deleteAgonyRecord(bookShelfId, agonyId, recordId, userId);
+    }
 }

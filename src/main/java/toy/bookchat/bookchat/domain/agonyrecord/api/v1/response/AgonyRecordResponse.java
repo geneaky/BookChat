@@ -3,7 +3,7 @@ package toy.bookchat.bookchat.domain.agonyrecord.api.v1.response;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import toy.bookchat.bookchat.db_module.agonyrecord.AgonyRecordEntity;
+import toy.bookchat.bookchat.domain.agonyrecord.AgonyRecord;
 
 @Getter
 @EqualsAndHashCode
@@ -22,7 +22,7 @@ public class AgonyRecordResponse {
         this.createdAt = createdAt;
     }
 
-    public static AgonyRecordResponse from(AgonyRecordEntity agonyRecordEntity) {
-        return new AgonyRecordResponse(agonyRecordEntity.getId(), agonyRecordEntity.getTitle(), agonyRecordEntity.getContent(), agonyRecordEntity.getCreateTimeInYearMonthDayFormat());
+    public static AgonyRecordResponse from(AgonyRecord agonyRecord) {
+        return new AgonyRecordResponse(agonyRecord.getId(), agonyRecord.getTitle(), agonyRecord.getContent(), agonyRecord.getCreateTimeInYearMonthDayFormat());
     }
 }

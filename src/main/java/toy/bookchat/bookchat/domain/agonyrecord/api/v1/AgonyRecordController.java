@@ -5,6 +5,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 import java.net.URI;
 import javax.validation.Valid;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import toy.bookchat.bookchat.domain.agonyrecord.AgonyRecord;
 import toy.bookchat.bookchat.domain.agonyrecord.api.v1.request.CreateAgonyRecordRequest;
 import toy.bookchat.bookchat.domain.agonyrecord.api.v1.request.ReviseAgonyRecordRequest;
 import toy.bookchat.bookchat.domain.agonyrecord.api.v1.response.AgonyRecordResponse;
@@ -33,8 +35,7 @@ public class AgonyRecordController {
     @PostMapping("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records")
     public ResponseEntity<Void> addAgonyRecordOnBookAgony(@PathVariable Long bookShelfId, @PathVariable Long agonyId, @Valid @RequestBody CreateAgonyRecordRequest createAgonyRecordRequest,
         @UserPayload TokenPayload tokenPayload) {
-
-        Long agonyRecordId = agonyRecordService.storeAgonyRecord(bookShelfId, createAgonyRecordRequest, tokenPayload.getUserId(), agonyId);
+        Long agonyRecordId = agonyRecordService.storeAgonyRecord(bookShelfId, createAgonyRecordRequest.toTarget(), tokenPayload.getUserId(), agonyId);
 
         return ResponseEntity.status(CREATED)
             .headers(hs -> hs.setLocation(URI.create("/v1/api/bookshelves/" + bookShelfId + "/agonies/" + agonyId + "/records/" + agonyRecordId)))
@@ -44,14 +45,16 @@ public class AgonyRecordController {
     @GetMapping("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records")
     public SliceOfAgonyRecordsResponse getAgonyRecordsOnBookAgony(@PathVariable Long bookShelfId, @PathVariable Long agonyId, Long postCursorId, @UserPayload TokenPayload tokenPayload,
         Pageable pageable) {
+        Slice<AgonyRecord> agonyRecordSlice = agonyRecordService.searchPageOfAgonyRecords(bookShelfId, agonyId, tokenPayload.getUserId(), pageable, postCursorId);
 
-        return agonyRecordService.searchPageOfAgonyRecords(bookShelfId, agonyId, tokenPayload.getUserId(), pageable, postCursorId);
+        return new SliceOfAgonyRecordsResponse(agonyRecordSlice);
     }
 
     @GetMapping("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records/{recordId}")
     public AgonyRecordResponse getAgonyRecordsOnBookAgony(@PathVariable Long bookShelfId, @PathVariable Long agonyId, @PathVariable Long recordId, @UserPayload TokenPayload tokenPayload) {
+        AgonyRecord agonyRecord = agonyRecordService.searchAgonyRecord(bookShelfId, agonyId, recordId, tokenPayload.getUserId());
 
-        return agonyRecordService.searchAgonyRecord(bookShelfId, agonyId, recordId, tokenPayload.getUserId());
+        return AgonyRecordResponse.from(agonyRecord);
     }
 
     @DeleteMapping("/v1/api/bookshelves/{bookShelfId}/agonies/{agonyId}/records/{recordId}")
@@ -64,6 +67,6 @@ public class AgonyRecordController {
     public void reviseAgonyRecord(@PathVariable Long bookShelfId, @PathVariable Long agonyId, @PathVariable Long recordId, @Valid @RequestBody ReviseAgonyRecordRequest reviseAgonyRecordRequest,
         @UserPayload TokenPayload tokenPayload) {
 
-        agonyRecordService.reviseAgonyRecord(bookShelfId, agonyId, recordId, tokenPayload.getUserId(), reviseAgonyRecordRequest);
+        agonyRecordService.reviseAgonyRecord(bookShelfId, agonyId, recordId, tokenPayload.getUserId(), reviseAgonyRecordRequest.toTarget());
     }
 }

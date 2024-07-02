@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import toy.bookchat.bookchat.domain.agonyrecord.AgonyRecordTitleAndContent;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -16,5 +17,12 @@ public class ReviseAgonyRecordRequest {
     private ReviseAgonyRecordRequest(String recordTitle, String recordContent) {
         this.recordTitle = recordTitle;
         this.recordContent = recordContent;
+    }
+
+    public AgonyRecordTitleAndContent toTarget() {
+        return AgonyRecordTitleAndContent.builder()
+            .title(this.recordTitle)
+            .content(this.recordContent)
+            .build();
     }
 }
