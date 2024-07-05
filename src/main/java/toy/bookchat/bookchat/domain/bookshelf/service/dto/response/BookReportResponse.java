@@ -1,24 +1,25 @@
 package toy.bookchat.bookchat.domain.bookshelf.service.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import java.time.LocalDate;
 import lombok.Getter;
-import toy.bookchat.bookchat.db_module.bookreport.BookReportEntity;
+import toy.bookchat.bookchat.domain.bookshelf.BookReport;
 
 @Getter
 public class BookReportResponse {
 
     private String reportTitle;
     private String reportContent;
-    private String reportCreatedAt;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate reportCreatedAt;
 
-    private BookReportResponse(String reportTitle, String reportContent,
-        String reportCreatedAt) {
+    private BookReportResponse(String reportTitle, String reportContent, LocalDate reportCreatedAt) {
         this.reportTitle = reportTitle;
         this.reportContent = reportContent;
         this.reportCreatedAt = reportCreatedAt;
     }
 
-    public static BookReportResponse from(BookReportEntity bookReportEntity) {
-        return new BookReportResponse(bookReportEntity.getTitle(), bookReportEntity.getContent(),
-            bookReportEntity.getCreateTimeInYearMonthDayFormat());
+    public static BookReportResponse from(BookReport bookReport) {
+        return new BookReportResponse(bookReport.getTitle(), bookReport.getContent(), bookReport.getReportedAt().toLocalDate());
     }
 }

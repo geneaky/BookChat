@@ -5,8 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import toy.bookchat.bookchat.db_module.bookreport.BookReportEntity;
-import toy.bookchat.bookchat.db_module.bookshelf.BookShelfEntity;
+import toy.bookchat.bookchat.domain.bookshelf.BookReport;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -23,11 +22,10 @@ public class WriteBookReportRequest {
         this.content = content;
     }
 
-    public BookReportEntity getBookReport(BookShelfEntity bookShelfEntity) {
-        return BookReportEntity.builder()
+    public BookReport toTarget() {
+        return BookReport.builder()
             .title(this.title)
             .content(this.content)
-            .bookShelfEntity(bookShelfEntity)
             .build();
     }
 }

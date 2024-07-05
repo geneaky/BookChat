@@ -1,34 +1,26 @@
 package toy.bookchat.bookchat.domain.bookshelf.service;
 
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import toy.bookchat.bookchat.db_module.agony.repository.AgonyRepository;
 import toy.bookchat.bookchat.db_module.agonyrecord.repository.AgonyRecordRepository;
-import toy.bookchat.bookchat.db_module.bookreport.BookReportEntity;
-import toy.bookchat.bookchat.db_module.bookreport.repository.BookReportRepository;
 import toy.bookchat.bookchat.db_module.bookshelf.BookShelfEntity;
 import toy.bookchat.bookchat.db_module.bookshelf.repository.BookShelfRepository;
+import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
+import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
+import toy.bookchat.bookchat.exception.notfound.book.BookNotFoundException;
 
 @Component
 public class BookShelfManager {
 
     private final BookShelfRepository bookShelfRepository;
-    private final BookReportRepository bookReportRepository;
     private final AgonyRepository agonyRepository;
     private final AgonyRecordRepository agonyRecordRepository;
 
 
-    public BookShelfManager(BookReportRepository bookReportRepository, BookShelfRepository bookShelfRepository, AgonyRepository agonyRepository, AgonyRecordRepository agonyRecordRepository) {
-        this.bookReportRepository = bookReportRepository;
+    public BookShelfManager(BookShelfRepository bookShelfRepository, AgonyRepository agonyRepository, AgonyRecordRepository agonyRecordRepository) {
         this.bookShelfRepository = bookShelfRepository;
         this.agonyRepository = agonyRepository;
         this.agonyRecordRepository = agonyRecordRepository;
-    }
-
-    @Transactional
-    public void append(BookShelfEntity bookShelfEntity, BookReportEntity bookReportEntity) {
-        bookReportRepository.save(bookReportEntity);
-        bookShelfEntity.writeReportInStateOfCompleteReading(bookReportEntity);
     }
 
     public void store(BookShelfEntity bookShelfEntity) {
@@ -43,5 +35,10 @@ public class BookShelfManager {
 
     public void remove(Long userId) {
         bookShelfRepository.deleteAllByUserId(userId);
+    }
+
+    public void modify(BookShelf bookShelf, ReadingStatus readingStatus) {
+        BookShelfEntity bookShelfEntity = bookShelfRepository.findById(bookShelf.getId()).orElseThrow(BookNotFoundException::new);
+        bookShelfEntity.updateReadingStatus(readingStatus);
     }
 }

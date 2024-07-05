@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import toy.bookchat.bookchat.domain.bookshelf.BookReport;
 import toy.bookchat.bookchat.domain.bookshelf.service.BookReportService;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ReviseBookReportRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.WriteBookReportRequest;
@@ -27,34 +28,24 @@ public class BookReportController {
     }
 
     @PostMapping
-    public void writeBookReport(
-        @Valid @RequestBody WriteBookReportRequest writeBookReportRequest,
-        @PathVariable Long bookShelfId, @UserPayload TokenPayload tokenPayload) {
-
-        bookReportService.writeReport(writeBookReportRequest, bookShelfId,
-            tokenPayload.getUserId());
+    public void writeBookReport(@Valid @RequestBody WriteBookReportRequest writeBookReportRequest, @PathVariable Long bookShelfId, @UserPayload TokenPayload tokenPayload) {
+        bookReportService.writeReport(tokenPayload.getUserId(), bookShelfId, writeBookReportRequest.toTarget());
     }
 
     @GetMapping
-    public BookReportResponse findBookReportFromBook(@PathVariable Long bookShelfId,
-        @UserPayload TokenPayload tokenPayload) {
+    public BookReportResponse findBookReportFromBook(@PathVariable Long bookShelfId, @UserPayload TokenPayload tokenPayload) {
+        BookReport bookReport = bookReportService.getBookReport(bookShelfId, tokenPayload.getUserId());
 
-        return bookReportService.getBookReportResponse(bookShelfId, tokenPayload.getUserId());
+        return BookReportResponse.from(bookReport);
     }
 
     @DeleteMapping
-    public void deleteBookReport(@PathVariable Long bookShelfId,
-        @UserPayload TokenPayload tokenPayload) {
-
+    public void deleteBookReport(@PathVariable Long bookShelfId, @UserPayload TokenPayload tokenPayload) {
         bookReportService.deleteBookReport(bookShelfId, tokenPayload.getUserId());
     }
 
     @PutMapping
-    public void reviseBookReport(@PathVariable Long bookShelfId,
-        @Valid @RequestBody ReviseBookReportRequest reviseBookReportRequest,
-        @UserPayload TokenPayload tokenPayload) {
-
-        bookReportService.reviseBookReport(bookShelfId, tokenPayload.getUserId(),
-            reviseBookReportRequest);
+    public void reviseBookReport(@PathVariable Long bookShelfId, @Valid @RequestBody ReviseBookReportRequest reviseBookReportRequest, @UserPayload TokenPayload tokenPayload) {
+        bookReportService.reviseBookReport(bookShelfId, tokenPayload.getUserId(), reviseBookReportRequest.toTarget());
     }
 }

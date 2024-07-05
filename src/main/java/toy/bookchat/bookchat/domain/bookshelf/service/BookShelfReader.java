@@ -33,7 +33,6 @@ public class BookShelfReader {
             .build();
     }
 
-
     public Page<BookShelfEntity> readBookShelfEntity(Long userId, ReadingStatus readingStatus, Pageable pageable) {
         return bookShelfRepository.findSpecificStatusBookByUserId(readingStatus, pageable, userId);
     }
