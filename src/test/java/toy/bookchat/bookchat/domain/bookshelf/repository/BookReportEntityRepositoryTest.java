@@ -17,11 +17,11 @@ class BookReportEntityRepositoryTest extends RepositoryTest {
     @Autowired
     BookShelfRepository bookShelfRepository;
 
-    private BookReportEntity getBookReport(BookShelfEntity bookShelfEntity) {
+    private BookReportEntity getBookReport(Long bookShelfId) {
         return BookReportEntity.builder()
             .title("title")
             .content("content")
-            .bookShelfEntity(bookShelfEntity)
+            .bookShelfId(bookShelfId)
             .build();
     }
 
@@ -31,7 +31,7 @@ class BookReportEntityRepositoryTest extends RepositoryTest {
             .build();
         bookShelfRepository.save(bookShelfEntity);
 
-        BookReportEntity bookReportEntity = getBookReport(bookShelfEntity);
+        BookReportEntity bookReportEntity = getBookReport(bookShelfEntity.getId());
         bookReportRepository.save(bookReportEntity);
 
         BookReportEntity findBookReportEntity = bookReportRepository.findById(bookReportEntity.getId()).get();

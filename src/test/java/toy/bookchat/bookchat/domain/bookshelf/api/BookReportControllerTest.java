@@ -27,12 +27,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-import toy.bookchat.bookchat.db_module.bookreport.BookReportEntity;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
+import toy.bookchat.bookchat.domain.bookshelf.BookReport;
 import toy.bookchat.bookchat.domain.bookshelf.service.BookReportService;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ReviseBookReportRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.WriteBookReportRequest;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.BookReportResponse;
 
 @BookReportPresentationTest
 class BookReportControllerTest extends ControllerTestExtension {
@@ -47,7 +46,6 @@ class BookReportControllerTest extends ControllerTestExtension {
 
     @Test
     void 다_읽은_책_독후감_작성_성공() throws Exception {
-
         WriteBookReportRequest writeBookReportRequest = WriteBookReportRequest.builder()
             .title("어렵지만 많이 배웠다")
             .content("요런 요런 내용, 저런저런 내용을 많이 배움")
@@ -76,14 +74,13 @@ class BookReportControllerTest extends ControllerTestExtension {
 
     @Test
     void 읽은책_독후감_조회_성공() throws Exception {
-
-        BookReportEntity bookReportEntity = BookReportEntity.builder()
+        BookReport bookReport = BookReport.builder()
             .title("재미있네")
             .content("다 읽은 후기 알려드립니다")
+            .reportedAt(LocalDateTime.now())
             .build();
-        bookReportEntity.setCreatedAt(LocalDateTime.now());
-        BookReportResponse bookReportResponse = BookReportResponse.from(bookReportEntity);
-        when(bookReportService.getBookReportResponse(any(), any())).thenReturn(bookReportResponse);
+        when(bookReportService.getBookReport(any(), any())).thenReturn(bookReport);
+
         mockMvc.perform(get("/v1/api/bookshelves/{bookShelfId}/report", 1L)
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal())))

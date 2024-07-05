@@ -14,15 +14,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import toy.bookchat.bookchat.db_module.book.BookEntity;
 import toy.bookchat.bookchat.db_module.book.repository.BookRepository;
-import toy.bookchat.bookchat.db_module.bookreport.BookReportEntity;
 import toy.bookchat.bookchat.db_module.bookreport.repository.BookReportRepository;
 import toy.bookchat.bookchat.db_module.bookshelf.BookShelfEntity;
 import toy.bookchat.bookchat.db_module.bookshelf.repository.BookShelfRepository;
+import toy.bookchat.bookchat.db_module.user.UserEntity;
+import toy.bookchat.bookchat.db_module.user.repository.UserRepository;
 import toy.bookchat.bookchat.domain.RepositoryTest;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.Star;
-import toy.bookchat.bookchat.db_module.user.UserEntity;
-import toy.bookchat.bookchat.db_module.user.repository.UserRepository;
 
 class BookShelfEntityRepositoryTest extends RepositoryTest {
 
@@ -229,34 +228,6 @@ class BookShelfEntityRepositoryTest extends RepositoryTest {
             userEntity.getId()).get();
         assertThat(findBookShelfEntity).isEqualTo(bookShelfEntity);
 
-    }
-
-    @Test
-    void bookShelfId_userId로_서재_독후감_조회_성공() throws Exception {
-        BookEntity bookEntity = getBook("1-4133-0454-0");
-        bookRepository.save(bookEntity);
-
-        UserEntity userEntity = UserEntity.builder().name("hi").build();
-        userRepository.save(userEntity);
-
-        BookReportEntity bookReportEntity = BookReportEntity.builder()
-            .title("test report")
-            .content("test report content")
-            .build();
-        bookReportRepository.save(bookReportEntity);
-
-        BookShelfEntity bookShelfEntity = BookShelfEntity.builder()
-            .bookEntity(bookEntity)
-            .userEntity(userEntity)
-            .bookReportEntity(bookReportEntity)
-            .readingStatus(ReadingStatus.READING)
-            .build();
-        bookShelfRepository.save(bookShelfEntity);
-
-        BookShelfEntity findBookShelfEntity = bookShelfRepository.findWithReportByIdAndUserId(bookShelfEntity.getId(),
-            userEntity.getId()).get();
-
-        assertThat(findBookShelfEntity.getBookReportEntity().getTitle()).isEqualTo(bookReportEntity.getTitle());
     }
 
     @Test
