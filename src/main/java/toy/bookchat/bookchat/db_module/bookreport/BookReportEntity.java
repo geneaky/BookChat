@@ -1,16 +1,14 @@
 package toy.bookchat.bookchat.db_module.bookreport;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import toy.bookchat.bookchat.db_module.BaseEntity;
-import toy.bookchat.bookchat.db_module.bookshelf.BookShelfEntity;
 
 @Getter
 @Entity
@@ -22,15 +20,15 @@ public class BookReportEntity extends BaseEntity {
     private Long id;
     private String title;
     private String content;
-    @OneToOne(mappedBy = "bookReportEntity", fetch = FetchType.LAZY)
-    private BookShelfEntity bookShelfEntity;
+    @Column(name = "book_shelf_id")
+    private Long bookShelfId;
 
     @Builder
-    private BookReportEntity(Long id, String title, String content, BookShelfEntity bookShelfEntity) {
+    private BookReportEntity(Long id, String title, String content, Long bookShelfId) {
         this.id = id;
         this.title = title;
         this.content = content;
-        this.bookShelfEntity = bookShelfEntity;
+        this.bookShelfId = bookShelfId;
     }
 
     protected BookReportEntity() {

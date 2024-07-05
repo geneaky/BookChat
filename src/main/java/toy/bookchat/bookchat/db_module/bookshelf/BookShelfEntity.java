@@ -14,17 +14,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import toy.bookchat.bookchat.db_module.BaseEntity;
 import toy.bookchat.bookchat.db_module.book.BookEntity;
-import toy.bookchat.bookchat.db_module.bookreport.BookReportEntity;
 import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.Star;
-import toy.bookchat.bookchat.exception.notfound.bookshelf.BookReportNotFoundException;
 
 @Getter
 @Entity
@@ -45,20 +42,15 @@ public class BookShelfEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id")
     private BookEntity bookEntity;
-    @OneToOne(fetch = FetchType.LAZY, orphanRemoval = true)
-    @JoinColumn(name = "book_report_id")
-    private BookReportEntity bookReportEntity;
 
     @Builder
-    private BookShelfEntity(Long id, Integer pages, ReadingStatus readingStatus, Star star, UserEntity userEntity,
-        BookEntity bookEntity, BookReportEntity bookReportEntity) {
+    private BookShelfEntity(Long id, Integer pages, ReadingStatus readingStatus, Star star, UserEntity userEntity, BookEntity bookEntity) {
         this.id = id;
         this.pages = pages;
         this.readingStatus = readingStatus;
         this.star = star;
         this.userEntity = userEntity;
         this.bookEntity = bookEntity;
-        this.bookReportEntity = bookReportEntity;
     }
 
     protected BookShelfEntity() {
@@ -107,26 +99,6 @@ public class BookShelfEntity extends BaseEntity {
 
     public void updateReadingStatus(ReadingStatus readingStatus) {
         this.readingStatus = readingStatus;
-    }
-
-    public void writeReportInStateOfCompleteReading(BookReportEntity bookReportEntity) {
-        this.readingStatus = COMPLETE;
-        this.bookReportEntity = bookReportEntity;
-    }
-
-    public BookReportEntity getBookReportEntity() {
-        isReportedBook();
-        return this.bookReportEntity;
-    }
-
-    private void isReportedBook() {
-        if (this.bookReportEntity == null) {
-            throw new BookReportNotFoundException();
-        }
-    }
-
-    public void deleteBookReport() {
-        this.bookReportEntity = null;
     }
 
     public void updateStar(Star star) {

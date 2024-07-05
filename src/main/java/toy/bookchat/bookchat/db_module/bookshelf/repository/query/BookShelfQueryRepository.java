@@ -17,8 +17,6 @@ public interface BookShelfQueryRepository {
 
     Optional<BookShelfEntity> findByIdAndUserId(Long bookShelfId, Long userId);
 
-    Optional<BookShelfEntity> findWithReportByIdAndUserId(Long bookShelfId, Long userId);
-
     void deleteBookShelfByIdAndUserId(Long bookShelfId, Long userId);
 
     void deleteAllByUserId(Long userId);

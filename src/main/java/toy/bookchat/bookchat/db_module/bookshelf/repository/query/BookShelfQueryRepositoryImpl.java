@@ -1,7 +1,6 @@
 package toy.bookchat.bookchat.db_module.bookshelf.repository.query;
 
 import static toy.bookchat.bookchat.db_module.book.QBookEntity.bookEntity;
-import static toy.bookchat.bookchat.db_module.bookreport.QBookReportEntity.bookReportEntity;
 import static toy.bookchat.bookchat.db_module.bookshelf.QBookShelfEntity.bookShelfEntity;
 import static toy.bookchat.bookchat.domain.common.RepositorySupport.extractOrderSpecifierFrom;
 
@@ -81,16 +80,5 @@ public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
             .where(bookShelfEntity.id.eq(bookShelfId)
                 .and(bookShelfEntity.userEntity.id.eq(userId)))
             .fetchOne());
-    }
-
-    @Override
-    public Optional<BookShelfEntity> findWithReportByIdAndUserId(Long bookShelfId, Long userId) {
-        return Optional.ofNullable(queryFactory.select(bookShelfEntity)
-            .from(bookShelfEntity)
-            .join(bookShelfEntity.bookReportEntity, bookReportEntity).fetchJoin()
-            .where(bookShelfEntity.id.eq(bookShelfId)
-                .and(bookShelfEntity.userEntity.id.eq(userId)))
-            .fetchOne());
-
     }
 }
