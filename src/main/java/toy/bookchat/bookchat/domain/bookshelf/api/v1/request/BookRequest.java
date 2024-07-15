@@ -9,7 +9,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import toy.bookchat.bookchat.db_module.book.BookEntity;
+import toy.bookchat.bookchat.domain.book.Book;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -41,8 +41,8 @@ public class BookRequest {
     }
 
 
-    public BookEntity extractBookEntity() {
-        return BookEntity.builder()
+    public Book extractBook() {
+        return Book.builder()
             .isbn(this.isbn)
             .title(this.title)
             .authors(this.authors)

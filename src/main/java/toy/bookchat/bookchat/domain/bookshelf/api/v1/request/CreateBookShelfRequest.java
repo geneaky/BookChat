@@ -10,15 +10,14 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import toy.bookchat.bookchat.db_module.book.BookEntity;
-import toy.bookchat.bookchat.db_module.bookshelf.BookShelfEntity;
+import toy.bookchat.bookchat.domain.book.Book;
+import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.Star;
-import toy.bookchat.bookchat.db_module.user.UserEntity;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class BookShelfRequest {
+public class CreateBookShelfRequest {
 
     @Valid
     @NotNull
@@ -28,14 +27,14 @@ public class BookShelfRequest {
     private Star star;
 
     @Builder
-    private BookShelfRequest(BookRequest bookRequest, ReadingStatus readingStatus, Star star) {
+    private CreateBookShelfRequest(BookRequest bookRequest, ReadingStatus readingStatus, Star star) {
         this.bookRequest = bookRequest;
         this.readingStatus = readingStatus;
         this.star = star;
     }
 
-    public BookEntity extractBookEntity() {
-        return this.bookRequest.extractBookEntity();
+    public Book getBook() {
+        return this.bookRequest.extractBook();
     }
 
     @JsonIgnore
@@ -64,19 +63,15 @@ public class BookShelfRequest {
         return this.bookRequest.getPublishAt();
     }
 
-    public BookShelfEntity createBookShelfByReadingStatus(BookEntity bookEntity, UserEntity userEntity) {
+    public BookShelf toTarget() {
         if (this.isCompleteReading()) {
-            return BookShelfEntity.builder()
-                .bookEntity(bookEntity)
+            return BookShelf.builder()
                 .readingStatus(this.getReadingStatus())
-                .userEntity(userEntity)
                 .star(this.getStar())
                 .build();
         }
-        return BookShelfEntity.builder()
-            .bookEntity(bookEntity)
+        return BookShelf.builder()
             .readingStatus(this.getReadingStatus())
-            .userEntity(userEntity)
             .build();
     }
 }

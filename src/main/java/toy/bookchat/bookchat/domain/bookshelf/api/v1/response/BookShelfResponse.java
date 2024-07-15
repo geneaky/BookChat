@@ -6,7 +6,8 @@ import java.util.List;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import toy.bookchat.bookchat.db_module.bookshelf.BookShelfEntity;
+import toy.bookchat.bookchat.domain.book.Book;
+import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.Star;
 
 @Getter
@@ -40,18 +41,19 @@ public class BookShelfResponse {
         this.lastUpdatedAt = lastUpdatedAt;
     }
 
-    public static BookShelfResponse from(BookShelfEntity bookShelfEntity) {
+    public static BookShelfResponse from(BookShelf bookShelf) {
+        Book book = bookShelf.getBook();
         return BookShelfResponse.builder()
-            .bookShelfId(bookShelfEntity.getId())
-            .title(bookShelfEntity.getBookTitle())
-            .isbn(bookShelfEntity.getIsbn())
-            .authors(bookShelfEntity.getBookAuthors())
-            .publisher(bookShelfEntity.getBookPublisher())
-            .bookCoverImageUrl(bookShelfEntity.getBookCoverImageUrl())
-            .publishAt(bookShelfEntity.getBookEntity().getPublishAt())
-            .star(bookShelfEntity.getStar())
-            .pages(bookShelfEntity.getPages())
-            .lastUpdatedAt(bookShelfEntity.getUpdatedAt())
+            .bookShelfId(bookShelf.getId())
+            .title(book.getTitle())
+            .isbn(book.getIsbn())
+            .authors(book.getAuthors())
+            .publisher(book.getPublisher())
+            .bookCoverImageUrl(book.getBookCoverImageUrl())
+            .publishAt(book.getPublishAt())
+            .star(bookShelf.getStar())
+            .pages(bookShelf.getPages())
+            .lastUpdatedAt(bookShelf.getLastUpdatedAt())
             .build();
     }
 }
