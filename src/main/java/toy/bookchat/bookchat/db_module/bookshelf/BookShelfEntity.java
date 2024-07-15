@@ -1,25 +1,17 @@
 package toy.bookchat.bookchat.db_module.bookshelf;
 
-import static toy.bookchat.bookchat.domain.bookshelf.ReadingStatus.COMPLETE;
-import static toy.bookchat.bookchat.domain.bookshelf.ReadingStatus.READING;
-import static toy.bookchat.bookchat.domain.bookshelf.ReadingStatus.WISH;
-
-import java.util.List;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import toy.bookchat.bookchat.db_module.BaseEntity;
-import toy.bookchat.bookchat.db_module.book.BookEntity;
-import toy.bookchat.bookchat.db_module.user.UserEntity;
+import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.Star;
 
@@ -31,89 +23,36 @@ public class BookShelfEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
+    @Column(name = "book_id", nullable = false)
+    private Long bookId;
     private Integer pages;
     @Enumerated(EnumType.STRING)
     private ReadingStatus readingStatus;
     @Enumerated(EnumType.STRING)
     private Star star;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private UserEntity userEntity;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_id")
-    private BookEntity bookEntity;
 
     @Builder
-    private BookShelfEntity(Long id, Integer pages, ReadingStatus readingStatus, Star star, UserEntity userEntity, BookEntity bookEntity) {
+    private BookShelfEntity(Long id, Long userId, Long bookId, Integer pages, ReadingStatus readingStatus, Star star) {
         this.id = id;
+        this.userId = userId;
+        this.bookId = bookId;
         this.pages = pages;
         this.readingStatus = readingStatus;
         this.star = star;
-        this.userEntity = userEntity;
-        this.bookEntity = bookEntity;
     }
 
     protected BookShelfEntity() {
-    }
-
-    public String getIsbn() {
-        return this.bookEntity.getIsbn();
-    }
-
-    public void setUserEntity(UserEntity userEntity) {
-        this.userEntity = userEntity;
-    }
-
-    public void setBookEntity(BookEntity bookEntity) {
-        this.bookEntity = bookEntity;
-    }
-
-    public String getBookTitle() {
-        return this.bookEntity.getTitle();
-    }
-
-    public List<String> getBookAuthors() {
-        loadBookAuthors();
-        return this.bookEntity.getAuthors();
-    }
-
-    private void loadBookAuthors() {
-        this.bookEntity.getAuthors().size();
-    }
-
-    public String getBookPublisher() {
-        return this.bookEntity.getBookCoverImageUrl();
-    }
-
-    public String getBookCoverImageUrl() {
-        return this.bookEntity.getBookCoverImageUrl();
-    }
-
-    public void updatePage(Integer pages) {
-        this.pages = pages;
-    }
-
-    public Long getBookId() {
-        return this.bookEntity.getId();
     }
 
     public void updateReadingStatus(ReadingStatus readingStatus) {
         this.readingStatus = readingStatus;
     }
 
-    public void updateStar(Star star) {
-        this.star = star;
-    }
-
-    public boolean isCompleteReading() {
-        return this.readingStatus == COMPLETE;
-    }
-
-    public boolean isReading() {
-        return this.readingStatus == READING;
-    }
-
-    public boolean isWish() {
-        return this.readingStatus == WISH;
+    public void updateWithoutBook(BookShelf bookShelf) {
+        this.star = bookShelf.getStar();
+        this.pages = bookShelf.getPages();
+        this.readingStatus = bookShelf.getReadingStatus();
     }
 }

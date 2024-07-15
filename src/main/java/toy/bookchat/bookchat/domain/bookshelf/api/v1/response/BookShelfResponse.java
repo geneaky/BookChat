@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.domain.bookshelf.service.dto.response;
+package toy.bookchat.bookchat.domain.bookshelf.api.v1.response;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

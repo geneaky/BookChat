@@ -39,7 +39,7 @@ public class DeviceService {
 
     @Transactional
     public void updateFcmToken(Long userId, String fcmToken) {
-        UserEntity userEntity = userReader.readUser(userId);
+        UserEntity userEntity = userReader.readUserEntity(userId);
         DeviceEntity deviceEntity = deviceReader.readUserDevice(userEntity);
         deviceEntity.changeFcmToken(fcmToken);
     }

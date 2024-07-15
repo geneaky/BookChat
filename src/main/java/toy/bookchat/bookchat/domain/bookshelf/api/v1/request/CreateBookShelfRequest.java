@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.domain.bookshelf.service.dto.request;
+package toy.bookchat.bookchat.domain.bookshelf.api.v1.request;
 
 import static toy.bookchat.bookchat.domain.bookshelf.ReadingStatus.COMPLETE;
 
@@ -33,6 +33,7 @@ public class CreateBookShelfRequest {
         this.star = star;
     }
 
+    @JsonIgnore
     public Book getBook() {
         return this.bookRequest.extractBook();
     }
@@ -47,8 +48,7 @@ public class CreateBookShelfRequest {
 
     private boolean isEvaluated() {
         if (this.star == null) {
-            throw new IllegalStateException(
-                "Star is required to change bookshelf complete reading status");
+            throw new IllegalStateException("Star is required to change bookshelf complete reading status");
         }
         return true;
     }

@@ -34,7 +34,7 @@ public class ScrapQueryRepositoryImpl implements ScrapQueryRepository {
             .from(scrapEntity)
             .join(bookShelfEntity)
             .on(scrapEntity.bookShelfEntity.id.eq(bookShelfEntity.id).and(bookShelfEntity.id.eq(bookShelfId))
-                .and(bookShelfEntity.userEntity.id.eq(userId)))
+                .and(bookShelfEntity.userId.eq(userId)))
             .where(gtCursorId(postCursorId))
             .limit(pageable.getPageSize())
             .orderBy(scrapEntity.id.asc())
@@ -48,7 +48,7 @@ public class ScrapQueryRepositoryImpl implements ScrapQueryRepository {
         return Optional.ofNullable(
             queryFactory.select(scrapEntity)
                 .from(scrapEntity)
-                .join(bookShelfEntity).on(scrapEntity.bookShelfEntity.id.eq(bookShelfEntity.id).and(bookShelfEntity.userEntity.id.eq(userId)))
+                .join(bookShelfEntity).on(scrapEntity.bookShelfEntity.id.eq(bookShelfEntity.id).and(bookShelfEntity.userId.eq(userId)))
                 .where(scrapEntity.id.eq(scrapId))
                 .fetchOne()
         );

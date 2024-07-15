@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.domain.bookshelf.api;
+package toy.bookchat.bookchat.domain.bookshelf.api.v1;
 
 import static org.springframework.http.HttpStatus.CREATED;
 
@@ -18,12 +18,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
+import toy.bookchat.bookchat.domain.bookshelf.api.v1.request.CreateBookShelfRequest;
+import toy.bookchat.bookchat.domain.bookshelf.api.v1.request.ReviseBookShelfRequest;
+import toy.bookchat.bookchat.domain.bookshelf.api.v1.response.BookShelfResponse;
+import toy.bookchat.bookchat.domain.bookshelf.api.v1.response.ExistenceBookOnBookShelfResponse;
+import toy.bookchat.bookchat.domain.bookshelf.api.v1.response.SearchBookShelfByReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.service.BookShelfService;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.CreateBookShelfRequest;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ReviseBookShelfRequest;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.BookShelfResponse;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.ExistenceBookOnBookShelfResponse;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.SearchBookShelfByReadingStatus;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPayload;
 

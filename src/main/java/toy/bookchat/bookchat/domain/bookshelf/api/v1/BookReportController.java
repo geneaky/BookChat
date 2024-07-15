@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.domain.bookshelf.api;
+package toy.bookchat.bookchat.domain.bookshelf.api.v1;
 
 import javax.validation.Valid;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import toy.bookchat.bookchat.domain.bookshelf.BookReport;
+import toy.bookchat.bookchat.domain.bookshelf.api.v1.request.ReviseBookReportRequest;
+import toy.bookchat.bookchat.domain.bookshelf.api.v1.request.WriteBookReportRequest;
+import toy.bookchat.bookchat.domain.bookshelf.api.v1.response.BookReportResponse;
 import toy.bookchat.bookchat.domain.bookshelf.service.BookReportService;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ReviseBookReportRequest;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.WriteBookReportRequest;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.BookReportResponse;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPayload;
 

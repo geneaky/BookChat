@@ -5,12 +5,13 @@ import java.util.List;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import toy.bookchat.bookchat.db_module.book.BookEntity;
 import toy.bookchat.bookchat.db_module.chatroom.ChatRoomEntity;
 import toy.bookchat.bookchat.db_module.participant.ParticipantEntity;
+import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.domain.participant.service.dto.RoomGuest;
 import toy.bookchat.bookchat.domain.participant.service.dto.RoomHost;
 import toy.bookchat.bookchat.domain.participant.service.dto.RoomSubHost;
-import toy.bookchat.bookchat.db_module.user.UserEntity;
 
 @Getter
 @EqualsAndHashCode
@@ -40,7 +41,7 @@ public class ChatRoomDetails {
         this.roomGuestList = roomGuestList;
     }
 
-    public static ChatRoomDetails from(List<ParticipantEntity> participantEntities, List<String> roomTags) {
+    public static ChatRoomDetails from(List<ParticipantEntity> participantEntities, List<String> roomTags, BookEntity bookEntity) {
         UserEntity host = getHost(participantEntities);
         RoomHost roomHost = RoomHost.builder()
             .id(host.getId())
@@ -53,9 +54,8 @@ public class ChatRoomDetails {
         fillParticipantsResponse(participantEntities, host, roomSubHostList, roomGuestList);
         ChatRoomEntity chatRoomEntity = getChatRoom(participantEntities);
 
-        return new ChatRoomDetails(chatRoomEntity.getRoomSize(), roomTags, chatRoomEntity.getRoomName(), chatRoomEntity.getBookTitle(), chatRoomEntity.getBookCoverImageUrl(),
-            chatRoomEntity.getBookAuthors(), roomHost,
-            roomSubHostList, roomGuestList);
+        return new ChatRoomDetails(chatRoomEntity.getRoomSize(), roomTags, chatRoomEntity.getRoomName(), bookEntity.getTitle(), bookEntity.getBookCoverImageUrl(), bookEntity.getAuthors(),
+            roomHost, roomSubHostList, roomGuestList);
     }
 
     private static ChatRoomEntity getChatRoom(List<ParticipantEntity> participantEntities) {

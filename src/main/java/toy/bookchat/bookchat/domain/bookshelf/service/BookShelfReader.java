@@ -5,7 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import toy.bookchat.bookchat.db_module.bookshelf.BookShelfEntity;
+import toy.bookchat.bookchat.db_module.bookshelf.BookShelfWithBook;
 import toy.bookchat.bookchat.db_module.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
@@ -21,24 +21,21 @@ public class BookShelfReader {
         this.bookShelfRepository = bookShelfRepository;
     }
 
-    public BookShelfEntity readBookShelfEntity(Long bookShelfId, Long userId) {
-        return bookShelfRepository.findByIdAndUserId(bookShelfId, userId).orElseThrow(BookNotFoundException::new);
-    }
-
-    public BookShelf readBookShelf(Long bookShelfId, Long userId) {
-        BookShelfEntity bookShelfEntity = bookShelfRepository.findByIdAndUserId(bookShelfId, userId).orElseThrow(BookNotFoundException::new);
-
-        return BookShelf.builder()
-            .id(bookShelfEntity.getId())
-            .build();
-    }
-
-    public Page<BookShelfEntity> readBookShelfEntity(Long userId, ReadingStatus readingStatus, Pageable pageable) {
-        return bookShelfRepository.findSpecificStatusBookByUserId(readingStatus, pageable, userId);
-    }
-
-    public BookShelfEntity readBookShelfEntity(Long userId, String isbn, LocalDate publishAt) {
-        return bookShelfRepository.findByUserIdAndIsbnAndPublishAt(userId, isbn, publishAt)
+    public BookShelf readBookShelf(Long userId, Long bookShelfId) {
+        BookShelfWithBook bookShelfWithBook = bookShelfRepository.findBookShelfWithBook(userId, bookShelfId)
             .orElseThrow(BookNotFoundException::new);
+
+        return bookShelfWithBook.toBookShelf();
+    }
+
+    public BookShelf readBookShelf(Long userId, String isbn, LocalDate publishAt) {
+        BookShelfWithBook bookShelfWithBook = bookShelfRepository.findByUserIdAndIsbnAndPublishAt(userId, isbn, publishAt)
+            .orElseThrow(BookNotFoundException::new);
+        return bookShelfWithBook.toBookShelf();
+    }
+
+    public Page<BookShelf> readPagedBookShelves(Long userId, ReadingStatus readingStatus, Pageable pageable) {
+        Page<BookShelfWithBook> pagedBookShelfWithBook = bookShelfRepository.findBookShelfWithBook(userId, readingStatus, pageable);
+        return pagedBookShelfWithBook.map(BookShelfWithBook::toBookShelf);
     }
 }

@@ -13,29 +13,29 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import toy.bookchat.bookchat.db_module.book.BookEntity;
-import toy.bookchat.bookchat.db_module.book.repository.BookRepository;
 import toy.bookchat.bookchat.db_module.chat.ChatEntity;
 import toy.bookchat.bookchat.db_module.chat.repository.ChatRepository;
 import toy.bookchat.bookchat.db_module.chatroom.ChatRoomEntity;
 import toy.bookchat.bookchat.db_module.chatroom.ChatRoomHashTagEntity;
 import toy.bookchat.bookchat.db_module.chatroom.HashTagEntity;
-import toy.bookchat.bookchat.domain.chatroom.api.dto.response.UserChatRoomDetailResponse;
 import toy.bookchat.bookchat.db_module.chatroom.repository.ChatRoomBlockedUserRepository;
 import toy.bookchat.bookchat.db_module.chatroom.repository.ChatRoomHashTagRepository;
 import toy.bookchat.bookchat.db_module.chatroom.repository.ChatRoomRepository;
 import toy.bookchat.bookchat.db_module.chatroom.repository.HashTagRepository;
 import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.response.ChatRoomsResponseSlice;
 import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.response.UserChatRoomsResponseSlice;
+import toy.bookchat.bookchat.db_module.participant.ParticipantEntity;
+import toy.bookchat.bookchat.db_module.participant.repository.ParticipantRepository;
+import toy.bookchat.bookchat.db_module.user.UserEntity;
+import toy.bookchat.bookchat.domain.book.Book;
+import toy.bookchat.bookchat.domain.book.service.BookReader;
+import toy.bookchat.bookchat.domain.chatroom.api.dto.response.UserChatRoomDetailResponse;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.ChatRoomRequest;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.CreateChatRoomRequest;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.ReviseChatRoomRequest;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.response.CreatedChatRoomDto;
-import toy.bookchat.bookchat.db_module.participant.ParticipantEntity;
-import toy.bookchat.bookchat.db_module.participant.repository.ParticipantRepository;
 import toy.bookchat.bookchat.domain.participant.service.dto.response.ChatRoomDetails;
 import toy.bookchat.bookchat.domain.storage.StorageService;
-import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.domain.user.service.UserReader;
 import toy.bookchat.bookchat.exception.badrequest.chatroom.ChatRoomIsFullException;
 import toy.bookchat.bookchat.exception.badrequest.participant.AlreadyParticipateException;
@@ -54,14 +54,15 @@ public class ChatRoomService {
     private final HashTagRepository hashTagRepository;
     private final ChatRoomHashTagRepository chatRoomHashTagRepository;
     private final StorageService storageService;
-    private final BookRepository bookRepository;
+    private final BookReader bookReader;
     private final UserReader userReader;
     private final ChatRoomBlockedUserRepository chatRoomBlockedUserRepository;
     private final MessagePublisher messagePublisher;
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public ChatRoomService(ChatRepository chatRepository, ChatRoomRepository chatRoomRepository, ParticipantRepository participantRepository, HashTagRepository hashTagRepository,
-        ChatRoomHashTagRepository chatRoomHashTagRepository, @Qualifier("chatRoomStorageService") StorageService storageService, BookRepository bookRepository, UserReader userReader,
+        ChatRoomHashTagRepository chatRoomHashTagRepository, @Qualifier("chatRoomStorageService") StorageService storageService, BookReader bookReader,
+        UserReader userReader,
         ChatRoomBlockedUserRepository chatRoomBlockedUserRepository, MessagePublisher messagePublisher) {
         this.chatRepository = chatRepository;
         this.chatRoomRepository = chatRoomRepository;
@@ -69,7 +70,7 @@ public class ChatRoomService {
         this.hashTagRepository = hashTagRepository;
         this.chatRoomHashTagRepository = chatRoomHashTagRepository;
         this.storageService = storageService;
-        this.bookRepository = bookRepository;
+        this.bookReader = bookReader;
         this.userReader = userReader;
         this.chatRoomBlockedUserRepository = chatRoomBlockedUserRepository;
         this.messagePublisher = messagePublisher;
@@ -77,29 +78,29 @@ public class ChatRoomService {
 
     @Transactional
     public CreatedChatRoomDto createChatRoom(CreateChatRoomRequest createChatRoomRequest, MultipartFile chatRoomImage, Long userId) {
-        BookEntity bookEntity = bookRepository.findByIsbnAndPublishAt(createChatRoomRequest.getIsbn(), createChatRoomRequest.getPublishAt())
-            .orElseGet(() -> bookRepository.save(createChatRoomRequest.createBook()));
-        UserEntity host = userReader.readUser(userId);
+        Book book = bookReader.readBook(createChatRoomRequest.createBook());
+
+        UserEntity host = userReader.readUserEntity(userId);
 
         if (chatRoomImageExistent(chatRoomImage)) {
             String uploadFileUrl = storageService.upload(chatRoomImage, UUID.randomUUID().toString(), LocalDateTime.now().format(dateTimeFormatter));
-            return CreatedChatRoomDto.of(registerChatRoom(createChatRoomRequest, bookEntity, host, uploadFileUrl));
+            return CreatedChatRoomDto.of(registerChatRoom(createChatRoomRequest, book, host, uploadFileUrl));
         }
-        return CreatedChatRoomDto.of(registerChatRoom(createChatRoomRequest, bookEntity, host, null));
+        return CreatedChatRoomDto.of(registerChatRoom(createChatRoomRequest, book, host, null));
     }
 
     private boolean chatRoomImageExistent(MultipartFile chatRoomImage) {
         return chatRoomImage != null;
     }
 
-    private ChatRoomEntity registerChatRoom(CreateChatRoomRequest createChatRoomRequest, BookEntity bookEntity, UserEntity host, String prefixedUUIDFileUrl) {
-        ChatRoomEntity chatRoomEntity = saveChatRoom(createChatRoomRequest, bookEntity, host, prefixedUUIDFileUrl);
+    private ChatRoomEntity registerChatRoom(CreateChatRoomRequest createChatRoomRequest, Book book, UserEntity host, String prefixedUUIDFileUrl) {
+        ChatRoomEntity chatRoomEntity = saveChatRoom(createChatRoomRequest, book, host, prefixedUUIDFileUrl);
         registerHashTagOnChatRoom(createChatRoomRequest, chatRoomEntity);
         return chatRoomEntity;
     }
 
-    private ChatRoomEntity saveChatRoom(CreateChatRoomRequest createChatRoomRequest, BookEntity bookEntity, UserEntity host, String fileUrl) {
-        ChatRoomEntity chatRoomEntity = chatRoomRepository.save(createChatRoomRequest.makeChatRoom(bookEntity, host, fileUrl));
+    private ChatRoomEntity saveChatRoom(CreateChatRoomRequest createChatRoomRequest, Book book, UserEntity host, String fileUrl) {
+        ChatRoomEntity chatRoomEntity = chatRoomRepository.save(createChatRoomRequest.makeChatRoom(book, host, fileUrl));
         saveParticipantWithRoomHostAndRoom(host, chatRoomEntity);
         return chatRoomEntity;
     }
@@ -178,7 +179,7 @@ public class ChatRoomService {
 
     @Transactional
     public void enterChatRoom(Long userId, Long roomId) {
-        UserEntity userEntity = userReader.readUser(userId);
+        UserEntity userEntity = userReader.readUserEntity(userId);
         ChatRoomEntity chatRoomEntity = chatRoomRepository.findById(roomId).orElseThrow(ChatRoomNotFoundException::new);
         participantRepository.findByUserIdAndChatRoomId(userEntity.getId(), chatRoomEntity.getId())
             .ifPresent(p -> {

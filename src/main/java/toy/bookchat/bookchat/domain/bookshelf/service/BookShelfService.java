@@ -5,16 +5,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import toy.bookchat.bookchat.db_module.book.BookEntity;
-import toy.bookchat.bookchat.db_module.bookshelf.BookShelfEntity;
-import toy.bookchat.bookchat.db_module.user.UserEntity;
+import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.book.service.BookReader;
+import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
+import toy.bookchat.bookchat.domain.bookshelf.BookShelfPageAndStarAndReadingStatus;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookShelfRequest;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ReviseBookShelfRequest;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.BookShelfResponse;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.ExistenceBookOnBookShelfResponse;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.SearchBookShelfByReadingStatus;
+import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.service.UserReader;
 
 @Service
@@ -23,46 +19,64 @@ public class BookShelfService {
 
     private final BookShelfManager bookShelfManager;
     private final BookShelfReader bookShelfReader;
+    private final BookShelfAppender bookShelfAppender;
     private final BookReader bookReader;
     private final UserReader userReader;
 
-    public BookShelfService(UserReader userReader, BookShelfManager bookShelfManager, BookShelfReader bookShelfReader, BookReader bookReader) {
+    public BookShelfService(UserReader userReader, BookShelfManager bookShelfManager, BookShelfReader bookShelfReader, BookShelfAppender bookShelfAppender, BookReader bookReader) {
         this.userReader = userReader;
         this.bookShelfManager = bookShelfManager;
         this.bookShelfReader = bookShelfReader;
+        this.bookShelfAppender = bookShelfAppender;
         this.bookReader = bookReader;
     }
 
     @Transactional(readOnly = true)
-    public BookShelfResponse getBookOnBookShelf(Long bookShelfId, Long userId) {
-        BookShelfEntity bookShelfEntity = bookShelfReader.readBookShelfEntity(bookShelfId, userId);
-        return BookShelfResponse.from(bookShelfEntity);
+    public BookShelf getBookOnBookShelf(Long bookShelfId, Long userId) {
+        return bookShelfReader.readBookShelf(userId, bookShelfId);
     }
 
     @Transactional
-    public Long putBookOnBookShelf(BookShelfRequest bookShelfRequest, Long userId) {
-        BookEntity bookEntity = bookReader.readBook(bookShelfRequest.getIsbn(), bookShelfRequest.getPublishAt(), bookShelfRequest.extractBookEntity());
-        UserEntity userEntity = userReader.readUser(userId);
-        BookShelfEntity bookShelfEntity = bookShelfRequest.createBookShelfByReadingStatus(bookEntity, userEntity);
-        bookShelfManager.store(bookShelfEntity);
-
-        return bookShelfEntity.getId();
+    public Long putBookOnBookShelf(BookShelf bookShelf, Book book, Long userId) {
+        Book storedBook = bookReader.readBook(book);
+        User user = userReader.readUser(userId);
+        return bookShelfAppender.append(bookShelf, user, storedBook);
     }
 
-    public SearchBookShelfByReadingStatus takeBooksOutOfBookShelves(ReadingStatus readingStatus, Pageable pageable, Long userId) {
-        Page<BookShelfEntity> pagingBookShelves = bookShelfReader.readBookShelfEntity(userId, readingStatus, pageable);
-        return new SearchBookShelfByReadingStatus(pagingBookShelves);
+    public Page<BookShelf> takeBooksOutOfBookShelves(ReadingStatus readingStatus, Pageable pageable, Long userId) {
+        return bookShelfReader.readPagedBookShelves(userId, readingStatus, pageable);
     }
 
-    public ExistenceBookOnBookShelfResponse getBookIfExisted(String isbn, LocalDate publishAt, Long userId) {
-        BookShelfEntity bookShelfEntity = bookShelfReader.readBookShelfEntity(userId, isbn, publishAt);
-        return ExistenceBookOnBookShelfResponse.from(bookShelfEntity);
+    public BookShelf getBookIfExisted(String isbn, LocalDate publishAt, Long userId) {
+        return bookShelfReader.readBookShelf(userId, isbn, publishAt);
     }
 
     @Transactional
-    public void reviseBookShelf(Long bookShelfId, ReviseBookShelfRequest reviseBookShelfRequest, Long userId) {
-        BookShelfEntity bookShelfEntity = bookShelfReader.readBookShelfEntity(bookShelfId, userId);
-        reviseBookShelfRequest.applyChanges(bookShelfEntity);
+    public void reviseBookShelf(Long bookShelfId, BookShelfPageAndStarAndReadingStatus bookShelfPageAndStarAndReadingStatus, Long userId) {
+        BookShelf bookShelf = bookShelfReader.readBookShelf(userId, bookShelfId);
+
+        if (bookShelf.isCompleteReading() && bookShelfPageAndStarAndReadingStatus.hasStar()) {//독서완료 도서 별점 수정
+            bookShelf.updateStar(bookShelfPageAndStarAndReadingStatus.getStar());
+            bookShelfManager.modify(bookShelf);
+
+            return;
+        }
+
+        if (bookShelf.isReading() && bookShelfPageAndStarAndReadingStatus.hasPages()) { //독서중 상태에서만 페이지 쪽수 지정
+            bookShelf.updatePage(bookShelfPageAndStarAndReadingStatus.getPages());
+            if (bookShelfPageAndStarAndReadingStatus.isReadingComplete() && bookShelfPageAndStarAndReadingStatus.hasStar()) { //독서중에서 독서 완료로 변경시 별점이 필수
+                bookShelf.updateReadingStatus(bookShelfPageAndStarAndReadingStatus.getReadingStatus());
+                bookShelf.updateStar(bookShelfPageAndStarAndReadingStatus.getStar());
+            }
+
+            bookShelfManager.modify(bookShelf);
+
+            return;
+        }
+
+        if (bookShelf.isWish() && bookShelfPageAndStarAndReadingStatus.isReading()) { // 독서예정 상태에서 독서중으로 변경
+            bookShelf.updateReadingStatus(bookShelfPageAndStarAndReadingStatus.getReadingStatus());
+        }
     }
 
     @Transactional

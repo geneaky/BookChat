@@ -11,12 +11,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import toy.bookchat.bookchat.db_module.device.DeviceEntity;
+import toy.bookchat.bookchat.db_module.user.UserEntity;
+import toy.bookchat.bookchat.db_module.user.repository.UserRepository;
 import toy.bookchat.bookchat.domain.device.service.DeviceService;
 import toy.bookchat.bookchat.domain.storage.StorageService;
-import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.domain.user.UserProfile;
 import toy.bookchat.bookchat.domain.user.api.dto.response.MemberProfileResponse;
-import toy.bookchat.bookchat.db_module.user.repository.UserRepository;
 import toy.bookchat.bookchat.domain.user.service.dto.request.ChangeUserNicknameRequest;
 import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignInRequest;
 import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignUpRequest;
@@ -72,19 +72,19 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserEntity findUserByUsername(String oauth2MemberNumber) {
-        return userReader.readUser(oauth2MemberNumber);
+        return userReader.readUserEntity(oauth2MemberNumber);
     }
 
     @Transactional
     public void deleteUser(Long userId) {
-        UserEntity userEntity = userReader.readUser(userId);
+        UserEntity userEntity = userReader.readUserEntity(userId);
         userEntity.inactive();
     }
 
     @Transactional
     public void updateUserProfile(ChangeUserNicknameRequest changeUserNicknameRequest,
         MultipartFile userProfileImage, Long userId) {
-        UserEntity userEntity = userReader.readUser(userId);
+        UserEntity userEntity = userReader.readUserEntity(userId);
         if (imageExistent(userProfileImage)) {
             updateNicknameWithProfileImage(changeUserNicknameRequest, userProfileImage, userEntity);
             return;
@@ -146,13 +146,13 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public MemberProfileResponse getMemberProfile(Long memberId) {
-        UserEntity userEntity = userReader.readUser(memberId);
+        UserEntity userEntity = userReader.readUserEntity(memberId);
         return MemberProfileResponse.of(userEntity);
     }
 
     @Transactional(readOnly = true)
     public UserProfile findUser(Long userId) {
-        UserEntity userEntity = userReader.readUser(userId);
+        UserEntity userEntity = userReader.readUserEntity(userId);
         return UserProfile.from(userEntity);
     }
 }

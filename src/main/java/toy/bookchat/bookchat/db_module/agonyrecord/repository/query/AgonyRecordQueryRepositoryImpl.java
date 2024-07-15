@@ -29,9 +29,11 @@ public class AgonyRecordQueryRepositoryImpl implements AgonyRecordQueryRepositor
     public Optional<AgonyRecordEntity> findUserAgonyRecord(Long bookShelfId, Long agonyId, Long recordId, Long userId) {
         return Optional.ofNullable(queryFactory.select(agonyRecordEntity)
             .from(agonyRecordEntity)
-            .join(agonyEntity).on(agonyRecordEntity.agonyId.eq(agonyEntity.id).and(agonyEntity.id.eq(agonyId)))
-            .join(bookShelfEntity).on(agonyEntity.bookShelfId.eq(bookShelfEntity.id).and(bookShelfEntity.id.eq(bookShelfId))
-                .and(bookShelfEntity.userEntity.id.eq(userId)))
+            .join(agonyEntity).on(agonyRecordEntity.agonyId.eq(agonyEntity.id)
+                .and(agonyEntity.id.eq(agonyId)))
+            .join(bookShelfEntity).on(agonyEntity.bookShelfId.eq(bookShelfEntity.id)
+                .and(bookShelfEntity.id.eq(bookShelfId))
+                .and(bookShelfEntity.userId.eq(userId)))
             .where(agonyRecordEntity.id.eq(recordId))
             .fetchOne());
     }
@@ -41,9 +43,11 @@ public class AgonyRecordQueryRepositoryImpl implements AgonyRecordQueryRepositor
     public Slice<AgonyRecordEntity> findSliceOfUserAgonyRecords(Long bookShelfId, Long agonyId, Long userId, Pageable pageable, Long postCursorId) {
         List<AgonyRecordEntity> contents = queryFactory.select(agonyRecordEntity)
             .from(agonyRecordEntity)
-            .join(agonyEntity).on(agonyRecordEntity.agonyId.eq(agonyEntity.id).and(agonyEntity.id.eq(agonyId)))
-            .join(bookShelfEntity).on(agonyEntity.bookShelfId.eq(bookShelfEntity.id).and(bookShelfEntity.id.eq(bookShelfId))
-                .and(bookShelfEntity.userEntity.id.eq(userId)))
+            .join(agonyEntity).on(agonyRecordEntity.agonyId.eq(agonyEntity.id)
+                .and(agonyEntity.id.eq(agonyId)))
+            .join(bookShelfEntity).on(agonyEntity.bookShelfId.eq(bookShelfEntity.id)
+                .and(bookShelfEntity.id.eq(bookShelfId))
+                .and(bookShelfEntity.userId.eq(userId)))
             .where(numberBasedPagination(agonyRecordEntity, agonyRecordEntity.id, postCursorId, pageable))
             .limit(pageable.getPageSize())
             .orderBy(extractOrderSpecifierFrom(agonyRecordEntity, pageable))
@@ -55,9 +59,8 @@ public class AgonyRecordQueryRepositoryImpl implements AgonyRecordQueryRepositor
     @Override
     public void deleteAgonyRecord(Long bookShelfId, Long agonyId, Long recordId, Long userId) {
         queryFactory.delete(agonyRecordEntity)
-            .where(agonyRecordEntity.id.eq(
-                fetchCorrespondedAgonyRecordId(bookShelfId, agonyId, recordId, userId))
-            ).execute();
+            .where(agonyRecordEntity.id.eq(fetchCorrespondedAgonyRecordId(bookShelfId, agonyId, recordId, userId)))
+            .execute();
     }
 
     @Override
@@ -65,8 +68,7 @@ public class AgonyRecordQueryRepositoryImpl implements AgonyRecordQueryRepositor
         queryFactory.update(agonyRecordEntity)
             .set(agonyRecordEntity.title, recordTitle)
             .set(agonyRecordEntity.content, recordContent)
-            .where(agonyRecordEntity.id.eq(
-                fetchCorrespondedAgonyRecordId(bookShelfId, agonyId, recordId, userId)))
+            .where(agonyRecordEntity.id.eq(fetchCorrespondedAgonyRecordId(bookShelfId, agonyId, recordId, userId)))
             .execute();
     }
 
@@ -79,9 +81,11 @@ public class AgonyRecordQueryRepositoryImpl implements AgonyRecordQueryRepositor
          */
         return queryFactory.select(agonyRecordEntity.id)
             .from(agonyRecordEntity)
-            .join(agonyEntity).on(agonyRecordEntity.agonyId.eq(agonyEntity.id).and(agonyEntity.id.eq(agonyId)))
-            .join(bookShelfEntity).on(agonyEntity.bookShelfId.eq(bookShelfEntity.id).and(bookShelfEntity.id.eq(bookShelfId))
-                .and(bookShelfEntity.userEntity.id.eq(userId)))
+            .join(agonyEntity).on(agonyRecordEntity.agonyId.eq(agonyEntity.id)
+                .and(agonyEntity.id.eq(agonyId)))
+            .join(bookShelfEntity).on(agonyEntity.bookShelfId.eq(bookShelfEntity.id)
+                .and(bookShelfEntity.id.eq(bookShelfId))
+                .and(bookShelfEntity.userId.eq(userId)))
             .where(agonyRecordEntity.id.eq(recordId))
             .fetchOne();
     }
@@ -93,8 +97,9 @@ public class AgonyRecordQueryRepositoryImpl implements AgonyRecordQueryRepositor
                 JPAExpressions.select(agonyEntity.id)
                     .from(agonyEntity)
                     .join(bookShelfEntity)
-                    .on(agonyEntity.bookShelfId.eq(bookShelfEntity.id).and(bookShelfEntity.id.eq(bookShelfId))
-                        .and(bookShelfEntity.userEntity.id.eq(userId)))
+                    .on(agonyEntity.bookShelfId.eq(bookShelfEntity.id)
+                        .and(bookShelfEntity.id.eq(bookShelfId))
+                        .and(bookShelfEntity.userId.eq(userId)))
                     .where(agonyEntity.id.in(agoniesIds))
             )).execute();
     }
@@ -106,7 +111,8 @@ public class AgonyRecordQueryRepositoryImpl implements AgonyRecordQueryRepositor
                 JPAExpressions.select(agonyEntity.id)
                     .from(agonyEntity)
                     .join(bookShelfEntity)
-                    .on(agonyEntity.bookShelfId.eq(bookShelfEntity.id).and(bookShelfEntity.userEntity.id.eq(userId)))
+                    .on(agonyEntity.bookShelfId.eq(bookShelfEntity.id)
+                        .and(bookShelfEntity.userId.eq(userId)))
             )).execute();
     }
 
@@ -117,8 +123,9 @@ public class AgonyRecordQueryRepositoryImpl implements AgonyRecordQueryRepositor
                 JPAExpressions.select(agonyEntity.id)
                     .from(agonyEntity)
                     .join(bookShelfEntity)
-                    .on(agonyEntity.bookShelfId.eq(bookShelfEntity.id).and(bookShelfEntity.id.eq(bookShelfId))
-                        .and(bookShelfEntity.userEntity.id.eq(userId)))
+                    .on(agonyEntity.bookShelfId.eq(bookShelfEntity.id)
+                        .and(bookShelfEntity.id.eq(bookShelfId))
+                        .and(bookShelfEntity.userId.eq(userId)))
             )).execute();
     }
 

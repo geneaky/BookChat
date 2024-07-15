@@ -23,10 +23,6 @@ public class BookShelfManager {
         this.agonyRecordRepository = agonyRecordRepository;
     }
 
-    public void store(BookShelfEntity bookShelfEntity) {
-        bookShelfRepository.save(bookShelfEntity);
-    }
-
     public void vacate(Long bookShelfId, Long userId) {
         agonyRecordRepository.deleteByBookShelfIdAndUserId(bookShelfId, userId);
         agonyRepository.deleteByBookShelfIdAndUserId(bookShelfId, userId);
@@ -40,5 +36,10 @@ public class BookShelfManager {
     public void modify(BookShelf bookShelf, ReadingStatus readingStatus) {
         BookShelfEntity bookShelfEntity = bookShelfRepository.findById(bookShelf.getId()).orElseThrow(BookNotFoundException::new);
         bookShelfEntity.updateReadingStatus(readingStatus);
+    }
+
+    public void modify(BookShelf bookShelf) {
+        BookShelfEntity bookShelfEntity = bookShelfRepository.findById(bookShelf.getId()).orElseThrow(BookNotFoundException::new);
+        bookShelfEntity.updateWithoutBook(bookShelf);
     }
 }

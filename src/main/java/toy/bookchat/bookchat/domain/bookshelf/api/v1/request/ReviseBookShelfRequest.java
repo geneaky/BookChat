@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.domain.bookshelf.service.dto.request;
+package toy.bookchat.bookchat.domain.bookshelf.api.v1.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.validation.constraints.NotNull;

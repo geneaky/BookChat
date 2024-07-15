@@ -30,14 +30,10 @@ public class AgonyQueryRepositoryImpl implements AgonyQueryRepository {
             queryFactory.select(agonyEntity)
                 .from(agonyEntity)
                 .join(bookShelfEntity)
-                .on(
-                    bookShelfEntity.id.eq(agonyEntity.bookShelfId)
-                        .and(bookShelfEntity.userEntity.id.eq(userId))
-                )
-                .where(
-                    agonyEntity.id.eq(agonyId)
-                        .and(agonyEntity.bookShelfId.eq(bookShelfId))
-                )
+                .on(bookShelfEntity.id.eq(agonyEntity.bookShelfId)
+                    .and(bookShelfEntity.userId.eq(userId)))
+                .where(agonyEntity.id.eq(agonyId)
+                    .and(agonyEntity.bookShelfId.eq(bookShelfId)))
                 .fetchOne());
     }
 
@@ -51,7 +47,7 @@ public class AgonyQueryRepositoryImpl implements AgonyQueryRepository {
             .on(
                 agonyEntity.bookShelfId.eq(bookShelfEntity.id)
                     .and(bookShelfEntity.id.eq(bookShelfId))
-                    .and(bookShelfEntity.userEntity.id.eq(userId))
+                    .and(bookShelfEntity.userId.eq(userId))
             )
             .where(numberBasedPagination(agonyEntity, agonyEntity.id, postCursorId, pageable))
             .limit(pageable.getPageSize())
@@ -67,7 +63,7 @@ public class AgonyQueryRepositoryImpl implements AgonyQueryRepository {
             .where(agonyEntity.bookShelfId.in(
                     JPAExpressions.select(bookShelfEntity.id)
                         .from(bookShelfEntity)
-                        .where(bookShelfEntity.userEntity.id.eq(userId))),
+                        .where(bookShelfEntity.userId.eq(userId))),
                 agonyEntity.id.in(agoniesIds)
             ).execute();
     }
@@ -78,7 +74,7 @@ public class AgonyQueryRepositoryImpl implements AgonyQueryRepository {
             .where(agonyEntity.bookShelfId.in(
                 JPAExpressions.select(bookShelfEntity.id)
                     .from(bookShelfEntity)
-                    .where(bookShelfEntity.userEntity.id.eq(userId))
+                    .where(bookShelfEntity.userId.eq(userId))
             )).execute();
     }
 
@@ -89,7 +85,7 @@ public class AgonyQueryRepositoryImpl implements AgonyQueryRepository {
                 JPAExpressions.select(bookShelfEntity.id)
                     .from(bookShelfEntity)
                     .where(bookShelfEntity.id.eq(bookShelfId)
-                        .and(bookShelfEntity.userEntity.id.eq(userId)))
+                        .and(bookShelfEntity.userId.eq(userId)))
             )).execute();
     }
 }

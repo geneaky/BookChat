@@ -1,5 +1,6 @@
 package toy.bookchat.bookchat.db_module.chatroom.repository.query;
 
+import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static toy.bookchat.bookchat.db_module.book.QBookEntity.bookEntity;
@@ -23,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
 import toy.bookchat.bookchat.db_module.book.BookEntity;
+import toy.bookchat.bookchat.db_module.book.QBookEntity;
 import toy.bookchat.bookchat.db_module.chat.QChatEntity;
 import toy.bookchat.bookchat.db_module.chatroom.ChatRoomEntity;
 import toy.bookchat.bookchat.db_module.chatroom.QChatRoomHashTagEntity;
@@ -112,21 +114,27 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
 
         List<Long> chatRoomIds = contents.stream().map(UserChatRoomResponse::getRoomId)
             .collect(toList());
+
         List<ChatRoomEntity> chatRoomEntities = queryFactory.select(chatRoomEntity)
             .from(chatRoomEntity)
-            .join(chatRoomEntity.bookEntity, bookEntity).fetchJoin()
             .where(chatRoomEntity.id.in(chatRoomIds))
             .fetch();
+        Map<Long, Long> chatRoomIdBookIdMap = chatRoomEntities.stream().collect(toMap(ChatRoomEntity::getId, ChatRoomEntity::getBookId));
 
-        Map<Long, BookEntity> mapBooksByChatRoomId = chatRoomEntities.stream()
-            .collect(toMap(ChatRoomEntity::getId, ChatRoomEntity::getBookEntity));
-        contents.forEach(c -> c.setBookInfo(mapBooksByChatRoomId.get(c.getRoomId())));
+        List<BookEntity> bookEntities = queryFactory.select(bookEntity)
+            .from(bookEntity)
+            .join(chatRoomEntity).on(chatRoomEntity.bookId.eq(bookEntity.id))
+            .where(chatRoomEntity.id.in(chatRoomIds))
+            .fetch();
+        Map<Long, BookEntity> bookIdBookEntityMap = bookEntities.stream().collect(toMap(BookEntity::getId, identity()));
+
+        contents.forEach(c -> c.setBookInfo(bookIdBookEntityMap.get(chatRoomIdBookIdMap.get(c.getRoomId()))));
 
         return toSlice(contents, pageable);
     }
 
     private BooleanExpression eqBookId(Long bookId) {
-        return bookId == null ? null : chatRoomEntity.bookEntity.id.eq(bookId);
+        return bookId == null ? null : chatRoomEntity.bookId.eq(bookId);
     }
 
     @Override
@@ -159,7 +167,7 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
                 ))
             .from(chatRoomEntity)
             .join(userEntity).on(chatRoomEntity.host.id.eq(userEntity.id))
-            .join(bookEntity).on(chatRoomEntity.bookEntity.id.eq(bookEntity.id))
+            .join(bookEntity).on(chatRoomEntity.bookId.eq(bookEntity.id))
             .join(chatRoomHashTagEntity).on(chatRoomHashTagEntity.chatRoomEntity.id.in(
                 JPAExpressions.select(subChatRoomHashTag.chatRoomEntity.id)
                     .from(subChatRoomHashTag)
@@ -185,15 +193,21 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
 
         List<Long> chatRoomIds = contents.stream().map(ChatRoomResponse::getRoomId)
             .collect(toList());
+
         List<ChatRoomEntity> chatRoomEntities = queryFactory.select(chatRoomEntity)
             .from(chatRoomEntity)
-            .join(chatRoomEntity.bookEntity, bookEntity).fetchJoin()
             .where(chatRoomEntity.id.in(chatRoomIds))
             .fetch();
+        Map<Long, Long> chatRoomBookIdMap = chatRoomEntities.stream().collect(toMap(ChatRoomEntity::getId, ChatRoomEntity::getBookId));
 
-        Map<Long, List<String>> authorsMap = chatRoomEntities.stream()
-            .collect(toMap(ChatRoomEntity::getId, ChatRoomEntity::getBookAuthors));
-        contents.forEach(c -> c.setBookAuthors(authorsMap.get(c.getRoomId())));
+        List<BookEntity> bookEntities = queryFactory.select(bookEntity)
+            .from(bookEntity)
+            .join(chatRoomEntity).on(chatRoomEntity.bookId.eq(bookEntity.id))
+            .where(chatRoomEntity.id.in(chatRoomIds))
+            .fetch();
+        Map<Long, List<String>> bookIdAuthorsMap = bookEntities.stream().collect(toMap(BookEntity::getId, BookEntity::getAuthors));
+
+        contents.forEach(c -> c.setBookAuthors(bookIdAuthorsMap.get(chatRoomBookIdMap.get(c.getRoomId()))));
 
         return toSlice(contents, pageable);
     }
@@ -210,7 +224,6 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
             .from(participantEntity)
             .join(participantEntity.userEntity, userEntity).fetchJoin()
             .join(participantEntity.chatRoomEntity, chatRoomEntity).fetchJoin()
-            .join(chatRoomEntity.bookEntity, bookEntity).fetchJoin()
             .where(participantEntity.chatRoomEntity.id.eq(JPAExpressions.select(subParticipant.chatRoomEntity.id)
                 .from(subParticipant)
                 .where(subParticipant.chatRoomEntity.id.eq(roomId)
@@ -227,7 +240,13 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
             .where(chatRoomHashTagEntity.chatRoomEntity.id.eq(roomId))
             .fetch();
 
-        return ChatRoomDetails.from(participantEntities, roomTags);
+        BookEntity bookEntity = queryFactory.select(QBookEntity.bookEntity)
+            .from(QBookEntity.bookEntity)
+            .join(chatRoomEntity).on(chatRoomEntity.bookId.eq(QBookEntity.bookEntity.id))
+            .where(chatRoomEntity.id.eq(roomId))
+            .fetchOne();
+
+        return ChatRoomDetails.from(participantEntities, roomTags, bookEntity);
     }
 
     @Override
