@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.LocalDate;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -14,7 +15,22 @@ import toy.bookchat.bookchat.domain.RepositoryTest;
 class BookEntityRepositoryTest extends RepositoryTest {
 
     @Autowired
-    BookRepository bookRepository;
+    private BookRepository bookRepository;
+
+    @Test
+    void 책_저장() throws Exception {
+        BookEntity bookEntity = BookEntity.builder()
+            .isbn("1-4133-0454-0")
+            .title("effective java")
+            .authors(List.of("Joshua"))
+            .publisher("insight")
+            .publishAt(LocalDate.now())
+            .bookCoverImageUrl("bookCover@naver.com")
+            .build();
+
+        BookEntity savedBookEntity = bookRepository.save(bookEntity);
+        assertThat(bookEntity).isEqualTo(savedBookEntity);
+    }
 
     @Test
     void ISBN_출판일로_도서_조회_성공() throws Exception {

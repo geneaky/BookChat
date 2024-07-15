@@ -17,13 +17,13 @@ import toy.bookchat.bookchat.db_module.book.BookEntity;
 import toy.bookchat.bookchat.db_module.book.repository.BookRepository;
 import toy.bookchat.bookchat.db_module.chat.ChatEntity;
 import toy.bookchat.bookchat.db_module.chat.repository.ChatRepository;
-import toy.bookchat.bookchat.domain.RepositoryTest;
 import toy.bookchat.bookchat.db_module.chatroom.ChatRoomEntity;
 import toy.bookchat.bookchat.db_module.chatroom.repository.ChatRoomRepository;
 import toy.bookchat.bookchat.db_module.participant.ParticipantEntity;
 import toy.bookchat.bookchat.db_module.participant.repository.ParticipantRepository;
 import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.db_module.user.repository.UserRepository;
+import toy.bookchat.bookchat.domain.RepositoryTest;
 
 class ChatEntityRepositoryTest extends RepositoryTest {
 
@@ -54,7 +54,7 @@ class ChatEntityRepositoryTest extends RepositoryTest {
         bookRepository.save(bookEntity);
 
         ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
-            .bookEntity(bookEntity)
+            .bookId(bookEntity.getId())
             .host(userEntity1)
             .roomSize(348)
             .roomSid("XKewmLwG")
@@ -120,12 +120,14 @@ class ChatEntityRepositoryTest extends RepositoryTest {
         userRepository.saveAll(List.of(userEntity1, userEntity2));
 
         ChatRoomEntity chatRoomEntity1 = ChatRoomEntity.builder()
+            .bookId(1L)
             .host(userEntity1)
             .roomSize(348)
             .roomSid("XKewmLwG")
             .defaultRoomImageType(1)
             .build();
         ChatRoomEntity chatRoomEntity2 = ChatRoomEntity.builder()
+            .bookId(2L)
             .host(userEntity1)
             .roomSize(200)
             .roomSid("pzSzDwI0Ev")

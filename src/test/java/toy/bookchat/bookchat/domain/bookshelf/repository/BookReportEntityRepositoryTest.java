@@ -28,6 +28,8 @@ class BookReportEntityRepositoryTest extends RepositoryTest {
     @Test
     void 독후감_저장_성공() throws Exception {
         BookShelfEntity bookShelfEntity = BookShelfEntity.builder()
+            .userId(1L)
+            .bookId(1L)
             .build();
         bookShelfRepository.save(bookShelfEntity);
 

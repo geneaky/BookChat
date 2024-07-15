@@ -13,12 +13,12 @@ import toy.bookchat.bookchat.db_module.book.BookEntity;
 import toy.bookchat.bookchat.db_module.book.repository.BookRepository;
 import toy.bookchat.bookchat.db_module.bookshelf.BookShelfEntity;
 import toy.bookchat.bookchat.db_module.bookshelf.repository.BookShelfRepository;
-import toy.bookchat.bookchat.db_module.scrap.repository.ScrapRepository;
-import toy.bookchat.bookchat.domain.RepositoryTest;
 import toy.bookchat.bookchat.db_module.scrap.ScrapEntity;
-import toy.bookchat.bookchat.domain.scrap.service.dto.response.ScrapResponse;
+import toy.bookchat.bookchat.db_module.scrap.repository.ScrapRepository;
 import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.db_module.user.repository.UserRepository;
+import toy.bookchat.bookchat.domain.RepositoryTest;
+import toy.bookchat.bookchat.domain.scrap.service.dto.response.ScrapResponse;
 
 class ScrapEntityRepositoryTest extends RepositoryTest {
 
@@ -43,8 +43,8 @@ class ScrapEntityRepositoryTest extends RepositoryTest {
         bookRepository.save(bookEntity);
 
         BookShelfEntity bookShelfEntity = BookShelfEntity.builder()
-            .bookEntity(bookEntity)
-            .userEntity(userEntity)
+            .bookId(bookEntity.getId())
+            .userId(userEntity.getId())
             .build();
         bookShelfRepository.save(bookShelfEntity);
 
@@ -75,8 +75,8 @@ class ScrapEntityRepositoryTest extends RepositoryTest {
         bookRepository.save(bookEntity);
 
         BookShelfEntity bookShelfEntity = BookShelfEntity.builder()
-            .bookEntity(bookEntity)
-            .userEntity(userEntity)
+            .bookId(bookEntity.getId())
+            .userId(userEntity.getId())
             .build();
         bookShelfRepository.save(bookShelfEntity);
 

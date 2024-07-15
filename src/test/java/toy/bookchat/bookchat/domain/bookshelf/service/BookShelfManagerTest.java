@@ -32,16 +32,6 @@ class BookShelfManagerTest {
     private BookShelfManager bookShelfManager;
 
     @Test
-    void 서재를_저장한다() throws Exception {
-        BookShelfEntity bookShelfEntity = BookShelfEntity.builder()
-            .build();
-
-        bookShelfManager.store(bookShelfEntity);
-
-        verify(bookShelfRepository).save(bookShelfEntity);
-    }
-
-    @Test
     void 서재와_관련_기록들을_비운다() throws Exception {
         bookShelfManager.vacate(1L, 2L);
 
@@ -61,7 +51,23 @@ class BookShelfManagerTest {
     void 서재의_독서_상태를_변경_성공() throws Exception {
         BookShelfEntity bookShelfEntity = BookShelfEntity.builder().readingStatus(READING).build();
         given(bookShelfRepository.findById(any())).willReturn(Optional.of(bookShelfEntity));
-        bookShelfManager.modify(BookShelf.builder().id(1L).build(), COMPLETE);
+        BookShelf bookShelf = BookShelf.builder()
+            .id(1L)
+            .readingStatus(COMPLETE)
+            .build();
+        bookShelfManager.modify(bookShelf);
+
+        assertThat(bookShelfEntity.getReadingStatus()).isEqualTo(COMPLETE);
+    }
+
+    @Test
+    void 사용자_도서의_상태를_변경한다() throws Exception {
+        BookShelfEntity bookShelfEntity = BookShelfEntity.builder().readingStatus(READING).build();
+        given(bookShelfRepository.findById(any())).willReturn(Optional.of(bookShelfEntity));
+        BookShelf bookShelf = BookShelf.builder()
+            .id(1L)
+            .build();
+        bookShelfManager.modify(bookShelf, COMPLETE);
 
         assertThat(bookShelfEntity.getReadingStatus()).isEqualTo(COMPLETE);
     }

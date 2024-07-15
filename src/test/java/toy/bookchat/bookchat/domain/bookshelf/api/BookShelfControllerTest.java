@@ -46,18 +46,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.web.servlet.MockMvc;
-import toy.bookchat.bookchat.db_module.book.BookEntity;
-import toy.bookchat.bookchat.db_module.bookshelf.BookShelfEntity;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
+import toy.bookchat.bookchat.domain.book.Book;
+import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
+import toy.bookchat.bookchat.domain.bookshelf.api.v1.request.BookRequest;
+import toy.bookchat.bookchat.domain.bookshelf.api.v1.request.CreateBookShelfRequest;
+import toy.bookchat.bookchat.domain.bookshelf.api.v1.request.ReviseBookShelfRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.BookShelfService;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookRequest;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookShelfRequest;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ReviseBookShelfRequest;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.BookShelfResponse;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.ExistenceBookOnBookShelfResponse;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.SearchBookShelfByReadingStatus;
-import toy.bookchat.bookchat.db_module.user.UserEntity;
 
 @BookShelfPresentationTest
 class BookShelfControllerTest extends ControllerTestExtension {
@@ -82,15 +78,15 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .build();
     }
 
-    private BookShelfRequest getBookShelfRequest(ReadingStatus readingStatus) {
+    private CreateBookShelfRequest getBookShelfRequest(ReadingStatus readingStatus) {
         if (readingStatus == COMPLETE) {
-            return BookShelfRequest.builder()
+            return CreateBookShelfRequest.builder()
                 .bookRequest(getBookRequest())
                 .readingStatus(readingStatus)
                 .star(FOUR)
                 .build();
         }
-        return BookShelfRequest.builder()
+        return CreateBookShelfRequest.builder()
             .bookRequest(getBookRequest())
             .readingStatus(readingStatus)
             .build();
@@ -107,14 +103,18 @@ class BookShelfControllerTest extends ControllerTestExtension {
 
     @Test
     void 책_단_건조회_성공() throws Exception {
-        BookShelfResponse response = BookShelfResponse.builder()
-            .bookShelfId(234L)
+        Book book = Book.builder()
             .title("effectiveJava")
             .isbn("124151214")
             .bookCoverImageUrl("bookCoverImage.com")
             .authors(List.of("Joshua"))
             .publisher("oreilly")
             .publishAt(LocalDate.now())
+            .build();
+
+        BookShelf response = BookShelf.builder()
+            .id(12L)
+            .book(book)
             .pages(152)
             .star(FOUR_HALF)
             .lastUpdatedAt(LocalDateTime.now())
@@ -148,10 +148,7 @@ class BookShelfControllerTest extends ControllerTestExtension {
 
     @Test
     void 읽고_있는_책_등록_성공() throws Exception {
-        BookShelfEntity bookShelfEntity = BookShelfEntity.builder()
-            .id(234L)
-            .build();
-        given(bookShelfService.putBookOnBookShelf(any(), any())).willReturn(456L);
+        given(bookShelfService.putBookOnBookShelf(any(), any(), any())).willReturn(456L);
 
         mockMvc.perform(post("/v1/api/bookshelves")
                 .header(AUTHORIZATION, JWT_TOKEN)
@@ -176,21 +173,15 @@ class BookShelfControllerTest extends ControllerTestExtension {
                     headerWithName(LOCATION).description("등록된 책 조회 URI")
                 )
             ));
-
-        verify(bookShelfService).putBookOnBookShelf(any(BookShelfRequest.class), any());
     }
 
     @Test
     void 읽은_책_등록_성공() throws Exception {
-        BookShelfEntity bookShelfEntity = BookShelfEntity.builder()
-            .id(234L)
-            .build();
-        given(bookShelfService.putBookOnBookShelf(any(), any())).willReturn(343L);
+        given(bookShelfService.putBookOnBookShelf(any(), any(), any())).willReturn(456L);
 
         mockMvc.perform(post("/v1/api/bookshelves")
                 .header(AUTHORIZATION, JWT_TOKEN)
-                .content(
-                    objectMapper.writeValueAsString(getBookShelfRequest(COMPLETE)))
+                .content(objectMapper.writeValueAsString(getBookShelfRequest(COMPLETE)))
                 .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isCreated())
@@ -211,17 +202,11 @@ class BookShelfControllerTest extends ControllerTestExtension {
                     headerWithName(LOCATION).description("등록된 책 조회 URI")
                 )
             ));
-
-        verify(bookShelfService).putBookOnBookShelf(any(BookShelfRequest.class),
-            any());
     }
 
     @Test
     void 읽을_책_등록_성공() throws Exception {
-        BookShelfEntity bookShelfEntity = BookShelfEntity.builder()
-            .id(234L)
-            .build();
-        given(bookShelfService.putBookOnBookShelf(any(), any())).willReturn(847L);
+        given(bookShelfService.putBookOnBookShelf(any(), any(), any())).willReturn(456L);
 
         mockMvc.perform(post("/v1/api/bookshelves")
                 .header(AUTHORIZATION, JWT_TOKEN)
@@ -247,9 +232,6 @@ class BookShelfControllerTest extends ControllerTestExtension {
                     headerWithName(LOCATION).description("등록된 책 조회 URI")
                 )
             ));
-
-        verify(bookShelfService).putBookOnBookShelf(any(BookShelfRequest.class),
-            any());
     }
 
     @Test
@@ -263,13 +245,13 @@ class BookShelfControllerTest extends ControllerTestExtension {
 
     @Test
     void readingStatus_없이_요청_실패() throws Exception {
-        BookShelfRequest bookShelfRequest = BookShelfRequest.builder()
+        CreateBookShelfRequest createBookShelfRequest = CreateBookShelfRequest.builder()
             .bookRequest(getBookRequest())
             .build();
 
         mockMvc.perform(post("/v1/api/bookshelves")
                 .header(AUTHORIZATION, JWT_TOKEN)
-                .content(objectMapper.writeValueAsString(bookShelfRequest))
+                .content(objectMapper.writeValueAsString(createBookShelfRequest))
                 .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isBadRequest());
@@ -284,14 +266,14 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .publisher("oreilly")
             .bookCoverImageUrl("bookCoverImage.com")
             .build();
-        BookShelfRequest bookShelfRequest = BookShelfRequest.builder()
+        CreateBookShelfRequest createBookShelfRequest = CreateBookShelfRequest.builder()
             .bookRequest(bookRequest)
             .readingStatus(WISH)
             .build();
 
         mockMvc.perform(post("/v1/api/bookshelves")
                 .header(AUTHORIZATION, JWT_TOKEN)
-                .content(objectMapper.writeValueAsString(bookShelfRequest))
+                .content(objectMapper.writeValueAsString(createBookShelfRequest))
                 .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isBadRequest());
@@ -306,14 +288,14 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .publisher("oreilly")
             .bookCoverImageUrl("bookCoverImage.com")
             .build();
-        BookShelfRequest bookShelfRequest = BookShelfRequest.builder()
+        CreateBookShelfRequest createBookShelfRequest = CreateBookShelfRequest.builder()
             .bookRequest(bookRequest)
             .readingStatus(WISH)
             .build();
 
         mockMvc.perform(post("/v1/api/bookshelves")
                 .header(AUTHORIZATION, JWT_TOKEN)
-                .content(objectMapper.writeValueAsString(bookShelfRequest))
+                .content(objectMapper.writeValueAsString(createBookShelfRequest))
                 .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isBadRequest());
@@ -327,14 +309,14 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .publisher("oreilly")
             .bookCoverImageUrl("bookCoverImage.com")
             .build();
-        BookShelfRequest bookShelfRequest = BookShelfRequest.builder()
+        CreateBookShelfRequest createBookShelfRequest = CreateBookShelfRequest.builder()
             .bookRequest(bookRequest)
             .readingStatus(WISH)
             .build();
 
         mockMvc.perform(post("/v1/api/bookshelves")
                 .header(AUTHORIZATION, JWT_TOKEN)
-                .content(objectMapper.writeValueAsString(bookShelfRequest))
+                .content(objectMapper.writeValueAsString(createBookShelfRequest))
                 .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isBadRequest());
@@ -350,14 +332,14 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .bookCoverImageUrl("bookCoverImage.com")
             .build();
 
-        BookShelfRequest bookShelfRequest = BookShelfRequest.builder()
+        CreateBookShelfRequest createBookShelfRequest = CreateBookShelfRequest.builder()
             .bookRequest(bookRequest)
             .readingStatus(WISH)
             .build();
 
         mockMvc.perform(post("/v1/api/bookshelves")
                 .header(AUTHORIZATION, JWT_TOKEN)
-                .content(objectMapper.writeValueAsString(bookShelfRequest))
+                .content(objectMapper.writeValueAsString(createBookShelfRequest))
                 .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isBadRequest());
@@ -372,14 +354,14 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .bookCoverImageUrl("bookCoverImage.com")
             .build();
 
-        BookShelfRequest bookShelfRequest = BookShelfRequest.builder()
+        CreateBookShelfRequest createBookShelfRequest = CreateBookShelfRequest.builder()
             .bookRequest(bookRequest)
             .readingStatus(WISH)
             .build();
 
         mockMvc.perform(post("/v1/api/bookshelves")
                 .header(AUTHORIZATION, JWT_TOKEN)
-                .content(objectMapper.writeValueAsString(bookShelfRequest))
+                .content(objectMapper.writeValueAsString(createBookShelfRequest))
                 .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isBadRequest());
@@ -395,14 +377,14 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .bookCoverImageUrl("bookCoverImage.com")
             .build();
 
-        BookShelfRequest bookShelfRequest = BookShelfRequest.builder()
+        CreateBookShelfRequest createBookShelfRequest = CreateBookShelfRequest.builder()
             .bookRequest(bookRequest)
             .readingStatus(WISH)
             .build();
 
         mockMvc.perform(post("/v1/api/bookshelves")
                 .header(AUTHORIZATION, JWT_TOKEN)
-                .content(objectMapper.writeValueAsString(bookShelfRequest))
+                .content(objectMapper.writeValueAsString(createBookShelfRequest))
                 .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isBadRequest());
@@ -417,14 +399,14 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .bookCoverImageUrl("bookCoverImage.com")
             .build();
 
-        BookShelfRequest bookShelfRequest = BookShelfRequest.builder()
+        CreateBookShelfRequest createBookShelfRequest = CreateBookShelfRequest.builder()
             .bookRequest(bookRequest)
             .readingStatus(WISH)
             .build();
 
         mockMvc.perform(post("/v1/api/bookshelves")
                 .header(AUTHORIZATION, JWT_TOKEN)
-                .content(objectMapper.writeValueAsString(bookShelfRequest))
+                .content(objectMapper.writeValueAsString(createBookShelfRequest))
                 .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isBadRequest());
@@ -440,14 +422,14 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .bookCoverImageUrl("bookCoverImage.com")
             .build();
 
-        BookShelfRequest bookShelfRequest = BookShelfRequest.builder()
+        CreateBookShelfRequest createBookShelfRequest = CreateBookShelfRequest.builder()
             .bookRequest(bookRequest)
             .readingStatus(WISH)
             .build();
 
         mockMvc.perform(post("/v1/api/bookshelves")
                 .header(AUTHORIZATION, JWT_TOKEN)
-                .content(objectMapper.writeValueAsString(bookShelfRequest))
+                .content(objectMapper.writeValueAsString(createBookShelfRequest))
                 .contentType(APPLICATION_JSON)
                 .with(user(getUserPrincipal())))
             .andExpect(status().isBadRequest());
@@ -455,11 +437,9 @@ class BookShelfControllerTest extends ControllerTestExtension {
 
     @Test
     void 읽고있는_책_조회_성공() throws Exception {
-        List<BookShelfEntity> result = new ArrayList<>();
+        List<BookShelf> result = new ArrayList<>();
 
-        UserEntity userEntity = UserEntity.builder().build();
-        BookEntity bookEntity = BookEntity.builder()
-            .id(1L)
+        Book book = Book.builder()
             .isbn("12345")
             .title("effectiveJava")
             .authors(List.of("joshua"))
@@ -468,25 +448,19 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .publishAt(LocalDate.now())
             .build();
 
-        BookShelfEntity bookShelfEntity = BookShelfEntity.builder()
+        BookShelf bookShelf = BookShelf.builder()
             .id(1L)
-            .bookEntity(bookEntity)
-            .userEntity(userEntity)
+            .book(book)
             .pages(152)
             .readingStatus(READING)
+            .lastUpdatedAt(LocalDateTime.now())
             .build();
-        bookShelfEntity.setUpdatedAt(LocalDateTime.now());
 
-        result.add(bookShelfEntity);
+        result.add(bookShelf);
 
         PageRequest pageRequest = PageRequest.of(0, 1, Sort.by("id").descending());
-        PageImpl<BookShelfEntity> bookShelves = new PageImpl<>(result, pageRequest, 1);
-        SearchBookShelfByReadingStatus searchBookShelfByReadingStatus = new SearchBookShelfByReadingStatus(
-            bookShelves);
-
-        when(bookShelfService.takeBooksOutOfBookShelves(any(ReadingStatus.class),
-            any(Pageable.class),
-            any())).thenReturn(searchBookShelfByReadingStatus);
+        PageImpl<BookShelf> bookShelves = new PageImpl<>(result, pageRequest, 1);
+        when(bookShelfService.takeBooksOutOfBookShelves(any(ReadingStatus.class), any(Pageable.class), any())).thenReturn(bookShelves);
 
         mockMvc.perform(get("/v1/api/bookshelves")
                 .header(AUTHORIZATION, JWT_TOKEN)
@@ -529,12 +503,9 @@ class BookShelfControllerTest extends ControllerTestExtension {
 
     @Test
     void 읽은_책_조회_성공() throws Exception {
-        List<BookShelfEntity> result = new ArrayList<>();
+        List<BookShelf> result = new ArrayList<>();
 
-        UserEntity userEntity = UserEntity.builder().build();
-
-        BookEntity bookEntity = BookEntity.builder()
-            .id(1L)
+        Book book = Book.builder()
             .isbn("12345")
             .title("effectiveJava")
             .authors(List.of("joshua"))
@@ -543,26 +514,20 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .publishAt(LocalDate.now())
             .build();
 
-        BookShelfEntity bookShelfEntity = BookShelfEntity.builder()
+        BookShelf bookShelf = BookShelf.builder()
             .id(1L)
-            .bookEntity(bookEntity)
-            .userEntity(userEntity)
-            .pages(0)
-            .readingStatus(READING)
+            .book(book)
+            .pages(152)
+            .readingStatus(COMPLETE)
             .star(FOUR_HALF)
+            .lastUpdatedAt(LocalDateTime.now())
             .build();
-        bookShelfEntity.setUpdatedAt(LocalDateTime.now());
 
-        result.add(bookShelfEntity);
+        result.add(bookShelf);
 
         PageRequest pageRequest = PageRequest.of(0, 1, Sort.by("id").descending());
-        PageImpl<BookShelfEntity> bookShelves = new PageImpl<>(result, pageRequest, 1);
-        SearchBookShelfByReadingStatus searchBookShelfByReadingStatus = new SearchBookShelfByReadingStatus(
-            bookShelves);
-
-        when(bookShelfService.takeBooksOutOfBookShelves(any(ReadingStatus.class),
-            any(Pageable.class),
-            any())).thenReturn(searchBookShelfByReadingStatus);
+        PageImpl<BookShelf> bookShelves = new PageImpl<>(result, pageRequest, 1);
+        when(bookShelfService.takeBooksOutOfBookShelves(any(ReadingStatus.class), any(Pageable.class), any())).thenReturn(bookShelves);
 
         mockMvc.perform(get("/v1/api/bookshelves")
                 .header(AUTHORIZATION, JWT_TOKEN)
@@ -605,11 +570,9 @@ class BookShelfControllerTest extends ControllerTestExtension {
 
     @Test
     void 읽을_책_조회_성공() throws Exception {
-        List<BookShelfEntity> result = new ArrayList<>();
+        List<BookShelf> result = new ArrayList<>();
 
-        UserEntity userEntity = UserEntity.builder().build();
-        BookEntity bookEntity = BookEntity.builder()
-            .id(1L)
+        Book book = Book.builder()
             .isbn("12345")
             .title("effectiveJava")
             .authors(List.of("joshua"))
@@ -618,26 +581,19 @@ class BookShelfControllerTest extends ControllerTestExtension {
             .publishAt(LocalDate.now())
             .build();
 
-        BookShelfEntity bookShelfEntity = BookShelfEntity.builder()
+        BookShelf bookShelf = BookShelf.builder()
             .id(1L)
-            .bookEntity(bookEntity)
-            .userEntity(userEntity)
-            .pages(0)
+            .book(book)
+            .pages(152)
             .readingStatus(WISH)
-            .star(null)
+            .lastUpdatedAt(LocalDateTime.now())
             .build();
-        bookShelfEntity.setUpdatedAt(LocalDateTime.now());
 
-        result.add(bookShelfEntity);
+        result.add(bookShelf);
 
         PageRequest pageRequest = PageRequest.of(0, 1, Sort.by("id").descending());
-        PageImpl<BookShelfEntity> bookShelves = new PageImpl<>(result, pageRequest, 1);
-        SearchBookShelfByReadingStatus searchBookShelfByReadingStatus = new SearchBookShelfByReadingStatus(
-            bookShelves);
-
-        when(bookShelfService.takeBooksOutOfBookShelves(any(ReadingStatus.class),
-            any(Pageable.class),
-            any())).thenReturn(searchBookShelfByReadingStatus);
+        PageImpl<BookShelf> bookShelves = new PageImpl<>(result, pageRequest, 1);
+        when(bookShelfService.takeBooksOutOfBookShelves(any(ReadingStatus.class), any(Pageable.class), any())).thenReturn(bookShelves);
 
         mockMvc.perform(get("/v1/api/bookshelves")
                 .header(AUTHORIZATION, JWT_TOKEN)
@@ -818,13 +774,12 @@ class BookShelfControllerTest extends ControllerTestExtension {
 
     @Test
     void isbn과_출판일자로_서재에_책이_등록되었는지_조회_성공() throws Exception {
-        ExistenceBookOnBookShelfResponse existenceBookOnBookShelfResponse = ExistenceBookOnBookShelfResponse.builder()
-            .bookShelfId(1L)
+        BookShelf bookShelf = BookShelf.builder()
+            .id(1L)
             .readingStatus(WISH)
             .build();
 
-        when(bookShelfService.getBookIfExisted(any(), any(), any())).thenReturn(
-            existenceBookOnBookShelfResponse);
+        when(bookShelfService.getBookIfExisted(any(), any(), any())).thenReturn(bookShelf);
         mockMvc.perform(get("/v1/api/bookshelves/book")
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .param("isbn", "1234567891011 0123456789")

@@ -20,23 +20,23 @@ import toy.bookchat.bookchat.db_module.book.BookEntity;
 import toy.bookchat.bookchat.db_module.book.repository.BookRepository;
 import toy.bookchat.bookchat.db_module.chat.ChatEntity;
 import toy.bookchat.bookchat.db_module.chat.repository.ChatRepository;
-import toy.bookchat.bookchat.db_module.chatroom.repository.ChatRoomBlockedUserRepository;
-import toy.bookchat.bookchat.db_module.chatroom.repository.ChatRoomHashTagRepository;
-import toy.bookchat.bookchat.db_module.chatroom.repository.ChatRoomRepository;
-import toy.bookchat.bookchat.db_module.chatroom.repository.HashTagRepository;
-import toy.bookchat.bookchat.domain.RepositoryTest;
 import toy.bookchat.bookchat.db_module.chatroom.ChatRoomBlockedUserEntity;
 import toy.bookchat.bookchat.db_module.chatroom.ChatRoomEntity;
 import toy.bookchat.bookchat.db_module.chatroom.ChatRoomHashTagEntity;
 import toy.bookchat.bookchat.db_module.chatroom.HashTagEntity;
+import toy.bookchat.bookchat.db_module.chatroom.repository.ChatRoomBlockedUserRepository;
+import toy.bookchat.bookchat.db_module.chatroom.repository.ChatRoomHashTagRepository;
+import toy.bookchat.bookchat.db_module.chatroom.repository.ChatRoomRepository;
+import toy.bookchat.bookchat.db_module.chatroom.repository.HashTagRepository;
 import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.response.ChatRoomResponse;
 import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.response.UserChatRoomResponse;
-import toy.bookchat.bookchat.domain.chatroom.service.dto.request.ChatRoomRequest;
 import toy.bookchat.bookchat.db_module.participant.ParticipantEntity;
 import toy.bookchat.bookchat.db_module.participant.repository.ParticipantRepository;
-import toy.bookchat.bookchat.domain.participant.service.dto.response.ChatRoomDetails;
 import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.db_module.user.repository.UserRepository;
+import toy.bookchat.bookchat.domain.RepositoryTest;
+import toy.bookchat.bookchat.domain.chatroom.service.dto.request.ChatRoomRequest;
+import toy.bookchat.bookchat.domain.participant.service.dto.response.ChatRoomDetails;
 import toy.bookchat.bookchat.exception.notfound.pariticipant.ParticipantNotFoundException;
 
 class ChatRoomEntityRepositoryTest extends RepositoryTest {
@@ -61,6 +61,7 @@ class ChatRoomEntityRepositoryTest extends RepositoryTest {
     @Test
     void 채팅방_저장_성공() throws Exception {
         ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
+            .bookId(1L)
             .roomName("test room")
             .roomSize(5)
             .roomSid("test sid")
@@ -93,21 +94,21 @@ class ChatRoomEntityRepositoryTest extends RepositoryTest {
         bookRepository.save(bookEntity2);
 
         ChatRoomEntity chatRoomEntity1 = ChatRoomEntity.builder()
-            .bookEntity(bookEntity1)
+            .bookId(bookEntity1.getId())
             .host(userEntity1)
             .roomSid("KlV8")
             .roomSize(576)
             .defaultRoomImageType(1)
             .build();
         ChatRoomEntity chatRoomEntity2 = ChatRoomEntity.builder()
-            .bookEntity(bookEntity2)
+            .bookId(bookEntity2.getId())
             .host(userEntity1)
             .roomSid("IwZrRxR5")
             .roomSize(110)
             .defaultRoomImageType(2)
             .build();
         ChatRoomEntity chatRoomEntity3 = ChatRoomEntity.builder()
-            .bookEntity(bookEntity1)
+            .bookId(bookEntity1.getId())
             .host(userEntity2)
             .roomSid("Gmw9yDI4")
             .roomSize(591)
@@ -170,9 +171,9 @@ class ChatRoomEntityRepositoryTest extends RepositoryTest {
             .hostNickname(userEntity2.getNickname())
             .hostProfileImageUrl(userEntity2.getProfileImageUrl())
             .hostDefaultProfileImageType(userEntity2.getDefaultProfileImageType())
-            .bookTitle(chatRoomEntity3.getBookTitle())
-            .bookCoverImageUrl(chatRoomEntity3.getBookCoverImageUrl())
-            .bookAuthors(chatRoomEntity3.getBookAuthors())
+            .bookTitle(bookEntity1.getTitle())
+            .bookCoverImageUrl(bookEntity1.getBookCoverImageUrl())
+            .bookAuthors(bookEntity1.getAuthors())
             .senderId(chatEntity4.getUserId())
             .senderNickname(chatEntity4.getUserNickname())
             .senderProfileImageUrl(chatEntity4.getUserProfileImageUrl())
@@ -191,9 +192,9 @@ class ChatRoomEntityRepositoryTest extends RepositoryTest {
             .hostNickname(userEntity1.getNickname())
             .hostProfileImageUrl(userEntity1.getProfileImageUrl())
             .hostDefaultProfileImageType(userEntity1.getDefaultProfileImageType())
-            .bookTitle(chatRoomEntity2.getBookTitle())
-            .bookCoverImageUrl(chatRoomEntity2.getBookCoverImageUrl())
-            .bookAuthors(chatRoomEntity2.getBookAuthors())
+            .bookTitle(bookEntity2.getTitle())
+            .bookCoverImageUrl(bookEntity2.getBookCoverImageUrl())
+            .bookAuthors(bookEntity2.getAuthors())
             .senderId(chatEntity2.getUserId())
             .senderNickname(chatEntity2.getUserNickname())
             .senderProfileImageUrl(chatEntity2.getUserProfileImageUrl())
@@ -235,21 +236,21 @@ class ChatRoomEntityRepositoryTest extends RepositoryTest {
         bookRepository.save(bookEntity2);
 
         ChatRoomEntity chatRoomEntity1 = ChatRoomEntity.builder()
-            .bookEntity(bookEntity1)
+            .bookId(bookEntity1.getId())
             .host(userEntity1)
             .roomSid("KlV8")
             .roomSize(576)
             .defaultRoomImageType(1)
             .build();
         ChatRoomEntity chatRoomEntity2 = ChatRoomEntity.builder()
-            .bookEntity(bookEntity2)
+            .bookId(bookEntity2.getId())
             .host(userEntity1)
             .roomSid("IwZrRxR5")
             .roomSize(110)
             .defaultRoomImageType(2)
             .build();
         ChatRoomEntity chatRoomEntity3 = ChatRoomEntity.builder()
-            .bookEntity(bookEntity1)
+            .bookId(bookEntity1.getId())
             .host(userEntity2)
             .roomSid("Gmw9yDI4")
             .roomSize(591)
@@ -306,9 +307,9 @@ class ChatRoomEntityRepositoryTest extends RepositoryTest {
             .hostNickname(userEntity1.getNickname())
             .hostProfileImageUrl(userEntity1.getProfileImageUrl())
             .hostDefaultProfileImageType(userEntity1.getDefaultProfileImageType())
-            .bookTitle(chatRoomEntity2.getBookTitle())
-            .bookCoverImageUrl(chatRoomEntity2.getBookCoverImageUrl())
-            .bookAuthors(chatRoomEntity2.getBookAuthors())
+            .bookTitle(bookEntity2.getTitle())
+            .bookCoverImageUrl(bookEntity2.getBookCoverImageUrl())
+            .bookAuthors(bookEntity2.getAuthors())
             .senderId(chatEntity2.getUserId())
             .senderNickname(chatEntity2.getUserNickname())
             .senderProfileImageUrl(chatEntity2.getUserProfileImageUrl())
@@ -327,9 +328,9 @@ class ChatRoomEntityRepositoryTest extends RepositoryTest {
             .hostNickname(userEntity1.getNickname())
             .hostProfileImageUrl(userEntity1.getProfileImageUrl())
             .hostDefaultProfileImageType(userEntity1.getDefaultProfileImageType())
-            .bookTitle(chatRoomEntity1.getBookTitle())
-            .bookCoverImageUrl(chatRoomEntity1.getBookCoverImageUrl())
-            .bookAuthors(chatRoomEntity1.getBookAuthors())
+            .bookTitle(bookEntity1.getTitle())
+            .bookCoverImageUrl(bookEntity1.getBookCoverImageUrl())
+            .bookAuthors(bookEntity1.getAuthors())
             .senderId(chatEntity1.getUserId())
             .senderNickname(chatEntity1.getUserNickname())
             .senderProfileImageUrl(chatEntity1.getUserProfileImageUrl())
@@ -366,21 +367,21 @@ class ChatRoomEntityRepositoryTest extends RepositoryTest {
         bookRepository.saveAll(List.of(bookEntity1, bookEntity2));
 
         ChatRoomEntity chatRoomEntity1 = ChatRoomEntity.builder()
-            .bookEntity(bookEntity1)
+            .bookId(bookEntity1.getId())
             .host(userEntity1)
             .roomSid("4SyVX")
             .roomSize(77)
             .defaultRoomImageType(1)
             .build();
         ChatRoomEntity chatRoomEntity2 = ChatRoomEntity.builder()
-            .bookEntity(bookEntity2)
+            .bookId(bookEntity2.getId())
             .host(userEntity1)
             .roomSid("1Y2j9RlN")
             .roomSize(573)
             .defaultRoomImageType(2)
             .build();
         ChatRoomEntity chatRoomEntity3 = ChatRoomEntity.builder()
-            .bookEntity(bookEntity2)
+            .bookId(bookEntity2.getId())
             .host(userEntity2)
             .roomSid("r7xr")
             .roomSize(38)
@@ -448,7 +449,7 @@ class ChatRoomEntityRepositoryTest extends RepositoryTest {
         bookRepository.save(bookEntity);
 
         ChatRoomEntity chatRoomEntity1 = ChatRoomEntity.builder()
-            .bookEntity(bookEntity)
+            .bookId(bookEntity.getId())
             .host(userEntity1)
             .roomName("chatRoom1")
             .roomSid("chatRoom1")
@@ -457,7 +458,7 @@ class ChatRoomEntityRepositoryTest extends RepositoryTest {
             .build();
 
         ChatRoomEntity chatRoomEntity2 = ChatRoomEntity.builder()
-            .bookEntity(bookEntity)
+            .bookId(bookEntity.getId())
             .host(userEntity2)
             .roomName("chatRoom2")
             .roomSid("chatRoom2")
@@ -583,7 +584,7 @@ class ChatRoomEntityRepositoryTest extends RepositoryTest {
         bookRepository.save(bookEntity);
 
         ChatRoomEntity chatRoomEntity1 = ChatRoomEntity.builder()
-            .bookEntity(bookEntity)
+            .bookId(bookEntity.getId())
             .host(userEntity1)
             .roomName("chatRoom1")
             .roomSid("chatRoom1")
@@ -592,7 +593,7 @@ class ChatRoomEntityRepositoryTest extends RepositoryTest {
             .build();
 
         ChatRoomEntity chatRoomEntity2 = ChatRoomEntity.builder()
-            .bookEntity(bookEntity)
+            .bookId(bookEntity.getId())
             .host(userEntity2)
             .roomName("chatRoom2")
             .roomSid("chatRoom2")
@@ -711,7 +712,7 @@ class ChatRoomEntityRepositoryTest extends RepositoryTest {
         bookRepository.save(bookEntity);
 
         ChatRoomEntity chatRoomEntity1 = ChatRoomEntity.builder()
-            .bookEntity(bookEntity)
+            .bookId(bookEntity.getId())
             .host(userEntity1)
             .roomName("chatRoom1")
             .roomSid("chatRoom1")
@@ -720,7 +721,7 @@ class ChatRoomEntityRepositoryTest extends RepositoryTest {
             .build();
 
         ChatRoomEntity chatRoomEntity2 = ChatRoomEntity.builder()
-            .bookEntity(bookEntity)
+            .bookId(bookEntity.getId())
             .host(userEntity2)
             .roomName("chatRoom2")
             .roomSid("chatRoom2")
@@ -844,7 +845,7 @@ class ChatRoomEntityRepositoryTest extends RepositoryTest {
         bookRepository.save(bookEntity);
 
         ChatRoomEntity chatRoomEntity1 = ChatRoomEntity.builder()
-            .bookEntity(bookEntity)
+            .bookId(bookEntity.getId())
             .host(userEntity1)
             .roomName("chatRoom1")
             .roomSid("chatRoom1")
@@ -853,7 +854,7 @@ class ChatRoomEntityRepositoryTest extends RepositoryTest {
             .build();
 
         ChatRoomEntity chatRoomEntity2 = ChatRoomEntity.builder()
-            .bookEntity(bookEntity)
+            .bookId(bookEntity.getId())
             .host(userEntity2)
             .roomName("chatRoom2")
             .roomSid("chatRoom2")
@@ -975,7 +976,7 @@ class ChatRoomEntityRepositoryTest extends RepositoryTest {
 
         ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
             .host(aUserEntity)
-            .bookEntity(bookEntity)
+            .bookId(bookEntity.getId())
             .roomSid("cES1Cn4N")
             .roomSize(275)
             .defaultRoomImageType(2)
@@ -1013,7 +1014,7 @@ class ChatRoomEntityRepositoryTest extends RepositoryTest {
 
         ChatRoomDetails real = chatRoomRepository.findChatRoomDetails(chatRoomEntity.getId(), cUserEntity.getId());
 
-        ChatRoomDetails expect = ChatRoomDetails.from(List.of(participantEntity1, participantEntity2, participantEntity3), List.of(tag.getTagName()));
+        ChatRoomDetails expect = ChatRoomDetails.from(List.of(participantEntity1, participantEntity2, participantEntity3), List.of(tag.getTagName()), bookEntity);
 
         assertThat(real).isEqualTo(expect);
     }
@@ -1031,6 +1032,7 @@ class ChatRoomEntityRepositoryTest extends RepositoryTest {
         userRepository.save(userEntity);
 
         ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
+            .bookId(1L)
             .roomSid("4SyVX")
             .roomSize(77)
             .defaultRoomImageType(1)

@@ -19,7 +19,7 @@ class UserReaderTest {
     private UserReader userReader;
 
     @Test
-    void 유저id로_유저를_찾을수없으면_예외발생() throws Exception {
+    void 유저id로_activie_유저를_찾을수없으면_예외발생() throws Exception {
         assertThatThrownBy(() -> {
             userReader.readUser(1L);
         }).isInstanceOf(UserNotFoundException.class);
@@ -28,7 +28,7 @@ class UserReaderTest {
     @Test
     void 유저의_oauth2_name_oauth2_number조합으로_지정된_이름으로_active상태_유저를_찾을수없으면_예외발생() throws Exception {
         assertThatThrownBy(() -> {
-            userReader.readUser("test");
+            userReader.readUserEntity("test");
         }).isInstanceOf(UserNotFoundException.class);
     }
 }

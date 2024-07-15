@@ -30,14 +30,10 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
-import toy.bookchat.bookchat.db_module.book.BookEntity;
-import toy.bookchat.bookchat.db_module.book.repository.BookRepository;
 import toy.bookchat.bookchat.db_module.chat.ChatEntity;
 import toy.bookchat.bookchat.db_module.chat.repository.ChatRepository;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookRequest;
 import toy.bookchat.bookchat.db_module.chatroom.ChatRoomBlockedUserEntity;
 import toy.bookchat.bookchat.db_module.chatroom.ChatRoomEntity;
-import toy.bookchat.bookchat.domain.chatroom.api.dto.response.UserChatRoomDetailResponse;
 import toy.bookchat.bookchat.db_module.chatroom.repository.ChatRoomBlockedUserRepository;
 import toy.bookchat.bookchat.db_module.chatroom.repository.ChatRoomHashTagRepository;
 import toy.bookchat.bookchat.db_module.chatroom.repository.ChatRoomRepository;
@@ -46,13 +42,17 @@ import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.response.Ch
 import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.response.ChatRoomsResponseSlice;
 import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.response.UserChatRoomResponse;
 import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.response.UserChatRoomsResponseSlice;
+import toy.bookchat.bookchat.db_module.participant.ParticipantEntity;
+import toy.bookchat.bookchat.db_module.participant.repository.ParticipantRepository;
+import toy.bookchat.bookchat.db_module.user.UserEntity;
+import toy.bookchat.bookchat.domain.book.Book;
+import toy.bookchat.bookchat.domain.book.service.BookReader;
+import toy.bookchat.bookchat.domain.bookshelf.api.v1.request.BookRequest;
+import toy.bookchat.bookchat.domain.chatroom.api.dto.response.UserChatRoomDetailResponse;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.ChatRoomRequest;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.CreateChatRoomRequest;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.ReviseChatRoomRequest;
-import toy.bookchat.bookchat.db_module.participant.ParticipantEntity;
-import toy.bookchat.bookchat.db_module.participant.repository.ParticipantRepository;
 import toy.bookchat.bookchat.domain.storage.ChatRoomStorageService;
-import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.domain.user.service.UserReader;
 import toy.bookchat.bookchat.exception.badrequest.chatroom.ChatRoomIsFullException;
 import toy.bookchat.bookchat.exception.badrequest.chatroom.NotEnoughRoomSizeException;
@@ -76,7 +76,7 @@ class ChatRoomServiceTest {
     @Mock
     ChatRoomHashTagRepository chatRoomHashTagRepository;
     @Mock
-    BookRepository bookRepository;
+    BookReader bookReader;
     @Mock
     UserReader userReader;
     @Mock
@@ -113,14 +113,15 @@ class ChatRoomServiceTest {
 
         ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
             .id(1L)
+            .bookId(1L)
             .roomSid("7D6")
             .roomImageUri("3wVp")
             .build();
 
-        when(bookRepository.findByIsbnAndPublishAt(any(), any())).thenReturn(
-            Optional.ofNullable(mock(BookEntity.class)));
-        when(userReader.readUser(anyLong())).thenReturn(mock(UserEntity.class));
-        when(chatRoomRepository.save(any())).thenReturn(chatRoomEntity);
+        Book book = Book.builder().build();
+        given(bookReader.readBook(any())).willReturn(book);
+        given(userReader.readUserEntity(anyLong())).willReturn(mock(UserEntity.class));
+        given(chatRoomRepository.save(any())).willReturn(chatRoomEntity);
 
         chatRoomService.createChatRoom(createChatRoomRequest, null, 1L);
 
@@ -137,14 +138,15 @@ class ChatRoomServiceTest {
 
         ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
             .id(1L)
+            .bookId(1L)
             .roomSid("7D6")
             .roomImageUri("3wVp")
             .build();
 
-        when(bookRepository.findByIsbnAndPublishAt(any(), any())).thenReturn(
-            Optional.ofNullable(mock(BookEntity.class)));
-        when(userReader.readUser(anyLong())).thenReturn(mock(UserEntity.class));
-        when(chatRoomRepository.save(any())).thenReturn(chatRoomEntity);
+        Book book = Book.builder().build();
+        given(bookReader.readBook(any())).willReturn(book);
+        given(userReader.readUserEntity(anyLong())).willReturn(mock(UserEntity.class));
+        given(chatRoomRepository.save(any())).willReturn(chatRoomEntity);
 
         chatRoomService.createChatRoom(createChatRoomRequest, image, 1L);
 
@@ -162,16 +164,19 @@ class ChatRoomServiceTest {
 
         ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
             .id(1L)
+            .bookId(1L)
             .roomSid("7D6")
             .roomImageUri("3wVp")
             .build();
 
-        when(userReader.readUser(anyLong())).thenReturn(mock(UserEntity.class));
-        when(chatRoomRepository.save(any())).thenReturn(chatRoomEntity);
+        Book book = Book.builder().build();
+
+        given(bookReader.readBook(any())).willReturn(book);
+        given(userReader.readUserEntity(anyLong())).willReturn(mock(UserEntity.class));
+        given(chatRoomRepository.save(any())).willReturn(chatRoomEntity);
 
         chatRoomService.createChatRoom(createChatRoomRequest, null, 1L);
 
-        verify(bookRepository).save(any());
         verify(chatRoomRepository).save(any());
         verify(hashTagRepository, times(2)).save(any());
         verify(chatRoomHashTagRepository, times(2)).save(any());
@@ -355,7 +360,7 @@ class ChatRoomServiceTest {
         ChatRoomEntity chatRoomEntity = mock(ChatRoomEntity.class);
         ChatRoomBlockedUserEntity blockedUser = mock(ChatRoomBlockedUserEntity.class);
 
-        when(userReader.readUser(anyLong())).thenReturn(userEntity);
+        when(userReader.readUserEntity(anyLong())).thenReturn(userEntity);
         when(chatRoomRepository.findById(any())).thenReturn(Optional.ofNullable(chatRoomEntity));
         when(chatRoomBlockedUserRepository.findByUserIdAndChatRoomId(any(), any())).thenReturn(
             Optional.ofNullable(blockedUser));
@@ -388,7 +393,7 @@ class ChatRoomServiceTest {
             .build();
         chatEntity.setCreatedAt(LocalDateTime.now());
 
-        when(userReader.readUser(anyLong())).thenReturn(userEntity);
+        when(userReader.readUserEntity(anyLong())).thenReturn(userEntity);
         when(chatRoomRepository.findById(any())).thenReturn(Optional.ofNullable(chatRoomEntity));
         when(participantRepository.findWithPessimisticLockByChatRoomEntity(any())).thenReturn(
             List.of(mock(ParticipantEntity.class), mock(ParticipantEntity.class), mock(ParticipantEntity.class)));
@@ -399,7 +404,7 @@ class ChatRoomServiceTest {
 
     @Test
     void 이미_입장한_사용자는_중복_입장_실패() throws Exception {
-        given(userReader.readUser(anyLong())).willReturn(mock(UserEntity.class));
+        given(userReader.readUserEntity(anyLong())).willReturn(mock(UserEntity.class));
         given(chatRoomRepository.findById(any())).willReturn(Optional.ofNullable(mock(ChatRoomEntity.class)));
         given(participantRepository.findByUserIdAndChatRoomId(any(), any())).willReturn(Optional.ofNullable(mock(ParticipantEntity.class)));
 
@@ -428,7 +433,7 @@ class ChatRoomServiceTest {
             .build();
         chatEntity.setCreatedAt(LocalDateTime.now());
 
-        when(userReader.readUser(anyLong())).thenReturn(userEntity);
+        when(userReader.readUserEntity(anyLong())).thenReturn(userEntity);
         when(chatRoomRepository.findById(any())).thenReturn(Optional.ofNullable(chatRoomEntity));
         when(participantRepository.findWithPessimisticLockByChatRoomEntity(any())).thenReturn(
             new ArrayList<>());

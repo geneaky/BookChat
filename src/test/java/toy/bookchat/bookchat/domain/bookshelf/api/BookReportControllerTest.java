@@ -29,9 +29,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
 import toy.bookchat.bookchat.domain.bookshelf.BookReport;
+import toy.bookchat.bookchat.domain.bookshelf.api.v1.request.ReviseBookReportRequest;
+import toy.bookchat.bookchat.domain.bookshelf.api.v1.request.WriteBookReportRequest;
 import toy.bookchat.bookchat.domain.bookshelf.service.BookReportService;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ReviseBookReportRequest;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.WriteBookReportRequest;
 
 @BookReportPresentationTest
 class BookReportControllerTest extends ControllerTestExtension {

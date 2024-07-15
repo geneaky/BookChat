@@ -20,17 +20,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
+import toy.bookchat.bookchat.db_module.device.DeviceEntity;
+import toy.bookchat.bookchat.db_module.user.UserEntity;
+import toy.bookchat.bookchat.db_module.user.repository.UserRepository;
 import toy.bookchat.bookchat.domain.agony.service.AgonyService;
 import toy.bookchat.bookchat.domain.bookshelf.service.BookShelfService;
 import toy.bookchat.bookchat.domain.common.Status;
-import toy.bookchat.bookchat.db_module.device.DeviceEntity;
 import toy.bookchat.bookchat.domain.device.service.DeviceService;
 import toy.bookchat.bookchat.domain.storage.StorageService;
 import toy.bookchat.bookchat.domain.storage.image.ImageValidator;
-import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.domain.user.UserProfile;
 import toy.bookchat.bookchat.domain.user.api.dto.response.MemberProfileResponse;
-import toy.bookchat.bookchat.db_module.user.repository.UserRepository;
 import toy.bookchat.bookchat.domain.user.service.dto.request.ChangeUserNicknameRequest;
 import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignInRequest;
 import toy.bookchat.bookchat.domain.user.service.dto.request.UserSignUpRequest;
@@ -111,7 +111,7 @@ class UserServiceTest {
             .status(ACTIVE)
             .build();
 
-        given(userReader.readUser(eq(1L))).willReturn(userEntity);
+        given(userReader.readUserEntity(eq(1L))).willReturn(userEntity);
         userService.deleteUser(1L);
 
         assertThat(userEntity.getStatus()).isEqualTo(Status.INACTIVE);
@@ -128,7 +128,7 @@ class UserServiceTest {
             "user2");
         MultipartFile multipartFile = mock(MultipartFile.class);
 
-        when(userReader.readUser(userEntity.getId())).thenReturn(userEntity);
+        when(userReader.readUserEntity(userEntity.getId())).thenReturn(userEntity);
         when(storageService.upload(any(), any(), any())).thenReturn("test-s3-image-url");
         userService.updateUserProfile(changeUserNicknameRequest, multipartFile, userEntity.getId());
 
@@ -147,7 +147,7 @@ class UserServiceTest {
         ChangeUserNicknameRequest changeUserNicknameRequest = new ChangeUserNicknameRequest(
             "user2");
 
-        when(userReader.readUser(userEntity.getId())).thenReturn(userEntity);
+        when(userReader.readUserEntity(userEntity.getId())).thenReturn(userEntity);
         userService.updateUserProfile(changeUserNicknameRequest, null, userEntity.getId());
 
         String nickname = userEntity.getNickname();
@@ -231,7 +231,7 @@ class UserServiceTest {
             .defaultProfileImageType(2)
             .build();
 
-        given(userReader.readUser(anyLong())).willReturn(userEntity);
+        given(userReader.readUserEntity(anyLong())).willReturn(userEntity);
 
         MemberProfileResponse expectedMemberProfileResponse = MemberProfileResponse.of(userEntity);
         MemberProfileResponse memberProfileResponse = userService.getMemberProfile(1L);
@@ -248,10 +248,10 @@ class UserServiceTest {
             .profileImageUrl("profile-image-url")
             .defaultProfileImageType(2)
             .build();
-        given(userReader.readUser(anyLong())).willReturn(userEntity);
+        given(userReader.readUserEntity(anyLong())).willReturn(userEntity);
 
         UserProfile userProfile = userService.findUser(1L);
 
-        verify(userReader).readUser(anyLong());
+        verify(userReader).readUserEntity(anyLong());
     }
 }

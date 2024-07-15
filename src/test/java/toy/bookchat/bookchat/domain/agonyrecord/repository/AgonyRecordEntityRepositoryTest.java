@@ -59,8 +59,8 @@ class AgonyRecordEntityRepositoryTest extends RepositoryTest {
 
     private BookShelfEntity getBookShelf(UserEntity userEntity, BookEntity bookEntity) {
         return BookShelfEntity.builder()
-            .userEntity(userEntity)
-            .bookEntity(bookEntity)
+            .bookId(bookEntity.getId())
+            .userId(userEntity.getId())
             .build();
     }
 

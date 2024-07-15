@@ -16,6 +16,7 @@ import toy.bookchat.bookchat.db_module.book.BookEntity;
 import toy.bookchat.bookchat.db_module.book.repository.BookRepository;
 import toy.bookchat.bookchat.db_module.bookreport.repository.BookReportRepository;
 import toy.bookchat.bookchat.db_module.bookshelf.BookShelfEntity;
+import toy.bookchat.bookchat.db_module.bookshelf.BookShelfWithBook;
 import toy.bookchat.bookchat.db_module.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.db_module.user.repository.UserRepository;
@@ -46,16 +47,7 @@ class BookShelfEntityRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    void 책_저장() throws Exception {
-        BookEntity bookEntity = getBook("1-4133-0454-0");
-
-        BookEntity savedBookEntity = bookRepository.save(bookEntity);
-        assertThat(bookEntity).isEqualTo(savedBookEntity);
-    }
-
-    @Test
     void 책장에_책을_저장() throws Exception {
-
         BookEntity bookEntity = getBook("1-4133-0454-0");
         bookRepository.save(bookEntity);
 
@@ -63,14 +55,13 @@ class BookShelfEntityRepositoryTest extends RepositoryTest {
         userRepository.save(userEntity);
 
         BookShelfEntity bookShelfEntity = BookShelfEntity.builder()
-            .bookEntity(bookEntity)
-            .userEntity(userEntity)
+            .bookId(bookEntity.getId())
+            .userId(userEntity.getId())
             .build();
         bookShelfRepository.save(bookShelfEntity);
 
         BookShelfEntity findBookShelfEntity = bookShelfRepository.findById(bookShelfEntity.getId()).get();
-        BookEntity findBookEntity = findBookShelfEntity.getBookEntity();
-        assertThat(bookEntity).isEqualTo(findBookEntity);
+        assertThat(bookShelfEntity).isEqualTo(findBookShelfEntity);
     }
 
     @Test
@@ -85,15 +76,15 @@ class BookShelfEntityRepositoryTest extends RepositoryTest {
         userRepository.save(userEntity);
 
         BookShelfEntity bookShelfEntity1 = BookShelfEntity.builder()
-            .bookEntity(bookEntity1)
-            .userEntity(userEntity)
+            .bookId(bookEntity1.getId())
+            .userId(userEntity.getId())
             .readingStatus(ReadingStatus.READING)
             .star(Star.ZERO)
             .build();
 
         BookShelfEntity bookShelfEntity2 = BookShelfEntity.builder()
-            .bookEntity(bookEntity2)
-            .userEntity(userEntity)
+            .bookId(bookEntity2.getId())
+            .userId(userEntity.getId())
             .readingStatus(ReadingStatus.READING)
             .star(Star.ZERO)
             .build();
@@ -102,11 +93,9 @@ class BookShelfEntityRepositoryTest extends RepositoryTest {
         bookShelfRepository.save(bookShelfEntity2);
 
         Pageable pageable = PageRequest.of(0, 2, Sort.by("id").descending());
-        Page<BookShelfEntity> pagingBookShelves = bookShelfRepository.findSpecificStatusBookByUserId(
-            ReadingStatus.READING, pageable, userEntity.getId());
-        List<BookShelfEntity> bookShelves = pagingBookShelves.getContent();
-        int result = bookShelves.size();
-        assertThat(result).isEqualTo(2);
+        Page<BookShelfWithBook> pagedBookShelfWithBook = bookShelfRepository.findBookShelfWithBook(userEntity.getId(), ReadingStatus.READING, pageable);
+        List<BookShelfWithBook> bookShelves = pagedBookShelfWithBook.getContent();
+        assertThat(bookShelves.size()).isEqualTo(2);
     }
 
     @Test
@@ -120,15 +109,15 @@ class BookShelfEntityRepositoryTest extends RepositoryTest {
         userRepository.save(userEntity);
 
         BookShelfEntity bookShelfEntity1 = BookShelfEntity.builder()
-            .bookEntity(bookEntity1)
-            .userEntity(userEntity)
+            .bookId(bookEntity1.getId())
+            .userId(userEntity.getId())
             .readingStatus(ReadingStatus.COMPLETE)
             .star(Star.THREE_HALF)
             .build();
 
         BookShelfEntity bookShelfEntity2 = BookShelfEntity.builder()
-            .bookEntity(bookEntity2)
-            .userEntity(userEntity)
+            .bookId(bookEntity2.getId())
+            .userId(userEntity.getId())
             .readingStatus(ReadingStatus.COMPLETE)
             .star(Star.FIVE)
             .build();
@@ -137,11 +126,9 @@ class BookShelfEntityRepositoryTest extends RepositoryTest {
         bookShelfRepository.save(bookShelfEntity2);
 
         Pageable pageable = PageRequest.of(0, 2, Sort.by("id").descending());
-        Page<BookShelfEntity> pagingBookShelves = bookShelfRepository.findSpecificStatusBookByUserId(
-            ReadingStatus.COMPLETE, pageable, userEntity.getId());
-        List<BookShelfEntity> bookShelves = pagingBookShelves.getContent();
-        int result = bookShelves.size();
-        assertThat(result).isEqualTo(2);
+        Page<BookShelfWithBook> pagedBookShelfWithBook = bookShelfRepository.findBookShelfWithBook(userEntity.getId(), ReadingStatus.COMPLETE, pageable);
+        List<BookShelfWithBook> bookShelves = pagedBookShelfWithBook.getContent();
+        assertThat(bookShelves.size()).isEqualTo(2);
     }
 
     @Test
@@ -156,15 +143,15 @@ class BookShelfEntityRepositoryTest extends RepositoryTest {
         userRepository.save(userEntity);
 
         BookShelfEntity bookShelfEntity1 = BookShelfEntity.builder()
-            .bookEntity(bookEntity1)
-            .userEntity(userEntity)
+            .bookId(bookEntity1.getId())
+            .userId(userEntity.getId())
             .readingStatus(ReadingStatus.WISH)
             .star(Star.ZERO)
             .build();
 
         BookShelfEntity bookShelfEntity2 = BookShelfEntity.builder()
-            .bookEntity(bookEntity2)
-            .userEntity(userEntity)
+            .bookId(bookEntity2.getId())
+            .userId(userEntity.getId())
             .readingStatus(ReadingStatus.WISH)
             .star(Star.ZERO)
             .build();
@@ -173,15 +160,12 @@ class BookShelfEntityRepositoryTest extends RepositoryTest {
         bookShelfRepository.save(bookShelfEntity2);
 
         userEntity.updateImageUrl("hi");
-        bookShelfEntity1.getUserEntity().updateImageUrl("by");
 
         Pageable pageable = PageRequest.of(0, 2, Sort.by("id").descending());
-        Page<BookShelfEntity> pagingBookShelves = bookShelfRepository.findSpecificStatusBookByUserId(
-            ReadingStatus.WISH, pageable, userEntity.getId());
+        Page<BookShelfWithBook> pagedBookShelfWithBook = bookShelfRepository.findBookShelfWithBook(userEntity.getId(), ReadingStatus.WISH, pageable);
+        List<BookShelfWithBook> bookShelves = pagedBookShelfWithBook.getContent();
 
-        List<BookShelfEntity> bookShelves = pagingBookShelves.getContent();
-        int result = bookShelves.size();
-        assertThat(result).isEqualTo(2);
+        assertThat(bookShelves.size()).isEqualTo(2);
     }
 
     @Test
@@ -194,8 +178,8 @@ class BookShelfEntityRepositoryTest extends RepositoryTest {
         userRepository.save(userEntity);
 
         BookShelfEntity bookShelfEntity = BookShelfEntity.builder()
-            .bookEntity(bookEntity)
-            .userEntity(userEntity)
+            .bookId(bookEntity.getId())
+            .userId(userEntity.getId())
             .readingStatus(ReadingStatus.READING)
             .build();
 
@@ -217,15 +201,14 @@ class BookShelfEntityRepositoryTest extends RepositoryTest {
         userRepository.save(userEntity);
 
         BookShelfEntity bookShelfEntity = BookShelfEntity.builder()
-            .bookEntity(bookEntity)
-            .userEntity(userEntity)
+            .bookId(bookEntity.getId())
+            .userId(userEntity.getId())
             .readingStatus(ReadingStatus.READING)
             .build();
 
         bookShelfRepository.save(bookShelfEntity);
 
-        BookShelfEntity findBookShelfEntity = bookShelfRepository.findByIdAndUserId(bookShelfEntity.getId(),
-            userEntity.getId()).get();
+        BookShelfEntity findBookShelfEntity = bookShelfRepository.findByIdAndUserId(bookShelfEntity.getId(), userEntity.getId()).get();
         assertThat(findBookShelfEntity).isEqualTo(bookShelfEntity);
 
     }
@@ -241,14 +224,14 @@ class BookShelfEntityRepositoryTest extends RepositoryTest {
         userRepository.save(userEntity);
 
         BookShelfEntity bookShelfEntity1 = BookShelfEntity.builder()
-            .bookEntity(bookEntity1)
-            .userEntity(userEntity)
+            .bookId(bookEntity1.getId())
+            .userId(userEntity.getId())
             .readingStatus(ReadingStatus.READING)
             .build();
 
         BookShelfEntity bookShelfEntity2 = BookShelfEntity.builder()
-            .bookEntity(bookEntity2)
-            .userEntity(userEntity)
+            .bookId(bookEntity2.getId())
+            .userId(userEntity.getId())
             .readingStatus(ReadingStatus.READING)
             .build();
 
@@ -261,28 +244,6 @@ class BookShelfEntityRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    void isbn으로_사용자_서재에_등록된_책_조회성공() throws Exception {
-        BookEntity bookEntity = getBook("1-4133-0454-0");
-        bookRepository.save(bookEntity);
-
-        UserEntity userEntity = UserEntity.builder().name("hi").build();
-        userRepository.save(userEntity);
-
-        BookShelfEntity bookShelfEntity1 = BookShelfEntity.builder()
-            .bookEntity(bookEntity)
-            .userEntity(userEntity)
-            .readingStatus(ReadingStatus.READING)
-            .build();
-
-        bookShelfRepository.save(bookShelfEntity1);
-
-        BookShelfEntity findBookShelfEntity = bookShelfRepository.findByUserIdAndIsbnAndPublishAt(userEntity.getId(),
-            bookEntity.getIsbn(), bookEntity.getPublishAt()).get();
-
-        assertThat(findBookShelfEntity).isEqualTo(bookShelfEntity1);
-    }
-
-    @Test
     void 서재에_도서_중복_저장_실패() throws Exception {
         BookEntity bookEntity = getBook("1-4133-0454-0");
         bookRepository.save(bookEntity);
@@ -291,16 +252,16 @@ class BookShelfEntityRepositoryTest extends RepositoryTest {
         userRepository.save(userEntity);
 
         BookShelfEntity bookShelfEntity1 = BookShelfEntity.builder()
-            .bookEntity(bookEntity)
-            .userEntity(userEntity)
+            .bookId(bookEntity.getId())
+            .userId(userEntity.getId())
             .readingStatus(ReadingStatus.READING)
             .build();
 
         bookShelfRepository.save(bookShelfEntity1);
 
         BookShelfEntity bookShelfEntity2 = BookShelfEntity.builder()
-            .bookEntity(bookEntity)
-            .userEntity(userEntity)
+            .bookId(bookEntity.getId())
+            .userId(userEntity.getId())
             .readingStatus(ReadingStatus.READING)
             .build();
 

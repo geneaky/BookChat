@@ -1,19 +1,18 @@
 package toy.bookchat.bookchat.domain.bookshelf.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static toy.bookchat.bookchat.domain.bookshelf.ReadingStatus.COMPLETE;
 import static toy.bookchat.bookchat.domain.bookshelf.ReadingStatus.READING;
 import static toy.bookchat.bookchat.domain.bookshelf.ReadingStatus.WISH;
 import static toy.bookchat.bookchat.domain.bookshelf.Star.FIVE;
-import static toy.bookchat.bookchat.domain.bookshelf.Star.HALF;
-import static toy.bookchat.bookchat.domain.bookshelf.Star.THREE;
+import static toy.bookchat.bookchat.domain.bookshelf.Star.FOUR;
+import static toy.bookchat.bookchat.domain.bookshelf.Star.ONE_HALF;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -22,21 +21,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import toy.bookchat.bookchat.db_module.book.BookEntity;
-import toy.bookchat.bookchat.db_module.bookshelf.BookShelfEntity;
 import toy.bookchat.bookchat.db_module.user.UserEntity;
+import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.book.service.BookReader;
-import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
-import toy.bookchat.bookchat.domain.bookshelf.Star;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookRequest;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookShelfRequest;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.ReviseBookShelfRequest;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.BookShelfResponse;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.ExistenceBookOnBookShelfResponse;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.response.SearchBookShelfByReadingStatus;
+import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
+import toy.bookchat.bookchat.domain.bookshelf.BookShelfPageAndStarAndReadingStatus;
 import toy.bookchat.bookchat.domain.user.service.UserReader;
 
 @ExtendWith(MockitoExtension.class)
@@ -46,6 +37,8 @@ class BookShelfServiceTest {
     private BookShelfManager bookShelfManager;
     @Mock
     private BookShelfReader bookShelfReader;
+    @Mock
+    private BookShelfAppender bookShelfAppender;
     @Mock
     private BookReader bookReader;
     @Mock
@@ -70,162 +63,106 @@ class BookShelfServiceTest {
             .build();
     }
 
-    private BookRequest getBookRequest() {
-        return BookRequest.builder()
-            .isbn("12345")
-            .title("testBook")
-            .authors(List.of("test Author"))
-            .publisher("test publisher")
-            .bookCoverImageUrl("test@naver.com")
-            .build();
-    }
-
-    private BookShelfRequest getBookShelfRequest(ReadingStatus readingStatus) {
-        if (readingStatus == COMPLETE) {
-            return BookShelfRequest.builder()
-                .bookRequest(getBookRequest())
-                .readingStatus(COMPLETE)
-                .star(THREE)
-                .build();
-        }
-        return BookShelfRequest.builder()
-            .bookRequest(getBookRequest())
-            .readingStatus(READING)
-            .build();
-    }
-
     @Test
     void 서재에서_책_조회_성공() throws Exception {
-        BookShelfEntity bookShelfEntity = BookShelfEntity.builder()
-            .id(1L)
-            .bookEntity(getBook())
-            .readingStatus(WISH)
-            .pages(0)
-            .star(null)
-            .build();
-
-        given(bookShelfReader.readBookShelfEntity(1L, 1L)).willReturn(bookShelfEntity);
-
-        BookShelfResponse result = bookShelfService.getBookOnBookShelf(1L, 1L);
-        BookShelfResponse expect = BookShelfResponse.from(bookShelfEntity);
-        assertThat(result).isEqualTo(expect);
+        bookShelfService.getBookOnBookShelf(1L, 1L);
+        verify(bookShelfReader).readBookShelf(any(), any());
     }
 
     @Test
     void 서재에_책_저장_성공() throws Exception {
-        BookShelfRequest bookShelfRequest = getBookShelfRequest(COMPLETE);
+        BookShelf bookShelf = BookShelf.builder().build();
+        Book book = Book.builder().build();
 
-        bookShelfService.putBookOnBookShelf(bookShelfRequest, 1L);
+        bookShelfService.putBookOnBookShelf(bookShelf, book, 1L);
 
-        verify(bookShelfManager).store(any(BookShelfEntity.class));
+        verify(bookReader).readBook(any());
+        verify(userReader).readUser(any());
+        verify(bookShelfAppender).append(any(), any(), any());
     }
 
     @Test
     void 도서_상태에따라_서재에서_조회_성공() throws Exception {
-        Pageable pageable = mock(Pageable.class);
-        UserEntity userEntity = getUser();
-        BookEntity bookEntity = BookEntity.builder()
-            .isbn("1234")
-            .title("toby's Spring")
-            .authors(List.of("이일민"))
-            .publisher("jpub")
-            .bookCoverImageUrl("testBookCoverImageUrl")
-            .build();
-        BookShelfEntity bookShelfEntity = BookShelfEntity.builder()
-            .userEntity(userEntity)
-            .bookEntity(bookEntity)
-            .readingStatus(WISH)
-            .pages(0)
-            .star(null)
-            .build();
+        bookShelfService.takeBooksOutOfBookShelves(WISH, mock(Pageable.class), 1L);
 
-        Page<BookShelfEntity> bookShelves = new PageImpl<>(List.of(bookShelfEntity), pageable, 1);
-        when(bookShelfReader.readBookShelfEntity(userEntity.getId(), WISH, pageable)).thenReturn(bookShelves);
-
-        SearchBookShelfByReadingStatus searchBookShelfByReadingStatus = bookShelfService.takeBooksOutOfBookShelves(
-            WISH, pageable, userEntity.getId());
-
-        assertThat(searchBookShelfByReadingStatus.getContents().get(0).getIsbn()).isEqualTo("1234");
+        verify(bookShelfReader).readPagedBookShelves(any(), any(), any());
     }
 
     @Test
     void 책이_서재에_등록되어있다면_응답성공() throws Exception {
-        BookEntity bookEntity = getBook();
-        BookShelfEntity bookShelfEntity = BookShelfEntity.builder()
-            .id(1L)
-            .bookEntity(bookEntity)
-            .readingStatus(WISH)
-            .build();
-
-        when(bookShelfReader.readBookShelfEntity(anyLong(), anyString(), any(LocalDate.class))).thenReturn(bookShelfEntity);
-
-        ExistenceBookOnBookShelfResponse result = bookShelfService.getBookIfExisted(bookEntity.getIsbn(), bookEntity.getPublishAt(), bookEntity.getId());
-
-        ExistenceBookOnBookShelfResponse expect = ExistenceBookOnBookShelfResponse.from(bookShelfEntity);
-
-        assertThat(result).usingRecursiveComparison().isEqualTo(expect);
+        bookShelfService.getBookIfExisted("1234", LocalDate.now(), 1L);
+        verify(bookShelfReader).readBookShelf(any(), anyString(), any());
     }
 
     @Test
     void 읽고있는_책_현재쪽수_업데이트_성공() throws Exception {
-        ReviseBookShelfRequest reviseBookShelfRequest = ReviseBookShelfRequest.builder()
+        BookShelfPageAndStarAndReadingStatus bookShelfPageAndStarAndReadingStatus = BookShelfPageAndStarAndReadingStatus.builder()
             .pages(123)
-            .star(null)
-            .readingStatus(READING)
             .build();
 
-        BookShelfEntity bookShelfEntity = BookShelfEntity.builder()
+        BookShelf bookShelf = BookShelf.builder()
             .readingStatus(READING)
-            .pages(0)
-            .star(null)
             .build();
+        given(bookShelfReader.readBookShelf(any(), any())).willReturn(bookShelf);
 
-        when(bookShelfReader.readBookShelfEntity(any(), any())).thenReturn(bookShelfEntity);
+        bookShelfService.reviseBookShelf(1L, bookShelfPageAndStarAndReadingStatus, 1L);
 
-        bookShelfService.reviseBookShelf(1L, reviseBookShelfRequest, 1L);
-
-        Integer result = bookShelfEntity.getPages();
-        assertThat(result).isEqualTo(123);
+        assertThat(bookShelf.getPages()).isEqualTo(123);
     }
 
     @Test
-    void 책장에_책_독서상태_변경_성공() throws Exception {
-        ReviseBookShelfRequest reviseBookShelfRequest = ReviseBookShelfRequest.builder()
+    void 읽고있는_책_현재쪽수_독서상태_별점_상태_변경_성공() throws Exception {
+        BookShelfPageAndStarAndReadingStatus bookShelfPageAndStarAndReadingStatus = BookShelfPageAndStarAndReadingStatus.builder()
             .pages(123)
-            .star(null)
+            .readingStatus(COMPLETE)
+            .star(ONE_HALF)
+            .build();
+
+        BookShelf bookShelf = BookShelf.builder()
+            .readingStatus(READING)
+            .build();
+        given(bookShelfReader.readBookShelf(any(), any())).willReturn(bookShelf);
+
+        bookShelfService.reviseBookShelf(1L, bookShelfPageAndStarAndReadingStatus, 1L);
+
+        assertAll(
+            () -> assertThat(bookShelf.getPages()).isEqualTo(123),
+            () -> assertThat(bookShelf.getReadingStatus()).isEqualTo(COMPLETE),
+            () -> assertThat(bookShelf.getStar()).isEqualTo(ONE_HALF)
+        );
+    }
+
+    @Test
+    void 독서예정_도서_독서중으로_변경_성공() throws Exception {
+        BookShelfPageAndStarAndReadingStatus bookShelfPageAndStarAndReadingStatus = BookShelfPageAndStarAndReadingStatus.builder()
             .readingStatus(READING)
             .build();
 
-        BookShelfEntity bookShelfEntity = BookShelfEntity.builder()
+        BookShelf bookShelf = BookShelf.builder()
             .readingStatus(WISH)
             .build();
+        given(bookShelfReader.readBookShelf(any(), any())).willReturn(bookShelf);
 
-        when(bookShelfReader.readBookShelfEntity(any(), any())).thenReturn(bookShelfEntity);
+        bookShelfService.reviseBookShelf(1L, bookShelfPageAndStarAndReadingStatus, 1L);
 
-        bookShelfService.reviseBookShelf(1L, reviseBookShelfRequest, 1L);
-
-        ReadingStatus readingStatus = bookShelfEntity.getReadingStatus();
-        assertThat(readingStatus).isEqualTo(READING);
+        assertThat(bookShelf.getReadingStatus()).isEqualTo(READING);
     }
 
     @Test
     void 독서완료_서재_별점수정_성공() throws Exception {
-        ReviseBookShelfRequest reviseBookShelfRequest = ReviseBookShelfRequest.builder()
-            .pages(123)
+        BookShelfPageAndStarAndReadingStatus bookShelfPageAndStarAndReadingStatus = BookShelfPageAndStarAndReadingStatus.builder()
             .star(FIVE)
-            .readingStatus(COMPLETE)
             .build();
 
-        BookShelfEntity bookShelfEntity = BookShelfEntity.builder()
-            .star(HALF)
+        BookShelf bookShelf = BookShelf.builder()
             .readingStatus(COMPLETE)
+            .star(FOUR)
             .build();
+        given(bookShelfReader.readBookShelf(any(), any())).willReturn(bookShelf);
 
-        when(bookShelfReader.readBookShelfEntity(any(), any())).thenReturn(bookShelfEntity);
-        bookShelfService.reviseBookShelf(1L, reviseBookShelfRequest, 1L);
+        bookShelfService.reviseBookShelf(1L, bookShelfPageAndStarAndReadingStatus, 1L);
 
-        Star result = bookShelfEntity.getStar();
-        assertThat(result).isEqualTo(FIVE);
+        assertThat(bookShelf.getStar()).isEqualTo(FIVE);
     }
 
     @Test

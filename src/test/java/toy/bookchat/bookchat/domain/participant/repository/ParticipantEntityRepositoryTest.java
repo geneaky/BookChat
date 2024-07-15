@@ -10,13 +10,13 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import toy.bookchat.bookchat.db_module.participant.repository.ParticipantRepository;
-import toy.bookchat.bookchat.domain.RepositoryTest;
 import toy.bookchat.bookchat.db_module.chatroom.ChatRoomEntity;
 import toy.bookchat.bookchat.db_module.chatroom.repository.ChatRoomRepository;
 import toy.bookchat.bookchat.db_module.participant.ParticipantEntity;
+import toy.bookchat.bookchat.db_module.participant.repository.ParticipantRepository;
 import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.db_module.user.repository.UserRepository;
+import toy.bookchat.bookchat.domain.RepositoryTest;
 import toy.bookchat.bookchat.exception.notfound.pariticipant.ParticipantNotFoundException;
 
 class ParticipantEntityRepositoryTest extends RepositoryTest {
@@ -38,6 +38,7 @@ class ParticipantEntityRepositoryTest extends RepositoryTest {
         userRepository.save(userEntity);
 
         ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
+            .bookId(1L)
             .host(userEntity)
             .roomSid("KUor")
             .roomSize(655)
@@ -74,6 +75,7 @@ class ParticipantEntityRepositoryTest extends RepositoryTest {
         userRepository.save(userEntity2);
 
         ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
+            .bookId(1L)
             .host(userEntity1)
             .roomSid("KUor")
             .roomSize(655)
@@ -104,6 +106,7 @@ class ParticipantEntityRepositoryTest extends RepositoryTest {
     @Test
     void 채팅방에_접속한_참여자수_조회_성공() throws Exception {
         ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
+            .bookId(645L)
             .roomSid("KUor")
             .roomSize(655)
             .defaultRoomImageType(1)
@@ -139,6 +142,7 @@ class ParticipantEntityRepositoryTest extends RepositoryTest {
         userRepository.save(userEntity);
 
         ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
+            .bookId(1L)
             .host(userEntity)
             .roomSid("KUor")
             .roomSize(655)
@@ -174,6 +178,7 @@ class ParticipantEntityRepositoryTest extends RepositoryTest {
         userRepository.save(userEntity);
 
         ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
+            .bookId(1L)
             .host(userEntity)
             .roomSid("KUor")
             .roomSize(655)

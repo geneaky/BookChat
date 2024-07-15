@@ -47,14 +47,14 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.db_module.book.BookEntity;
 import toy.bookchat.bookchat.db_module.chat.ChatEntity;
-import toy.bookchat.bookchat.domain.ControllerTestExtension;
-import toy.bookchat.bookchat.domain.bookshelf.service.dto.request.BookRequest;
 import toy.bookchat.bookchat.db_module.chatroom.ChatRoomEntity;
-import toy.bookchat.bookchat.domain.chatroom.api.dto.response.UserChatRoomDetailResponse;
 import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.response.ChatRoomResponse;
 import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.response.ChatRoomsResponseSlice;
 import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.response.UserChatRoomResponse;
 import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.response.UserChatRoomsResponseSlice;
+import toy.bookchat.bookchat.domain.ControllerTestExtension;
+import toy.bookchat.bookchat.domain.bookshelf.api.v1.request.BookRequest;
+import toy.bookchat.bookchat.domain.chatroom.api.dto.response.UserChatRoomDetailResponse;
 import toy.bookchat.bookchat.domain.chatroom.service.ChatRoomService;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.CreateChatRoomRequest;
 import toy.bookchat.bookchat.domain.chatroom.service.dto.request.ReviseChatRoomRequest;
@@ -144,18 +144,21 @@ class ChatRoomControllerTest extends ControllerTestExtension {
     @Test
     void 사용자의_채팅방_목록_조회_성공() throws Exception {
         BookEntity bookEntity1 = BookEntity.builder()
+            .id(1L)
             .title("effective java")
             .bookCoverImageUrl("effectivejava@s3.com")
             .authors(List.of("Joshua", "JJU"))
             .build();
 
         BookEntity bookEntity2 = BookEntity.builder()
+            .id(2L)
             .title("effective kotlin")
             .bookCoverImageUrl("effectivekotlin@s3.com")
             .authors(List.of("marcin mosckala"))
             .build();
 
         BookEntity bookEntity3 = BookEntity.builder()
+            .id(3L)
             .title("toby spring")
             .bookCoverImageUrl("tobyspring@s3.com")
             .authors(List.of("21min"))
@@ -163,7 +166,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
 
         ChatRoomEntity chatRoomEntity1 = ChatRoomEntity.builder()
             .id(1L)
-            .bookEntity(bookEntity1)
+            .bookId(bookEntity1.getId())
             .roomName("이펙티브 자바 부수는 방")
             .roomSid("secret1")
             .roomSize(100)
@@ -173,7 +176,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
         chatRoomEntity1.setCreatedAt(LocalDateTime.now());
         ChatRoomEntity chatRoomEntity2 = ChatRoomEntity.builder()
             .id(2L)
-            .bookEntity(bookEntity2)
+            .bookId(bookEntity2.getId())
             .roomName("이펙티브 코틀린 부수는 방")
             .roomSid("secret2")
             .roomSize(10)
@@ -183,7 +186,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
         chatRoomEntity2.setCreatedAt(LocalDateTime.now());
         ChatRoomEntity chatRoomEntity3 = ChatRoomEntity.builder()
             .id(3L)
-            .bookEntity(bookEntity3)
+            .bookId(bookEntity3.getId())
             .roomName("토비의 스프링 부수는 방")
             .roomSid("secret3")
             .roomSize(5)
@@ -210,8 +213,8 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .message("토비의 스프링 부수는 방 입니다.")
             .build();
 
-        List<UserChatRoomResponse> result = List.of(getChatRoomResponse(chatRoomEntity1, chatEntity1),
-            getChatRoomResponse(chatRoomEntity2, chatEntity2), getChatRoomResponse(chatRoomEntity3, chatEntity3));
+        List<UserChatRoomResponse> result = List.of(getChatRoomResponse(chatRoomEntity1, chatEntity1, bookEntity1),
+            getChatRoomResponse(chatRoomEntity2, chatEntity2, bookEntity2), getChatRoomResponse(chatRoomEntity3, chatEntity3, bookEntity3));
 
         PageRequest pageRequest = PageRequest.of(0, 3, Sort.by("id").descending());
         Slice<UserChatRoomResponse> slice = new SliceImpl<>(result, pageRequest, true);
@@ -566,7 +569,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                 )));
     }
 
-    private UserChatRoomResponse getChatRoomResponse(ChatRoomEntity chatRoomEntity, ChatEntity chatEntity) {
+    private UserChatRoomResponse getChatRoomResponse(ChatRoomEntity chatRoomEntity, ChatEntity chatEntity, BookEntity bookEntity) {
         return UserChatRoomResponse.builder()
             .roomId(chatRoomEntity.getId())
             .roomSid(chatRoomEntity.getRoomSid())
@@ -577,9 +580,9 @@ class ChatRoomControllerTest extends ControllerTestExtension {
             .hostNickname("host 별명")
             .hostProfileImageUrl("host Profile Image Url")
             .hostDefaultProfileImageType(1)
-            .bookTitle(chatRoomEntity.getBookTitle())
-            .bookCoverImageUrl(chatRoomEntity.getBookCoverImageUrl())
-            .bookAuthors(chatRoomEntity.getBookAuthors())
+            .bookTitle(bookEntity.getTitle())
+            .bookCoverImageUrl(bookEntity.getBookCoverImageUrl())
+            .bookAuthors(bookEntity.getAuthors())
             .senderId(1L)
             .senderNickname("sender Nickname")
             .senderProfileImageUrl("sender Profile Image Url")

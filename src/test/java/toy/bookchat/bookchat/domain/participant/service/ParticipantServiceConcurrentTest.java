@@ -23,10 +23,10 @@ import toy.bookchat.bookchat.db_module.book.repository.BookRepository;
 import toy.bookchat.bookchat.db_module.chatroom.ChatRoomEntity;
 import toy.bookchat.bookchat.db_module.chatroom.repository.ChatRoomRepository;
 import toy.bookchat.bookchat.db_module.participant.ParticipantEntity;
-import toy.bookchat.bookchat.domain.participant.ParticipantStatus;
 import toy.bookchat.bookchat.db_module.participant.repository.ParticipantRepository;
 import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.db_module.user.repository.UserRepository;
+import toy.bookchat.bookchat.domain.participant.ParticipantStatus;
 import toy.bookchat.bookchat.infrastructure.broker.MessagePublisher;
 import toy.bookchat.bookchat.infrastructure.push.service.PushService;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
@@ -93,7 +93,7 @@ class ParticipantServiceConcurrentTest {
 
         ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
             .host(userEntityList.get(0))
-            .bookEntity(bookEntity)
+            .bookId(bookEntity.getId())
             .defaultRoomImageType(1)
             .roomSize(200)
             .roomSid("HNsIG51b")
