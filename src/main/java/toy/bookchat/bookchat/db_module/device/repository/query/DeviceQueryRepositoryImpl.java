@@ -31,7 +31,7 @@ public class DeviceQueryRepositoryImpl implements DeviceQueryRepository {
     public List<DeviceEntity> getDisconnectedUserDevice(Long roomId) {
         return queryFactory.select(deviceEntity)
             .from(deviceEntity)
-            .innerJoin(participantEntity).on(deviceEntity.userEntity.eq(participantEntity.userEntity).and(participantEntity.chatRoomEntity.id.eq(roomId)))
+            .innerJoin(participantEntity).on(deviceEntity.userEntity.id.eq(participantEntity.userId).and(participantEntity.chatRoomId.eq(roomId)))
             .where(participantEntity.isConnected.isFalse())
             .fetch();
     }

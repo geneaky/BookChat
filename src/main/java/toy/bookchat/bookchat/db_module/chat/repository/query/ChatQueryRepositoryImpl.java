@@ -25,14 +25,13 @@ public class ChatQueryRepositoryImpl implements ChatQueryRepository {
     }
 
     @Override
-    public Slice<ChatEntity> getChatRoomChats(Long roomId, Long postCursorId, Pageable pageable,
-        Long userId) {
+    public Slice<ChatEntity> getChatRoomChats(Long roomId, Long postCursorId, Pageable pageable, Long userId) {
         return toSlice(queryFactory.select(chatEntity)
             .from(chatEntity)
-            .where(chatEntity.chatRoomEntity.id.eq(JPAExpressions.select(participantEntity.chatRoomEntity.id)
+            .where(chatEntity.chatRoomId.eq(JPAExpressions.select(participantEntity.chatRoomId)
                     .from(participantEntity)
-                    .where(participantEntity.userEntity.id.eq(userId)
-                        .and(participantEntity.chatRoomEntity.id.eq(roomId)))),
+                    .where(participantEntity.userId.eq(userId)
+                        .and(participantEntity.chatRoomId.eq(roomId)))),
                 numberBasedPagination(chatEntity, chatEntity.id, postCursorId, pageable)
             )
             .limit(pageable.getPageSize())
@@ -43,12 +42,12 @@ public class ChatQueryRepositoryImpl implements ChatQueryRepository {
     public Optional<ChatEntity> getUserChatRoomChat(Long chatId, Long userId) {
         return Optional.ofNullable(queryFactory.select(chatEntity)
             .from(chatEntity)
-            .join(chatEntity.userEntity, userEntity).fetchJoin()
+            .join(userEntity).on(chatEntity.userId.eq(userEntity.id))
             .where(chatEntity.id.eq(chatId)
-                .and(chatEntity.chatRoomEntity.id.in(
-                    JPAExpressions.select(participantEntity.chatRoomEntity.id)
+                .and(chatEntity.chatRoomId.in(
+                    JPAExpressions.select(participantEntity.chatRoomId)
                         .from(participantEntity)
-                        .where(participantEntity.userEntity.id.eq(userId)))
+                        .where(participantEntity.userId.eq(userId)))
                 ))
             .fetchOne());
     }

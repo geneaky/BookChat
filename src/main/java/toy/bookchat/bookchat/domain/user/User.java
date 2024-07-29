@@ -6,10 +6,16 @@ import lombok.Getter;
 @Getter
 public class User {
 
-    private Long id;
+  private final Long id;
+  private final String nickname;
+  private final String profileImageUrl;
+  private final Integer defaultProfileImageType;
 
-    @Builder
-    private User(Long id) {
-        this.id = id;
-    }
+  @Builder
+  public User(Long id, String nickname, String profileImageUrl, Integer defaultProfileImageType) {
+    this.id = id;
+    this.nickname = nickname;
+    this.profileImageUrl = profileImageUrl;
+    this.defaultProfileImageType = defaultProfileImageType;
+  }
 }

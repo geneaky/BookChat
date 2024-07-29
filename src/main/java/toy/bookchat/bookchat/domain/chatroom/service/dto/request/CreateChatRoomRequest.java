@@ -51,7 +51,7 @@ public class CreateChatRoomRequest {
             .roomSize(this.roomSize)
             .defaultRoomImageType(this.defaultRoomImageType)
             .roomImageUri(fileUrl)
-            .host(host)
+            .hostId(host.getId())
             .build();
     }
 

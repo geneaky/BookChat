@@ -8,104 +8,94 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
-import toy.bookchat.bookchat.db_module.chatroom.ChatRoomEntity;
 import toy.bookchat.bookchat.domain.participant.ParticipantStatus;
-import toy.bookchat.bookchat.db_module.user.UserEntity;
 
 @Getter
 @Entity
 @Table(name = "participant")
 public class ParticipantEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private ParticipantStatus participantStatus;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private UserEntity userEntity;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "chat_room_id")
-    private ChatRoomEntity chatRoomEntity;
-    private Boolean isConnected;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private ParticipantStatus participantStatus;
+  @Column(name = "user_id")
+  private Long userId;
+  @Column(name = "chat_room_id")
+  private Long chatRoomId;
+  private Boolean isConnected;
 
-    protected ParticipantEntity() {
-    }
+  protected ParticipantEntity() {
+  }
 
-    @Builder
-    private ParticipantEntity(Long id, ParticipantStatus participantStatus, UserEntity userEntity,
-        ChatRoomEntity chatRoomEntity, Boolean isConnected) {
-        this.id = id;
-        this.participantStatus = participantStatus;
-        this.userEntity = userEntity;
-        this.chatRoomEntity = chatRoomEntity;
-        this.isConnected = isConnected;
-    }
+  @Builder
+  private ParticipantEntity(Long id, ParticipantStatus participantStatus, Long userId, Long chatRoomId,
+      Boolean isConnected) {
+    this.id = id;
+    this.participantStatus = participantStatus;
+    this.userId = userId;
+    this.chatRoomId = chatRoomId;
+    this.isConnected = isConnected;
+  }
 
-    public Long getUserId() {
-        return this.userEntity.getId();
-    }
 
-    public String getUserNickname() {
-        return this.userEntity.getNickname();
-    }
+  public String getUserNickname() {
+//        return this.userEntity.getNickname();
+    return null;
+  }
 
-    public String getUserProfileImageUrl() {
-        return this.userEntity.getProfileImageUrl();
-    }
+  public String getUserProfileImageUrl() {
+//        return this.userEntity.getProfileImageUrl();
+    return null;
+  }
 
-    public Integer getUserDefaultProfileImageType() {
-        return this.userEntity.getDefaultProfileImageType();
-    }
+  public Integer getUserDefaultProfileImageType() {
+//        return this.userEntity.getDefaultProfileImageType();
+    return null;
+  }
 
-    public boolean isSubHost() {
-        return this.participantStatus == SUBHOST;
-    }
+  public boolean isSubHost() {
+    return this.participantStatus == SUBHOST;
+  }
 
-    public boolean isHost() {
-        return this.participantStatus == HOST;
-    }
+  public boolean isHost() {
+    return this.participantStatus == HOST;
+  }
 
-    public boolean isNotHost() {
-        return this.participantStatus != HOST;
-    }
+  public boolean isNotHost() {
+    return this.participantStatus != HOST;
+  }
 
-    public boolean isGuest() {
-        return this.participantStatus == GUEST;
-    }
+  public boolean isGuest() {
+    return this.participantStatus == GUEST;
+  }
 
-    public void toGuest() {
-        this.participantStatus = GUEST;
-    }
+  public String getChatRoomSid() {
+//        return this.chatRoomEntity.getRoomSid();
+    return null;
+  }
 
-    public void toHost() {
-        this.participantStatus = HOST;
-    }
+  public boolean isNotSubHost() {
+    return this.participantStatus != SUBHOST;
+  }
 
-    public void toSubHost() {
-        this.participantStatus = SUBHOST;
-    }
+  public void connect() {
+    this.isConnected = true;
+  }
 
-    public String getChatRoomSid() {
-        return this.chatRoomEntity.getRoomSid();
-    }
+  public void disconnect() {
+    this.isConnected = false;
+  }
 
-    public boolean isNotSubHost() {
-        return this.participantStatus != SUBHOST;
-    }
-
-    public void connect() {
-        this.isConnected = true;
-    }
+  public void changeStatus(ParticipantStatus participantStatus) {
+    this.participantStatus = participantStatus;
+  }
 }

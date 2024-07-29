@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.domain.chat.api;
+package toy.bookchat.bookchat.domain.chat.api.v1;
 
 import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import toy.bookchat.bookchat.domain.chat.Chat;
-import toy.bookchat.bookchat.domain.chat.api.v1.request.MessageDto;
+import toy.bookchat.bookchat.domain.chat.api.v1.request.MessageRequest;
 import toy.bookchat.bookchat.domain.chat.api.v1.response.ChatDetailResponse;
 import toy.bookchat.bookchat.domain.chat.api.v1.response.ChatRoomChatsResponse;
 import toy.bookchat.bookchat.domain.chat.service.ChatService;
@@ -28,8 +28,8 @@ public class ChatController {
     }
 
     @MessageMapping("/send/chatrooms/{roomId}")
-    public void sendMessage(@Valid MessageDto messageDto, @DestinationVariable Long roomId, @UserPayload TokenPayload tokenPayload) {
-        chatService.sendMessage(tokenPayload.getUserId(), roomId, messageDto);
+    public void sendMessage(@Valid MessageRequest messageRequest, @DestinationVariable Long roomId, @UserPayload TokenPayload tokenPayload) {
+        chatService.sendMessage(tokenPayload.getUserId(), roomId, messageRequest.toTarget());
     }
 
     @GetMapping("/v1/api/chatrooms/{roomId}/chats")

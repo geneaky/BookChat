@@ -2,6 +2,8 @@ package toy.bookchat.bookchat.domain.user.service;
 
 import static toy.bookchat.bookchat.domain.common.Status.ACTIVE;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.db_module.user.repository.UserRepository;
@@ -32,6 +34,22 @@ public class UserReader {
 
         return User.builder()
             .id(userEntity.getId())
+            .nickname(userEntity.getNickname())
+            .profileImageUrl(userEntity.getProfileImageUrl())
+            .defaultProfileImageType(userEntity.getDefaultProfileImageType())
             .build();
+    }
+
+    public List<User> readUsers(List<Long> userIds) {
+        List<UserEntity> userEntities = userRepository.findByIdIn(userIds);
+
+        return userEntities.stream()
+            .map(userEntity -> User.builder()
+                .id(userEntity.getId())
+                .nickname(userEntity.getNickname())
+                .profileImageUrl(userEntity.getProfileImageUrl())
+                .defaultProfileImageType(userEntity.getDefaultProfileImageType())
+                .build())
+            .collect(Collectors.toList());
     }
 }

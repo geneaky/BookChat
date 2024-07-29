@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
-import toy.bookchat.bookchat.db_module.participant.repository.ParticipantRepository;
+import toy.bookchat.bookchat.domain.participant.service.ParticipantManager;
 import toy.bookchat.bookchat.security.user.UserPrincipal;
 
 @Slf4j
@@ -18,10 +18,10 @@ public class StompEventListener {
 
     public static final int TOPIC_NAME_LENGTH = 7;
 
-    private final ParticipantRepository participantRepository;
+    private final ParticipantManager participantManager;
 
-    public StompEventListener(ParticipantRepository participantRepository) {
-        this.participantRepository = participantRepository;
+    public StompEventListener(ParticipantManager participantManager) {
+        this.participantManager = participantManager;
     }
 
     @EventListener
@@ -35,7 +35,7 @@ public class StompEventListener {
     public void handleStompDisconnectEvent(SessionDisconnectEvent event) {
         UsernamePasswordAuthenticationToken user = (UsernamePasswordAuthenticationToken) event.getUser();
         UserPrincipal userPrincipal = (UserPrincipal) user.getPrincipal();
-        participantRepository.disconnectAllByUserId(userPrincipal.getUserId());
+        participantManager.disconnectAll(userPrincipal.getUserId());
         log.info("Stomp Disconnect Event :: {}", userPrincipal.getUsername());
     }
 
@@ -46,7 +46,7 @@ public class StompEventListener {
         UserPrincipal userPrincipal = (UserPrincipal) user.getPrincipal();
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
         String roomSid = accessor.getDestination().substring(TOPIC_NAME_LENGTH);
-        participantRepository.connect(userPrincipal.getUserId(), roomSid);
+        participantManager.connect(userPrincipal.getUserId(), roomSid);
         log.info("Stomp Subscribe Event :: {}", userPrincipal.getUsername());
     }
 
@@ -54,8 +54,8 @@ public class StompEventListener {
     public void handleStompUnsubscribeEvent(SessionSubscribeEvent event) {
         UsernamePasswordAuthenticationToken user = (UsernamePasswordAuthenticationToken) event.getUser();
         UserPrincipal userPrincipal = (UserPrincipal) user.getPrincipal();
-        String destination = StompHeaderAccessor.wrap(event.getMessage()).getDestination().substring(TOPIC_NAME_LENGTH);
-        participantRepository.disconnect(userPrincipal.getUserId(), destination);
+        String roomSid = StompHeaderAccessor.wrap(event.getMessage()).getDestination().substring(TOPIC_NAME_LENGTH);
+        participantManager.disconnect(userPrincipal.getUserId(), roomSid);
         log.info("Stomp Unsubscribe Event :: {}", userPrincipal.getUsername());
     }
 

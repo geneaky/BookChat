@@ -3,11 +3,11 @@ package toy.bookchat.bookchat.domain.chat.api.v1.response;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import toy.bookchat.bookchat.db_module.user.UserEntity;
+import toy.bookchat.bookchat.domain.chat.Sender;
 
 @Getter
 @EqualsAndHashCode
-public class ChatSender {
+public class ChatSenderResponse {
 
     private Long id;
     private String nickname;
@@ -15,19 +15,19 @@ public class ChatSender {
     private Integer defaultProfileImageType;
 
     @Builder
-    private ChatSender(Long id, String nickname, String profileImageUrl, Integer defaultProfileImageType) {
+    private ChatSenderResponse(Long id, String nickname, String profileImageUrl, Integer defaultProfileImageType) {
         this.id = id;
         this.nickname = nickname;
         this.profileImageUrl = profileImageUrl;
         this.defaultProfileImageType = defaultProfileImageType;
     }
 
-    public static ChatSender from(UserEntity userEntity) {
-        return ChatSender.builder()
-            .id(userEntity.getId())
-            .nickname(userEntity.getNickname())
-            .profileImageUrl(userEntity.getProfileImageUrl())
-            .defaultProfileImageType(userEntity.getDefaultProfileImageType())
+    public static ChatSenderResponse from(Sender sender) {
+        return ChatSenderResponse.builder()
+            .id(sender.getId())
+            .nickname(sender.getNickname())
+            .profileImageUrl(sender.getProfileImageUrl())
+            .defaultProfileImageType(sender.getDefaultProfileImageType())
             .build();
     }
 }

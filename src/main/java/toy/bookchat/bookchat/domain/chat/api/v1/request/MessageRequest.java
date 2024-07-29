@@ -7,11 +7,12 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import toy.bookchat.bookchat.domain.chat.Message;
 
 @Getter
 @EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class MessageDto {
+public class MessageRequest {
 
     @NotNull
     private Integer receiptId;
@@ -19,8 +20,12 @@ public class MessageDto {
     private String message;
 
     @Builder
-    private MessageDto(Integer receiptId, String message) {
+    private MessageRequest(Integer receiptId, String message) {
         this.receiptId = receiptId;
         this.message = message;
+    }
+
+    public Message toTarget() {
+        return Message.of(receiptId, message);
     }
 }

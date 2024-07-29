@@ -1,9 +1,9 @@
-package toy.bookchat.bookchat.domain.chat.api.dto.response;
+package toy.bookchat.bookchat.domain.chat.api.v1.response;
 
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
-import toy.bookchat.bookchat.db_module.chat.ChatEntity;
+import toy.bookchat.bookchat.domain.chat.Chat;
 
 @Getter
 public class ChatDetailResponse {
@@ -12,10 +12,10 @@ public class ChatDetailResponse {
     private Long chatRoomId;
     private String message;
     private LocalDateTime dispatchTime;
-    private ChatSender sender;
+    private ChatSenderResponse sender;
 
     @Builder
-    private ChatDetailResponse(Long chatId, Long chatRoomId, String message, LocalDateTime dispatchTime, ChatSender sender) {
+    private ChatDetailResponse(Long chatId, Long chatRoomId, String message, LocalDateTime dispatchTime, ChatSenderResponse sender) {
         this.chatId = chatId;
         this.chatRoomId = chatRoomId;
         this.message = message;
@@ -23,13 +23,13 @@ public class ChatDetailResponse {
         this.sender = sender;
     }
 
-    public static ChatDetailResponse from(ChatEntity chatEntity) {
+    public static ChatDetailResponse from(Chat chat) {
         return ChatDetailResponse.builder()
-            .chatId(chatEntity.getId())
-            .chatRoomId(chatEntity.getChatRoomEntity().getId())
-            .message(chatEntity.getMessage())
-            .dispatchTime(chatEntity.getCreatedAt())
-            .sender(ChatSender.from(chatEntity.getUserEntity()))
+            .chatId(chat.getId())
+            .chatRoomId(chat.getChatRoomId())
+            .message(chat.getMessage())
+            .dispatchTime(chat.getDispatchTime())
+            .sender(ChatSenderResponse.from(chat.getSender()))
             .build();
     }
 }

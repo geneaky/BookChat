@@ -21,8 +21,8 @@ public class ChatRoomBlockedUserQueryRepositoryImpl implements ChatRoomBlockedUs
         return Optional.ofNullable(
             queryFactory.select(chatRoomBlockedUserEntity)
                 .from(chatRoomBlockedUserEntity)
-                .where(chatRoomBlockedUserEntity.userEntity.id.eq(userId)
-                    .and(chatRoomBlockedUserEntity.chatRoomEntity.id.eq(chatRoomId)))
+                .where(chatRoomBlockedUserEntity.userId.eq(userId)
+                    .and(chatRoomBlockedUserEntity.chatRoomId.eq(chatRoomId)))
                 .fetchOne()
         );
     }

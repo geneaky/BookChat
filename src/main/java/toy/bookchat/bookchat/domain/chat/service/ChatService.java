@@ -4,18 +4,18 @@ import static toy.bookchat.bookchat.infrastructure.push.PushType.CHAT;
 
 import java.util.List;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import toy.bookchat.bookchat.db_module.chat.ChatEntity;
-import toy.bookchat.bookchat.db_module.chat.repository.ChatRepository;
-import toy.bookchat.bookchat.domain.chat.api.dto.request.MessageDto;
-import toy.bookchat.bookchat.domain.chat.api.dto.response.ChatDetailResponse;
-import toy.bookchat.bookchat.domain.chat.service.dto.response.ChatRoomChatsResponse;
-import toy.bookchat.bookchat.db_module.device.DeviceEntity;
-import toy.bookchat.bookchat.db_module.device.repository.DeviceRepository;
-import toy.bookchat.bookchat.db_module.participant.ParticipantEntity;
-import toy.bookchat.bookchat.db_module.participant.repository.ParticipantRepository;
-import toy.bookchat.bookchat.exception.badrequest.participant.NotParticipatedException;
+import toy.bookchat.bookchat.domain.chat.Chat;
+import toy.bookchat.bookchat.domain.chat.Message;
+import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
+import toy.bookchat.bookchat.domain.chatroom.service.ChatRoomReader;
+import toy.bookchat.bookchat.domain.device.Device;
+import toy.bookchat.bookchat.domain.device.service.DeviceReader;
+import toy.bookchat.bookchat.domain.participant.service.ParticipantValidator;
+import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.service.UserReader;
 import toy.bookchat.bookchat.infrastructure.broker.MessagePublisher;
 import toy.bookchat.bookchat.infrastructure.broker.message.CommonMessage;
 import toy.bookchat.bookchat.infrastructure.push.ChatMessageBody;
@@ -25,61 +25,58 @@ import toy.bookchat.bookchat.infrastructure.push.service.PushService;
 @Service
 public class ChatService {
 
-    private static final int SEPARATE_LENGTH = 1000;
-    private final ChatRepository chatRepository;
-    private final ParticipantRepository participantRepository;
-    private final DeviceRepository deviceRepository;
-    private final MessagePublisher messagePublisher;
-    private final PushService pushService;
+  private final ChatReader chatReader;
+  private final ChatAppender chatAppender;
+  private final UserReader userReader;
+  private final ChatRoomReader chatRoomReader;
+  private final ParticipantValidator participantValidator;
+  private final DeviceReader deviceReader;
+  private final MessagePublisher messagePublisher;
+  private final PushService pushService;
 
-    public ChatService(ChatRepository chatRepository, ParticipantRepository participantRepository,
-        DeviceRepository deviceRepository, MessagePublisher messagePublisher,
-        PushService pushService) {
-        this.chatRepository = chatRepository;
-        this.participantRepository = participantRepository;
-        this.deviceRepository = deviceRepository;
-        this.messagePublisher = messagePublisher;
-        this.pushService = pushService;
+  public ChatService(UserReader userReader, ChatReader chatReader, ChatAppender chatAppender,
+      ChatRoomReader chatRoomReader, ParticipantValidator participantValidator, DeviceReader deviceReader,
+      MessagePublisher messagePublisher, PushService pushService) {
+    this.userReader = userReader;
+    this.chatReader = chatReader;
+    this.chatAppender = chatAppender;
+    this.chatRoomReader = chatRoomReader;
+    this.participantValidator = participantValidator;
+    this.deviceReader = deviceReader;
+    this.messagePublisher = messagePublisher;
+    this.pushService = pushService;
+  }
+
+  @Transactional
+  public void sendMessage(Long userId, Long roomId, Message message) {
+    participantValidator.checkDoesUserParticipate(userId, roomId);
+
+    User user = userReader.readUser(userId);
+    ChatRoom chatRoom = chatRoomReader.readChatRoom(roomId);
+    Chat chat = chatAppender.append(user, chatRoom, message.getMessage());
+
+    CommonMessage commonMessage = CommonMessage.from(chat, message.getReceiptId());
+
+    ChatMessageBody chatMessageBody = ChatMessageBody.builder()
+        .chatId(chat.getId())
+        .chatRoomId(roomId)
+        .build();
+    messagePublisher.sendCommonMessage(chatRoom.getSid(), commonMessage);
+
+    PushMessageBody pushMessageBody = PushMessageBody.of(CHAT, chatMessageBody);
+    List<Device> disconnectedUserDevice = deviceReader.readDisconnectedUserDevice(roomId);
+    for (Device device : disconnectedUserDevice) {
+      pushService.send(device.getFcmToken(), pushMessageBody);
     }
+  }
 
-    @Transactional
-    public void sendMessage(Long userId, Long roomId, MessageDto messageDto) {
-        ParticipantEntity participantEntity = participantRepository.findByUserIdAndChatRoomId(userId, roomId)
-            .orElseThrow(NotParticipatedException::new);
+  @Transactional(readOnly = true)
+  public Slice<Chat> getChatRoomChats(Long roomId, Long postCursorId, Pageable pageable, Long userId) {
+    return chatReader.readSlicedChat(userId, roomId, postCursorId, pageable);
+  }
 
-        List<DeviceEntity> disconnectedUserDeviceEntity = deviceRepository.getDisconnectedUserDevice(roomId);
-
-        ChatEntity chatEntity = chatRepository.save(ChatEntity.builder()
-            .userEntity(participantEntity.getUserEntity())
-            .chatRoomEntity(participantEntity.getChatRoomEntity())
-            .message(messageDto.getMessage())
-            .build());
-
-        CommonMessage message = CommonMessage.from(participantEntity.getUserId(), chatEntity, messageDto);
-
-        ChatMessageBody chatMessageBody = ChatMessageBody.builder()
-            .chatId(chatEntity.getId())
-            .chatRoomId(roomId)
-            .build();
-
-        PushMessageBody pushMessageBody = PushMessageBody.of(CHAT, chatMessageBody);
-        for (DeviceEntity deviceEntity : disconnectedUserDeviceEntity) {
-            pushService.send(deviceEntity.getFcmToken(), pushMessageBody);
-        }
-
-        messagePublisher.sendCommonMessage(participantEntity.getChatRoomSid(), message);
-    }
-
-    @Transactional(readOnly = true)
-    public ChatRoomChatsResponse getChatRoomChats(Long roomId, Long postCursorId, Pageable pageable,
-        Long userId) {
-        return new ChatRoomChatsResponse(
-            chatRepository.getChatRoomChats(roomId, postCursorId, pageable, userId));
-    }
-
-    @Transactional(readOnly = true)
-    public ChatDetailResponse getChatDetail(Long chatId, Long userId) {
-        ChatEntity chatEntity = chatRepository.getUserChatRoomChat(chatId, userId).orElseThrow(NotParticipatedException::new);
-        return ChatDetailResponse.from(chatEntity);
-    }
+  @Transactional(readOnly = true)
+  public Chat getChatDetail(Long chatId, Long userId) {
+    return chatReader.readChat(userId, chatId);
+  }
 }
