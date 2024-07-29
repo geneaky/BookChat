@@ -2,12 +2,10 @@ package toy.bookchat.bookchat.domain.chat.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
-import com.google.firebase.messaging.FirebaseMessaging;
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -32,15 +30,19 @@ import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
-import toy.bookchat.bookchat.db_module.chat.ChatEntity;
 import toy.bookchat.bookchat.db_module.chat.repository.ChatRepository;
-import toy.bookchat.bookchat.domain.ControllerTestExtension;
-import toy.bookchat.bookchat.db_module.chatroom.ChatRoomEntity;
-import toy.bookchat.bookchat.db_module.chatroom.repository.ChatRoomRepository;
-import toy.bookchat.bookchat.db_module.device.repository.DeviceRepository;
 import toy.bookchat.bookchat.db_module.participant.ParticipantEntity;
 import toy.bookchat.bookchat.db_module.participant.repository.ParticipantRepository;
-import toy.bookchat.bookchat.db_module.user.repository.UserRepository;
+import toy.bookchat.bookchat.domain.ControllerTestExtension;
+import toy.bookchat.bookchat.domain.chat.Chat;
+import toy.bookchat.bookchat.domain.chat.Sender;
+import toy.bookchat.bookchat.domain.chat.service.ChatAppender;
+import toy.bookchat.bookchat.domain.chat.service.ChatReader;
+import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
+import toy.bookchat.bookchat.domain.chatroom.service.ChatRoomReader;
+import toy.bookchat.bookchat.domain.participant.service.ParticipantValidator;
+import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.service.UserReader;
 import toy.bookchat.bookchat.infrastructure.broker.message.CommonMessage;
 import toy.bookchat.bookchat.infrastructure.push.service.PushService;
 
@@ -53,19 +55,21 @@ class ChatControllerMessagingTest extends ControllerTestExtension {
     private int port;
     private StompSession stompSession;
     @MockBean
-    private DeviceRepository deviceRepository;
-    @MockBean
     private PushService pushService;
-    @MockBean
-    private FirebaseMessaging firebaseMessaging;
-    @MockBean
-    private UserRepository userRepository;
-    @MockBean
-    private ChatRoomRepository chatRoomRepository;
     @MockBean
     private ParticipantRepository participantRepository;
     @MockBean
     private ChatRepository chatRepository;
+    @MockBean
+    private ChatReader chatReader;
+    @MockBean
+    private ChatAppender chatAppender;
+    @MockBean
+    private ChatRoomReader chatRoomReader;
+    @MockBean
+    private ParticipantValidator participantValidator;
+    @MockBean
+    private UserReader userReader;
 
     ChatControllerMessagingTest() throws Exception {
         this.webSocketStompClient = new WebSocketStompClient(new StandardWebSocketClient());
@@ -134,64 +138,75 @@ class ChatControllerMessagingTest extends ControllerTestExtension {
         StompHeaders subscribeHeader = stompSubscribeHeaders("/topic/heho");
         StompHeaders sendHeader = stompSendHeaders("/subscriptions/send/chatrooms/1");
 
-        ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
+        User user = User.builder()
             .id(1L)
-            .roomSize(3)
-            .roomSid("heho")
             .build();
+        given(userReader.readUser(any())).willReturn(user);
 
-        ChatEntity chatEntity1 = ChatEntity.builder()
+        ChatRoom chatRoom = ChatRoom.builder()
             .id(1L)
+            .roomSize(10)
+            .sid("heho")
+            .build();
+        given(chatRoomReader.readChatRoom(any())).willReturn(chatRoom);
+
+        Sender sender = Sender.builder()
+            .id(user.getId())
+            .build();
+        Chat chat1 = Chat.builder()
+            .id(1L)
+            .sender(sender)
             .message("test")
-            .userEntity(getUser())
-            .chatRoomEntity(chatRoomEntity)
+            .chatRoomId(chatRoom.getId())
+            .dispatchTime(LocalDateTime.now())
             .build();
-        chatEntity1.setCreatedAt(LocalDateTime.now());
-
-        ChatEntity chatEntity2 = ChatEntity.builder()
+        Chat chat2 = Chat.builder()
             .id(2L)
+            .sender(sender)
             .message("test test")
-            .userEntity(getUser())
-            .chatRoomEntity(chatRoomEntity)
+            .chatRoomId(chatRoom.getId())
+            .dispatchTime(LocalDateTime.now())
             .build();
-        chatEntity2.setCreatedAt(LocalDateTime.now());
-
-        ChatEntity chatEntity3 = ChatEntity.builder()
+        Chat chat3 = Chat.builder()
             .id(3L)
+            .sender(sender)
             .message("test test test")
-            .userEntity(getUser())
-            .chatRoomEntity(chatRoomEntity)
+            .chatRoomId(chatRoom.getId())
+            .dispatchTime(LocalDateTime.now())
             .build();
-        chatEntity3.setCreatedAt(LocalDateTime.now());
+        given(chatAppender.append(any(), any(), any())).willReturn(chat1, chat2, chat3);
 
         ParticipantEntity participantEntity = ParticipantEntity.builder()
-            .chatRoomEntity(chatRoomEntity)
-            .userEntity(getUser())
+            .chatRoomId(chatRoom.getId())
+            .userId(getUserId())
             .id(1L)
             .build();
+        when(participantRepository.findByUserIdAndChatRoomId(any(), any())).thenReturn(
+            Optional.of(participantEntity));
+        given(participantRepository.findByUserIdAndChatRoomSid(any(), any())).willReturn(Optional.of(participantEntity));
 
         CommonMessage dto1 = CommonMessage.builder()
             .senderId(getUserId())
-            .chatId(chatEntity1.getId())
+            .chatId(chat1.getId())
             .receiptId(1)
-            .dispatchTime(chatEntity1.getDispatchTime())
-            .message(chatEntity1.getMessage())
+            .dispatchTime(chat1.getDispatchTime().toString())
+            .message(chat1.getMessage())
             .build();
 
         CommonMessage dto2 = CommonMessage.builder()
             .senderId(getUserId())
-            .chatId(chatEntity2.getId())
+            .chatId(chat2.getId())
             .receiptId(2)
-            .dispatchTime(chatEntity2.getDispatchTime())
-            .message(chatEntity2.getMessage())
+            .dispatchTime(chat2.getDispatchTime().toString())
+            .message(chat2.getMessage())
             .build();
 
         CommonMessage dto3 = CommonMessage.builder()
             .senderId(getUserId())
-            .chatId(chatEntity3.getId())
+            .chatId(chat3.getId())
             .receiptId(3)
-            .dispatchTime(chatEntity3.getDispatchTime())
-            .message(chatEntity3.getMessage())
+            .dispatchTime(chat3.getDispatchTime().toString())
+            .message(chat3.getMessage())
             .build();
 
         Runnable[] chatActions = {
@@ -199,10 +214,6 @@ class ChatControllerMessagingTest extends ControllerTestExtension {
             () -> this.stompSession.send(sendHeader, dto2),
             () -> this.stompSession.send(sendHeader, dto3)
         };
-
-        when(participantRepository.findByUserIdAndChatRoomId(any(), any())).thenReturn(
-            Optional.ofNullable(participantEntity));
-        when(chatRepository.save(any())).thenReturn(chatEntity1, chatEntity2, chatEntity3);
 
         CountDownLatch chatAttemptCountLatch = new CountDownLatch(chatActions.length);
 
@@ -214,7 +225,6 @@ class ChatControllerMessagingTest extends ControllerTestExtension {
         chatAttemptCountLatch.await();
 
         assertThat(blockingQueue).containsExactlyInAnyOrder(dto1, dto2, dto3);
-        verify(chatRepository, times(chatActions.length)).save(any());
     }
 
     private void doChat(Runnable... chatActions) {

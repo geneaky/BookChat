@@ -1,361 +1,228 @@
 package toy.bookchat.bookchat.domain.participant.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.GUEST;
 import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.HOST;
 import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.SUBHOST;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import toy.bookchat.bookchat.db_module.chat.ChatEntity;
-import toy.bookchat.bookchat.db_module.chat.repository.ChatRepository;
-import toy.bookchat.bookchat.db_module.chatroom.ChatRoomEntity;
-import toy.bookchat.bookchat.db_module.chatroom.repository.ChatRoomBlockedUserRepository;
-import toy.bookchat.bookchat.db_module.participant.ParticipantEntity;
-import toy.bookchat.bookchat.db_module.participant.repository.ParticipantRepository;
-import toy.bookchat.bookchat.db_module.user.UserEntity;
-import toy.bookchat.bookchat.exception.forbidden.participant.NoPermissionParticipantException;
-import toy.bookchat.bookchat.exception.notfound.pariticipant.ParticipantNotFoundException;
+import toy.bookchat.bookchat.domain.chat.Chat;
+import toy.bookchat.bookchat.domain.chat.service.ChatAppender;
+import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
+import toy.bookchat.bookchat.domain.chatroom.service.ChatRoomBlockedUserAppender;
+import toy.bookchat.bookchat.domain.chatroom.service.ChatRoomManager;
+import toy.bookchat.bookchat.domain.participant.Host;
+import toy.bookchat.bookchat.domain.participant.Participant;
+import toy.bookchat.bookchat.domain.participant.ParticipantAdmin;
+import toy.bookchat.bookchat.domain.participant.ParticipantWithChatRoom;
 import toy.bookchat.bookchat.infrastructure.broker.MessagePublisher;
-import toy.bookchat.bookchat.infrastructure.broker.message.NotificationMessage;
 
 @ExtendWith(MockitoExtension.class)
 class ParticipantServiceTest {
 
-    @Mock
-    private ParticipantRepository participantRepository;
-    @Mock
-    private ChatRoomBlockedUserRepository chatRoomBlockedUserRepository;
-    @Mock
-    private ChatRepository chatRepository;
-    @Mock
-    private MessagePublisher messagePublisher;
-    @InjectMocks
-    private ParticipantService participantService;
+  @Mock
+  private ParticipantReader participantReader;
+  @Mock
+  private ChatRoomBlockedUserAppender chatRoomBlockedUserAppender;
+  @Mock
+  private MessagePublisher messagePublisher;
+  @Mock
+  private ParticipantManager participantManager;
+  @Mock
+  private ParticipantCleaner participantCleaner;
+  @Mock
+  private ChatRoomManager chatRoomManager;
+  @Mock
+  private ChatAppender chatAppender;
+  @InjectMocks
+  private ParticipantService participantService;
 
-    @Test
-    void 요청자가_방장이_아닐경우_예외발생() throws Exception {
+  @Test
+  @DisplayName("부방장을 방장으로 위임후 방장은 위임해제 성공")
+  void changeParticipantRights1() throws Exception {
+    Host host = Host.builder().id(1L).build();
+    given(participantReader.readHostForUpdate(any(), any())).willReturn(host);
 
-        UserEntity host = ParticipantServiceTestFixture.createUser(1L);
-        UserEntity guest = ParticipantServiceTestFixture.createUser(2L);
-        ChatRoomEntity chatRoomEntity = ParticipantServiceTestFixture.createChatRoom(host);
+    Participant participant = Participant.builder().status(SUBHOST).build();
+    ChatRoom chatRoom = ChatRoom.builder().sid("L21").build();
+    ParticipantWithChatRoom participantWithChatRoom = ParticipantWithChatRoom.builder()
+        .participant(participant)
+        .chatRoom(chatRoom)
+        .build();
+    given(participantReader.readParticipantWithChatRoom(any(), any())).willReturn(participantWithChatRoom);
 
-        assertThatThrownBy(() -> {
-            participantService.changeParticipantRights(chatRoomEntity.getId(), guest.getId(), SUBHOST,
-                guest.getId());
-        }).isInstanceOf(NoPermissionParticipantException.class);
-    }
+    Chat chat = Chat.builder().dispatchTime(LocalDateTime.now()).build();
+    given(chatAppender.appendAnnouncement(any(), any())).willReturn(chat);
 
-    @Test
-    void 권한변경_지정한_참여자가_채팅방_참여자가_아닐경우_예외발생() throws Exception {
-        UserEntity host = ParticipantServiceTestFixture.createUser(1L);
-        UserEntity guest = ParticipantServiceTestFixture.createUser(2L);
-        ChatRoomEntity chatRoomEntity = ParticipantServiceTestFixture.createChatRoom(host);
+    participantService.changeParticipantRights(1L, 2L, HOST, 1L);
 
-        ParticipantEntity participantEntity = ParticipantServiceTestFixture.createHostParticipant(1L, host,
-            chatRoomEntity);
+    assertAll(
+        () -> assertThat(host.getStatus()).isEqualTo(GUEST),
+        () -> assertThat(participant.getStatus()).isEqualTo(HOST)
+    );
+  }
 
-        when(participantRepository.findWithPessimisticLockByUserIdAndChatRoomId(host.getId(),
-            chatRoomEntity.getId())).thenReturn(Optional.ofNullable(participantEntity));
+  @Test
+  @DisplayName("부방장을 게스트로 변경 성공")
+  void changeParticipantRights2() throws Exception {
+    Host host = Host.builder().id(1L).build();
+    given(participantReader.readHostForUpdate(any(), any())).willReturn(host);
 
-        assertThatThrownBy(() -> {
-            participantService.changeParticipantRights(chatRoomEntity.getId(), guest.getId(), SUBHOST,
-                host.getId());
-        }).isInstanceOf(ParticipantNotFoundException.class);
-    }
+    Participant participant = Participant.builder().status(SUBHOST).build();
+    ChatRoom chatRoom = ChatRoom.builder().sid("L21").build();
+    ParticipantWithChatRoom participantWithChatRoom = ParticipantWithChatRoom.builder()
+        .participant(participant)
+        .chatRoom(chatRoom)
+        .build();
+    given(participantReader.readParticipantWithChatRoom(any(), any())).willReturn(participantWithChatRoom);
 
-    @Test
-    void 게스트를_부방장으로_위임_성공() throws Exception {
-        UserEntity host = ParticipantServiceTestFixture.createUser(1L);
-        UserEntity guest = ParticipantServiceTestFixture.createUser(2L);
-        ChatRoomEntity chatRoomEntity = ParticipantServiceTestFixture.createChatRoom(host);
-        ParticipantEntity participantEntity1 = ParticipantServiceTestFixture.createHostParticipant(1L, host,
-            chatRoomEntity);
-        ParticipantEntity participantEntity2 = ParticipantServiceTestFixture.createGuestParticipant(2L, guest,
-            chatRoomEntity);
-        ChatEntity chatEntity = ParticipantServiceTestFixture.createChat(chatRoomEntity);
+    Chat chat = Chat.builder().dispatchTime(LocalDateTime.now()).build();
+    given(chatAppender.appendAnnouncement(any(), any())).willReturn(chat);
 
-        when(participantRepository.findWithPessimisticLockByUserIdAndChatRoomId(host.getId(),
-            chatRoomEntity.getId())).thenReturn(Optional.ofNullable(participantEntity1));
-        when(participantRepository.findByUserIdAndChatRoomId(guest.getId(),
-            chatRoomEntity.getId())).thenReturn(Optional.ofNullable(participantEntity2));
-        when(chatRepository.save(any())).thenReturn(chatEntity);
-        participantService.changeParticipantRights(1L, guest.getId(), SUBHOST, host.getId());
+    participantService.changeParticipantRights(1L, 2L, GUEST, 1L);
 
-        assertThat(participantEntity2.getParticipantStatus()).isEqualTo(SUBHOST);
-        verify(messagePublisher).sendNotificationMessage(anyString(),
-            any(NotificationMessage.class));
-    }
+    assertThat(participant.getStatus()).isEqualTo(GUEST);
+  }
 
-    @Test
-    void 부방장_제한인원수_이상_위임_불가() throws Exception {
-        UserEntity host = ParticipantServiceTestFixture.createUser(1L);
-        UserEntity guest = ParticipantServiceTestFixture.createUser(2L);
-        ChatRoomEntity chatRoomEntity = ParticipantServiceTestFixture.createChatRoom(host);
-        ParticipantEntity participantEntity1 = ParticipantServiceTestFixture.createHostParticipant(1L, host,
-            chatRoomEntity);
-        ParticipantEntity participantEntity2 = ParticipantServiceTestFixture.createGuestParticipant(2L, guest,
-            chatRoomEntity);
-        ChatEntity chatEntity = ParticipantServiceTestFixture.createChat(chatRoomEntity);
+  @Test
+  @DisplayName("게스트를 부방장으로 변경 성공")
+  void changeParticipantRights3() throws Exception {
+    Host host = Host.builder().id(1L).build();
+    given(participantReader.readHostForUpdate(any(), any())).willReturn(host);
 
-        when(participantRepository.findWithPessimisticLockByUserIdAndChatRoomId(host.getId(),
-            chatRoomEntity.getId())).thenReturn(Optional.ofNullable(participantEntity1));
-        when(participantRepository.findByUserIdAndChatRoomId(guest.getId(),
-            chatRoomEntity.getId())).thenReturn(Optional.ofNullable(participantEntity2));
-        when(participantRepository.countSubHostByRoomId(any())).thenReturn(5L);
-        participantService.changeParticipantRights(1L, guest.getId(), SUBHOST, host.getId());
+    Participant participant = Participant.builder().status(GUEST).build();
+    ChatRoom chatRoom = ChatRoom.builder().sid("L21").build();
+    ParticipantWithChatRoom participantWithChatRoom = ParticipantWithChatRoom.builder()
+        .participant(participant)
+        .chatRoom(chatRoom)
+        .build();
+    given(participantReader.readParticipantWithChatRoom(any(), any())).willReturn(participantWithChatRoom);
 
-        assertThat(participantEntity2.getParticipantStatus()).isEqualTo(GUEST);
-    }
+    Chat chat = Chat.builder().dispatchTime(LocalDateTime.now()).build();
+    given(chatAppender.appendAnnouncement(any(), any())).willReturn(chat);
 
-    @Test
-    void 부방장을_위임해제_성공() throws Exception {
-        UserEntity host = ParticipantServiceTestFixture.createUser(1L);
-        UserEntity subHost = ParticipantServiceTestFixture.createUser(2L);
-        ChatRoomEntity chatRoomEntity = ParticipantServiceTestFixture.createChatRoom(host);
-        ParticipantEntity participantEntity1 = ParticipantServiceTestFixture.createHostParticipant(1L, host,
-            chatRoomEntity);
-        ParticipantEntity participantEntity2 = ParticipantServiceTestFixture.createSubHostParticipant(2L,
-            subHost, chatRoomEntity);
-        ChatEntity chatEntity = ParticipantServiceTestFixture.createChat(chatRoomEntity);
+    participantService.changeParticipantRights(1L, 2L, SUBHOST, 1L);
 
-        when(participantRepository.findWithPessimisticLockByUserIdAndChatRoomId(host.getId(),
-            chatRoomEntity.getId())).thenReturn(Optional.ofNullable(participantEntity1));
-        when(participantRepository.findByUserIdAndChatRoomId(subHost.getId(),
-            chatRoomEntity.getId())).thenReturn(Optional.ofNullable(participantEntity2));
-        when(chatRepository.save(any())).thenReturn(chatEntity);
-        participantService.changeParticipantRights(1L, subHost.getId(), GUEST, host.getId());
+    assertThat(participant.getStatus()).isEqualTo(SUBHOST);
+  }
 
-        assertThat(participantEntity2.getParticipantStatus()).isEqualTo(GUEST);
-        verify(messagePublisher).sendNotificationMessage(anyString(),
-            any(NotificationMessage.class));
-    }
+  @Test
+  @DisplayName("부방장은 제한 인원수 이상 위임할 수 없다")
+  void changeParticipantRights4() throws Exception {
+    Host host = Host.builder().id(1L).build();
+    given(participantReader.readHostForUpdate(any(), any())).willReturn(host);
 
-    @Test
-    void 부방장을_방장으로_위임후_방장은_위임해제_성공() throws Exception {
-        UserEntity host = ParticipantServiceTestFixture.createUser(1L);
-        UserEntity subHost = ParticipantServiceTestFixture.createUser(2L);
-        ChatRoomEntity chatRoomEntity = ParticipantServiceTestFixture.createChatRoom(host);
-        ParticipantEntity participantEntity1 = ParticipantServiceTestFixture.createHostParticipant(1L, host,
-            chatRoomEntity);
-        ParticipantEntity participantEntity2 = ParticipantServiceTestFixture.createSubHostParticipant(2L,
-            subHost, chatRoomEntity);
-        ChatEntity chatEntity = ParticipantServiceTestFixture.createChat(chatRoomEntity);
+    Participant participant = Participant.builder().status(GUEST).build();
+    ChatRoom chatRoom = ChatRoom.builder().sid("L21").build();
+    ParticipantWithChatRoom participantWithChatRoom = ParticipantWithChatRoom.builder()
+        .participant(participant)
+        .chatRoom(chatRoom)
+        .build();
+    given(participantReader.readParticipantWithChatRoom(any(), any())).willReturn(participantWithChatRoom);
 
-        when(participantRepository.findWithPessimisticLockByUserIdAndChatRoomId(host.getId(),
-            chatRoomEntity.getId())).thenReturn(Optional.ofNullable(participantEntity1));
-        when(participantRepository.findByUserIdAndChatRoomId(subHost.getId(),
-            chatRoomEntity.getId())).thenReturn(Optional.ofNullable(participantEntity2));
-        when(chatRepository.save(any())).thenReturn(chatEntity);
-        participantService.changeParticipantRights(1L, subHost.getId(), HOST, host.getId());
+    given(participantReader.readTotalSubHostCount(any())).willReturn(5L);
 
-        assertAll(
-            () -> {
-                assertThat(participantEntity2.getParticipantStatus()).isEqualTo(HOST);
-            },
-            () -> {
-                assertThat(participantEntity1.getParticipantStatus()).isEqualTo(GUEST);
-            },
-            () -> {
-                assertThat(chatRoomEntity.getHost()).isEqualTo(subHost);
-            }
-        );
-        verify(messagePublisher).sendNotificationMessage(anyString(),
-            any(NotificationMessage.class));
-    }
+    participantService.changeParticipantRights(1L, 2L, SUBHOST, 1L);
 
-    @Test
-    void 게스트_방장으로_위임후_방장_위임해제_성공() throws Exception {
-        UserEntity host = ParticipantServiceTestFixture.createUser(1L);
-        UserEntity guest = ParticipantServiceTestFixture.createUser(2L);
-        ChatRoomEntity chatRoomEntity = ParticipantServiceTestFixture.createChatRoom(host);
-        ParticipantEntity participantEntity1 = ParticipantServiceTestFixture.createHostParticipant(1L, host,
-            chatRoomEntity);
-        ParticipantEntity participantEntity2 = ParticipantServiceTestFixture.createGuestParticipant(2L, guest,
-            chatRoomEntity);
-        ChatEntity chatEntity = ParticipantServiceTestFixture.createChat(chatRoomEntity);
+    assertThat(participant.getStatus()).isEqualTo(GUEST);
+  }
 
-        when(participantRepository.findWithPessimisticLockByUserIdAndChatRoomId(host.getId(),
-            chatRoomEntity.getId())).thenReturn(Optional.ofNullable(participantEntity1));
-        when(participantRepository.findByUserIdAndChatRoomId(guest.getId(),
-            chatRoomEntity.getId())).thenReturn(Optional.ofNullable(participantEntity2));
-        when(chatRepository.save(any())).thenReturn(chatEntity);
-        participantService.changeParticipantRights(1L, guest.getId(), HOST, host.getId());
+  @Test
+  @DisplayName("게스트를 방장으로 위임후 방장은 게스트가 될 수 있다")
+  void changeParticipantRight5() throws Exception {
+    Host host = Host.builder().id(1L).build();
+    given(participantReader.readHostForUpdate(any(), any())).willReturn(host);
 
-        assertAll(
-            () -> {
-                assertThat(participantEntity2.getParticipantStatus()).isEqualTo(HOST);
-            },
-            () -> {
-                assertThat(participantEntity1.getParticipantStatus()).isEqualTo(GUEST);
-            },
-            () -> {
-                assertThat(chatRoomEntity.getHost()).isEqualTo(guest);
-            }
-        );
-        verify(messagePublisher).sendNotificationMessage(anyString(),
-            any(NotificationMessage.class));
-    }
+    Participant participant = Participant.builder().status(GUEST).build();
+    ChatRoom chatRoom = ChatRoom.builder().sid("L21").build();
+    ParticipantWithChatRoom participantWithChatRoom = ParticipantWithChatRoom.builder()
+        .participant(participant)
+        .chatRoom(chatRoom)
+        .build();
+    given(participantReader.readParticipantWithChatRoom(any(), any())).willReturn(participantWithChatRoom);
 
-    @Test
-    void 방장의_부방장_강퇴_성공() throws Exception {
-        UserEntity host = ParticipantServiceTestFixture.createUser(1L);
-        UserEntity subHost = ParticipantServiceTestFixture.createUser(2L);
-        ChatRoomEntity chatRoomEntity = ParticipantServiceTestFixture.createChatRoom(host);
-        ParticipantEntity participantEntity1 = ParticipantServiceTestFixture.createHostParticipant(1L, host,
-            chatRoomEntity);
-        ParticipantEntity participantEntity2 = ParticipantServiceTestFixture.createSubHostParticipant(2L,
-            subHost, chatRoomEntity);
-        ChatEntity chatEntity = ParticipantServiceTestFixture.createChat(chatRoomEntity);
+    Chat chat = Chat.builder().dispatchTime(LocalDateTime.now()).build();
+    given(chatAppender.appendAnnouncement(any(), any())).willReturn(chat);
 
-        when(participantRepository.findByUserIdAndChatRoomId(host.getId(),
-            chatRoomEntity.getId())).thenReturn(Optional.ofNullable(participantEntity1));
-        when(participantRepository.findByUserIdAndChatRoomId(subHost.getId(),
-            chatRoomEntity.getId())).thenReturn(Optional.ofNullable(participantEntity2));
-        when(chatRepository.save(any())).thenReturn(chatEntity);
-        participantService.kickParticipant(chatRoomEntity.getId(), subHost.getId(), host.getId());
+    participantService.changeParticipantRights(1L, 2L, HOST, 1L);
 
-        verify(participantRepository).delete(participantEntity2);
-        verify(chatRoomBlockedUserRepository).save(any());
-        verify(messagePublisher).sendNotificationMessage(anyString(),
-            any(NotificationMessage.class));
-    }
+    assertThat(participant.getStatus()).isEqualTo(HOST);
+    assertThat(host.getStatus()).isEqualTo(GUEST);
+  }
 
-    @Test
-    void 방장의_게스트_강퇴_성공() throws Exception {
-        UserEntity host = ParticipantServiceTestFixture.createUser(1L);
-        UserEntity guest = ParticipantServiceTestFixture.createUser(2L);
-        ChatRoomEntity chatRoomEntity = ParticipantServiceTestFixture.createChatRoom(host);
-        ParticipantEntity participantEntity1 = ParticipantServiceTestFixture.createHostParticipant(1L, host,
-            chatRoomEntity);
-        ParticipantEntity participantEntity2 = ParticipantServiceTestFixture.createGuestParticipant(2L, guest,
-            chatRoomEntity);
-        ChatEntity chatEntity = ParticipantServiceTestFixture.createChat(chatRoomEntity);
+  @Test
+  @DisplayName("방장이 게스트를 강퇴할 수 있다")
+  void kickParticipant1() throws Exception {
+    ParticipantAdmin admin = ParticipantAdmin.builder().status(HOST).build();
+    given(participantReader.readAdmin(any(), any())).willReturn(admin);
 
-        when(participantRepository.findByUserIdAndChatRoomId(1L, 1L)).thenReturn(
-            Optional.ofNullable(participantEntity1));
-        when(participantRepository.findByUserIdAndChatRoomId(2L, 1L)).thenReturn(
-            Optional.ofNullable(participantEntity2));
-        when(chatRepository.save(any())).thenReturn(chatEntity);
-        participantService.kickParticipant(chatRoomEntity.getId(), guest.getId(), host.getId());
+    Participant participant = Participant.builder().status(GUEST).build();
+    ChatRoom chatRoom = ChatRoom.builder().build();
+    ParticipantWithChatRoom participantWithChatRoom = ParticipantWithChatRoom.builder()
+        .participant(participant)
+        .chatRoom(chatRoom)
+        .build();
+    given(participantReader.readParticipantWithChatRoom(any(), any())).willReturn(participantWithChatRoom);
+    Chat chat = Chat.builder().dispatchTime(LocalDateTime.now()).build();
+    given(chatAppender.appendAnnouncement(any(), any())).willReturn(chat);
 
-        verify(participantRepository).delete(participantEntity2);
-        verify(chatRoomBlockedUserRepository).save(any());
-        verify(messagePublisher).sendNotificationMessage(anyString(),
-            any(NotificationMessage.class));
-    }
+    participantService.kickParticipant(1L, 2L, 1L);
 
-    @Test
-    void 부방장의_게스트_강퇴_성공() throws Exception {
-        UserEntity host = ParticipantServiceTestFixture.createUser(1L);
-        UserEntity subHost = ParticipantServiceTestFixture.createUser(2L);
-        UserEntity guest = ParticipantServiceTestFixture.createUser(3L);
-        ChatRoomEntity chatRoomEntity = ParticipantServiceTestFixture.createChatRoom(host);
-        ParticipantEntity participantEntity1 = ParticipantServiceTestFixture.createHostParticipant(1L, host,
-            chatRoomEntity);
-        ParticipantEntity participantEntity2 = ParticipantServiceTestFixture.createGuestParticipant(2L, guest,
-            chatRoomEntity);
-        ChatEntity chatEntity = ParticipantServiceTestFixture.createChat(chatRoomEntity);
+    verify(participantCleaner).clean(any());
+    verify(chatRoomBlockedUserAppender).append(any());
+  }
 
-        when(participantRepository.findByUserIdAndChatRoomId(subHost.getId(),
-            chatRoomEntity.getId())).thenReturn(Optional.ofNullable(participantEntity1));
-        when(participantRepository.findByUserIdAndChatRoomId(guest.getId(),
-            chatRoomEntity.getId())).thenReturn(Optional.ofNullable(participantEntity2));
-        when(chatRepository.save(any())).thenReturn(chatEntity);
-        participantService.kickParticipant(chatRoomEntity.getId(), guest.getId(), subHost.getId());
+  @Test
+  @DisplayName("방장은 부방장을 강퇴할 수 있다")
+  void kickParticipant2() throws Exception {
+    ParticipantAdmin admin = ParticipantAdmin.builder().status(HOST).build();
+    given(participantReader.readAdmin(any(), any())).willReturn(admin);
 
-        verify(participantRepository).delete(participantEntity2);
-        verify(chatRoomBlockedUserRepository).save(any());
-        verify(messagePublisher).sendNotificationMessage(anyString(),
-            any(NotificationMessage.class));
-    }
+    Participant participant = Participant.builder().status(SUBHOST).build();
+    ChatRoom chatRoom = ChatRoom.builder().build();
+    ParticipantWithChatRoom participantWithChatRoom = ParticipantWithChatRoom.builder()
+        .participant(participant)
+        .chatRoom(chatRoom)
+        .build();
+    given(participantReader.readParticipantWithChatRoom(any(), any())).willReturn(participantWithChatRoom);
+    Chat chat = Chat.builder().dispatchTime(LocalDateTime.now()).build();
+    given(chatAppender.appendAnnouncement(any(), any())).willReturn(chat);
 
-    @Test
-    void 게스트가_강퇴_요청시_예외발생() throws Exception {
-        UserEntity host = ParticipantServiceTestFixture.createUser(1L);
-        UserEntity guest1 = ParticipantServiceTestFixture.createUser(2L);
-        UserEntity guest2 = ParticipantServiceTestFixture.createUser(3L);
-        ChatRoomEntity chatRoomEntity = ParticipantServiceTestFixture.createChatRoom(host);
-        ParticipantEntity participantEntity1 = ParticipantServiceTestFixture.createGuestParticipant(1L, guest1,
-            chatRoomEntity);
-        ParticipantEntity participantEntity2 = ParticipantServiceTestFixture.createGuestParticipant(2L, guest2,
-            chatRoomEntity);
+    participantService.kickParticipant(1L, 2L, 1L);
 
-        when(participantRepository.findByUserIdAndChatRoomId(guest1.getId(),
-            chatRoomEntity.getId())).thenReturn(Optional.ofNullable(participantEntity1));
-        when(participantRepository.findByUserIdAndChatRoomId(guest2.getId(),
-            chatRoomEntity.getId())).thenReturn(Optional.ofNullable(participantEntity2));
+    verify(participantCleaner).clean(any());
+    verify(chatRoomBlockedUserAppender).append(any());
+  }
 
-        assertThatThrownBy(() -> {
-            participantService.kickParticipant(chatRoomEntity.getId(), guest1.getId(), guest2.getId());
-        }).isInstanceOf(NoPermissionParticipantException.class);
-    }
+  @Test
+  @DisplayName("부방장은 게스트를 강퇴할 수 있다")
+  void kickParticipant3() throws Exception {
+    ParticipantAdmin admin = ParticipantAdmin.builder().status(HOST).build();
+    given(participantReader.readAdmin(any(), any())).willReturn(admin);
 
-    private static class ParticipantServiceTestFixture {
+    Participant participant = Participant.builder().status(GUEST).build();
+    ChatRoom chatRoom = ChatRoom.builder().build();
+    ParticipantWithChatRoom participantWithChatRoom = ParticipantWithChatRoom.builder()
+        .participant(participant)
+        .chatRoom(chatRoom)
+        .build();
+    given(participantReader.readParticipantWithChatRoom(any(), any())).willReturn(participantWithChatRoom);
+    Chat chat = Chat.builder().dispatchTime(LocalDateTime.now()).build();
+    given(chatAppender.appendAnnouncement(any(), any())).willReturn(chat);
 
-        public static UserEntity createUser(Long userId) {
-            return UserEntity.builder()
-                .id(userId)
-                .build();
-        }
+    participantService.kickParticipant(1L, 2L, 1L);
 
-        public static ChatRoomEntity createChatRoom(UserEntity host) {
-            return ChatRoomEntity.builder()
-                .id(1L)
-                .host(host)
-                .roomSid("L21")
-                .build();
-        }
-
-        public static ParticipantEntity createHostParticipant(Long participantId, UserEntity host,
-            ChatRoomEntity chatRoomEntity) {
-            return ParticipantEntity.builder()
-                .id(participantId)
-                .userEntity(host)
-                .participantStatus(HOST)
-                .chatRoomEntity(chatRoomEntity)
-                .build();
-        }
-
-        public static ParticipantEntity createSubHostParticipant(Long participantId, UserEntity subHost,
-            ChatRoomEntity chatRoomEntity) {
-            return ParticipantEntity.builder()
-                .id(participantId)
-                .userEntity(subHost)
-                .participantStatus(SUBHOST)
-                .chatRoomEntity(chatRoomEntity)
-                .build();
-        }
-
-        public static ParticipantEntity createGuestParticipant(Long participantId, UserEntity guest,
-            ChatRoomEntity chatRoomEntity) {
-            return ParticipantEntity.builder()
-                .id(participantId)
-                .userEntity(guest)
-                .participantStatus(GUEST)
-                .chatRoomEntity(chatRoomEntity)
-                .build();
-        }
-
-        public static ChatEntity createChat(ChatRoomEntity chatRoomEntity) {
-            ChatEntity chatEntity = ChatEntity.builder()
-                .id(1L)
-                .chatRoomEntity(chatRoomEntity)
-                .build();
-            chatEntity.setCreatedAt(LocalDateTime.now());
-
-            return chatEntity;
-        }
-    }
+    verify(participantCleaner).clean(any());
+    verify(chatRoomBlockedUserAppender).append(any());
+  }
 }

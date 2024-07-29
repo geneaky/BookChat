@@ -92,7 +92,7 @@ class ParticipantServiceConcurrentTest {
         bookRepository.save(bookEntity);
 
         ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
-            .host(userEntityList.get(0))
+            .hostId(userEntityList.get(0).getId())
             .bookId(bookEntity.getId())
             .defaultRoomImageType(1)
             .roomSize(200)
@@ -105,15 +105,15 @@ class ParticipantServiceConcurrentTest {
         for (int i = 0; i < count; i++) {
             if (i == 0) {
                 participantEntityList.add(ParticipantEntity.builder()
-                    .userEntity(userEntityList.get(i))
-                    .chatRoomEntity(chatRoomEntity)
+                    .userId(userEntityList.get(i).getId())
+                    .chatRoomId(chatRoomEntity.getId())
                     .participantStatus(ParticipantStatus.HOST)
                     .build());
                 continue;
             }
             participantEntityList.add(ParticipantEntity.builder()
-                .userEntity(userEntityList.get(i))
-                .chatRoomEntity(chatRoomEntity)
+                .userId(userEntityList.get(i).getId())
+                .chatRoomId(chatRoomEntity.getId())
                 .participantStatus(ParticipantStatus.GUEST)
                 .build());
         }

@@ -17,7 +17,6 @@ import toy.bookchat.bookchat.db_module.participant.repository.ParticipantReposit
 import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.db_module.user.repository.UserRepository;
 import toy.bookchat.bookchat.domain.RepositoryTest;
-import toy.bookchat.bookchat.exception.notfound.pariticipant.ParticipantNotFoundException;
 
 class ParticipantEntityRepositoryTest extends RepositoryTest {
 
@@ -39,7 +38,7 @@ class ParticipantEntityRepositoryTest extends RepositoryTest {
 
         ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
             .bookId(1L)
-            .host(userEntity)
+            .hostId(userEntity.getId())
             .roomSid("KUor")
             .roomSize(655)
             .defaultRoomImageType(1)
@@ -47,9 +46,9 @@ class ParticipantEntityRepositoryTest extends RepositoryTest {
         chatRoomRepository.save(chatRoomEntity);
 
         ParticipantEntity participantEntity = ParticipantEntity.builder()
-            .userEntity(userEntity)
+            .userId(userEntity.getId())
+            .chatRoomId(chatRoomEntity.getId())
             .participantStatus(HOST)
-            .chatRoomEntity(chatRoomEntity)
             .build();
 
         participantRepository.save(participantEntity);
@@ -76,7 +75,7 @@ class ParticipantEntityRepositoryTest extends RepositoryTest {
 
         ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
             .bookId(1L)
-            .host(userEntity1)
+            .hostId(userEntity1.getId())
             .roomSid("KUor")
             .roomSize(655)
             .defaultRoomImageType(1)
@@ -84,15 +83,15 @@ class ParticipantEntityRepositoryTest extends RepositoryTest {
         chatRoomRepository.save(chatRoomEntity);
 
         ParticipantEntity participantEntity1 = ParticipantEntity.builder()
-            .userEntity(userEntity1)
+            .userId(userEntity1.getId())
+            .chatRoomId(chatRoomEntity.getId())
             .participantStatus(HOST)
-            .chatRoomEntity(chatRoomEntity)
             .build();
 
         ParticipantEntity participantEntity2 = ParticipantEntity.builder()
-            .userEntity(userEntity2)
+            .userId(userEntity2.getId())
+            .chatRoomId(chatRoomEntity.getId())
             .participantStatus(SUBHOST)
-            .chatRoomEntity(chatRoomEntity)
             .build();
 
         participantRepository.save(participantEntity1);
@@ -107,6 +106,7 @@ class ParticipantEntityRepositoryTest extends RepositoryTest {
     void 채팅방에_접속한_참여자수_조회_성공() throws Exception {
         ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
             .bookId(645L)
+            .hostId(384L)
             .roomSid("KUor")
             .roomSize(655)
             .defaultRoomImageType(1)
@@ -114,20 +114,23 @@ class ParticipantEntityRepositoryTest extends RepositoryTest {
         chatRoomRepository.save(chatRoomEntity);
 
         ParticipantEntity participantEntity1 = ParticipantEntity.builder()
+            .userId(384L)
+            .chatRoomId(chatRoomEntity.getId())
             .participantStatus(HOST)
-            .chatRoomEntity(chatRoomEntity)
             .build();
         ParticipantEntity participantEntity2 = ParticipantEntity.builder()
+            .userId(1L)
+            .chatRoomId(chatRoomEntity.getId())
             .participantStatus(SUBHOST)
-            .chatRoomEntity(chatRoomEntity)
             .build();
         ParticipantEntity participantEntity3 = ParticipantEntity.builder()
+            .userId(2L)
+            .chatRoomId(chatRoomEntity.getId())
             .participantStatus(GUEST)
-            .chatRoomEntity(chatRoomEntity)
             .build();
         participantRepository.saveAll(List.of(participantEntity1, participantEntity2, participantEntity3));
 
-        Long memberCount = participantRepository.countByChatRoomEntity(chatRoomEntity);
+        Long memberCount = participantRepository.countByChatRoomId(chatRoomEntity.getId());
 
         assertThat(memberCount).isEqualTo(3);
     }
@@ -143,7 +146,7 @@ class ParticipantEntityRepositoryTest extends RepositoryTest {
 
         ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
             .bookId(1L)
-            .host(userEntity)
+            .hostId(userEntity.getId())
             .roomSid("KUor")
             .roomSize(655)
             .defaultRoomImageType(1)
@@ -151,57 +154,20 @@ class ParticipantEntityRepositoryTest extends RepositoryTest {
         chatRoomRepository.save(chatRoomEntity);
 
         ParticipantEntity participantEntity = ParticipantEntity.builder()
-            .userEntity(userEntity)
+            .userId(userEntity.getId())
+            .chatRoomId(chatRoomEntity.getId())
             .participantStatus(HOST)
-            .chatRoomEntity(chatRoomEntity)
             .build();
 
         participantRepository.save(participantEntity);
 
         ParticipantEntity duplicateParticipantEntity = ParticipantEntity.builder()
-            .userEntity(userEntity)
+            .userId(userEntity.getId())
+            .chatRoomId(chatRoomEntity.getId())
             .participantStatus(GUEST)
-            .chatRoomEntity(chatRoomEntity)
             .build();
 
         assertThatThrownBy(() -> participantRepository.save(duplicateParticipantEntity))
             .isInstanceOf(DataIntegrityViolationException.class);
-    }
-
-    @Test
-    void 채팅방에_참여한_사용자라면_접속상태로_변경_성공() throws Exception {
-        UserEntity userEntity = UserEntity.builder()
-            .nickname("AUser")
-            .defaultProfileImageType(1)
-            .build();
-
-        userRepository.save(userEntity);
-
-        ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
-            .bookId(1L)
-            .host(userEntity)
-            .roomSid("KUor")
-            .roomSize(655)
-            .defaultRoomImageType(1)
-            .build();
-        chatRoomRepository.save(chatRoomEntity);
-
-        ParticipantEntity participantEntity = ParticipantEntity.builder()
-            .userEntity(userEntity)
-            .participantStatus(HOST)
-            .chatRoomEntity(chatRoomEntity)
-            .build();
-
-        participantRepository.save(participantEntity);
-
-        participantRepository.connect(userEntity.getId(), chatRoomEntity.getRoomSid());
-
-        assertThat(participantEntity.getIsConnected()).isTrue();
-    }
-
-    @Test
-    void 채팅방연결_시도시_참여하지않은_사용자라면_예외발생_성공() throws Exception {
-        assertThatThrownBy(() -> participantRepository.connect(1L, "KUor"))
-            .isInstanceOf(ParticipantNotFoundException.class);
     }
 }

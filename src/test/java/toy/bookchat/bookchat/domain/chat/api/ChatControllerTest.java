@@ -27,13 +27,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.web.servlet.MockMvc;
-import toy.bookchat.bookchat.db_module.chat.ChatEntity;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
-import toy.bookchat.bookchat.domain.chat.api.dto.response.ChatDetailResponse;
-import toy.bookchat.bookchat.domain.chat.api.dto.response.ChatSender;
+import toy.bookchat.bookchat.domain.chat.Chat;
+import toy.bookchat.bookchat.domain.chat.Sender;
 import toy.bookchat.bookchat.domain.chat.service.ChatService;
-import toy.bookchat.bookchat.domain.chat.service.dto.response.ChatRoomChatsResponse;
-import toy.bookchat.bookchat.db_module.user.UserEntity;
 
 @ChatPresentationTest
 class ChatControllerTest extends ControllerTestExtension {
@@ -46,38 +43,39 @@ class ChatControllerTest extends ControllerTestExtension {
 
     @Test
     void 현재_채팅방_채팅내역_조회_성공() throws Exception {
-
-        UserEntity aUserEntity = UserEntity.builder()
+        Chat chat1 = Chat.builder()
             .id(1L)
-            .build();
-        UserEntity bUserEntity = UserEntity.builder()
-            .id(2L)
-            .build();
-
-        ChatEntity chatEntity1 = ChatEntity.builder()
-            .id(1L)
-            .userEntity(aUserEntity)
+            .chatRoomId(1L)
+            .sender(Sender.builder()
+                .id(1L)
+                .build())
             .message("first chat")
+            .dispatchTime(LocalDateTime.now())
             .build();
-        chatEntity1.setCreatedAt(LocalDateTime.now());
-        ChatEntity chatEntity2 = ChatEntity.builder()
+        Chat chat2 = Chat.builder()
             .id(2L)
-            .userEntity(bUserEntity)
+            .chatRoomId(1L)
+            .sender(
+                Sender.builder()
+                    .id(2L)
+                    .build())
             .message("second chat")
+            .dispatchTime(LocalDateTime.now())
             .build();
-        chatEntity2.setCreatedAt(LocalDateTime.now());
-        ChatEntity chatEntity3 = ChatEntity.builder()
+        Chat chat3 = Chat.builder()
             .id(3L)
-            .userEntity(aUserEntity)
+            .chatRoomId(1L)
+            .sender(
+                Sender.builder()
+                    .id(3L)
+                    .build())
             .message("welcome")
+            .dispatchTime(LocalDateTime.now())
             .build();
-        chatEntity3.setCreatedAt(LocalDateTime.now());
         PageRequest pageRequest = PageRequest.of(0, 3, Sort.by("id").descending());
-        SliceImpl<ChatEntity> chatSlice = new SliceImpl<>(List.of(chatEntity1, chatEntity2, chatEntity3), pageRequest,
-            true);
-        ChatRoomChatsResponse chatRoomChatsResponse = new ChatRoomChatsResponse(chatSlice);
-        when(chatService.getChatRoomChats(any(), any(), any(), any())).thenReturn(
-            chatRoomChatsResponse);
+        SliceImpl<Chat> chatSlice = new SliceImpl<>(List.of(chat1, chat2, chat3), pageRequest, true);
+
+        when(chatService.getChatRoomChats(any(), any(), any(), any())).thenReturn(chatSlice);
         mockMvc.perform(get("/v1/api/chatrooms/{roomId}/chats", 1)
                 .header(AUTHORIZATION, JWT_TOKEN)
                 .with(user(getUserPrincipal()))
@@ -109,12 +107,12 @@ class ChatControllerTest extends ControllerTestExtension {
 
     @Test
     void 채팅_상세_정보_조회() throws Exception {
-        given(chatService.getChatDetail(1L, 1L)).willReturn(ChatDetailResponse.builder()
-            .chatId(1L)
+        given(chatService.getChatDetail(1L, 1L)).willReturn(Chat.builder()
+            .id(1L)
             .chatRoomId(1L)
             .message("first chat")
             .dispatchTime(LocalDateTime.now())
-            .sender(ChatSender.builder()
+            .sender(Sender.builder()
                 .id(1L)
                 .nickname("test")
                 .profileImageUrl("test-image-url.com")

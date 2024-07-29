@@ -1,7 +1,6 @@
 package toy.bookchat.bookchat.domain.chat.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.GUEST;
 import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.HOST;
 
@@ -55,7 +54,7 @@ class ChatEntityRepositoryTest extends RepositoryTest {
 
         ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
             .bookId(bookEntity.getId())
-            .host(userEntity1)
+            .hostId(userEntity1.getId())
             .roomSize(348)
             .roomSid("XKewmLwG")
             .defaultRoomImageType(1)
@@ -63,19 +62,19 @@ class ChatEntityRepositoryTest extends RepositoryTest {
         chatRoomRepository.save(chatRoomEntity);
 
         ChatEntity chatEntity0 = ChatEntity.builder().message("enter")
-            .chatRoomEntity(chatRoomEntity)
+            .chatRoomId(chatRoomEntity.getId())
             .build();
-        ChatEntity chatEntity1 = ChatEntity.builder().userEntity(userEntity1).message("a")
-            .chatRoomEntity(chatRoomEntity)
+        ChatEntity chatEntity1 = ChatEntity.builder().userId(userEntity1.getId()).message("a")
+            .chatRoomId(chatRoomEntity.getId())
             .build();
-        ChatEntity chatEntity2 = ChatEntity.builder().userEntity(userEntity1).message("b")
-            .chatRoomEntity(chatRoomEntity)
+        ChatEntity chatEntity2 = ChatEntity.builder().userId(userEntity1.getId()).message("b")
+            .chatRoomId(chatRoomEntity.getId())
             .build();
-        ChatEntity chatEntity3 = ChatEntity.builder().userEntity(userEntity2).message("c")
-            .chatRoomEntity(chatRoomEntity)
+        ChatEntity chatEntity3 = ChatEntity.builder().userId(userEntity2.getId()).message("c")
+            .chatRoomId(chatRoomEntity.getId())
             .build();
-        ChatEntity chatEntity4 = ChatEntity.builder().userEntity(userEntity1).message("d")
-            .chatRoomEntity(chatRoomEntity)
+        ChatEntity chatEntity4 = ChatEntity.builder().userId(userEntity1.getId()).message("d")
+            .chatRoomId(chatRoomEntity.getId())
             .build();
 
         chatRepository.save(chatEntity0);
@@ -85,13 +84,13 @@ class ChatEntityRepositoryTest extends RepositoryTest {
         chatRepository.save(chatEntity4);
 
         ParticipantEntity participantEntity1 = ParticipantEntity.builder()
-            .userEntity(userEntity1)
-            .chatRoomEntity(chatRoomEntity)
+            .userId(userEntity1.getId())
+            .chatRoomId(chatRoomEntity.getId())
             .participantStatus(HOST)
             .build();
         ParticipantEntity participantEntity2 = ParticipantEntity.builder()
-            .userEntity(userEntity2)
-            .chatRoomEntity(chatRoomEntity)
+            .userId(userEntity2.getId())
+            .chatRoomId(chatRoomEntity.getId())
             .participantStatus(GUEST)
             .build();
         participantRepository.save(participantEntity1);
@@ -121,14 +120,14 @@ class ChatEntityRepositoryTest extends RepositoryTest {
 
         ChatRoomEntity chatRoomEntity1 = ChatRoomEntity.builder()
             .bookId(1L)
-            .host(userEntity1)
+            .hostId(userEntity1.getId())
             .roomSize(348)
             .roomSid("XKewmLwG")
             .defaultRoomImageType(1)
             .build();
         ChatRoomEntity chatRoomEntity2 = ChatRoomEntity.builder()
             .bookId(2L)
-            .host(userEntity1)
+            .hostId(userEntity1.getId())
             .roomSize(200)
             .roomSid("pzSzDwI0Ev")
             .defaultRoomImageType(1)
@@ -136,31 +135,31 @@ class ChatEntityRepositoryTest extends RepositoryTest {
         chatRoomRepository.saveAll(List.of(chatRoomEntity1, chatRoomEntity2));
 
         ChatEntity chatEntity = ChatEntity.builder()
-            .userEntity(userEntity1)
+            .userId(userEntity1.getId())
             .message("test")
-            .chatRoomEntity(chatRoomEntity1)
-            .userEntity(userEntity1)
+            .chatRoomId(chatRoomEntity1.getId())
+            .userId(userEntity1.getId())
             .build();
         chatRepository.save(chatEntity);
 
         ParticipantEntity participantEntity1 = ParticipantEntity.builder()
-            .userEntity(userEntity1)
-            .chatRoomEntity(chatRoomEntity1)
+            .userId(userEntity1.getId())
+            .chatRoomId(chatRoomEntity1.getId())
             .participantStatus(HOST)
             .build();
         ParticipantEntity participantEntity2 = ParticipantEntity.builder()
-            .userEntity(userEntity2)
-            .chatRoomEntity(chatRoomEntity1)
+            .userId(userEntity2.getId())
+            .chatRoomId(chatRoomEntity1.getId())
             .participantStatus(GUEST)
             .build();
         ParticipantEntity participantEntity3 = ParticipantEntity.builder()
-            .userEntity(userEntity1)
-            .chatRoomEntity(chatRoomEntity2)
+            .userId(userEntity1.getId())
+            .chatRoomId(chatRoomEntity2.getId())
             .participantStatus(HOST)
             .build();
         ParticipantEntity participantEntity4 = ParticipantEntity.builder()
-            .userEntity(userEntity2)
-            .chatRoomEntity(chatRoomEntity2)
+            .userId(userEntity2.getId())
+            .chatRoomId(chatRoomEntity2.getId())
             .participantStatus(GUEST)
             .build();
         participantRepository.saveAll(List.of(participantEntity1, participantEntity2, participantEntity3, participantEntity4));
@@ -171,10 +170,7 @@ class ChatEntityRepositoryTest extends RepositoryTest {
         Optional<ChatEntity> optionalChat = chatRepository.getUserChatRoomChat(chatEntity.getId(), userEntity2.getId());
         ChatEntity findChatEntity = optionalChat.get();
 
-        assertAll(
-            () -> assertThat(findChatEntity.getUserEntity()).extracting(UserEntity::getId, UserEntity::getNickname, UserEntity::getProfileImageUrl, UserEntity::getDefaultProfileImageType)
-                .containsExactly(userEntity1.getId(), userEntity1.getNickname(), userEntity1.getProfileImageUrl(), userEntity1.getDefaultProfileImageType()),
-            () -> assertThat(findChatEntity.getChatRoomEntity().getId()).isEqualTo(chatRoomEntity1.getId())
-        );
+        assertThat(findChatEntity).extracting(ChatEntity::getUserId, ChatEntity::getChatRoomId)
+            .containsExactly(userEntity1.getId(), chatRoomEntity1.getId());
     }
 }

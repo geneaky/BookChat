@@ -197,19 +197,19 @@ class ChatRoomControllerTest extends ControllerTestExtension {
 
         ChatEntity chatEntity1 = ChatEntity.builder()
             .id(1L)
-            .chatRoomEntity(chatRoomEntity1)
+            .chatRoomId(chatRoomEntity1.getId())
             .message("이펙티브 자바 부수는 방 입니다.")
             .build();
 
         ChatEntity chatEntity2 = ChatEntity.builder()
             .id(2L)
-            .chatRoomEntity(chatRoomEntity2)
+            .chatRoomId(chatRoomEntity2.getId())
             .message("이펙티브 코틀린 부수는 방 입니다.")
             .build();
 
         ChatEntity chatEntity3 = ChatEntity.builder()
             .id(3L)
-            .chatRoomEntity(chatRoomEntity3)
+            .chatRoomId(chatRoomEntity3.getId())
             .message("토비의 스프링 부수는 방 입니다.")
             .build();
 

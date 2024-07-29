@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.domain.chat.api.dto.request;
+package toy.bookchat.bookchat.domain.chat.api.v1.request;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
