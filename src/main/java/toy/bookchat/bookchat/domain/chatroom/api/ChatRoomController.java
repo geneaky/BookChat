@@ -14,15 +14,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import toy.bookchat.bookchat.domain.chatroom.api.dto.response.UserChatRoomDetailResponse;
 import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.response.ChatRoomsResponseSlice;
 import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.response.UserChatRoomsResponseSlice;
+import toy.bookchat.bookchat.domain.chatroom.api.v1.request.ChatRoomRequest;
+import toy.bookchat.bookchat.domain.chatroom.api.v1.request.CreateChatRoomRequest;
+import toy.bookchat.bookchat.domain.chatroom.api.v1.request.ReviseChatRoomRequest;
+import toy.bookchat.bookchat.domain.chatroom.api.v1.response.CreatedChatRoomDto;
+import toy.bookchat.bookchat.domain.chatroom.api.v1.response.UserChatRoomDetailResponse;
 import toy.bookchat.bookchat.domain.chatroom.service.ChatRoomService;
-import toy.bookchat.bookchat.domain.chatroom.service.dto.request.ChatRoomRequest;
-import toy.bookchat.bookchat.domain.chatroom.service.dto.request.CreateChatRoomRequest;
-import toy.bookchat.bookchat.domain.chatroom.service.dto.request.ReviseChatRoomRequest;
-import toy.bookchat.bookchat.domain.chatroom.service.dto.response.CreatedChatRoomDto;
-import toy.bookchat.bookchat.domain.participant.service.dto.response.ChatRoomDetails;
+import toy.bookchat.bookchat.domain.participant.api.v1.response.ChatRoomDetails;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPayload;
 
@@ -30,57 +30,63 @@ import toy.bookchat.bookchat.security.user.UserPayload;
 @RequestMapping("/v1/api")
 public class ChatRoomController {
 
-    private final ChatRoomService chatRoomService;
+  private final ChatRoomService chatRoomService;
 
-    public ChatRoomController(
-        ChatRoomService chatRoomService) {
-        this.chatRoomService = chatRoomService;
-    }
+  public ChatRoomController(
+      ChatRoomService chatRoomService) {
+    this.chatRoomService = chatRoomService;
+  }
 
-    @PostMapping("/chatrooms")
-    public ResponseEntity<Void> createChatRoom(@Valid @RequestPart CreateChatRoomRequest createChatRoomRequest, @RequestPart(required = false) MultipartFile chatRoomImage,
-        @UserPayload TokenPayload tokenPayload) {
-        CreatedChatRoomDto createdChatRoomDto = chatRoomService.createChatRoom(createChatRoomRequest, chatRoomImage, tokenPayload.getUserId());
+  @PostMapping("/chatrooms")
+  public ResponseEntity<Void> createChatRoom(@Valid @RequestPart CreateChatRoomRequest createChatRoomRequest,
+      @RequestPart(required = false) MultipartFile chatRoomImage,
+      @UserPayload TokenPayload tokenPayload) {
+    CreatedChatRoomDto createdChatRoomDto = chatRoomService.createChatRoom(createChatRoomRequest, chatRoomImage,
+        tokenPayload.getUserId());
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-            .headers(hs -> hs.setLocation(URI.create("/v1/api/chatrooms/" + createdChatRoomDto.getRoomId())))
-            .build();
-    }
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .headers(hs -> hs.setLocation(URI.create("/v1/api/chatrooms/" + createdChatRoomDto.getRoomId())))
+        .build();
+  }
 
-    @GetMapping("/users/chatrooms")
-    public UserChatRoomsResponseSlice getUserChatRooms(Long bookId, Long postCursorId, Pageable pageable, @UserPayload TokenPayload tokenPayload) {
-        return chatRoomService.getUserChatRooms(bookId, postCursorId, pageable, tokenPayload.getUserId());
-    }
+  @GetMapping("/users/chatrooms")
+  public UserChatRoomsResponseSlice getUserChatRooms(Long bookId, Long postCursorId, Pageable pageable,
+      @UserPayload TokenPayload tokenPayload) {
+    return chatRoomService.getUserChatRooms(bookId, postCursorId, pageable, tokenPayload.getUserId());
+  }
 
-    @GetMapping("/users/chatrooms/{roomId}")
-    public UserChatRoomDetailResponse getUserChatRoomDetails(@PathVariable Long roomId, @UserPayload TokenPayload tokenPayload) {
-        return chatRoomService.getUserChatRoomDetails(roomId, tokenPayload.getUserId());
-    }
+  @GetMapping("/users/chatrooms/{roomId}")
+  public UserChatRoomDetailResponse getUserChatRoomDetails(@PathVariable Long roomId,
+      @UserPayload TokenPayload tokenPayload) {
+    return chatRoomService.getUserChatRoomDetails(roomId, tokenPayload.getUserId());
+  }
 
-    @GetMapping("/chatrooms")
-    public ChatRoomsResponseSlice getChatRooms(@ModelAttribute ChatRoomRequest chatRoomRequest, @UserPayload TokenPayload tokenPayload, Pageable pageable) {
-        chatRoomRequest.validate();
-        return chatRoomService.getChatRooms(tokenPayload.getUserId(), chatRoomRequest, pageable);
-    }
+  @GetMapping("/chatrooms")
+  public ChatRoomsResponseSlice getChatRooms(@ModelAttribute ChatRoomRequest chatRoomRequest,
+      @UserPayload TokenPayload tokenPayload, Pageable pageable) {
+    chatRoomRequest.validate();
+    return chatRoomService.getChatRooms(tokenPayload.getUserId(), chatRoomRequest, pageable);
+  }
 
-    @GetMapping("/chatrooms/{roomId}")
-    public ChatRoomDetails getChatRoomDetails(@PathVariable Long roomId, @UserPayload TokenPayload tokenPayload) {
-        return chatRoomService.getChatRoomDetails(roomId, tokenPayload.getUserId());
-    }
+  @GetMapping("/chatrooms/{roomId}")
+  public ChatRoomDetails getChatRoomDetails(@PathVariable Long roomId, @UserPayload TokenPayload tokenPayload) {
+    return chatRoomService.getChatRoomDetails(roomId, tokenPayload.getUserId());
+  }
 
-    @PostMapping("/chatrooms/{roomId}")
-    public void reviseChatRoom(@Valid @RequestPart ReviseChatRoomRequest reviseChatRoomRequest, @RequestPart(required = false) MultipartFile chatRoomImage, @UserPayload TokenPayload tokenPayload) {
-        chatRoomService.reviseChatRoom(reviseChatRoomRequest, chatRoomImage, tokenPayload.getUserId());
-    }
+  @PostMapping("/chatrooms/{roomId}")
+  public void reviseChatRoom(@Valid @RequestPart ReviseChatRoomRequest reviseChatRoomRequest,
+      @RequestPart(required = false) MultipartFile chatRoomImage, @UserPayload TokenPayload tokenPayload) {
+    chatRoomService.reviseChatRoom(reviseChatRoomRequest, chatRoomImage, tokenPayload.getUserId());
+  }
 
-    @PostMapping("/enter/chatrooms/{roomId}")
-    public void enterChatRoom(@UserPayload TokenPayload tokenPayload, @PathVariable Long roomId) {
-        chatRoomService.enterChatRoom(tokenPayload.getUserId(), roomId);
-    }
+  @PostMapping("/enter/chatrooms/{roomId}")
+  public void enterChatRoom(@UserPayload TokenPayload tokenPayload, @PathVariable Long roomId) {
+    chatRoomService.enterChatRoom(tokenPayload.getUserId(), roomId);
+  }
 
-    @DeleteMapping("/leave/chatrooms/{roomId}")
-    public void leaveChatRoom(@UserPayload TokenPayload tokenPayload, @PathVariable Long roomId) {
-        chatRoomService.exitChatRoom(tokenPayload.getUserId(), roomId);
-    }
+  @DeleteMapping("/leave/chatrooms/{roomId}")
+  public void leaveChatRoom(@UserPayload TokenPayload tokenPayload, @PathVariable Long roomId) {
+    chatRoomService.exitChatRoom(tokenPayload.getUserId(), roomId);
+  }
 
 }

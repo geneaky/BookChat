@@ -13,48 +13,49 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
 import toy.bookchat.bookchat.db_module.scrap.ScrapEntity;
-import toy.bookchat.bookchat.domain.scrap.service.dto.response.ScrapResponse;
+import toy.bookchat.bookchat.domain.scrap.api.v1.response.ScrapResponse;
 
 @Repository
 public class ScrapQueryRepositoryImpl implements ScrapQueryRepository {
 
-    private final JPAQueryFactory queryFactory;
+  private final JPAQueryFactory queryFactory;
 
-    public ScrapQueryRepositoryImpl(JPAQueryFactory queryFactory) {
-        this.queryFactory = queryFactory;
-    }
+  public ScrapQueryRepositoryImpl(JPAQueryFactory queryFactory) {
+    this.queryFactory = queryFactory;
+  }
 
-    @Override
-    public Slice<ScrapResponse> findScraps(Long bookShelfId, Long postCursorId, Pageable pageable,
-        Long userId) {
+  @Override
+  public Slice<ScrapResponse> findScraps(Long bookShelfId, Long postCursorId, Pageable pageable,
+      Long userId) {
 
-        List<ScrapResponse> scrapList = queryFactory.select(
-                Projections.constructor(ScrapResponse.class,
-                    scrapEntity.id, scrapEntity.scrapContent))
+    List<ScrapResponse> scrapList = queryFactory.select(
+            Projections.constructor(ScrapResponse.class,
+                scrapEntity.id, scrapEntity.scrapContent))
+        .from(scrapEntity)
+        .join(bookShelfEntity)
+        .on(scrapEntity.bookShelfEntity.id.eq(bookShelfEntity.id).and(bookShelfEntity.id.eq(bookShelfId))
+            .and(bookShelfEntity.userId.eq(userId)))
+        .where(gtCursorId(postCursorId))
+        .limit(pageable.getPageSize())
+        .orderBy(scrapEntity.id.asc())
+        .fetch();
+
+    return toSlice(scrapList, pageable);
+  }
+
+  @Override
+  public Optional<ScrapEntity> findUserScrap(Long scrapId, Long userId) {
+    return Optional.ofNullable(
+        queryFactory.select(scrapEntity)
             .from(scrapEntity)
             .join(bookShelfEntity)
-            .on(scrapEntity.bookShelfEntity.id.eq(bookShelfEntity.id).and(bookShelfEntity.id.eq(bookShelfId))
-                .and(bookShelfEntity.userId.eq(userId)))
-            .where(gtCursorId(postCursorId))
-            .limit(pageable.getPageSize())
-            .orderBy(scrapEntity.id.asc())
-            .fetch();
+            .on(scrapEntity.bookShelfEntity.id.eq(bookShelfEntity.id).and(bookShelfEntity.userId.eq(userId)))
+            .where(scrapEntity.id.eq(scrapId))
+            .fetchOne()
+    );
+  }
 
-        return toSlice(scrapList, pageable);
-    }
-
-    @Override
-    public Optional<ScrapEntity> findUserScrap(Long scrapId, Long userId) {
-        return Optional.ofNullable(
-            queryFactory.select(scrapEntity)
-                .from(scrapEntity)
-                .join(bookShelfEntity).on(scrapEntity.bookShelfEntity.id.eq(bookShelfEntity.id).and(bookShelfEntity.userId.eq(userId)))
-                .where(scrapEntity.id.eq(scrapId))
-                .fetchOne()
-        );
-    }
-
-    private BooleanExpression gtCursorId(Long cursorId) {
-        return cursorId == null ? null : scrapEntity.id.gt(cursorId);
-    }
+  private BooleanExpression gtCursorId(Long cursorId) {
+    return cursorId == null ? null : scrapEntity.id.gt(cursorId);
+  }
 }

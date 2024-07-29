@@ -30,17 +30,17 @@ import toy.bookchat.bookchat.domain.book.service.BookReader;
 import toy.bookchat.bookchat.domain.chat.Chat;
 import toy.bookchat.bookchat.domain.chat.service.ChatAppender;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
-import toy.bookchat.bookchat.domain.chatroom.api.dto.response.UserChatRoomDetailResponse;
-import toy.bookchat.bookchat.domain.chatroom.service.dto.request.ChatRoomRequest;
-import toy.bookchat.bookchat.domain.chatroom.service.dto.request.CreateChatRoomRequest;
-import toy.bookchat.bookchat.domain.chatroom.service.dto.request.ReviseChatRoomRequest;
-import toy.bookchat.bookchat.domain.chatroom.service.dto.response.CreatedChatRoomDto;
+import toy.bookchat.bookchat.domain.chatroom.api.v1.request.ChatRoomRequest;
+import toy.bookchat.bookchat.domain.chatroom.api.v1.request.CreateChatRoomRequest;
+import toy.bookchat.bookchat.domain.chatroom.api.v1.request.ReviseChatRoomRequest;
+import toy.bookchat.bookchat.domain.chatroom.api.v1.response.CreatedChatRoomDto;
+import toy.bookchat.bookchat.domain.chatroom.api.v1.response.UserChatRoomDetailResponse;
 import toy.bookchat.bookchat.domain.participant.Participant;
+import toy.bookchat.bookchat.domain.participant.api.v1.response.ChatRoomDetails;
 import toy.bookchat.bookchat.domain.participant.service.ParticipantAppender;
 import toy.bookchat.bookchat.domain.participant.service.ParticipantCleaner;
 import toy.bookchat.bookchat.domain.participant.service.ParticipantReader;
 import toy.bookchat.bookchat.domain.participant.service.ParticipantValidator;
-import toy.bookchat.bookchat.domain.participant.service.dto.response.ChatRoomDetails;
 import toy.bookchat.bookchat.domain.storage.StorageService;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.service.UserReader;
@@ -112,41 +112,6 @@ public class ChatRoomService {
     return CreatedChatRoomDto.of(registerChatRoom(createChatRoomRequest, book, host, null));
   }
 
-  private boolean chatRoomImageExistent(MultipartFile chatRoomImage) {
-    return chatRoomImage != null;
-  }
-
-  private ChatRoomEntity registerChatRoom(CreateChatRoomRequest createChatRoomRequest, Book book, UserEntity host,
-      String prefixedUUIDFileUrl) {
-    ChatRoomEntity chatRoomEntity = saveChatRoom(createChatRoomRequest, book, host, prefixedUUIDFileUrl);
-    registerHashTagOnChatRoom(createChatRoomRequest, chatRoomEntity);
-    return chatRoomEntity;
-  }
-
-  private ChatRoomEntity saveChatRoom(CreateChatRoomRequest createChatRoomRequest, Book book, UserEntity host,
-      String fileUrl) {
-    ChatRoomEntity chatRoomEntity = chatRoomRepository.save(createChatRoomRequest.makeChatRoom(book, host, fileUrl));
-    saveParticipantWithRoomHostAndRoom(host, chatRoomEntity);
-    return chatRoomEntity;
-  }
-
-  private void saveParticipantWithRoomHostAndRoom(UserEntity host, ChatRoomEntity chatRoomEntity) {
-    ParticipantEntity participantEntity = ParticipantEntity.builder()
-        .participantStatus(HOST)
-        .chatRoomId(chatRoomEntity.getId())
-        .userId(host.getId())
-        .build();
-    participantRepository.save(participantEntity);
-  }
-
-  private void registerHashTagOnChatRoom(CreateChatRoomRequest createChatRoomRequest, ChatRoomEntity chatRoomEntity) {
-    createChatRoomRequest.getHashTags().stream()
-        .map(tagName -> hashTagRepository.findByTagName(tagName)
-            .orElseGet(() -> hashTagRepository.save(HashTagEntity.of(tagName))))
-        .forEach(
-            hashTag -> chatRoomHashTagRepository.save(ChatRoomHashTagEntity.of(chatRoomEntity, hashTag)));
-  }
-
   @Transactional(readOnly = true)
   public UserChatRoomsResponseSlice getUserChatRooms(Long bookId, Long postCursorId, Pageable pageable, Long userId) {
     return UserChatRoomsResponseSlice.of(
@@ -192,21 +157,6 @@ public class ChatRoomService {
     reviseChatRoomRequest.reviseChatRoom(chatRoomEntity);
   }
 
-  private void updateIfChatRoomHashTagsPresent(ReviseChatRoomRequest reviseChatRoomRequest,
-      ChatRoomEntity chatRoomEntity) {
-    if (reviseChatRoomRequest.tagExistent()) {
-      chatRoomHashTagRepository.deleteAllByChatRoomEntity(chatRoomEntity);
-
-      List<HashTagEntity> hashTagEntities = reviseChatRoomRequest.createHashTag();
-      hashTagRepository.saveAll(hashTagEntities);
-
-      List<ChatRoomHashTagEntity> chatRoomHashTagEntities = hashTagEntities.stream()
-          .map(ht -> ChatRoomHashTagEntity.of(chatRoomEntity, ht))
-          .collect(Collectors.toList());
-      chatRoomHashTagRepository.saveAll(chatRoomHashTagEntities);
-    }
-  }
-
   @Transactional
   public void enterChatRoom(Long userId, Long roomId) {
     ChatRoom chatRoom = chatRoomReader.readChatRoomWithLock(roomId);
@@ -248,5 +198,55 @@ public class ChatRoomService {
 
     participantCleaner.clean(participant);
     messagePublisher.sendNotificationMessage(chatRoom.getSid(), NotificationMessage.createExitMessage(chat, userId));
+  }
+
+  private boolean chatRoomImageExistent(MultipartFile chatRoomImage) {
+    return chatRoomImage != null;
+  }
+
+  private ChatRoomEntity registerChatRoom(CreateChatRoomRequest createChatRoomRequest, Book book, UserEntity host,
+      String prefixedUUIDFileUrl) {
+    ChatRoomEntity chatRoomEntity = saveChatRoom(createChatRoomRequest, book, host, prefixedUUIDFileUrl);
+    registerHashTagOnChatRoom(createChatRoomRequest, chatRoomEntity);
+    return chatRoomEntity;
+  }
+
+  private ChatRoomEntity saveChatRoom(CreateChatRoomRequest createChatRoomRequest, Book book, UserEntity host,
+      String fileUrl) {
+    ChatRoomEntity chatRoomEntity = chatRoomRepository.save(createChatRoomRequest.makeChatRoom(book, host, fileUrl));
+    saveParticipantWithRoomHostAndRoom(host, chatRoomEntity);
+    return chatRoomEntity;
+  }
+
+  private void saveParticipantWithRoomHostAndRoom(UserEntity host, ChatRoomEntity chatRoomEntity) {
+    ParticipantEntity participantEntity = ParticipantEntity.builder()
+        .participantStatus(HOST)
+        .chatRoomId(chatRoomEntity.getId())
+        .userId(host.getId())
+        .build();
+    participantRepository.save(participantEntity);
+  }
+
+  private void registerHashTagOnChatRoom(CreateChatRoomRequest createChatRoomRequest, ChatRoomEntity chatRoomEntity) {
+    createChatRoomRequest.getHashTags().stream()
+        .map(tagName -> hashTagRepository.findByTagName(tagName)
+            .orElseGet(() -> hashTagRepository.save(HashTagEntity.of(tagName))))
+        .forEach(
+            hashTag -> chatRoomHashTagRepository.save(ChatRoomHashTagEntity.of(chatRoomEntity, hashTag)));
+  }
+
+  private void updateIfChatRoomHashTagsPresent(ReviseChatRoomRequest reviseChatRoomRequest,
+      ChatRoomEntity chatRoomEntity) {
+    if (reviseChatRoomRequest.tagExistent()) {
+      chatRoomHashTagRepository.deleteAllByChatRoomEntity(chatRoomEntity);
+
+      List<HashTagEntity> hashTagEntities = reviseChatRoomRequest.createHashTag();
+      hashTagRepository.saveAll(hashTagEntities);
+
+      List<ChatRoomHashTagEntity> chatRoomHashTagEntities = hashTagEntities.stream()
+          .map(ht -> ChatRoomHashTagEntity.of(chatRoomEntity, ht))
+          .collect(Collectors.toList());
+      chatRoomHashTagRepository.saveAll(chatRoomHashTagEntities);
+    }
   }
 }

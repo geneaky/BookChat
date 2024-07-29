@@ -34,8 +34,8 @@ import toy.bookchat.bookchat.db_module.participant.ParticipantEntity;
 import toy.bookchat.bookchat.db_module.participant.QParticipantEntity;
 import toy.bookchat.bookchat.db_module.user.QUserEntity;
 import toy.bookchat.bookchat.db_module.user.UserEntity;
-import toy.bookchat.bookchat.domain.chatroom.service.dto.request.ChatRoomRequest;
-import toy.bookchat.bookchat.domain.participant.service.dto.response.ChatRoomDetails;
+import toy.bookchat.bookchat.domain.chatroom.api.v1.request.ChatRoomRequest;
+import toy.bookchat.bookchat.domain.participant.api.v1.response.ChatRoomDetails;
 import toy.bookchat.bookchat.exception.notfound.pariticipant.ParticipantNotFoundException;
 
 @Repository

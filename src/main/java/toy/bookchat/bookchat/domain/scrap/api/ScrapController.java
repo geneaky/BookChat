@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import toy.bookchat.bookchat.domain.scrap.api.v1.request.CreateScrapRequest;
+import toy.bookchat.bookchat.domain.scrap.api.v1.response.ScrapResponse;
+import toy.bookchat.bookchat.domain.scrap.api.v1.response.ScrapResponseSlice;
 import toy.bookchat.bookchat.domain.scrap.service.ScrapService;
-import toy.bookchat.bookchat.domain.scrap.service.dto.request.CreateScrapRequest;
-import toy.bookchat.bookchat.domain.scrap.service.dto.response.ScrapResponse;
-import toy.bookchat.bookchat.domain.scrap.service.dto.response.ScrapResponseSlice;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPayload;
 
@@ -25,33 +25,36 @@ import toy.bookchat.bookchat.security.user.UserPayload;
 @RequestMapping("/v1/api")
 public class ScrapController {
 
-    private final ScrapService scrapService;
+  private final ScrapService scrapService;
 
-    public ScrapController(ScrapService scrapService) {
-        this.scrapService = scrapService;
-    }
+  public ScrapController(ScrapService scrapService) {
+    this.scrapService = scrapService;
+  }
 
-    @PostMapping("/scraps")
-    public ResponseEntity<Void> scrapChat(@Valid @RequestBody CreateScrapRequest createScrapRequest, @UserPayload TokenPayload tokenPayload) {
-        Long scrapId = scrapService.scrap(createScrapRequest, tokenPayload.getUserId());
+  @PostMapping("/scraps")
+  public ResponseEntity<Void> scrapChat(@Valid @RequestBody CreateScrapRequest createScrapRequest,
+      @UserPayload TokenPayload tokenPayload) {
+    Long scrapId = scrapService.scrap(createScrapRequest, tokenPayload.getUserId());
 
-        return ResponseEntity.status(CREATED)
-            .headers(hs -> hs.setLocation(URI.create("/v1/api/scraps/" + scrapId)))
-            .build();
-    }
+    return ResponseEntity.status(CREATED)
+        .headers(hs -> hs.setLocation(URI.create("/v1/api/scraps/" + scrapId)))
+        .build();
+  }
 
-    @GetMapping("/scraps")
-    public ScrapResponseSlice getScraps(Long bookShelfId, Long postCursorId, Pageable pageable, @UserPayload TokenPayload tokenPayload) {
-        return scrapService.getScraps(bookShelfId, postCursorId, pageable, tokenPayload.getUserId());
-    }
+  @GetMapping("/scraps")
+  public ScrapResponseSlice getScraps(Long bookShelfId, Long postCursorId, Pageable pageable,
+      @UserPayload TokenPayload tokenPayload) {
+    return scrapService.getScraps(bookShelfId, postCursorId, pageable, tokenPayload.getUserId());
+  }
 
-    @GetMapping("/scraps/{scrapId}")
-    public ScrapResponse getScrap(@PathVariable Long scrapId, @UserPayload TokenPayload tokenPayload) {
-        return scrapService.getScrap(scrapId, tokenPayload.getUserId());
-    }
+  @GetMapping("/scraps/{scrapId}")
+  public ScrapResponse getScrap(@PathVariable Long scrapId, @UserPayload TokenPayload tokenPayload) {
+    return scrapService.getScrap(scrapId, tokenPayload.getUserId());
+  }
 
-    @DeleteMapping("/scraps/{scrapIds}")
-    public void deleteScraps(Long bookShelfId, @PathVariable List<Long> scrapIds, @UserPayload TokenPayload tokenPayload) {
-        scrapService.deleteScraps(bookShelfId, scrapIds, tokenPayload.getUserId());
-    }
+  @DeleteMapping("/scraps/{scrapIds}")
+  public void deleteScraps(Long bookShelfId, @PathVariable List<Long> scrapIds,
+      @UserPayload TokenPayload tokenPayload) {
+    scrapService.deleteScraps(bookShelfId, scrapIds, tokenPayload.getUserId());
+  }
 }
