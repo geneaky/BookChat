@@ -28,13 +28,16 @@ import toy.bookchat.bookchat.db_module.book.QBookEntity;
 import toy.bookchat.bookchat.db_module.chat.QChatEntity;
 import toy.bookchat.bookchat.db_module.chatroom.ChatRoomEntity;
 import toy.bookchat.bookchat.db_module.chatroom.QChatRoomHashTagEntity;
+import toy.bookchat.bookchat.db_module.chatroom.QHashTagEntity;
 import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.response.ChatRoomResponse;
+import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.response.QChatRoomResponse;
 import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.response.UserChatRoomResponse;
 import toy.bookchat.bookchat.db_module.participant.ParticipantEntity;
 import toy.bookchat.bookchat.db_module.participant.QParticipantEntity;
 import toy.bookchat.bookchat.db_module.user.QUserEntity;
 import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.domain.chatroom.api.v1.request.ChatRoomRequest;
+import toy.bookchat.bookchat.domain.participant.ParticipantStatus;
 import toy.bookchat.bookchat.domain.participant.api.v1.response.ChatRoomDetails;
 import toy.bookchat.bookchat.exception.notfound.pariticipant.ParticipantNotFoundException;
 
@@ -47,7 +50,7 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
     this.queryFactory = queryFactory;
   }
 
-  private BooleanExpression inTags(List<String> tags) {
+  private BooleanExpression inTags(QHashTagEntity hashTagEntity, List<String> tags) {
     if (tags.isEmpty()) {
       return null;
     }
@@ -144,10 +147,11 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
   @Override
   public Slice<ChatRoomResponse> findChatRooms(Long userId, ChatRoomRequest chatRoomRequest, Pageable pageable) {
     QChatEntity subChat = new QChatEntity("subChat");
-    QChatRoomHashTagEntity subChatRoomHashTag = new QChatRoomHashTagEntity("subChatRoomHashTag");
+    QChatRoomHashTagEntity subChatRoomHashTagEntity = new QChatRoomHashTagEntity("subChatRoomHashTagEntity");
+    QHashTagEntity subHashTagEntity = new QHashTagEntity("subHashTagEntity");
 
     List<ChatRoomResponse> contents = queryFactory.select(
-            Projections.constructor(ChatRoomResponse.class,
+            new QChatRoomResponse(
                 chatRoomEntity.id,
                 chatRoomEntity.roomName,
                 chatRoomEntity.roomSid,
@@ -167,17 +171,20 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
                 chatEntity.userId,
                 chatEntity.id,
                 chatEntity.message,
-                chatEntity.createdAt
-            ))
+                chatEntity.createdAt)
+        )
         .from(chatRoomEntity)
         .join(userEntity).on(chatRoomEntity.hostId.eq(userEntity.id))
         .join(bookEntity).on(chatRoomEntity.bookId.eq(bookEntity.id))
-        .join(chatRoomHashTagEntity).on(chatRoomHashTagEntity.chatRoomEntity.id.in(
-            JPAExpressions.select(subChatRoomHashTag.chatRoomEntity.id)
-                .from(subChatRoomHashTag)
-                .where(subChatRoomHashTag.chatRoomEntity.id.eq(chatRoomEntity.id),
-                    inTags(chatRoomRequest.getTags()))))
-        .join(hashTagEntity).on(hashTagEntity.id.eq(chatRoomHashTagEntity.hashTagEntity.id))
+        .join(chatRoomHashTagEntity).on(chatRoomHashTagEntity.chatRoomId.in(
+            JPAExpressions.select(subChatRoomHashTagEntity.chatRoomId)
+                .from(subChatRoomHashTagEntity)
+                .join(subHashTagEntity).on(subHashTagEntity.id.eq(subChatRoomHashTagEntity.hashTagId))
+                .where(subChatRoomHashTagEntity.chatRoomId.eq(chatRoomEntity.id),
+                    inTags(subHashTagEntity, chatRoomRequest.getTags())
+                )
+        ))
+        .join(hashTagEntity).on(hashTagEntity.id.eq(chatRoomHashTagEntity.hashTagId))
         .leftJoin(participantEntity)
         .on(chatRoomEntity.id.eq(participantEntity.chatRoomId).and(participantEntity.userId.eq(userId)))
         .leftJoin(chatEntity).on(chatEntity.id.in(
@@ -243,8 +250,8 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
 
     List<String> roomTags = queryFactory.select(hashTagEntity.tagName)
         .from(hashTagEntity)
-        .join(chatRoomHashTagEntity).on(chatRoomHashTagEntity.hashTagEntity.id.eq(hashTagEntity.id))
-        .where(chatRoomHashTagEntity.chatRoomEntity.id.eq(roomId))
+        .join(chatRoomHashTagEntity).on(chatRoomHashTagEntity.hashTagId.eq(hashTagEntity.id))
+        .where(chatRoomHashTagEntity.chatRoomId.eq(roomId))
         .fetch();
 
     BookEntity bookEntity = queryFactory.select(QBookEntity.bookEntity)
@@ -264,12 +271,16 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
   }
 
   @Override
-  public Optional<ChatRoomEntity> findUserChatRoom(Long roomId, Long userId) {
+  public Optional<ChatRoomEntity> findUserChatRoom(Long roomId, Long userId, ParticipantStatus participantStatus) {
     return Optional.ofNullable(queryFactory.select(chatRoomEntity)
         .from(chatRoomEntity)
         .join(participantEntity)
         .on(participantEntity.chatRoomId.eq(chatRoomEntity.id).and(participantEntity.userId.eq(userId)))
-        .where(chatRoomEntity.id.eq(roomId))
+        .where(chatRoomEntity.id.eq(roomId), eqParticipantStatus(participantStatus))
         .fetchOne());
+  }
+
+  private BooleanExpression eqParticipantStatus(ParticipantStatus participantStatus) {
+    return participantStatus == null ? null : participantEntity.participantStatus.eq(participantStatus);
   }
 }

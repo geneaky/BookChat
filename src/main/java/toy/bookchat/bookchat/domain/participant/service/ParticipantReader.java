@@ -10,6 +10,7 @@ import toy.bookchat.bookchat.domain.chatroom.service.ChatRoomReader;
 import toy.bookchat.bookchat.domain.participant.Host;
 import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.participant.ParticipantAdmin;
+import toy.bookchat.bookchat.domain.participant.ParticipantStatus;
 import toy.bookchat.bookchat.domain.participant.ParticipantWithChatRoom;
 import toy.bookchat.bookchat.exception.forbidden.participant.NoPermissionParticipantException;
 import toy.bookchat.bookchat.exception.notfound.pariticipant.ParticipantNotFoundException;
@@ -62,8 +63,8 @@ public class ParticipantReader {
         .build();
   }
 
-  public Long readTotalSubHostCount(Long roomId) {
-    return participantRepository.countSubHostByRoomId(roomId);
+  public Long readParticipantCount(Long roomId, ParticipantStatus participantStatus) {
+    return participantRepository.countByRoomIdAndParticipantStatus(roomId, participantStatus);
   }
 
   public ParticipantAdmin readAdmin(Long adminId, Long roomId) {
@@ -78,5 +79,9 @@ public class ParticipantReader {
         .userId(participantEntity.getUserId())
         .status(participantEntity.getParticipantStatus())
         .build();
+  }
+
+  public Long readParticipantCount(ChatRoom chatRoom) {
+    return participantRepository.countByChatRoomId(chatRoom.getId());
   }
 }

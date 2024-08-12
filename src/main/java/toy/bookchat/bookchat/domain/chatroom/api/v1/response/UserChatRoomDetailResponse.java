@@ -2,7 +2,7 @@ package toy.bookchat.bookchat.domain.chatroom.api.v1.response;
 
 import lombok.Builder;
 import lombok.Getter;
-import toy.bookchat.bookchat.db_module.chatroom.ChatRoomEntity;
+import toy.bookchat.bookchat.domain.chatroom.UserChatRoomDetail;
 
 @Getter
 public class UserChatRoomDetailResponse {
@@ -25,14 +25,14 @@ public class UserChatRoomDetailResponse {
     this.roomMemberCount = roomMemberCount;
   }
 
-  public static UserChatRoomDetailResponse from(ChatRoomEntity chatroom, Long roomMemberCount) {
+  public static UserChatRoomDetailResponse from(UserChatRoomDetail userChatRoomDetail) {
     return UserChatRoomDetailResponse.builder()
-        .roomId(chatroom.getId())
-        .roomName(chatroom.getRoomName())
-        .roomSid(chatroom.getRoomSid())
-        .roomImageUri(chatroom.getRoomImageUri())
-        .defaultRoomImageType(chatroom.getDefaultRoomImageType())
-        .roomMemberCount(roomMemberCount)
+        .roomId(userChatRoomDetail.getRoomId())
+        .roomName(userChatRoomDetail.getRoomName())
+        .roomSid(userChatRoomDetail.getRoomSid())
+        .roomImageUri(userChatRoomDetail.getRoomImageUri())
+        .defaultRoomImageType(userChatRoomDetail.getDefaultRoomImageType())
+        .roomMemberCount(userChatRoomDetail.getRoomMemberCount())
         .build();
   }
 }

@@ -8,8 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.util.StringUtils;
-import toy.bookchat.bookchat.db_module.chatroom.ChatRoomEntity;
-import toy.bookchat.bookchat.db_module.chatroom.HashTagEntity;
+import toy.bookchat.bookchat.domain.chatroom.HashTag;
 import toy.bookchat.bookchat.exception.badrequest.chatroom.NotEnoughRoomSizeException;
 
 @Getter
@@ -31,22 +30,23 @@ public class ReviseChatRoomRequest {
     this.tags = tags;
   }
 
-  public void reviseChatRoom(ChatRoomEntity chatRoomEntity) {
-    if (StringUtils.hasText(this.roomName)) {
-      chatRoomEntity.changeRoomName(this.roomName);
-    }
-    if (roomSize >= chatRoomEntity.getRoomSize()) {
-      chatRoomEntity.changeRoomSize(this.roomSize);
-    } else {
-      throw new NotEnoughRoomSizeException();
-    }
-  }
-
   public boolean tagExistent() {
     return this.tags != null && !this.tags.isEmpty();
   }
 
-  public List<HashTagEntity> createHashTag() {
-    return this.tags.stream().map(HashTagEntity::of).collect(Collectors.toList());
+  public List<HashTag> createHashTags() {
+    return this.tags.stream().map(tag -> HashTag.builder().tagName(tag).build()).collect(Collectors.toList());
+  }
+
+  public boolean hasRoomName() {
+    return StringUtils.hasText(this.roomName);
+  }
+
+  public boolean canChangeRoomSize(Integer currentRoomSize) {
+    if (this.roomSize >= currentRoomSize) {
+      return true;
+    }
+
+    throw new NotEnoughRoomSizeException();
   }
 }

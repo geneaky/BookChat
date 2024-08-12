@@ -7,6 +7,7 @@ import toy.bookchat.bookchat.db_module.chatroom.ChatRoomEntity;
 import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.response.ChatRoomResponse;
 import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.response.UserChatRoomResponse;
 import toy.bookchat.bookchat.domain.chatroom.api.v1.request.ChatRoomRequest;
+import toy.bookchat.bookchat.domain.participant.ParticipantStatus;
 import toy.bookchat.bookchat.domain.participant.api.v1.response.ChatRoomDetails;
 
 public interface ChatRoomQueryRepository {
@@ -19,5 +20,5 @@ public interface ChatRoomQueryRepository {
 
   ChatRoomDetails findChatRoomDetails(Long roomId, Long userId);
 
-  Optional<ChatRoomEntity> findUserChatRoom(Long roomId, Long userId);
+  Optional<ChatRoomEntity> findUserChatRoom(Long roomId, Long userId, ParticipantStatus participantStatus);
 }

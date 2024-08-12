@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import toy.bookchat.bookchat.db_module.participant.ParticipantEntity;
 import toy.bookchat.bookchat.db_module.participant.repository.ParticipantRepository;
 import toy.bookchat.bookchat.domain.participant.Participant;
+import toy.bookchat.bookchat.domain.participant.ParticipantStatus;
 
 @Component
 public class ParticipantAppender {
@@ -24,5 +25,16 @@ public class ParticipantAppender {
         .build();
 
     participantRepository.save(participantEntity);
+  }
+
+  public void append(Long userId, Long chatRoomId, ParticipantStatus status) {
+    ParticipantEntity participantEntity = ParticipantEntity.builder()
+        .userId(userId)
+        .chatRoomId(chatRoomId)
+        .participantStatus(status)
+        .build();
+
+    participantRepository.save(participantEntity);
+
   }
 }

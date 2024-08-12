@@ -3,6 +3,7 @@ package toy.bookchat.bookchat.domain.chatroom.api;
 import java.net.URI;
 import javax.validation.Valid;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,12 +15,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.response.ChatRoomResponse;
 import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.response.ChatRoomsResponseSlice;
+import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.response.UserChatRoomResponse;
 import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.response.UserChatRoomsResponseSlice;
+import toy.bookchat.bookchat.domain.chatroom.UserChatRoomDetail;
 import toy.bookchat.bookchat.domain.chatroom.api.v1.request.ChatRoomRequest;
 import toy.bookchat.bookchat.domain.chatroom.api.v1.request.CreateChatRoomRequest;
 import toy.bookchat.bookchat.domain.chatroom.api.v1.request.ReviseChatRoomRequest;
-import toy.bookchat.bookchat.domain.chatroom.api.v1.response.CreatedChatRoomDto;
 import toy.bookchat.bookchat.domain.chatroom.api.v1.response.UserChatRoomDetailResponse;
 import toy.bookchat.bookchat.domain.chatroom.service.ChatRoomService;
 import toy.bookchat.bookchat.domain.participant.api.v1.response.ChatRoomDetails;
@@ -32,40 +35,44 @@ public class ChatRoomController {
 
   private final ChatRoomService chatRoomService;
 
-  public ChatRoomController(
-      ChatRoomService chatRoomService) {
+  public ChatRoomController(ChatRoomService chatRoomService) {
     this.chatRoomService = chatRoomService;
   }
 
   @PostMapping("/chatrooms")
   public ResponseEntity<Void> createChatRoom(@Valid @RequestPart CreateChatRoomRequest createChatRoomRequest,
-      @RequestPart(required = false) MultipartFile chatRoomImage,
-      @UserPayload TokenPayload tokenPayload) {
-    CreatedChatRoomDto createdChatRoomDto = chatRoomService.createChatRoom(createChatRoomRequest, chatRoomImage,
-        tokenPayload.getUserId());
+      @RequestPart(required = false) MultipartFile chatRoomImage, @UserPayload TokenPayload tokenPayload) {
+    Long roomId = chatRoomService.createChatRoom(createChatRoomRequest.toChatRoom(), createChatRoomRequest.toHashTags(),
+        createChatRoomRequest.toBook(), chatRoomImage, tokenPayload.getUserId());
 
     return ResponseEntity.status(HttpStatus.CREATED)
-        .headers(hs -> hs.setLocation(URI.create("/v1/api/chatrooms/" + createdChatRoomDto.getRoomId())))
+        .headers(hs -> hs.setLocation(URI.create("/v1/api/chatrooms/" + roomId)))
         .build();
   }
 
   @GetMapping("/users/chatrooms")
   public UserChatRoomsResponseSlice getUserChatRooms(Long bookId, Long postCursorId, Pageable pageable,
       @UserPayload TokenPayload tokenPayload) {
-    return chatRoomService.getUserChatRooms(bookId, postCursorId, pageable, tokenPayload.getUserId());
+    Slice<UserChatRoomResponse> slicedUserChatRoomResponse = chatRoomService.getUserChatRooms(bookId, postCursorId,
+        pageable, tokenPayload.getUserId());
+    return UserChatRoomsResponseSlice.of(slicedUserChatRoomResponse);
   }
 
   @GetMapping("/users/chatrooms/{roomId}")
   public UserChatRoomDetailResponse getUserChatRoomDetails(@PathVariable Long roomId,
       @UserPayload TokenPayload tokenPayload) {
-    return chatRoomService.getUserChatRoomDetails(roomId, tokenPayload.getUserId());
+    UserChatRoomDetail userChatRoomDetail = chatRoomService.getUserChatRoomDetails(roomId, tokenPayload.getUserId());
+    return UserChatRoomDetailResponse.from(userChatRoomDetail);
   }
 
   @GetMapping("/chatrooms")
   public ChatRoomsResponseSlice getChatRooms(@ModelAttribute ChatRoomRequest chatRoomRequest,
       @UserPayload TokenPayload tokenPayload, Pageable pageable) {
     chatRoomRequest.validate();
-    return chatRoomService.getChatRooms(tokenPayload.getUserId(), chatRoomRequest, pageable);
+    Slice<ChatRoomResponse> slicedChatRoomResponse = chatRoomService.getChatRooms(tokenPayload.getUserId(),
+        chatRoomRequest, pageable);
+
+    return ChatRoomsResponseSlice.of(slicedChatRoomResponse);
   }
 
   @GetMapping("/chatrooms/{roomId}")

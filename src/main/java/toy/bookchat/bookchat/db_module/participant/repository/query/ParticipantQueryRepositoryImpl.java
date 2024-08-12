@@ -3,13 +3,13 @@ package toy.bookchat.bookchat.db_module.participant.repository.query;
 import static toy.bookchat.bookchat.db_module.chatroom.QChatRoomEntity.chatRoomEntity;
 import static toy.bookchat.bookchat.db_module.participant.QParticipantEntity.participantEntity;
 import static toy.bookchat.bookchat.db_module.user.QUserEntity.userEntity;
-import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.SUBHOST;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.Optional;
 import javax.persistence.LockModeType;
 import org.springframework.stereotype.Repository;
 import toy.bookchat.bookchat.db_module.participant.ParticipantEntity;
+import toy.bookchat.bookchat.domain.participant.ParticipantStatus;
 
 @Repository
 public class ParticipantQueryRepositoryImpl implements ParticipantQueryRepository {
@@ -49,10 +49,10 @@ public class ParticipantQueryRepositoryImpl implements ParticipantQueryRepositor
   }
 
   @Override
-  public Long countSubHostByRoomId(Long roomId) {
+  public Long countByRoomIdAndParticipantStatus(Long roomId, ParticipantStatus participantStatus) {
     return queryFactory.select(participantEntity.count())
         .from(participantEntity)
-        .where(participantEntity.chatRoomId.eq(roomId).and(participantEntity.participantStatus.eq(SUBHOST)))
+        .where(participantEntity.chatRoomId.eq(roomId).and(participantEntity.participantStatus.eq(participantStatus)))
         .fetchOne();
   }
 

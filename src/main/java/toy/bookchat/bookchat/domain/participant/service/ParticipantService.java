@@ -46,7 +46,7 @@ public class ParticipantService {
   public void changeParticipantRights(Long roomId, Long userId, ParticipantStatus participantStatus, Long requesterId) {
     Host host = participantReader.readHostForUpdate(roomId, requesterId);
     ParticipantWithChatRoom participant = participantReader.readParticipantWithChatRoom(userId, roomId);
-    Long subHostCount = participantReader.readTotalSubHostCount(roomId);
+    Long subHostCount = participantReader.readParticipantCount(roomId, SUBHOST);
 
     if (participant.canBeSubHost(participantStatus) && subHostCount < SUB_HOST_COUNT) {
       participant.changeStatus(SUBHOST);
