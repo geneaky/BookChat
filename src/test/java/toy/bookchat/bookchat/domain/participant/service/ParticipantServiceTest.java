@@ -130,7 +130,7 @@ class ParticipantServiceTest {
         .build();
     given(participantReader.readParticipantWithChatRoom(any(), any())).willReturn(participantWithChatRoom);
 
-    given(participantReader.readTotalSubHostCount(any())).willReturn(5L);
+    given(participantReader.readParticipantCount(any(), any())).willReturn(5L);
 
     participantService.changeParticipantRights(1L, 2L, SUBHOST, 1L);
 

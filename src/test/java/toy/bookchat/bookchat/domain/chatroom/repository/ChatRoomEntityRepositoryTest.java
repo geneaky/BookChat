@@ -493,9 +493,9 @@ class ChatRoomEntityRepositoryTest extends RepositoryTest {
     hashTagRepository.save(tag2);
     hashTagRepository.save(tag3);
 
-    chatRoomHashTagRepository.save(ChatRoomHashTagEntity.of(chatRoomEntity1, tag1));
-    chatRoomHashTagRepository.save(ChatRoomHashTagEntity.of(chatRoomEntity2, tag2));
-    chatRoomHashTagRepository.save(ChatRoomHashTagEntity.of(chatRoomEntity1, tag3));
+    chatRoomHashTagRepository.save(ChatRoomHashTagEntity.of(chatRoomEntity1.getId(), tag1.getId()));
+    chatRoomHashTagRepository.save(ChatRoomHashTagEntity.of(chatRoomEntity2.getId(), tag2.getId()));
+    chatRoomHashTagRepository.save(ChatRoomHashTagEntity.of(chatRoomEntity1.getId(), tag3.getId()));
 
     ParticipantEntity participantEntity1 = ParticipantEntity.builder().userId(userEntity1.getId())
         .chatRoomId(chatRoomEntity1.getId())
@@ -632,9 +632,9 @@ class ChatRoomEntityRepositoryTest extends RepositoryTest {
     hashTagRepository.save(tag2);
     hashTagRepository.save(tag3);
 
-    chatRoomHashTagRepository.save(ChatRoomHashTagEntity.of(chatRoomEntity1, tag1));
-    chatRoomHashTagRepository.save(ChatRoomHashTagEntity.of(chatRoomEntity2, tag2));
-    chatRoomHashTagRepository.save(ChatRoomHashTagEntity.of(chatRoomEntity1, tag3));
+    chatRoomHashTagRepository.save(ChatRoomHashTagEntity.of(chatRoomEntity1.getId(), tag1.getId()));
+    chatRoomHashTagRepository.save(ChatRoomHashTagEntity.of(chatRoomEntity2.getId(), tag2.getId()));
+    chatRoomHashTagRepository.save(ChatRoomHashTagEntity.of(chatRoomEntity1.getId(), tag3.getId()));
 
     ParticipantEntity participantEntity1 = ParticipantEntity.builder().userId(userEntity1.getId())
         .chatRoomId(chatRoomEntity1.getId())
@@ -769,9 +769,9 @@ class ChatRoomEntityRepositoryTest extends RepositoryTest {
     hashTagRepository.save(tag2);
     hashTagRepository.save(tag3);
 
-    chatRoomHashTagRepository.save(ChatRoomHashTagEntity.of(chatRoomEntity1, tag1));
-    chatRoomHashTagRepository.save(ChatRoomHashTagEntity.of(chatRoomEntity2, tag2));
-    chatRoomHashTagRepository.save(ChatRoomHashTagEntity.of(chatRoomEntity1, tag3));
+    chatRoomHashTagRepository.save(ChatRoomHashTagEntity.of(chatRoomEntity1.getId(), tag1.getId()));
+    chatRoomHashTagRepository.save(ChatRoomHashTagEntity.of(chatRoomEntity2.getId(), tag2.getId()));
+    chatRoomHashTagRepository.save(ChatRoomHashTagEntity.of(chatRoomEntity1.getId(), tag3.getId()));
 
     ParticipantEntity participantEntity1 = ParticipantEntity.builder().userId(userEntity1.getId())
         .chatRoomId(chatRoomEntity1.getId())
@@ -905,9 +905,9 @@ class ChatRoomEntityRepositoryTest extends RepositoryTest {
     hashTagRepository.save(tag2);
     hashTagRepository.save(tag3);
 
-    chatRoomHashTagRepository.save(ChatRoomHashTagEntity.of(chatRoomEntity1, tag1));
-    chatRoomHashTagRepository.save(ChatRoomHashTagEntity.of(chatRoomEntity2, tag2));
-    chatRoomHashTagRepository.save(ChatRoomHashTagEntity.of(chatRoomEntity1, tag3));
+    chatRoomHashTagRepository.save(ChatRoomHashTagEntity.of(chatRoomEntity1.getId(), tag1.getId()));
+    chatRoomHashTagRepository.save(ChatRoomHashTagEntity.of(chatRoomEntity2.getId(), tag2.getId()));
+    chatRoomHashTagRepository.save(ChatRoomHashTagEntity.of(chatRoomEntity1.getId(), tag3.getId()));
 
     ParticipantEntity participantEntity1 = ParticipantEntity.builder().userId(userEntity1.getId())
         .chatRoomId(chatRoomEntity1.getId())
@@ -1022,7 +1022,7 @@ class ChatRoomEntityRepositoryTest extends RepositoryTest {
     HashTagEntity tag = HashTagEntity.of("tag1");
     hashTagRepository.save(tag);
 
-    ChatRoomHashTagEntity chatRoomHashTagEntity = ChatRoomHashTagEntity.of(chatRoomEntity, tag);
+    ChatRoomHashTagEntity chatRoomHashTagEntity = ChatRoomHashTagEntity.of(chatRoomEntity.getId(), tag.getId());
     chatRoomHashTagRepository.save(chatRoomHashTagEntity);
 
     ParticipantEntity participantEntity1 = ParticipantEntity.builder()
@@ -1079,7 +1079,7 @@ class ChatRoomEntityRepositoryTest extends RepositoryTest {
     participantRepository.save(participantEntity);
 
     Optional<ChatRoomEntity> optionalChatRoom = chatRoomRepository.findUserChatRoom(chatRoomEntity.getId(),
-        userEntity.getId());
+        userEntity.getId(), null);
 
     assertThat(optionalChatRoom).isPresent();
   }
