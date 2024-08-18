@@ -6,7 +6,7 @@ import org.springframework.data.domain.Slice;
 import toy.bookchat.bookchat.db_module.scrap.ScrapEntity;
 import toy.bookchat.bookchat.domain.scrap.api.v1.response.ScrapResponse;
 
-public interface ScrapQueryRepository {
+public interface ScrapEntityQueryRepository {
 
   Slice<ScrapResponse> findScraps(Long bookShelfId, Long postCursorId, Pageable pageable, Long userId);
 

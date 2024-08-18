@@ -6,7 +6,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import toy.bookchat.bookchat.db_module.bookshelf.BookShelfEntity;
 import toy.bookchat.bookchat.db_module.scrap.ScrapEntity;
 
 @Getter
@@ -24,9 +23,9 @@ public class CreateScrapRequest {
     this.scrapContent = scrapContent;
   }
 
-  public ScrapEntity create(BookShelfEntity bookShelfEntity) {
+  public ScrapEntity create(Long bookShelfId) {
     return ScrapEntity.builder()
-        .bookShelfEntity(bookShelfEntity)
+        .bookShelfId(bookShelfId)
         .scrapContent(this.scrapContent)
         .build();
   }

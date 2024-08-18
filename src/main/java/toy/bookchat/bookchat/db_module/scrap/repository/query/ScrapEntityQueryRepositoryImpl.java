@@ -16,11 +16,11 @@ import toy.bookchat.bookchat.db_module.scrap.ScrapEntity;
 import toy.bookchat.bookchat.domain.scrap.api.v1.response.ScrapResponse;
 
 @Repository
-public class ScrapQueryRepositoryImpl implements ScrapQueryRepository {
+public class ScrapEntityQueryRepositoryImpl implements ScrapEntityQueryRepository {
 
   private final JPAQueryFactory queryFactory;
 
-  public ScrapQueryRepositoryImpl(JPAQueryFactory queryFactory) {
+  public ScrapEntityQueryRepositoryImpl(JPAQueryFactory queryFactory) {
     this.queryFactory = queryFactory;
   }
 
@@ -33,7 +33,7 @@ public class ScrapQueryRepositoryImpl implements ScrapQueryRepository {
                 scrapEntity.id, scrapEntity.scrapContent))
         .from(scrapEntity)
         .join(bookShelfEntity)
-        .on(scrapEntity.bookShelfEntity.id.eq(bookShelfEntity.id).and(bookShelfEntity.id.eq(bookShelfId))
+        .on(scrapEntity.bookShelfId.eq(bookShelfEntity.id).and(bookShelfEntity.id.eq(bookShelfId))
             .and(bookShelfEntity.userId.eq(userId)))
         .where(gtCursorId(postCursorId))
         .limit(pageable.getPageSize())
@@ -49,7 +49,7 @@ public class ScrapQueryRepositoryImpl implements ScrapQueryRepository {
         queryFactory.select(scrapEntity)
             .from(scrapEntity)
             .join(bookShelfEntity)
-            .on(scrapEntity.bookShelfEntity.id.eq(bookShelfEntity.id).and(bookShelfEntity.userId.eq(userId)))
+            .on(scrapEntity.bookShelfId.eq(bookShelfEntity.id).and(bookShelfEntity.userId.eq(userId)))
             .where(scrapEntity.id.eq(scrapId))
             .fetchOne()
     );
