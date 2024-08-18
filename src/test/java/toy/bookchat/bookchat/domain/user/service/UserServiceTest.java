@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
@@ -14,6 +13,7 @@ import static org.mockito.internal.verification.VerificationModeFactory.noIntera
 import static toy.bookchat.bookchat.domain.common.Status.ACTIVE;
 
 import java.util.Optional;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,14 +21,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
 import toy.bookchat.bookchat.db_module.device.DeviceEntity;
+import toy.bookchat.bookchat.db_module.device.repository.DeviceRepository;
 import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.db_module.user.repository.UserRepository;
-import toy.bookchat.bookchat.domain.agony.service.AgonyService;
-import toy.bookchat.bookchat.domain.bookshelf.service.BookShelfService;
 import toy.bookchat.bookchat.domain.common.Status;
-import toy.bookchat.bookchat.domain.device.service.DeviceService;
 import toy.bookchat.bookchat.domain.storage.StorageService;
-import toy.bookchat.bookchat.domain.storage.image.ImageValidator;
 import toy.bookchat.bookchat.domain.user.UserProfile;
 import toy.bookchat.bookchat.domain.user.api.v1.request.ChangeUserNicknameRequest;
 import toy.bookchat.bookchat.domain.user.api.v1.request.UserSignInRequest;
@@ -42,41 +39,29 @@ import toy.bookchat.bookchat.infrastructure.push.service.PushService;
 class UserServiceTest {
 
   @Mock
-  UserRepository userRepository;
-  @Mock
-  UserReader userReader;
-  @Mock
-  BookShelfService bookShelfService;
-  @Mock
-  AgonyService agonyService;
-  @Mock
-  DeviceService deviceService;
-  @Mock
   PushService pushService;
   @Mock
   StorageService storageService;
-  @Mock
-  ImageValidator imageValidator;
   @InjectMocks
   UserService userService;
+  @Mock
+  private UserRepository userRepository;
+  @Mock
+  private UserReader userReader;
+  @Mock
+  private DeviceRepository deviceRepository;
 
   @Test
-  void 사용자_중복된_nickname_체크() throws Exception {
+  @DisplayName("사용자 nickname 중복 체크")
+  void isDuplicatedName1() throws Exception {
+    userService.isDuplicatedName("test");
 
-    when(userRepository.existsByNickname(anyString())).thenReturn(true);
-    boolean result = userService.isDuplicatedName("test");
-    assertThat(result).isTrue();
+    verify(userRepository).existsByNickname(any());
   }
 
   @Test
-  void 사용자가_중복되지_않은_nickname_체크() throws Exception {
-    when(userRepository.existsByNickname(anyString())).thenReturn(false);
-    boolean result = userService.isDuplicatedName("test");
-    assertThat(result).isFalse();
-  }
-
-  @Test
-  void 처음_가입하는_회원의_경우_회원가입_성공() throws Exception {
+  @DisplayName("처음 가입하는 회원의 경우 회원가입 성공")
+  void registerNewUser1() throws Exception {
     UserSignUpRequest userSignUpRequest = mock(UserSignUpRequest.class);
     UserEntity mockUserEntity = mock(UserEntity.class);
     MultipartFile multipartFile = mock(MultipartFile.class);
@@ -91,7 +76,8 @@ class UserServiceTest {
   }
 
   @Test
-  void 이미_가입된_사용자일경우_예외발생() throws Exception {
+  @DisplayName("이미 가입된 사용자일 경우 예외발생")
+  void registerNewUser2() throws Exception {
     UserSignUpRequest userSignUpRequest = mock(UserSignUpRequest.class);
     UserEntity mockUserEntity = mock(UserEntity.class);
 
@@ -106,7 +92,8 @@ class UserServiceTest {
   }
 
   @Test
-  void 사용자_회원탈퇴_요청시_삭제_성공() throws Exception {
+  @DisplayName("사용자 회원탈퇴시 soft delete 성공")
+  void deleteUser() throws Exception {
     UserEntity userEntity = UserEntity.builder()
         .status(ACTIVE)
         .build();
@@ -118,7 +105,8 @@ class UserServiceTest {
   }
 
   @Test
-  void 사용자_닉네임_프로필사진_변경_성공() throws Exception {
+  @DisplayName("사용자 닉네임, 프로필사진 변경 성공")
+  void updateUserProfile1() throws Exception {
     UserEntity userEntity = UserEntity.builder()
         .id(1L)
         .nickname("user1")
@@ -137,7 +125,8 @@ class UserServiceTest {
   }
 
   @Test
-  void 사용자_닉네임만_변경_성공() throws Exception {
+  @DisplayName("사용자 닉네임만 변경 성공")
+  void updateUserProfile2() throws Exception {
     UserEntity userEntity = UserEntity.builder()
         .id(1L)
         .nickname("user1")
@@ -156,28 +145,26 @@ class UserServiceTest {
   }
 
   @Test
-  void 등록된_디바이스가_없을경우_사용자_디바이스를_등록한다() throws Exception {
+  @DisplayName("등록된 기기가 없을 경우 사용자 기기를 등록한다")
+  void checkDevice1() throws Exception {
     UserSignInRequest userSignInRequest = UserSignInRequest.builder()
         .deviceToken("5o9")
         .fcmToken("w0teX6P")
         .build();
 
-    UserEntity userEntity = UserEntity.builder().build();
+    userService.checkDevice(userSignInRequest, 1L);
 
-    userService.checkDevice(userSignInRequest, userEntity);
-
-    verify(deviceService).registerDevice(any());
+    verify(deviceRepository).save(any());
   }
 
   @Test
-  void 등록된_디바이스가_있는데_승인한경우_fcm발송후_디바이스정보_최신화() throws Exception {
+  @DisplayName("등록된 기기가 있는데 승인한 경우 fcm발송 후 디바이스 정보 최신화")
+  void checkDevice2() throws Exception {
     UserSignInRequest userSignInRequest = UserSignInRequest.builder()
         .deviceToken("5o9")
         .fcmToken("w0teX6P")
         .approveChangingDevice(true)
         .build();
-
-    UserEntity userEntity = UserEntity.builder().build();
 
     DeviceEntity deviceEntity = DeviceEntity.builder()
         .deviceToken("18P1xu8")
@@ -186,8 +173,8 @@ class UserServiceTest {
 
     String oldDeviceFcmToken = deviceEntity.getFcmToken();
 
-    when(deviceService.findUserDevice(eq(userEntity))).thenReturn(Optional.of(deviceEntity));
-    userService.checkDevice(userSignInRequest, userEntity);
+    given(deviceRepository.findByUserId(any())).willReturn(Optional.of(deviceEntity));
+    userService.checkDevice(userSignInRequest, 1L);
 
     assertThat(deviceEntity.getDeviceToken()).isEqualTo(userSignInRequest.getDeviceToken());
     assertThat(deviceEntity.getFcmToken()).isEqualTo(userSignInRequest.getFcmToken());
@@ -195,7 +182,8 @@ class UserServiceTest {
   }
 
   @Test
-  void 등록된_디바이스가_현재_디바이스와_다른_디바이스이고_승인이나지_않은경우_예외발생() throws Exception {
+  @DisplayName("등록된 기기가 현재 기기와 다른 기기이고 승인하지 않은 경우 예외발생")
+  void checkDevice3() throws Exception {
     UserSignInRequest userSignInRequest = UserSignInRequest.builder()
         .deviceToken("5o9")
         .fcmToken("w0teX6P")
@@ -208,17 +196,19 @@ class UserServiceTest {
         .fcmToken("nMhp5")
         .build();
 
-    when(deviceService.findUserDevice(userEntity)).thenReturn(Optional.of(deviceEntity));
+    given(deviceRepository.findByUserId(any())).willReturn(Optional.of(deviceEntity));
+
     assertThatThrownBy(() -> {
-      userService.checkDevice(userSignInRequest, userEntity);
+      userService.checkDevice(userSignInRequest, 1L);
     }).isInstanceOf(DeviceAlreadyRegisteredException.class);
   }
 
   @Test
-  void 사용자_디바이스_삭제_성공() throws Exception {
+  @DisplayName("사용자 디바이스 삭제 성공")
+  void deleteDevice() throws Exception {
     userService.deleteDevice(17L);
 
-    verify(deviceService).deleteUserDevice(eq(17L));
+    verify(deviceRepository).deleteByUserId(eq(17L));
   }
 
   @Test

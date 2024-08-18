@@ -9,98 +9,96 @@ import javax.persistence.PersistenceContext;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import toy.bookchat.bookchat.db_module.device.repository.DeviceRepository;
-import toy.bookchat.bookchat.domain.RepositoryTest;
 import toy.bookchat.bookchat.db_module.device.DeviceEntity;
+import toy.bookchat.bookchat.db_module.device.repository.DeviceRepository;
 import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.db_module.user.repository.UserRepository;
+import toy.bookchat.bookchat.domain.RepositoryTest;
 import toy.bookchat.bookchat.security.token.jwt.RefreshTokenEntity;
 import toy.bookchat.bookchat.security.token.jwt.RefreshTokenRepository;
 
 class DeviceEntityRepositoryTest extends RepositoryTest {
 
-    @Autowired
-    private DeviceRepository deviceRepository;
-    @Autowired
-    private RefreshTokenRepository refreshTokenRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @PersistenceContext
-    private EntityManager em;
+  @Autowired
+  private DeviceRepository deviceRepository;
+  @Autowired
+  private RefreshTokenRepository refreshTokenRepository;
+  @Autowired
+  private UserRepository userRepository;
+  @PersistenceContext
+  private EntityManager em;
 
-    @Test
-    void 사용자_디바이스_조회() throws Exception {
-        UserEntity userEntity = UserEntity.builder()
-            .nickname("Khl")
-            .build();
+  @Test
+  void 사용자_디바이스_조회() throws Exception {
+    UserEntity userEntity = UserEntity.builder()
+        .nickname("Khl")
+        .build();
 
-        userRepository.save(userEntity);
+    userRepository.save(userEntity);
 
-        DeviceEntity deviceEntity = DeviceEntity.builder()
-            .userEntity(userEntity)
-            .deviceToken("1F46c3Hr")
-            .fcmToken("gFFS190")
-            .build();
+    DeviceEntity deviceEntity = DeviceEntity.builder()
+        .userId(userEntity.getId())
+        .deviceToken("1F46c3Hr")
+        .fcmToken("gFFS190")
+        .build();
 
-        deviceRepository.save(deviceEntity);
+    deviceRepository.save(deviceEntity);
 
-        DeviceEntity findDeviceEntity = deviceRepository.findByUserEntity(userEntity).get();
+    DeviceEntity findDeviceEntity = deviceRepository.findByUserId(userEntity.getId()).get();
 
-        assertThat(deviceEntity).isEqualTo(findDeviceEntity);
-    }
+    assertThat(deviceEntity).isEqualTo(findDeviceEntity);
+  }
 
-    @Test
-    void 사용자_디바이스_삭제() throws Exception {
-        UserEntity userEntity = UserEntity.builder()
-            .nickname("Khl")
-            .build();
+  @Test
+  void 사용자_디바이스_삭제() throws Exception {
+    UserEntity userEntity = UserEntity.builder()
+        .nickname("Khl")
+        .build();
+    userRepository.save(userEntity);
 
-        userRepository.save(userEntity);
+    DeviceEntity deviceEntity = DeviceEntity.builder()
+        .userId(userEntity.getId())
+        .deviceToken("1F46c3Hr")
+        .fcmToken("gFFS190")
+        .build();
+    deviceRepository.save(deviceEntity);
 
-        DeviceEntity deviceEntity = DeviceEntity.builder()
-            .userEntity(userEntity)
-            .deviceToken("1F46c3Hr")
-            .fcmToken("gFFS190")
-            .build();
+    em.clear();
 
-        deviceRepository.save(deviceEntity);
+    deviceRepository.deleteByUserId(userEntity.getId());
 
-        em.clear();
+    Optional<DeviceEntity> findDevice = deviceRepository.findByUserId(userEntity.getId());
 
-        deviceRepository.deleteByUserId(userEntity.getId());
+    assertThat(findDevice).isEmpty();
+  }
 
-        Optional<DeviceEntity> findDevice = deviceRepository.findByUserEntity(userEntity);
+  @Test
+  @Disabled
+  void 만료된_fcm토큰_삭제() throws Exception {
+    UserEntity userEntity = UserEntity.builder()
+        .nickname("Khl")
+        .build();
+    userRepository.save(userEntity);
 
-        assertThat(findDevice).isEmpty();
-    }
+    DeviceEntity deviceEntity = DeviceEntity.builder()
+        .deviceToken("nSPKVZh")
+        .fcmToken("z2G1")
+        .userId(userEntity.getId())
+        .build();
+    deviceRepository.save(deviceEntity);
 
-    @Test
-    @Disabled
-    void 만료된_fcm토큰_삭제() throws Exception {
-        UserEntity userEntity = UserEntity.builder()
-            .nickname("Khl")
-            .build();
-        userRepository.save(userEntity);
+    RefreshTokenEntity refreshTokenEntity = RefreshTokenEntity.builder()
+        .userId(userEntity.getId())
+        .build();
+    refreshTokenEntity.setUpdatedAt(LocalDateTime.now().minusMonths(2).minusHours(2));
+    refreshTokenRepository.save(refreshTokenEntity);
 
-        DeviceEntity deviceEntity = DeviceEntity.builder()
-            .deviceToken("nSPKVZh")
-            .fcmToken("z2G1")
-            .userEntity(userEntity)
-            .build();
-        deviceRepository.save(deviceEntity);
+    em.flush();
+    em.clear();
 
-        RefreshTokenEntity refreshTokenEntity = RefreshTokenEntity.builder()
-            .userId(userEntity.getId())
-            .build();
-        refreshTokenEntity.setUpdatedAt(LocalDateTime.now().minusMonths(2).minusHours(2));
-        refreshTokenRepository.save(refreshTokenEntity);
+    deviceRepository.deleteExpiredFcmToken();
+    Optional<DeviceEntity> optionalDevice = deviceRepository.findById(deviceEntity.getId());
 
-        em.flush();
-        em.clear();
-
-        deviceRepository.deleteExpiredFcmToken();
-        Optional<DeviceEntity> optionalDevice = deviceRepository.findById(deviceEntity.getId());
-
-        assertThat(optionalDevice).isEmpty();
-    }
+    assertThat(optionalDevice).isEmpty();
+  }
 }
