@@ -1,19 +1,16 @@
 package toy.bookchat.bookchat.db_module.device;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import toy.bookchat.bookchat.db_module.BaseEntity;
-import toy.bookchat.bookchat.db_module.user.UserEntity;
 
 @Getter
 @Entity
@@ -21,28 +18,27 @@ import toy.bookchat.bookchat.db_module.user.UserEntity;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class DeviceEntity extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String deviceToken;
-    private String fcmToken;
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private UserEntity userEntity;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+  @Column(name = "user_id", nullable = false)
+  private Long userId;
+  private String deviceToken;
+  private String fcmToken;
 
-    @Builder
-    private DeviceEntity(Long id, String deviceToken, String fcmToken, UserEntity userEntity) {
-        this.id = id;
-        this.deviceToken = deviceToken;
-        this.fcmToken = fcmToken;
-        this.userEntity = userEntity;
-    }
+  @Builder
+  private DeviceEntity(Long id, Long userId, String deviceToken, String fcmToken) {
+    this.id = id;
+    this.userId = userId;
+    this.deviceToken = deviceToken;
+    this.fcmToken = fcmToken;
+  }
 
-    public void changeDeviceToken(String deviceToken) {
-        this.deviceToken = deviceToken;
-    }
+  public void changeDeviceToken(String deviceToken) {
+    this.deviceToken = deviceToken;
+  }
 
-    public void changeFcmToken(String fcmToken) {
-        this.fcmToken = fcmToken;
-    }
+  public void changeFcmToken(String fcmToken) {
+    this.fcmToken = fcmToken;
+  }
 }

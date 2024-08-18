@@ -11,9 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import toy.bookchat.bookchat.db_module.device.DeviceEntity;
+import toy.bookchat.bookchat.db_module.device.repository.DeviceRepository;
 import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.db_module.user.repository.UserRepository;
-import toy.bookchat.bookchat.domain.device.service.DeviceService;
 import toy.bookchat.bookchat.domain.storage.StorageService;
 import toy.bookchat.bookchat.domain.user.UserProfile;
 import toy.bookchat.bookchat.domain.user.api.v1.request.ChangeUserNicknameRequest;
@@ -30,17 +30,17 @@ public class UserService {
 
   private final UserRepository userRepository;
   private final UserReader userReader;
-  private final DeviceService deviceService;
+  private final DeviceRepository deviceRepository;
   private final PushService pushService;
   private final StorageService storageService;
   private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-  public UserService(UserRepository userRepository, UserReader userReader, DeviceService deviceService,
-      PushService pushService,
+  public UserService(UserRepository userRepository, UserReader userReader,
+      DeviceRepository deviceRepository, PushService pushService,
       @Qualifier("userProfileStorageService") StorageService storageService) {
     this.userRepository = userRepository;
     this.userReader = userReader;
-    this.deviceService = deviceService;
+    this.deviceRepository = deviceRepository;
     this.pushService = pushService;
     this.storageService = storageService;
   }
@@ -117,14 +117,14 @@ public class UserService {
   }
 
   @Transactional
-  public void checkDevice(UserSignInRequest userSignInRequest, UserEntity userEntity) {
-    deviceService.findUserDevice(userEntity)
+  public void checkDevice(UserSignInRequest userSignInRequest, Long userId) {
+    deviceRepository.findByUserId(userId)
         .ifPresentOrElse(changeDeviceIfApproved(userSignInRequest),
-            registerUserDevice(userSignInRequest, userEntity));
+            registerUserDevice(userSignInRequest, userId));
   }
 
-  private Runnable registerUserDevice(UserSignInRequest userSignInRequest, UserEntity userEntity) {
-    return () -> deviceService.registerDevice(userSignInRequest.createDevice(userEntity));
+  private Runnable registerUserDevice(UserSignInRequest userSignInRequest, Long userId) {
+    return () -> deviceRepository.save(userSignInRequest.createDevice(userId));
   }
 
   private Consumer<DeviceEntity> changeDeviceIfApproved(UserSignInRequest userSignInRequest) {
@@ -143,7 +143,7 @@ public class UserService {
 
   @Transactional
   public void deleteDevice(Long userId) {
-    deviceService.deleteUserDevice(userId);
+    deviceRepository.deleteByUserId(userId);
   }
 
   @Transactional(readOnly = true)

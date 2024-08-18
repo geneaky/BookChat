@@ -6,12 +6,16 @@ import lombok.Getter;
 @Getter
 public class Device {
 
-    private Long id;
-    private String fcmToken;
+  private Long id;
+  private String fcmToken;
 
-    @Builder
-    private Device(Long id, String fcmToken) {
-        this.id = id;
-        this.fcmToken = fcmToken;
-    }
+  @Builder
+  private Device(Long id, String fcmToken) {
+    this.id = id;
+    this.fcmToken = fcmToken;
+  }
+
+  public void changeFcmToken(String fcmToken) {
+    this.fcmToken = fcmToken;
+  }
 }

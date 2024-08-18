@@ -96,7 +96,7 @@ public class UserController {
         userSignInRequest.getOauth2Provider());
 
     UserEntity userEntity = userService.findUserByUsername(userName);
-    userService.checkDevice(userSignInRequest, userEntity);
+    userService.checkDevice(userSignInRequest, userEntity.getId());
 
     Token token = jwtTokenProvider.createToken(userEntity);
     jwtTokenRecorder.record(userEntity.getId(), token.getRefreshToken());
