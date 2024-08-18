@@ -14,7 +14,7 @@ import toy.bookchat.bookchat.db_module.book.repository.BookRepository;
 import toy.bookchat.bookchat.db_module.bookshelf.BookShelfEntity;
 import toy.bookchat.bookchat.db_module.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.db_module.scrap.ScrapEntity;
-import toy.bookchat.bookchat.db_module.scrap.repository.ScrapRepository;
+import toy.bookchat.bookchat.db_module.scrap.repository.ScrapEntityEntityRepository;
 import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.db_module.user.repository.UserRepository;
 import toy.bookchat.bookchat.domain.RepositoryTest;
@@ -23,7 +23,7 @@ import toy.bookchat.bookchat.domain.scrap.api.v1.response.ScrapResponse;
 class ScrapEntityRepositoryTest extends RepositoryTest {
 
   @Autowired
-  private ScrapRepository scrapRepository;
+  private ScrapEntityEntityRepository scrapEntityRepository;
   @Autowired
   private BookRepository bookRepository;
   @Autowired
@@ -49,14 +49,14 @@ class ScrapEntityRepositoryTest extends RepositoryTest {
     bookShelfRepository.save(bookShelfEntity);
 
     ScrapEntity scrapEntity = ScrapEntity.builder()
-        .bookShelfEntity(bookShelfEntity)
+        .bookShelfId(bookShelfEntity.getId())
         .scrapContent("content1")
         .build();
-    scrapRepository.save(scrapEntity);
+    scrapEntityRepository.save(scrapEntity);
 
     PageRequest pageRequest = PageRequest.of(0, 3, Sort.by("id").ascending());
 
-    Slice<ScrapResponse> scrapResponseSlice = scrapRepository.findScraps(bookShelfEntity.getId(),
+    Slice<ScrapResponse> scrapResponseSlice = scrapEntityRepository.findScraps(bookShelfEntity.getId(),
         null,
         pageRequest, userEntity.getId());
 
@@ -81,12 +81,12 @@ class ScrapEntityRepositoryTest extends RepositoryTest {
     bookShelfRepository.save(bookShelfEntity);
 
     ScrapEntity scrapEntity = ScrapEntity.builder()
-        .bookShelfEntity(bookShelfEntity)
+        .bookShelfId(bookShelfEntity.getId())
         .scrapContent("content1")
         .build();
-    scrapRepository.save(scrapEntity);
+    scrapEntityRepository.save(scrapEntity);
 
-    Optional<ScrapEntity> findScrap = scrapRepository.findUserScrap(scrapEntity.getId(), userEntity.getId());
+    Optional<ScrapEntity> findScrap = scrapEntityRepository.findUserScrap(scrapEntity.getId(), userEntity.getId());
 
     assertThat(findScrap).isPresent();
   }

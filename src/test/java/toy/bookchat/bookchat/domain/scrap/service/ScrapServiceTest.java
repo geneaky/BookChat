@@ -20,7 +20,7 @@ import org.springframework.data.domain.Sort;
 import toy.bookchat.bookchat.db_module.bookshelf.BookShelfEntity;
 import toy.bookchat.bookchat.db_module.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.db_module.scrap.ScrapEntity;
-import toy.bookchat.bookchat.db_module.scrap.repository.ScrapRepository;
+import toy.bookchat.bookchat.db_module.scrap.repository.ScrapEntityEntityRepository;
 import toy.bookchat.bookchat.domain.scrap.api.v1.request.CreateScrapRequest;
 import toy.bookchat.bookchat.domain.scrap.api.v1.response.ScrapResponse;
 
@@ -28,7 +28,7 @@ import toy.bookchat.bookchat.domain.scrap.api.v1.response.ScrapResponse;
 class ScrapServiceTest {
 
   @Mock
-  private ScrapRepository scrapRepository;
+  private ScrapEntityEntityRepository scrapEntityRepository;
   @Mock
   private BookShelfRepository bookShelfRepository;
   @InjectMocks
@@ -43,7 +43,7 @@ class ScrapServiceTest {
 
     scrapService.scrap(createScrapRequest, 928L);
 
-    verify(scrapRepository).save(any());
+    verify(scrapEntityRepository).save(any());
   }
 
   @Test
@@ -64,11 +64,11 @@ class ScrapServiceTest {
     Slice<ScrapResponse> slice = new SliceImpl<>(
         List.of(scrapResponse1, scrapResponse2, scrapResponse3), pageRequest, true);
 
-    when(scrapRepository.findScraps(any(), any(), any(), any())).thenReturn(slice);
+    when(scrapEntityRepository.findScraps(any(), any(), any(), any())).thenReturn(slice);
 
     scrapService.getScraps(1L, 1L, pageRequest, 1L);
 
-    verify(scrapRepository).findScraps(any(), any(), any(), any());
+    verify(scrapEntityRepository).findScraps(any(), any(), any(), any());
   }
 
   @Test
@@ -77,7 +77,7 @@ class ScrapServiceTest {
         .id(100L)
         .scrapContent("1BGKFmFC1Wj")
         .build();
-    given(scrapRepository.findUserScrap(any(), any())).willReturn(Optional.of(scrapEntity));
+    given(scrapEntityRepository.findUserScrap(any(), any())).willReturn(Optional.of(scrapEntity));
 
     ScrapResponse actual = scrapService.getScrap(1L, 1L);
     ScrapResponse expected = ScrapResponse.from(scrapEntity);
@@ -90,11 +90,11 @@ class ScrapServiceTest {
 
     when(bookShelfRepository.findByIdAndUserId(any(), any())).thenReturn(
         ScrapServiceTestFixture.mockBookShelf());
-    when(scrapRepository.findAllById(any())).thenReturn(ScrapServiceTestFixture.getScrapList());
+    when(scrapEntityRepository.findAllById(any())).thenReturn(ScrapServiceTestFixture.getScrapList());
 
     scrapService.deleteScraps(1L, List.of(1L, 2L, 3L), 1L);
 
-    verify(scrapRepository).deleteAllInBatch(any());
+    verify(scrapEntityRepository).deleteAllInBatch(any());
   }
 
   private static class ScrapServiceTestFixture {
