@@ -1,1 +1,0 @@
-alter table chat_room add is_deleted boolean not null default false after updated_at;

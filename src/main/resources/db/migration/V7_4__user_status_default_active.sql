@@ -1,1 +1,0 @@
-alter table user modify column status enum('ACTIVE', 'INACTIVE') default 'ACTIVE';

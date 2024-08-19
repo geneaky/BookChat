@@ -1,1 +1,0 @@
-alter table chat_room drop column is_deleted;
