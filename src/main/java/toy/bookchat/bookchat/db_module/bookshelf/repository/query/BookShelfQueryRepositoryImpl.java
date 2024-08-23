@@ -19,6 +19,7 @@ import toy.bookchat.bookchat.db_module.bookshelf.BookShelfEntity;
 import toy.bookchat.bookchat.db_module.bookshelf.BookShelfWithBook;
 import toy.bookchat.bookchat.db_module.bookshelf.QBookShelfWithBook;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
+import toy.bookchat.bookchat.exception.notfound.book.BookNotFoundException;
 
 @Repository
 public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
@@ -39,6 +40,7 @@ public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
             bookEntity.bookCoverImageUrl,
             bookEntity.publishAt,
             bookEntity.publisher,
+            bookShelfEntity.readingStatus,
             bookShelfEntity.star,
             bookShelfEntity.pages,
             bookShelfEntity.updatedAt
@@ -68,7 +70,7 @@ public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
   }
 
   @Override
-  public Optional<BookShelfWithBook> findByUserIdAndIsbnAndPublishAt(Long userId, String isbn, LocalDate publishAt) {
+  public BookShelfWithBook findByUserIdAndIsbnAndPublishAt(Long userId, String isbn, LocalDate publishAt) {
     BookShelfWithBook bookShelfWithBook = queryFactory.select(new QBookShelfWithBook(
             bookShelfEntity.id,
             bookEntity.id,
@@ -77,6 +79,7 @@ public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
             bookEntity.bookCoverImageUrl,
             bookEntity.publishAt,
             bookEntity.publisher,
+            bookShelfEntity.readingStatus,
             bookShelfEntity.star,
             bookShelfEntity.pages,
             bookShelfEntity.updatedAt
@@ -88,17 +91,21 @@ public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
             .and(bookEntity.publishAt.eq(publishAt)))
         .fetchOne();
 
+    if (bookShelfWithBook == null) {
+      throw new BookNotFoundException();
+    }
+
     BookEntity findBookEntity = queryFactory.select(bookEntity)
         .from(bookEntity)
         .where(bookEntity.id.eq(bookShelfWithBook.getBookId()))
         .fetchOne();
     bookShelfWithBook.setAuthors(findBookEntity.getAuthors());
 
-    return Optional.ofNullable(bookShelfWithBook);
+    return bookShelfWithBook;
   }
 
   @Override
-  public Optional<BookShelfWithBook> findBookShelfWithBook(Long userId, Long bookShelfId) {
+  public BookShelfWithBook findBookShelfWithBook(Long userId, Long bookShelfId) {
     BookShelfWithBook bookShelfWithBook = queryFactory.select(new QBookShelfWithBook(
             bookShelfEntity.id,
             bookEntity.id,
@@ -107,6 +114,7 @@ public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
             bookEntity.bookCoverImageUrl,
             bookEntity.publishAt,
             bookEntity.publisher,
+            bookShelfEntity.readingStatus,
             bookShelfEntity.star,
             bookShelfEntity.pages,
             bookShelfEntity.updatedAt
@@ -117,13 +125,17 @@ public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
             .and(bookShelfEntity.id.eq(bookShelfId)))
         .fetchOne();
 
+    if (bookShelfWithBook == null) {
+      throw new BookNotFoundException();
+    }
+
     BookEntity findBookEntity = queryFactory.select(bookEntity)
         .from(bookEntity)
         .where(bookEntity.id.eq(bookShelfWithBook.getBookId()))
         .fetchOne();
     bookShelfWithBook.setAuthors(findBookEntity.getAuthors());
 
-    return Optional.ofNullable(bookShelfWithBook);
+    return bookShelfWithBook;
   }
 
   @Override

@@ -9,33 +9,31 @@ import toy.bookchat.bookchat.db_module.bookshelf.BookShelfWithBook;
 import toy.bookchat.bookchat.db_module.bookshelf.repository.BookShelfRepository;
 import toy.bookchat.bookchat.domain.bookshelf.BookShelf;
 import toy.bookchat.bookchat.domain.bookshelf.ReadingStatus;
-import toy.bookchat.bookchat.exception.notfound.book.BookNotFoundException;
 
 @Component
 @Transactional(readOnly = true)
 public class BookShelfReader {
 
-    private final BookShelfRepository bookShelfRepository;
+  private final BookShelfRepository bookShelfRepository;
 
-    public BookShelfReader(BookShelfRepository bookShelfRepository) {
-        this.bookShelfRepository = bookShelfRepository;
-    }
+  public BookShelfReader(BookShelfRepository bookShelfRepository) {
+    this.bookShelfRepository = bookShelfRepository;
+  }
 
-    public BookShelf readBookShelf(Long userId, Long bookShelfId) {
-        BookShelfWithBook bookShelfWithBook = bookShelfRepository.findBookShelfWithBook(userId, bookShelfId)
-            .orElseThrow(BookNotFoundException::new);
+  public BookShelf readBookShelf(Long userId, Long bookShelfId) {
+    BookShelfWithBook bookShelfWithBook = bookShelfRepository.findBookShelfWithBook(userId, bookShelfId);
 
-        return bookShelfWithBook.toBookShelf();
-    }
+    return bookShelfWithBook.toBookShelf();
+  }
 
-    public BookShelf readBookShelf(Long userId, String isbn, LocalDate publishAt) {
-        BookShelfWithBook bookShelfWithBook = bookShelfRepository.findByUserIdAndIsbnAndPublishAt(userId, isbn, publishAt)
-            .orElseThrow(BookNotFoundException::new);
-        return bookShelfWithBook.toBookShelf();
-    }
+  public BookShelf readBookShelf(Long userId, String isbn, LocalDate publishAt) {
+    BookShelfWithBook bookShelfWithBook = bookShelfRepository.findByUserIdAndIsbnAndPublishAt(userId, isbn, publishAt);
+    return bookShelfWithBook.toBookShelf();
+  }
 
-    public Page<BookShelf> readPagedBookShelves(Long userId, ReadingStatus readingStatus, Pageable pageable) {
-        Page<BookShelfWithBook> pagedBookShelfWithBook = bookShelfRepository.findBookShelfWithBook(userId, readingStatus, pageable);
-        return pagedBookShelfWithBook.map(BookShelfWithBook::toBookShelf);
-    }
+  public Page<BookShelf> readPagedBookShelves(Long userId, ReadingStatus readingStatus, Pageable pageable) {
+    Page<BookShelfWithBook> pagedBookShelfWithBook = bookShelfRepository.findBookShelfWithBook(userId, readingStatus,
+        pageable);
+    return pagedBookShelfWithBook.map(BookShelfWithBook::toBookShelf);
+  }
 }
