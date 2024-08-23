@@ -72,6 +72,7 @@ public class BookShelfWithBook {
 
   public BookShelf toBookShelf() {
     Book book = Book.builder()
+        .id(this.bookId)
         .title(this.title)
         .isbn(this.isbn)
         .bookCoverImageUrl(this.bookCoverImageUrl)
@@ -83,8 +84,8 @@ public class BookShelfWithBook {
     return BookShelf.builder()
         .id(this.bookShelfId)
         .book(book)
-        .readingStatus(this.readingStatus)
         .star(this.star)
+        .readingStatus(this.readingStatus)
         .pages(this.pages)
         .lastUpdatedAt(this.lastUpdatedAt)
         .build();
