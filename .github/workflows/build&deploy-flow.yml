@@ -44,7 +44,7 @@ jobs:
       run: mkdir ./src/main/resources/firebase && echo '${{ env.FCM }}' > ./src/main/resources/firebase/bookchat-firebase-private.json
       
     - name: Substitute Configuration File
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with: 
         name: application.yml
         path: ./src/main/resources/application.yml
