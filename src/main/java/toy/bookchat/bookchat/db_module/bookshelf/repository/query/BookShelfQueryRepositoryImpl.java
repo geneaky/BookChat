@@ -88,6 +88,12 @@ public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
             .and(bookEntity.publishAt.eq(publishAt)))
         .fetchOne();
 
+    BookEntity findBookEntity = queryFactory.select(bookEntity)
+        .from(bookEntity)
+        .where(bookEntity.id.eq(bookShelfWithBook.getBookId()))
+        .fetchOne();
+    bookShelfWithBook.setAuthors(findBookEntity.getAuthors());
+
     return Optional.ofNullable(bookShelfWithBook);
   }
 
@@ -110,6 +116,13 @@ public class BookShelfQueryRepositoryImpl implements BookShelfQueryRepository {
         .where(bookShelfEntity.userId.eq(userId)
             .and(bookShelfEntity.id.eq(bookShelfId)))
         .fetchOne();
+
+    BookEntity findBookEntity = queryFactory.select(bookEntity)
+        .from(bookEntity)
+        .where(bookEntity.id.eq(bookShelfWithBook.getBookId()))
+        .fetchOne();
+    bookShelfWithBook.setAuthors(findBookEntity.getAuthors());
+
     return Optional.ofNullable(bookShelfWithBook);
   }
 
