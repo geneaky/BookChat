@@ -12,34 +12,37 @@ import toy.bookchat.bookchat.exception.notfound.book.BookNotFoundException;
 @Component
 public class BookShelfManager {
 
-    private final BookShelfRepository bookShelfRepository;
-    private final AgonyRepository agonyRepository;
-    private final AgonyRecordRepository agonyRecordRepository;
+  private final BookShelfRepository bookShelfRepository;
+  private final AgonyRepository agonyRepository;
+  private final AgonyRecordRepository agonyRecordRepository;
 
 
-    public BookShelfManager(BookShelfRepository bookShelfRepository, AgonyRepository agonyRepository, AgonyRecordRepository agonyRecordRepository) {
-        this.bookShelfRepository = bookShelfRepository;
-        this.agonyRepository = agonyRepository;
-        this.agonyRecordRepository = agonyRecordRepository;
-    }
+  public BookShelfManager(BookShelfRepository bookShelfRepository, AgonyRepository agonyRepository,
+      AgonyRecordRepository agonyRecordRepository) {
+    this.bookShelfRepository = bookShelfRepository;
+    this.agonyRepository = agonyRepository;
+    this.agonyRecordRepository = agonyRecordRepository;
+  }
 
-    public void vacate(Long bookShelfId, Long userId) {
-        agonyRecordRepository.deleteByBookShelfIdAndUserId(bookShelfId, userId);
-        agonyRepository.deleteByBookShelfIdAndUserId(bookShelfId, userId);
-        bookShelfRepository.deleteBookShelfByIdAndUserId(bookShelfId, userId);
-    }
+  public void vacate(Long bookShelfId, Long userId) {
+    agonyRecordRepository.deleteByBookShelfIdAndUserId(bookShelfId, userId);
+    agonyRepository.deleteByBookShelfIdAndUserId(bookShelfId, userId);
+    bookShelfRepository.deleteBookShelfByIdAndUserId(bookShelfId, userId);
+  }
 
-    public void remove(Long userId) {
-        bookShelfRepository.deleteAllByUserId(userId);
-    }
+  public void remove(Long userId) {
+    bookShelfRepository.deleteAllByUserId(userId);
+  }
 
-    public void modify(BookShelf bookShelf, ReadingStatus readingStatus) {
-        BookShelfEntity bookShelfEntity = bookShelfRepository.findById(bookShelf.getId()).orElseThrow(BookNotFoundException::new);
-        bookShelfEntity.updateReadingStatus(readingStatus);
-    }
+  public void modify(BookShelf bookShelf, ReadingStatus readingStatus) {
+    BookShelfEntity bookShelfEntity = bookShelfRepository.findById(bookShelf.getId())
+        .orElseThrow(BookNotFoundException::new);
+    bookShelfEntity.updateReadingStatus(readingStatus);
+  }
 
-    public void modify(BookShelf bookShelf) {
-        BookShelfEntity bookShelfEntity = bookShelfRepository.findById(bookShelf.getId()).orElseThrow(BookNotFoundException::new);
-        bookShelfEntity.updateWithoutBook(bookShelf);
-    }
+  public void modify(BookShelf bookShelf) {
+    BookShelfEntity bookShelfEntity = bookShelfRepository.findById(bookShelf.getId())
+        .orElseThrow(BookNotFoundException::new);
+    bookShelfEntity.updateBy(bookShelf);
+  }
 }

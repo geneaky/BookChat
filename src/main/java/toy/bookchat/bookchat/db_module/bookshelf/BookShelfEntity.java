@@ -20,39 +20,39 @@ import toy.bookchat.bookchat.domain.bookshelf.Star;
 @Table(name = "book_shelf")
 public class BookShelfEntity extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
-    @Column(name = "book_id", nullable = false)
-    private Long bookId;
-    private Integer pages;
-    @Enumerated(EnumType.STRING)
-    private ReadingStatus readingStatus;
-    @Enumerated(EnumType.STRING)
-    private Star star;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+  @Column(name = "user_id", nullable = false)
+  private Long userId;
+  @Column(name = "book_id", nullable = false)
+  private Long bookId;
+  private Integer pages;
+  @Enumerated(EnumType.STRING)
+  private ReadingStatus readingStatus;
+  @Enumerated(EnumType.STRING)
+  private Star star;
 
-    @Builder
-    private BookShelfEntity(Long id, Long userId, Long bookId, Integer pages, ReadingStatus readingStatus, Star star) {
-        this.id = id;
-        this.userId = userId;
-        this.bookId = bookId;
-        this.pages = pages;
-        this.readingStatus = readingStatus;
-        this.star = star;
-    }
+  @Builder
+  private BookShelfEntity(Long id, Long userId, Long bookId, Integer pages, ReadingStatus readingStatus, Star star) {
+    this.id = id;
+    this.userId = userId;
+    this.bookId = bookId;
+    this.pages = pages;
+    this.readingStatus = readingStatus;
+    this.star = star;
+  }
 
-    protected BookShelfEntity() {
-    }
+  protected BookShelfEntity() {
+  }
 
-    public void updateReadingStatus(ReadingStatus readingStatus) {
-        this.readingStatus = readingStatus;
-    }
+  public void updateReadingStatus(ReadingStatus readingStatus) {
+    this.readingStatus = readingStatus;
+  }
 
-    public void updateWithoutBook(BookShelf bookShelf) {
-        this.star = bookShelf.getStar();
-        this.pages = bookShelf.getPages();
-        this.readingStatus = bookShelf.getReadingStatus();
-    }
+  public void updateBy(BookShelf bookShelf) {
+    this.star = bookShelf.getStar();
+    this.pages = bookShelf.getPages();
+    this.readingStatus = bookShelf.getReadingStatus();
+  }
 }
