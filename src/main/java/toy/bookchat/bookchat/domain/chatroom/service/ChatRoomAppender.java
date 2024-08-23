@@ -18,6 +18,7 @@ public class ChatRoomAppender {
     ChatRoomEntity entity = ChatRoomEntity.builder()
         .hostId(chatRoom.getHostId())
         .bookId(chatRoom.getBookId())
+        .roomName(chatRoom.getName())
         .roomSize(chatRoom.getRoomSize())
         .roomImageUri(chatRoom.getRoomImageUri())
         .defaultRoomImageType(chatRoom.getDefaultRoomImageType())
@@ -25,7 +26,7 @@ public class ChatRoomAppender {
         .build();
 
     chatRoomRepository.save(entity);
-   
+
     return entity.getId();
   }
 }
