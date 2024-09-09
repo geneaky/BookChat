@@ -47,18 +47,18 @@ import org.springframework.test.web.servlet.MockMvc;
 import toy.bookchat.bookchat.db_module.book.BookEntity;
 import toy.bookchat.bookchat.db_module.chat.ChatEntity;
 import toy.bookchat.bookchat.db_module.chatroom.ChatRoomEntity;
-import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.response.ChatRoomResponse;
-import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.response.UserChatRoomResponse;
+import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.ChatRoomResponse;
+import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.UserChatRoomResponse;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
 import toy.bookchat.bookchat.domain.bookshelf.api.v1.request.BookRequest;
 import toy.bookchat.bookchat.domain.chatroom.UserChatRoomDetail;
 import toy.bookchat.bookchat.domain.chatroom.api.v1.request.CreateChatRoomRequest;
 import toy.bookchat.bookchat.domain.chatroom.api.v1.request.ReviseChatRoomRequest;
+import toy.bookchat.bookchat.domain.chatroom.api.v1.response.ChatRoomDetails;
+import toy.bookchat.bookchat.domain.chatroom.api.v1.response.RoomGuest;
+import toy.bookchat.bookchat.domain.chatroom.api.v1.response.RoomHost;
+import toy.bookchat.bookchat.domain.chatroom.api.v1.response.RoomSubHost;
 import toy.bookchat.bookchat.domain.chatroom.service.ChatRoomService;
-import toy.bookchat.bookchat.domain.participant.api.v1.response.ChatRoomDetails;
-import toy.bookchat.bookchat.domain.participant.api.v1.response.RoomGuest;
-import toy.bookchat.bookchat.domain.participant.api.v1.response.RoomHost;
-import toy.bookchat.bookchat.domain.participant.api.v1.response.RoomSubHost;
 
 @ChatRoomPresentationTest
 class ChatRoomControllerTest extends ControllerTestExtension {
@@ -365,7 +365,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
 
     Slice<ChatRoomResponse> chatRoomResponses = new SliceImpl<>(contents, pageable, true);
 
-    when(chatRoomService.getChatRooms(any(), any(), any())).thenReturn(chatRoomResponses);
+    when(chatRoomService.getChatRooms(any(), any())).thenReturn(chatRoomResponses);
 
     mockMvc.perform(get("/v1/api/chatrooms")
             .header(AUTHORIZATION, JWT_TOKEN)

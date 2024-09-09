@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.response;
+package toy.bookchat.bookchat.db_module.chatroom.repository.query.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
 import java.time.LocalDateTime;
@@ -61,23 +61,23 @@ public class ChatRoomResponse {
   }
 
   @QueryProjection
-  public ChatRoomResponse(Long roomId, String roomName, String roomSid, String bookTitle, String bookCoverImageUri,
+  public ChatRoomResponse(Long roomId, String roomName, String roomSid, Integer defaultRoomImageType,
+      String roomImageUri, Integer roomSize, Long roomMemberCount, String bookTitle, String bookCoverImageUri,
       Long hostId, String hostName, Integer hostDefaultProfileImageType, String hostProfileImageUri,
-      Long roomMemberCount, Integer roomSize, Integer defaultRoomImageType, String roomImageUri, String tags,
-      Long lastChatSenderId, Long lastChatId, String lastChatMessage, LocalDateTime lastChatDispatchTime) {
+      String tags, Long lastChatSenderId, Long lastChatId, String lastChatMessage, LocalDateTime lastChatDispatchTime) {
     this.roomId = roomId;
     this.roomName = roomName;
     this.roomSid = roomSid;
+    this.defaultRoomImageType = defaultRoomImageType;
+    this.roomImageUri = roomImageUri;
+    this.roomSize = roomSize;
+    this.roomMemberCount = roomMemberCount;
     this.bookTitle = bookTitle;
     this.bookCoverImageUri = bookCoverImageUri;
     this.hostId = hostId;
     this.hostName = hostName;
     this.hostDefaultProfileImageType = hostDefaultProfileImageType;
     this.hostProfileImageUri = hostProfileImageUri;
-    this.roomMemberCount = roomMemberCount;
-    this.roomSize = roomSize;
-    this.defaultRoomImageType = defaultRoomImageType;
-    this.roomImageUri = roomImageUri;
     this.tags = tags;
     this.lastChatSenderId = lastChatSenderId;
     this.lastChatId = lastChatId;

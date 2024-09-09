@@ -16,7 +16,6 @@ public class ChatRoomAppender {
 
   public Long append(ChatRoom chatRoom) {
     ChatRoomEntity entity = ChatRoomEntity.builder()
-        .hostId(chatRoom.getHostId())
         .bookId(chatRoom.getBookId())
         .roomName(chatRoom.getName())
         .roomSize(chatRoom.getRoomSize())

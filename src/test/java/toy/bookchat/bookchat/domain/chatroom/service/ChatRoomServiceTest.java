@@ -37,6 +37,7 @@ import toy.bookchat.bookchat.domain.chatroom.UserChatRoomDetail;
 import toy.bookchat.bookchat.domain.chatroom.api.v1.request.ChatRoomRequest;
 import toy.bookchat.bookchat.domain.chatroom.api.v1.request.CreateChatRoomRequest;
 import toy.bookchat.bookchat.domain.chatroom.api.v1.request.ReviseChatRoomRequest;
+import toy.bookchat.bookchat.domain.participant.Host;
 import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.participant.service.ParticipantAppender;
 import toy.bookchat.bookchat.domain.participant.service.ParticipantCleaner;
@@ -154,9 +155,9 @@ class ChatRoomServiceTest {
   @DisplayName("채팅방 조회 성공")
   void 채팅방_조회_성공() throws Exception {
     ChatRoomRequest request = ChatRoomRequest.builder().build();
-    chatRoomService.getChatRooms(1L, request, mock(Pageable.class));
+    chatRoomService.getChatRooms(request, mock(Pageable.class));
 
-    verify(chatRoomReader).readSlicedChatRooms(any(), any(), any());
+    verify(chatRoomReader).readSlicedChatRooms(any(), any());
   }
 
   @Test
@@ -197,9 +198,11 @@ class ChatRoomServiceTest {
   void enterChatRoom1() throws Exception {
     User user = User.builder().id(1L).build();
     given(userReader.readUser(any())).willReturn(user);
-    ChatRoom chatRoom = ChatRoom.builder().id(1L).hostId(2L).build();
+    ChatRoom chatRoom = ChatRoom.builder().id(1L).build();
     given(chatRoomReader.readChatRoomWithLock(anyLong())).willReturn(chatRoom);
     Chat chat = Chat.builder().dispatchTime(LocalDateTime.now()).build();
+    Host host = Host.builder().build();
+    given(participantReader.readHost(any())).willReturn(host);
     given(chatAppender.appendAnnouncement(any(), any())).willReturn(chat);
 
     chatRoomService.enterChatRoom(1L, chatRoom.getId());
@@ -217,6 +220,8 @@ class ChatRoomServiceTest {
     given(participantReader.readParticipant(any(), any())).willReturn(participant);
     ChatRoom chatRoom = ChatRoom.builder().build();
     given(chatRoomReader.readChatRoom(any())).willReturn(chatRoom);
+    Host host = Host.builder().build();
+    given(participantReader.readHost(any())).willReturn(host);
     Chat chat = Chat.builder().dispatchTime(LocalDateTime.now()).build();
     given(chatAppender.appendAnnouncement(any(), any())).willReturn(chat);
 
@@ -230,8 +235,10 @@ class ChatRoomServiceTest {
   void exitChatRoom2() throws Exception {
     Participant participant = Participant.builder().build();
     given(participantReader.readParticipant(any(), any())).willReturn(participant);
-    ChatRoom chatRoom = ChatRoom.builder().hostId(1L).build();
+    ChatRoom chatRoom = ChatRoom.builder().build();
     given(chatRoomReader.readChatRoom(any())).willReturn(chatRoom);
+    Host host = Host.builder().userId(1L).build();
+    given(participantReader.readHost(any())).willReturn(host);
     Chat chat = Chat.builder().dispatchTime(LocalDateTime.now()).build();
     given(chatAppender.appendAnnouncement(any(), any())).willReturn(chat);
 

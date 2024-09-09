@@ -76,7 +76,6 @@ public class ParticipantService {
 
       participant.changeStatus(HOST);
       participantManager.update(participant);
-      chatRoomManager.changeHost(participant);
 
       Chat chat = chatAppender.appendAnnouncement(roomId, "#" + participant.getParticipantId() + "#님이 방장이 되었습니다.");
       messagePublisher.sendNotificationMessage(participant.getChatRoomSid(),

@@ -36,109 +36,109 @@ import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ParticipantServiceConcurrentTest {
 
-    @Autowired
-    private ParticipantService participantService;
-    @Autowired
-    private ParticipantRepository participantRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private BookRepository bookRepository;
-    @Autowired
-    private ChatRoomRepository chatRoomRepository;
-    @Autowired
-    private Flyway flyway;
-    @MockBean
-    private MessagePublisher messagePublisher;
-    @MockBean
-    private PushService pushService;
-    @MockBean
-    private FirebaseMessaging firebaseMessaging;
+  @Autowired
+  private ParticipantService participantService;
+  @Autowired
+  private ParticipantRepository participantRepository;
+  @Autowired
+  private UserRepository userRepository;
+  @Autowired
+  private BookRepository bookRepository;
+  @Autowired
+  private ChatRoomRepository chatRoomRepository;
+  @Autowired
+  private Flyway flyway;
+  @MockBean
+  private MessagePublisher messagePublisher;
+  @MockBean
+  private PushService pushService;
+  @MockBean
+  private FirebaseMessaging firebaseMessaging;
 
-    @BeforeAll
-    public void tearUp() {
-        flyway.clean();
-        flyway.migrate();
+  @BeforeAll
+  public void tearUp() {
+    flyway.clean();
+    flyway.migrate();
+  }
+
+  @AfterAll
+  public void tearDown() {
+    flyway.clean();
+    flyway.migrate();
+  }
+
+  @Test
+  void 게스트_방장_위임_동시성_테스트() throws Exception {
+    int count = 50;
+    CountDownLatch countDownLatch = new CountDownLatch(count);
+    ExecutorService executorService = Executors.newFixedThreadPool(10);
+
+    List<UserEntity> userEntityList = new ArrayList<>();
+    for (int i = 0; i < count; i++) {
+      userEntityList.add(UserEntity.builder()
+          .nickname(i + "nickname")
+          .defaultProfileImageType(1)
+          .provider(OAuth2Provider.KAKAO)
+          .email(i + "email")
+          .name(i + "name")
+          .build());
     }
+    userRepository.saveAll(userEntityList);
 
-    @AfterAll
-    public void tearDown() {
-        flyway.clean();
-        flyway.migrate();
+    BookEntity bookEntity = BookEntity.builder()
+        .isbn("4640485366")
+        .publishAt(LocalDate.now())
+        .build();
+    bookRepository.save(bookEntity);
+
+    ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
+//            .hostId(userEntityList.get(0).getId())
+        .bookId(bookEntity.getId())
+        .defaultRoomImageType(1)
+        .roomSize(200)
+        .roomSid("HNsIG51b")
+        .roomName("RtzE")
+        .build();
+    chatRoomRepository.save(chatRoomEntity);
+
+    List<ParticipantEntity> participantEntityList = new ArrayList<>();
+    for (int i = 0; i < count; i++) {
+      if (i == 0) {
+        participantEntityList.add(ParticipantEntity.builder()
+            .userId(userEntityList.get(i).getId())
+            .chatRoomId(chatRoomEntity.getId())
+            .participantStatus(ParticipantStatus.HOST)
+            .build());
+        continue;
+      }
+      participantEntityList.add(ParticipantEntity.builder()
+          .userId(userEntityList.get(i).getId())
+          .chatRoomId(chatRoomEntity.getId())
+          .participantStatus(ParticipantStatus.GUEST)
+          .build());
     }
+    participantRepository.saveAll(participantEntityList);
 
-    @Test
-    void 게스트_방장_위임_동시성_테스트() throws Exception {
-        int count = 50;
-        CountDownLatch countDownLatch = new CountDownLatch(count);
-        ExecutorService executorService = Executors.newFixedThreadPool(10);
-
-        List<UserEntity> userEntityList = new ArrayList<>();
-        for (int i = 0; i < count; i++) {
-            userEntityList.add(UserEntity.builder()
-                .nickname(i + "nickname")
-                .defaultProfileImageType(1)
-                .provider(OAuth2Provider.KAKAO)
-                .email(i + "email")
-                .name(i + "name")
-                .build());
+    countDownLatch.countDown();
+    for (int i = 1; i < count; i++) {
+      final int idx = i;
+      executorService.execute(() -> {
+        try {
+          participantService.changeParticipantRights(chatRoomEntity.getId(),
+              participantEntityList.get(idx).getUserId(), ParticipantStatus.HOST,
+              participantEntityList.get(0).getUserId());
+        } catch (Exception exception) {
+          log.info(exception.getMessage());
         }
-        userRepository.saveAll(userEntityList);
-
-        BookEntity bookEntity = BookEntity.builder()
-            .isbn("4640485366")
-            .publishAt(LocalDate.now())
-            .build();
-        bookRepository.save(bookEntity);
-
-        ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
-            .hostId(userEntityList.get(0).getId())
-            .bookId(bookEntity.getId())
-            .defaultRoomImageType(1)
-            .roomSize(200)
-            .roomSid("HNsIG51b")
-            .roomName("RtzE")
-            .build();
-        chatRoomRepository.save(chatRoomEntity);
-
-        List<ParticipantEntity> participantEntityList = new ArrayList<>();
-        for (int i = 0; i < count; i++) {
-            if (i == 0) {
-                participantEntityList.add(ParticipantEntity.builder()
-                    .userId(userEntityList.get(i).getId())
-                    .chatRoomId(chatRoomEntity.getId())
-                    .participantStatus(ParticipantStatus.HOST)
-                    .build());
-                continue;
-            }
-            participantEntityList.add(ParticipantEntity.builder()
-                .userId(userEntityList.get(i).getId())
-                .chatRoomId(chatRoomEntity.getId())
-                .participantStatus(ParticipantStatus.GUEST)
-                .build());
-        }
-        participantRepository.saveAll(participantEntityList);
-
         countDownLatch.countDown();
-        for (int i = 1; i < count; i++) {
-            final int idx = i;
-            executorService.execute(() -> {
-                try {
-                    participantService.changeParticipantRights(chatRoomEntity.getId(),
-                        participantEntityList.get(idx).getUserId(), ParticipantStatus.HOST,
-                        participantEntityList.get(0).getUserId());
-                } catch (Exception exception) {
-                    log.info(exception.getMessage());
-                }
-                countDownLatch.countDown();
-            });
-        }
-
-        countDownLatch.await();
-
-        long hostCount = participantEntityList.stream()
-            .filter(p -> p.getParticipantStatus() == ParticipantStatus.HOST).count();
-
-        assertThat(hostCount).isOne();
+      });
     }
+
+    countDownLatch.await();
+
+    long hostCount = participantEntityList.stream()
+        .filter(p -> p.getParticipantStatus() == ParticipantStatus.HOST).count();
+
+    assertThat(hostCount).isOne();
+  }
 }

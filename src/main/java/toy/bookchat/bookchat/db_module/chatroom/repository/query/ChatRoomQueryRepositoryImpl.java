@@ -11,8 +11,8 @@ import static toy.bookchat.bookchat.db_module.chatroom.QHashTagEntity.hashTagEnt
 import static toy.bookchat.bookchat.db_module.participant.QParticipantEntity.participantEntity;
 import static toy.bookchat.bookchat.db_module.user.QUserEntity.userEntity;
 import static toy.bookchat.bookchat.domain.common.RepositorySupport.toSlice;
+import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.HOST;
 
-import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
@@ -24,21 +24,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
 import toy.bookchat.bookchat.db_module.book.BookEntity;
-import toy.bookchat.bookchat.db_module.book.QBookEntity;
 import toy.bookchat.bookchat.db_module.chat.QChatEntity;
 import toy.bookchat.bookchat.db_module.chatroom.ChatRoomEntity;
-import toy.bookchat.bookchat.db_module.chatroom.QChatRoomHashTagEntity;
 import toy.bookchat.bookchat.db_module.chatroom.QHashTagEntity;
-import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.response.ChatRoomResponse;
-import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.response.QChatRoomResponse;
-import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.response.UserChatRoomResponse;
-import toy.bookchat.bookchat.db_module.participant.ParticipantEntity;
+import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.ChatRoomParticipantModel;
+import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.ChatRoomResponse;
+import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.QChatRoomParticipantModel;
+import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.QChatRoomResponse;
+import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.QUserChatRoomResponse;
+import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.UserChatRoomResponse;
 import toy.bookchat.bookchat.db_module.participant.QParticipantEntity;
 import toy.bookchat.bookchat.db_module.user.QUserEntity;
-import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.domain.chatroom.api.v1.request.ChatRoomRequest;
+import toy.bookchat.bookchat.domain.chatroom.api.v1.response.ChatRoomDetails;
 import toy.bookchat.bookchat.domain.participant.ParticipantStatus;
-import toy.bookchat.bookchat.domain.participant.api.v1.response.ChatRoomDetails;
 import toy.bookchat.bookchat.exception.notfound.pariticipant.ParticipantNotFoundException;
 
 @Repository
@@ -76,43 +75,48 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
   @Override
   public Slice<UserChatRoomResponse> findUserChatRoomsWithLastChat(Pageable pageable, Long bookId, Long postCursorId,
       Long userId) {
-    QChatEntity subChat = new QChatEntity("subChat");
-    QParticipantEntity subParticipant = new QParticipantEntity("subParticipant1");
-    QUserEntity subUser = new QUserEntity("subUser");
+    QParticipantEntity subParticipantEntity1 = new QParticipantEntity("subParticipantEntity1");
+    QParticipantEntity subParticipantEntity2 = new QParticipantEntity("subParticipantEntity2");
+    QChatEntity subChatEntity = new QChatEntity("subChatEntity");
+    QUserEntity subUserEntity = new QUserEntity("subUserEntity");
 
     List<UserChatRoomResponse> contents = queryFactory.select(
-            Projections.constructor(UserChatRoomResponse.class,
+            new QUserChatRoomResponse(
                 chatRoomEntity.id,
                 chatRoomEntity.roomName,
                 chatRoomEntity.roomSid,
-                subParticipant.count(),
+                subParticipantEntity2.count(),
                 chatRoomEntity.defaultRoomImageType,
                 chatRoomEntity.roomImageUri,
-                subUser.id,
-                subUser.nickname,
-                subUser.profileImageUrl,
-                subUser.defaultProfileImageType,
                 userEntity.id,
                 userEntity.nickname,
                 userEntity.profileImageUrl,
                 userEntity.defaultProfileImageType,
+                subUserEntity.id,
+                subUserEntity.nickname,
+                subUserEntity.profileImageUrl,
+                subUserEntity.defaultProfileImageType,
                 chatEntity.id,
                 chatEntity.message,
                 chatEntity.createdAt
             ))
         .from(chatRoomEntity)
-        .join(subUser).on(subUser.id.eq(chatRoomEntity.hostId))
         .join(participantEntity)
         .on(participantEntity.chatRoomId.eq(chatRoomEntity.id).and(participantEntity.userId.eq(userId))) //사용자 채팅방
-        .leftJoin(subParticipant).on(subParticipant.chatRoomId.eq(chatRoomEntity.id)) // 채팅방 인원수
+        .join(subParticipantEntity1)
+        .on(subParticipantEntity1.chatRoomId.eq(chatRoomEntity.id)
+            .and(subParticipantEntity1.participantStatus.eq(HOST)))
+        .join(userEntity).on(userEntity.id.eq(subParticipantEntity1.userId)) //방장
         .leftJoin(chatEntity).on(chatEntity.id.eq( // 마지막 채팅, 채팅 내
-                JPAExpressions.select(subChat.id.max())
-                    .from(subChat)
-                    .where(subChat.chatRoomId.eq(chatRoomEntity.id))
+                JPAExpressions.select(subChatEntity.id.max())
+                    .from(subChatEntity)
+                    .where(subChatEntity.chatRoomId.eq(chatRoomEntity.id))
             )
         )
-        .leftJoin(userEntity).on(userEntity.id.eq(chatEntity.userId))
-        .groupBy(chatRoomEntity.id, chatEntity.id)
+        .leftJoin(subUserEntity).on(subUserEntity.id.eq(chatEntity.userId))
+        .leftJoin(subParticipantEntity2).on(subParticipantEntity2.chatRoomId.eq(chatRoomEntity.id)) //채팅방 인원수
+        .groupBy(chatRoomEntity.id, participantEntity.id, subParticipantEntity1.id, userEntity.id, subUserEntity.id,
+            chatEntity.id)
         .where(afterChatRoomId(postCursorId), eqBookId(bookId))
         .orderBy(chatEntity.id.desc())
         .limit(pageable.getPageSize())
@@ -145,28 +149,26 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
   }
 
   @Override
-  public Slice<ChatRoomResponse> findChatRooms(Long userId, ChatRoomRequest chatRoomRequest, Pageable pageable) {
-    QChatEntity subChat = new QChatEntity("subChat");
-    QChatRoomHashTagEntity subChatRoomHashTagEntity = new QChatRoomHashTagEntity("subChatRoomHashTagEntity");
-    QHashTagEntity subHashTagEntity = new QHashTagEntity("subHashTagEntity");
+  public Slice<ChatRoomResponse> findChatRooms(ChatRoomRequest chatRoomRequest, Pageable pageable) {
+    QChatEntity subChatEntity = new QChatEntity("subChatEntity");
+    QParticipantEntity subParticipantEntity = new QParticipantEntity("subParticipantEntity");
 
     List<ChatRoomResponse> contents = queryFactory.select(
             new QChatRoomResponse(
                 chatRoomEntity.id,
                 chatRoomEntity.roomName,
                 chatRoomEntity.roomSid,
+                chatRoomEntity.defaultRoomImageType,
+                chatRoomEntity.roomImageUri,
+                chatRoomEntity.roomSize,
+                JPAExpressions.select(subParticipantEntity.count()).from(subParticipantEntity)
+                    .where(subParticipantEntity.chatRoomId.eq(chatRoomEntity.id)),
                 bookEntity.title,
                 bookEntity.bookCoverImageUrl,
-                chatRoomEntity.hostId,
+                userEntity.id,
                 userEntity.nickname,
                 userEntity.defaultProfileImageType,
                 userEntity.profileImageUrl,
-                // TODO: 2023/03/19 scalar subquery 성능 문제가 있다면 대체 방법 고려
-                JPAExpressions.select(participantEntity.count()).from(participantEntity)
-                    .where(participantEntity.chatRoomId.eq(chatRoomEntity.id)),
-                chatRoomEntity.roomSize,
-                chatRoomEntity.defaultRoomImageType,
-                chatRoomEntity.roomImageUri,
                 Expressions.stringTemplate("group_concat({0})", hashTagEntity.tagName),
                 chatEntity.userId,
                 chatEntity.id,
@@ -174,26 +176,19 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
                 chatEntity.createdAt)
         )
         .from(chatRoomEntity)
-        .join(userEntity).on(chatRoomEntity.hostId.eq(userEntity.id))
-        .join(bookEntity).on(chatRoomEntity.bookId.eq(bookEntity.id))
-        .join(chatRoomHashTagEntity).on(chatRoomHashTagEntity.chatRoomId.in(
-            JPAExpressions.select(subChatRoomHashTagEntity.chatRoomId)
-                .from(subChatRoomHashTagEntity)
-                .join(subHashTagEntity).on(subHashTagEntity.id.eq(subChatRoomHashTagEntity.hashTagId))
-                .where(subChatRoomHashTagEntity.chatRoomId.eq(chatRoomEntity.id),
-                    inTags(subHashTagEntity, chatRoomRequest.getTags())
-                )
-        ))
+        .join(chatRoomHashTagEntity).on(chatRoomHashTagEntity.chatRoomId.eq(chatRoomEntity.id))
         .join(hashTagEntity).on(hashTagEntity.id.eq(chatRoomHashTagEntity.hashTagId))
-        .leftJoin(participantEntity)
-        .on(chatRoomEntity.id.eq(participantEntity.chatRoomId).and(participantEntity.userId.eq(userId)))
+        .join(participantEntity)
+        .on(participantEntity.chatRoomId.eq(chatRoomEntity.id).and(participantEntity.participantStatus.eq(HOST)))
+        .join(userEntity).on(userEntity.id.eq(participantEntity.userId))
+        .join(bookEntity).on(chatRoomEntity.bookId.eq(bookEntity.id))
         .leftJoin(chatEntity).on(chatEntity.id.in(
-            JPAExpressions.select(subChat.id.max())
-                .from(subChat)
-                .groupBy(subChat.chatRoomId)
-                .having(subChat.chatRoomId.eq(chatRoomEntity.id))))
-        .groupBy(chatRoomEntity.id, chatEntity.id)
-        .where(chatEntity.chatRoomId.eq(chatRoomEntity.id),
+            JPAExpressions.select(subChatEntity.id.max())
+                .from(subChatEntity)
+                .where(subChatEntity.chatRoomId.eq(chatRoomEntity.id)))
+        )
+        .groupBy(chatRoomEntity.id, userEntity.id, chatEntity.id)
+        .where(
             ltCursorId(chatRoomRequest.getPostCursorId()),
             eqIsbn(chatRoomRequest.getIsbn()),
             containsTitle(chatRoomRequest.getTitle()),
@@ -234,17 +229,24 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
   public ChatRoomDetails findChatRoomDetails(Long roomId, Long userId) {
     QParticipantEntity subParticipant = new QParticipantEntity("subParticipant");
 
-    List<ParticipantEntity> participantEntities = queryFactory.select(participantEntity)
-        .from(participantEntity)
+    List<ChatRoomParticipantModel> chatRoomParticipantModels = queryFactory.select(
+            new QChatRoomParticipantModel(
+                userEntity.id,
+                userEntity.nickname,
+                userEntity.profileImageUrl,
+                userEntity.defaultProfileImageType,
+                participantEntity.participantStatus
+            )
+        ).from(participantEntity)
         .join(userEntity).on(userEntity.id.eq(participantEntity.userId))
-        .join(chatRoomEntity).on(chatRoomEntity.id.eq(participantEntity.chatRoomId))
-        .where(participantEntity.chatRoomId.eq(JPAExpressions.select(subParticipant.chatRoomId)
-            .from(subParticipant)
-            .where(subParticipant.chatRoomId.eq(roomId)
-                .and(subParticipant.userId.eq(userId)))))
+        .where(participantEntity.chatRoomId.eq(
+            JPAExpressions.select(subParticipant.chatRoomId)
+                .from(subParticipant)
+                .where(subParticipant.chatRoomId.eq(roomId)
+                    .and(subParticipant.userId.eq(userId)))))
         .fetch();
 
-    if (participantEntities.isEmpty()) {
+    if (chatRoomParticipantModels.isEmpty()) {
       throw new ParticipantNotFoundException();
     }
 
@@ -254,20 +256,18 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
         .where(chatRoomHashTagEntity.chatRoomId.eq(roomId))
         .fetch();
 
-    BookEntity bookEntity = queryFactory.select(QBookEntity.bookEntity)
-        .from(QBookEntity.bookEntity)
-        .join(chatRoomEntity).on(chatRoomEntity.bookId.eq(QBookEntity.bookEntity.id))
+    BookEntity book = queryFactory.select(bookEntity)
+        .from(bookEntity)
+        .join(chatRoomEntity).on(chatRoomEntity.bookId.eq(bookEntity.id))
         .where(chatRoomEntity.id.eq(roomId))
         .fetchOne();
 
-    ChatRoomEntity chatRoom = queryFactory.select(chatRoomEntity).from(chatRoomEntity)
-        .where(chatRoomEntity.id.eq(roomId)).fetchOne();
+    ChatRoomEntity chatRoom = queryFactory.select(chatRoomEntity)
+        .from(chatRoomEntity)
+        .where(chatRoomEntity.id.eq(roomId))
+        .fetchOne();
 
-    UserEntity host = queryFactory.select(userEntity).from(userEntity)
-        .join(chatRoomEntity).on(chatRoomEntity.hostId.eq(userEntity.id))
-        .where(chatRoomEntity.id.eq(roomId)).fetchOne();
-
-    return ChatRoomDetails.from(participantEntities, roomTags, bookEntity, chatRoom, host);
+    return ChatRoomDetails.from(chatRoomParticipantModels, roomTags, book, chatRoom);
   }
 
   @Override

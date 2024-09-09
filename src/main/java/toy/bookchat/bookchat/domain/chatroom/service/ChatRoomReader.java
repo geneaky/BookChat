@@ -5,12 +5,12 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 import toy.bookchat.bookchat.db_module.chatroom.ChatRoomEntity;
 import toy.bookchat.bookchat.db_module.chatroom.repository.ChatRoomRepository;
-import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.response.ChatRoomResponse;
-import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.response.UserChatRoomResponse;
+import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.ChatRoomResponse;
+import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.UserChatRoomResponse;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
 import toy.bookchat.bookchat.domain.chatroom.api.v1.request.ChatRoomRequest;
+import toy.bookchat.bookchat.domain.chatroom.api.v1.response.ChatRoomDetails;
 import toy.bookchat.bookchat.domain.participant.ParticipantStatus;
-import toy.bookchat.bookchat.domain.participant.api.v1.response.ChatRoomDetails;
 import toy.bookchat.bookchat.exception.notfound.chatroom.ChatRoomNotFoundException;
 
 @Component
@@ -27,7 +27,6 @@ public class ChatRoomReader {
 
     return ChatRoom.builder()
         .id(chatRoomEntity.getId())
-        .hostId(chatRoomEntity.getHostId())
         .sid(chatRoomEntity.getRoomSid())
         .roomSize(chatRoomEntity.getRoomSize())
         .build();
@@ -39,7 +38,6 @@ public class ChatRoomReader {
 
     return ChatRoom.builder()
         .id(chatRoomEntity.getId())
-        .hostId(chatRoomEntity.getHostId())
         .sid(chatRoomEntity.getRoomSid())
         .roomSize(chatRoomEntity.getRoomSize())
         .build();
@@ -56,7 +54,6 @@ public class ChatRoomReader {
 
     return ChatRoom.builder()
         .id(chatRoomEntity.getId())
-        .hostId(chatRoomEntity.getHostId())
         .name(chatRoomEntity.getRoomName())
         .roomImageUri(chatRoomEntity.getRoomImageUri())
         .defaultRoomImageType(chatRoomEntity.getDefaultRoomImageType())
@@ -71,7 +68,6 @@ public class ChatRoomReader {
 
     return ChatRoom.builder()
         .id(chatRoomEntity.getId())
-        .hostId(chatRoomEntity.getHostId())
         .name(chatRoomEntity.getRoomName())
         .roomImageUri(chatRoomEntity.getRoomImageUri())
         .defaultRoomImageType(chatRoomEntity.getDefaultRoomImageType())
@@ -80,8 +76,8 @@ public class ChatRoomReader {
         .build();
   }
 
-  public Slice<ChatRoomResponse> readSlicedChatRooms(Long userId, ChatRoomRequest chatRoomRequest, Pageable pageable) {
-    return chatRoomRepository.findChatRooms(userId, chatRoomRequest, pageable);
+  public Slice<ChatRoomResponse> readSlicedChatRooms(ChatRoomRequest chatRoomRequest, Pageable pageable) {
+    return chatRoomRepository.findChatRooms(chatRoomRequest, pageable);
   }
 
   public ChatRoomDetails readChatRoomDetails(Long roomId, Long userId) {

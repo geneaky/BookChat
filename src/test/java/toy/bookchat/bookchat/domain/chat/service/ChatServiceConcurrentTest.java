@@ -2,6 +2,7 @@ package toy.bookchat.bookchat.domain.chat.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static toy.bookchat.bookchat.domain.common.Status.ACTIVE;
+import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.HOST;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ import toy.bookchat.bookchat.db_module.book.repository.BookRepository;
 import toy.bookchat.bookchat.db_module.chat.repository.ChatRepository;
 import toy.bookchat.bookchat.db_module.chatroom.ChatRoomEntity;
 import toy.bookchat.bookchat.db_module.chatroom.repository.ChatRoomRepository;
+import toy.bookchat.bookchat.db_module.participant.ParticipantEntity;
 import toy.bookchat.bookchat.db_module.participant.repository.ParticipantRepository;
 import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.db_module.user.repository.UserRepository;
@@ -51,6 +53,12 @@ class ChatServiceConcurrentTest {
     int roomSize = 5;
     int count = 10;
 
+    BookEntity bookEntity = BookEntity.builder()
+        .isbn("4640485366")
+        .publishAt(LocalDate.now())
+        .build();
+    bookRepository.save(bookEntity);
+
     UserEntity host = UserEntity.builder()
         .nickname("host")
         .defaultProfileImageType(1)
@@ -60,6 +68,22 @@ class ChatServiceConcurrentTest {
         .status(ACTIVE)
         .build();
     userRepository.save(host);
+
+    ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
+        .bookId(bookEntity.getId())
+        .defaultRoomImageType(1)
+        .roomSize(roomSize)
+        .roomSid("HNsIG51b")
+        .roomName("RtzE")
+        .build();
+    chatRoomRepository.save(chatRoomEntity);
+
+    ParticipantEntity participantEntity = ParticipantEntity.builder()
+        .chatRoomId(chatRoomEntity.getId())
+        .userId(host.getId())
+        .participantStatus(HOST)
+        .build();
+    participantRepository.save(participantEntity);
 
     List<UserEntity> userEntityList = new ArrayList<>();
     for (int i = 0; i < count; i++) {
@@ -73,22 +97,6 @@ class ChatServiceConcurrentTest {
           .build());
     }
     userRepository.saveAll(userEntityList);
-
-    BookEntity bookEntity = BookEntity.builder()
-        .isbn("4640485366")
-        .publishAt(LocalDate.now())
-        .build();
-    bookRepository.save(bookEntity);
-
-    ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
-        .hostId(host.getId())
-        .bookId(bookEntity.getId())
-        .defaultRoomImageType(1)
-        .roomSize(roomSize)
-        .roomSid("HNsIG51b")
-        .roomName("RtzE")
-        .build();
-    chatRoomRepository.save(chatRoomEntity);
 
     CountDownLatch countDownLatch = new CountDownLatch(count);
     ExecutorService executorService = Executors.newFixedThreadPool(10);
@@ -106,7 +114,7 @@ class ChatServiceConcurrentTest {
     }
     countDownLatch.await();
 
-    assertThat(result.get()).isEqualTo(roomSize);
+    assertThat(result.get()).isEqualTo(roomSize - 1);
 
     userRepository.deleteAll();
     bookRepository.deleteAllInBatch();

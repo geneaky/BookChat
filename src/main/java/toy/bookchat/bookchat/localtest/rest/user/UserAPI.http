@@ -29,7 +29,9 @@ OIDC: Bearer test
 Content-Type: application/json
 
 {
-  "oauth2Provider": "google"
+  "oauth2Provider": "google",
+  "fcmToken": "test",
+  "deviceToken": "test"
 }
 
 > {%

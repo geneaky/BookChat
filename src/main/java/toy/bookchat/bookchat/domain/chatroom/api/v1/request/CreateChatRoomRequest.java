@@ -13,8 +13,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import toy.bookchat.bookchat.db_module.chatroom.ChatRoomEntity;
-import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.bookshelf.api.v1.request.BookRequest;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
@@ -45,22 +43,6 @@ public class CreateChatRoomRequest {
     this.defaultRoomImageType = defaultRoomImageType;
     this.hashTags = hashTags;
     this.bookRequest = bookRequest;
-  }
-
-  public ChatRoomEntity makeChatRoom(Book book, UserEntity host, String fileUrl) {
-    return ChatRoomEntity.builder()
-        .bookId(book.getId())
-        .roomSid(UUID.randomUUID().toString())
-        .roomName(this.roomName)
-        .roomSize(this.roomSize)
-        .defaultRoomImageType(this.defaultRoomImageType)
-        .roomImageUri(fileUrl)
-        .hostId(host.getId())
-        .build();
-  }
-
-  public Book createBook() {
-    return this.bookRequest.extractBook();
   }
 
   @JsonIgnore

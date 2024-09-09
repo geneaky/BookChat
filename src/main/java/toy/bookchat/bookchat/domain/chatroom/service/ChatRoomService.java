@@ -13,8 +13,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.response.ChatRoomResponse;
-import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.response.UserChatRoomResponse;
+import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.ChatRoomResponse;
+import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.UserChatRoomResponse;
 import toy.bookchat.bookchat.domain.book.Book;
 import toy.bookchat.bookchat.domain.book.service.BookReader;
 import toy.bookchat.bookchat.domain.chat.Chat;
@@ -25,8 +25,9 @@ import toy.bookchat.bookchat.domain.chatroom.HashTags;
 import toy.bookchat.bookchat.domain.chatroom.UserChatRoomDetail;
 import toy.bookchat.bookchat.domain.chatroom.api.v1.request.ChatRoomRequest;
 import toy.bookchat.bookchat.domain.chatroom.api.v1.request.ReviseChatRoomRequest;
+import toy.bookchat.bookchat.domain.chatroom.api.v1.response.ChatRoomDetails;
+import toy.bookchat.bookchat.domain.participant.Host;
 import toy.bookchat.bookchat.domain.participant.Participant;
-import toy.bookchat.bookchat.domain.participant.api.v1.response.ChatRoomDetails;
 import toy.bookchat.bookchat.domain.participant.service.ParticipantAppender;
 import toy.bookchat.bookchat.domain.participant.service.ParticipantCleaner;
 import toy.bookchat.bookchat.domain.participant.service.ParticipantReader;
@@ -88,17 +89,16 @@ public class ChatRoomService {
       Long userId) {
     Book book = bookReader.readBook(chatRoomBook);
     User host = userReader.readUser(userId);
-    chatRoom = chatRoom
-        .withHostId(userId)
-        .withBookId(book.getId());
+
+    chatRoom = chatRoom.withBookId(book.getId());
 
     if (hasImage(chatRoomImage)) {
       String uploadFileUrl = storageService.upload(chatRoomImage, UUID.randomUUID().toString(),
           LocalDateTime.now().format(dateTimeFormatter));
       chatRoom = chatRoom.withImageUrl(uploadFileUrl);
     }
-    Long chatRoomId = chatRoomAppender.append(chatRoom);
 
+    Long chatRoomId = chatRoomAppender.append(chatRoom);
     participantAppender.append(host.getId(), chatRoomId, HOST);
 
     for (HashTag hashTag : hashTags.getList()) {
@@ -123,8 +123,8 @@ public class ChatRoomService {
   }
 
   @Transactional(readOnly = true)
-  public Slice<ChatRoomResponse> getChatRooms(Long userId, ChatRoomRequest chatRoomRequest, Pageable pageable) {
-    Slice<ChatRoomResponse> slicedChatRooms = chatRoomReader.readSlicedChatRooms(userId, chatRoomRequest, pageable);
+  public Slice<ChatRoomResponse> getChatRooms(ChatRoomRequest chatRoomRequest, Pageable pageable) {
+    Slice<ChatRoomResponse> slicedChatRooms = chatRoomReader.readSlicedChatRooms(chatRoomRequest, pageable);
 
     return slicedChatRooms;
   }
@@ -172,8 +172,9 @@ public class ChatRoomService {
     ChatRoom chatRoom = chatRoomReader.readChatRoomWithLock(roomId);
     User user = userReader.readUser(userId);
     participantValidator.checkDoesUserAlreadyParticipate(userId, roomId);
+    Host host = participantReader.readHost(roomId);
 
-    if (chatRoom.isNotHost(user)) {
+    if (host.isNotSameUser(user)) {
       chatRoomUserValidator.checkIsBlockedUser(userId, roomId);
       participantValidator.checkIsChatRoomFull(chatRoom);
 
@@ -196,8 +197,9 @@ public class ChatRoomService {
   public void exitChatRoom(Long userId, Long roomId) {
     Participant participant = participantReader.readParticipant(userId, roomId);
     ChatRoom chatRoom = chatRoomReader.readChatRoom(roomId);
+    Host host = participantReader.readHost(roomId);
 
-    if (chatRoom.isHost(userId)) {
+    if (host.isSameUser(userId)) {
       Chat chat = chatAppender.appendAnnouncement(roomId, "#" + userId + "#님이 퇴장하셨습니다.");
       participantCleaner.cleanBy(chatRoom);
       messagePublisher.sendNotificationMessage(chatRoom.getSid(), NotificationMessage.createHostExitMessage(chat));

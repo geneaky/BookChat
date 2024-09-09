@@ -20,30 +20,30 @@ import toy.bookchat.bookchat.db_module.BaseEntity;
 @Table(name = "book")
 public class BookEntity extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String isbn;
-    private String title;
-    private String publisher;
-    private String bookCoverImageUrl;
-    private LocalDate publishAt;
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "book_author")
-    private List<String> authors = new ArrayList<>();
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+  private String isbn;
+  private String title;
+  private String publisher;
+  private String bookCoverImageUrl;
+  private LocalDate publishAt;
+  @ElementCollection(fetch = FetchType.EAGER)
+  @CollectionTable(name = "book_authors")
+  private List<String> authors = new ArrayList<>();
 
-    @Builder
-    private BookEntity(Long id, String isbn, String title, List<String> authors, String publisher,
-        String bookCoverImageUrl, LocalDate publishAt) {
-        this.id = id;
-        this.isbn = isbn;
-        this.title = title;
-        this.authors = authors;
-        this.publisher = publisher;
-        this.bookCoverImageUrl = bookCoverImageUrl;
-        this.publishAt = publishAt;
-    }
+  @Builder
+  private BookEntity(Long id, String isbn, String title, List<String> authors, String publisher,
+      String bookCoverImageUrl, LocalDate publishAt) {
+    this.id = id;
+    this.isbn = isbn;
+    this.title = title;
+    this.authors = authors;
+    this.publisher = publisher;
+    this.bookCoverImageUrl = bookCoverImageUrl;
+    this.publishAt = publishAt;
+  }
 
-    protected BookEntity() {
-    }
+  protected BookEntity() {
+  }
 }

@@ -38,7 +38,6 @@ class ParticipantEntityRepositoryTest extends RepositoryTest {
 
     ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
         .bookId(1L)
-        .hostId(userEntity.getId())
         .roomSid("KUor")
         .roomSize(655)
         .defaultRoomImageType(1)
@@ -75,7 +74,6 @@ class ParticipantEntityRepositoryTest extends RepositoryTest {
 
     ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
         .bookId(1L)
-        .hostId(userEntity1.getId())
         .roomSid("KUor")
         .roomSize(655)
         .defaultRoomImageType(1)
@@ -106,7 +104,6 @@ class ParticipantEntityRepositoryTest extends RepositoryTest {
   void 채팅방에_접속한_참여자수_조회_성공() throws Exception {
     ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
         .bookId(645L)
-        .hostId(384L)
         .roomSid("KUor")
         .roomSize(655)
         .defaultRoomImageType(1)
@@ -146,7 +143,6 @@ class ParticipantEntityRepositoryTest extends RepositoryTest {
 
     ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
         .bookId(1L)
-        .hostId(userEntity.getId())
         .roomSid("KUor")
         .roomSize(655)
         .defaultRoomImageType(1)

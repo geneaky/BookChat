@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.domain.participant.api.v1.response;
+package toy.bookchat.bookchat.domain.chatroom.api.v1.response;
 
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @EqualsAndHashCode
-public class RoomHost {
+public class RoomGuest {
 
   private final Long id;
   private final String nickname;
@@ -14,7 +14,7 @@ public class RoomHost {
   private final Integer defaultProfileImageType;
 
   @Builder
-  private RoomHost(Long id, String nickname, String profileImageUrl,
+  private RoomGuest(Long id, String nickname, String profileImageUrl,
       Integer defaultProfileImageType) {
     this.id = id;
     this.nickname = nickname;

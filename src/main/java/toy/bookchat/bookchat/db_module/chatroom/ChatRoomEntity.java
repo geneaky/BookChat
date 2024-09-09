@@ -20,27 +20,25 @@ public class ChatRoomEntity extends BaseEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+  @Column(name = "book_id")
+  private Long bookId;
   private String roomName;
   private String roomSid;
   private Integer roomSize;
   private Integer defaultRoomImageType;
   private String roomImageUri;
-  @Column(name = "book_id")
-  private Long bookId;
-  @Column(name = "host_id")
-  private Long hostId;
 
   @Builder
-  private ChatRoomEntity(Long id, String roomName, String roomSid, Integer roomSize, Integer defaultRoomImageType,
-      String roomImageUri, Long bookId, Long hostId) {
+  private ChatRoomEntity(Long id, Long bookId, String roomName, String roomSid, Integer roomSize,
+      Integer defaultRoomImageType,
+      String roomImageUri) {
     this.id = id;
+    this.bookId = bookId;
     this.roomName = roomName;
     this.roomSid = roomSid;
     this.roomSize = roomSize;
     this.defaultRoomImageType = defaultRoomImageType;
     this.roomImageUri = roomImageUri;
-    this.bookId = bookId;
-    this.hostId = hostId;
   }
 
   protected ChatRoomEntity() {
@@ -56,10 +54,5 @@ public class ChatRoomEntity extends BaseEntity {
 
   public void changeRoomImageUri(String roomImageUri) {
     this.roomImageUri = roomImageUri;
-  }
-
-  public void changeHost(Long hostId) {
-    this.hostId = hostId;
-
   }
 }

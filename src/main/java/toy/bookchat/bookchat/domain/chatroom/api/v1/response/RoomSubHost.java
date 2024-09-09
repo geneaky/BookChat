@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.domain.participant.api.v1.response;
+package toy.bookchat.bookchat.domain.chatroom.api.v1.response;
 
 import lombok.Builder;
 import lombok.EqualsAndHashCode;

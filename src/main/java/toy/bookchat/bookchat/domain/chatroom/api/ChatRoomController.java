@@ -15,17 +15,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.response.ChatRoomResponse;
-import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.response.ChatRoomsResponseSlice;
-import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.response.UserChatRoomResponse;
-import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.response.UserChatRoomsResponseSlice;
+import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.ChatRoomResponse;
+import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.ChatRoomsResponseSlice;
+import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.UserChatRoomResponse;
+import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.UserChatRoomsResponseSlice;
 import toy.bookchat.bookchat.domain.chatroom.UserChatRoomDetail;
 import toy.bookchat.bookchat.domain.chatroom.api.v1.request.ChatRoomRequest;
 import toy.bookchat.bookchat.domain.chatroom.api.v1.request.CreateChatRoomRequest;
 import toy.bookchat.bookchat.domain.chatroom.api.v1.request.ReviseChatRoomRequest;
+import toy.bookchat.bookchat.domain.chatroom.api.v1.response.ChatRoomDetails;
 import toy.bookchat.bookchat.domain.chatroom.api.v1.response.UserChatRoomDetailResponse;
 import toy.bookchat.bookchat.domain.chatroom.service.ChatRoomService;
-import toy.bookchat.bookchat.domain.participant.api.v1.response.ChatRoomDetails;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPayload;
 
@@ -69,8 +69,7 @@ public class ChatRoomController {
   public ChatRoomsResponseSlice getChatRooms(@ModelAttribute ChatRoomRequest chatRoomRequest,
       @UserPayload TokenPayload tokenPayload, Pageable pageable) {
     chatRoomRequest.validate();
-    Slice<ChatRoomResponse> slicedChatRoomResponse = chatRoomService.getChatRooms(tokenPayload.getUserId(),
-        chatRoomRequest, pageable);
+    Slice<ChatRoomResponse> slicedChatRoomResponse = chatRoomService.getChatRooms(chatRoomRequest, pageable);
 
     return ChatRoomsResponseSlice.of(slicedChatRoomResponse);
   }

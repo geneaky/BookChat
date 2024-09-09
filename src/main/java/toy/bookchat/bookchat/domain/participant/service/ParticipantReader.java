@@ -84,4 +84,17 @@ public class ParticipantReader {
   public Long readParticipantCount(ChatRoom chatRoom) {
     return participantRepository.countByChatRoomId(chatRoom.getId());
   }
+
+  public Host readHost(Long roomId) {
+    ParticipantEntity participantEntity = participantRepository.findByChatRoomIdAndParticipantStatus(roomId,
+            ParticipantStatus.HOST)
+        .orElseThrow(ParticipantNotFoundException::new);
+
+    return Host.builder()
+        .id(participantEntity.getId())
+        .chatRoomId(participantEntity.getChatRoomId())
+        .userId(participantEntity.getUserId())
+        .status(participantEntity.getParticipantStatus())
+        .build();
+  }
 }

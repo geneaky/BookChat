@@ -9,9 +9,6 @@ import toy.bookchat.bookchat.db_module.chatroom.repository.query.ChatRoomQueryRe
 
 public interface ChatRoomRepository extends ChatRoomQueryRepository, JpaRepository<ChatRoomEntity, Long> {
 
-  Optional<ChatRoomEntity> findChatRoomByIdAndHostId(Long id, Long hostId);
-
-
   @Lock(LockModeType.PESSIMISTIC_WRITE)
   Optional<ChatRoomEntity> findWithLockById(Long id);
 }
