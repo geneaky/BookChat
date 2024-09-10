@@ -83,6 +83,7 @@ include::{snippets}/post-update-user-profile/request-parts.adoc[]
 `changeUserNicknameRequest`
 include::{snippets}/post-update-user-profile/request-part-changeUserNicknameRequest-fields.adoc[]
 ****
+
 include::{snippets}/post-update-user-profile/http-request.adoc[]
 
 `Response`
@@ -104,6 +105,7 @@ include::{snippets}/user-signup/request-parts.adoc[]
 `userSignUpRequest`
 include::{snippets}/user-signup/request-part-userSignUpRequest-fields.adoc[]
 ****
+
 include::{snippets}/user-signup/http-request.adoc[]
 
 `Response`
@@ -188,7 +190,6 @@ include::{snippets}/post-logout/http-request.adoc[]
 
 include::{snippets}/post-logout/http-response.adoc[]
 
-
 === 사용자 회원탈퇴
 
 `Request Header`
@@ -211,6 +212,7 @@ include::{snippets}/update-fcm-token/request-headers.adoc[]
 
 `Request`
 
+include::{snippets}/update-fcm-token/http-request.adoc[]
 include::{snippets}/update-fcm-token/request-fields.adoc[]
 
 `Response`
