@@ -73,4 +73,8 @@ public class ChatRoom {
         .defaultRoomImageType(this.defaultRoomImageType)
         .build();
   }
+
+  public ChatRoom withoutImageUrl() {
+    return withImageUrl(null);
+  }
 }

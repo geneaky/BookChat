@@ -144,6 +144,8 @@ public class ChatRoomService {
       String roomImageUri = storageService.upload(chatRoomImage, UUID.randomUUID().toString(),
           LocalDateTime.now().format(dateTimeFormatter));
       chatRoom = chatRoom.withImageUrl(roomImageUri);
+    } else {
+      chatRoom = chatRoom.withoutImageUrl();
     }
 
     if (request.tagExistent()) {

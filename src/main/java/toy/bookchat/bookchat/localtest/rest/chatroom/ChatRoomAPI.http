@@ -1,9 +1,9 @@
 ### 채팅방 생성
 POST localhost:8080/v1/api/chatrooms
 Authorization: {{jwt_token}}
-Content-Type: multipart/form-data; boundary=WebAppBoundary
+Content-Type: multipart/form-data; boundary=boundary
 
---WebAppBoundary
+--boundary
 Content-Type: application/json
 Content-Disposition: form-data; name="createChatRoomRequest"; filename="createChatRoomRequest";
 
@@ -22,7 +22,14 @@ Content-Disposition: form-data; name="createChatRoomRequest"; filename="createCh
   }
 }
 
---WebAppBoundary
+--boundary
+Content-Type: image/webp
+Content-Transfer-Encoding: binary
+Content-Disposition: form-data; name="chatRoomImage"; filename="test_chatroom_image.webp"
+
+< test_chatroom_image.webp
+
+--boundary
 
 ### 채팅방 수정
 POST localhost:8080/v1/api/chatrooms/1
@@ -41,13 +48,13 @@ Content-Disposition: form-data; name="reviseChatRoomRequest"; filename="reviseCh
  }
 
 --boundary
-Content-Type: image/webp
-Content-Transfer-Encoding: binary
-Content-Disposition: form-data; name="chatRoomImage"; filename="test_chatroom_image.webp"
-
-< test_chatroom_image.webp
-
---boundary
+#Content-Type: image/webp
+#Content-Transfer-Encoding: binary
+#Content-Disposition: form-data; name="chatRoomImage"; filename="test_chatroom_image.webp"
+#
+#< test_chatroom_image.webp
+#
+#--boundary
 
 ### 사용자 채팅방 조회
 GET localhost:8080/v1/api/users/chatrooms?size=3

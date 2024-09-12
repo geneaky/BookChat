@@ -68,12 +68,9 @@ public class UserController {
   }
 
   @PostMapping("/users/profile")
-  public void updateUserProfile(
-      @Valid @RequestPart ChangeUserNicknameRequest changeUserNicknameRequest,
-      @RequestPart(required = false) MultipartFile userProfileImage,
-      @UserPayload TokenPayload tokenPayload) {
-    userService.updateUserProfile(changeUserNicknameRequest, userProfileImage,
-        tokenPayload.getUserId());
+  public void updateUserProfile(@Valid @RequestPart ChangeUserNicknameRequest changeUserNicknameRequest,
+      @RequestPart(required = false) MultipartFile userProfileImage, @UserPayload TokenPayload tokenPayload) {
+    userService.updateUserProfile(changeUserNicknameRequest, userProfileImage, tokenPayload.getUserId());
   }
 
   @PostMapping("/users/signup")
