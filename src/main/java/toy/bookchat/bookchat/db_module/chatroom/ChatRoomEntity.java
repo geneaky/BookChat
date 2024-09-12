@@ -20,12 +20,17 @@ public class ChatRoomEntity extends BaseEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-  @Column(name = "book_id")
+  @Column(name = "book_id", nullable = false)
   private Long bookId;
+  @Column(name = "room_name")
   private String roomName;
+  @Column(name = "room_sid")
   private String roomSid;
+  @Column(name = "room_size")
   private Integer roomSize;
+  @Column(name = "default_room_image_type")
   private Integer defaultRoomImageType;
+  @Column(name = "room_image_uri")
   private String roomImageUri;
 
   @Builder

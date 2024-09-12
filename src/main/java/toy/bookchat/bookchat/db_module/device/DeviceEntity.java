@@ -23,7 +23,9 @@ public class DeviceEntity extends BaseEntity {
   private Long id;
   @Column(name = "user_id", nullable = false)
   private Long userId;
+  @Column(name = "device_token")
   private String deviceToken;
+  @Column(name = "fcm_token")
   private String fcmToken;
 
   @Builder

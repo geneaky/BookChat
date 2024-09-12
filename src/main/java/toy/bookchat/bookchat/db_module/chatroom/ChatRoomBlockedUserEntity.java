@@ -14,21 +14,21 @@ import lombok.Getter;
 @Table(name = "chat_room_blocked_user")
 public class ChatRoomBlockedUserEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    @Column(name = "user_id")
-    private Long userId;
-    @Column(name = "chat_room_id")
-    private Long chatRoomId;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+  @Column(name = "user_id", nullable = false)
+  private Long userId;
+  @Column(name = "chat_room_id", nullable = false)
+  private Long chatRoomId;
 
-    protected ChatRoomBlockedUserEntity() {
-    }
+  protected ChatRoomBlockedUserEntity() {
+  }
 
-    @Builder
-    private ChatRoomBlockedUserEntity(Long id, Long userId, Long chatRoomId) {
-        this.id = id;
-        this.userId = userId;
-        this.chatRoomId = chatRoomId;
-    }
+  @Builder
+  private ChatRoomBlockedUserEntity(Long id, Long userId, Long chatRoomId) {
+    this.id = id;
+    this.userId = userId;
+    this.chatRoomId = chatRoomId;
+  }
 }

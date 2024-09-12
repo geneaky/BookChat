@@ -176,8 +176,7 @@ class ChatRoomServiceTest {
     MockMultipartFile chatRoomImage = new MockMultipartFile("newImageFile", "newImageFile",
         "image/webp", "content".getBytes());
 
-    when(storageService.upload(eq(chatRoomImage), anyString(), anyString())).thenReturn(
-        "newRoomImageUri");
+    when(storageService.upload(eq(chatRoomImage), anyString(), anyString())).thenReturn("newRoomImageUri");
 
     chatRoomService.reviseChatRoom(reviseChatRoomRequest, chatRoomImage, 763L);
 

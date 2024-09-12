@@ -15,30 +15,32 @@ import toy.bookchat.bookchat.db_module.BaseEntity;
 @Table(name = "book_report")
 public class BookReportEntity extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String title;
-    private String content;
-    @Column(name = "book_shelf_id")
-    private Long bookShelfId;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+  @Column(name = "title")
+  private String title;
+  @Column(name = "content")
+  private String content;
+  @Column(name = "book_shelf_id", nullable = false)
+  private Long bookShelfId;
 
-    @Builder
-    private BookReportEntity(Long id, String title, String content, Long bookShelfId) {
-        this.id = id;
-        this.title = title;
-        this.content = content;
-        this.bookShelfId = bookShelfId;
-    }
+  @Builder
+  private BookReportEntity(Long id, String title, String content, Long bookShelfId) {
+    this.id = id;
+    this.title = title;
+    this.content = content;
+    this.bookShelfId = bookShelfId;
+  }
 
-    protected BookReportEntity() {
-    }
+  protected BookReportEntity() {
+  }
 
-    public void reviseTitle(String title) {
-        this.title = title;
-    }
+  public void reviseTitle(String title) {
+    this.title = title;
+  }
 
-    public void reviseContent(String content) {
-        this.content = content;
-    }
+  public void reviseContent(String content) {
+    this.content = content;
+  }
 }

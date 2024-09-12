@@ -20,6 +20,7 @@ public class ScrapEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+  @Column(name = "scrap_content")
   private String scrapContent;
   @Column(name = "book_shelf_id", nullable = false)
   private Long bookShelfId;

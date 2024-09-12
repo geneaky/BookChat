@@ -16,22 +16,24 @@ import toy.bookchat.bookchat.db_module.BaseEntity;
 @Table(name = "agony_record")
 public class AgonyRecordEntity extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = IDENTITY)
-    private Long id;
-    private String title;
-    private String content;
-    @Column(name = "agony_id", nullable = false)
-    private Long agonyId;
+  @Id
+  @GeneratedValue(strategy = IDENTITY)
+  private Long id;
+  @Column(name = "title")
+  private String title;
+  @Column(name = "content")
+  private String content;
+  @Column(name = "agony_id", nullable = false)
+  private Long agonyId;
 
-    @Builder
-    private AgonyRecordEntity(Long id, String title, String content, Long agonyId) {
-        this.id = id;
-        this.title = title;
-        this.content = content;
-        this.agonyId = agonyId;
-    }
+  @Builder
+  private AgonyRecordEntity(Long id, String title, String content, Long agonyId) {
+    this.id = id;
+    this.title = title;
+    this.content = content;
+    this.agonyId = agonyId;
+  }
 
-    protected AgonyRecordEntity() {
-    }
+  protected AgonyRecordEntity() {
+  }
 }

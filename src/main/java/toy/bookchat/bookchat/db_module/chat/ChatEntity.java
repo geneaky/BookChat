@@ -15,27 +15,28 @@ import toy.bookchat.bookchat.db_module.BaseEntity;
 @Table(name = "chat")
 public class ChatEntity extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String message;
-    @Column(name = "user_id")
-    private Long userId;
-    @Column(name = "chat_room_id")
-    private Long chatRoomId;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+  @Column(name = "message")
+  private String message;
+  @Column(name = "user_id")
+  private Long userId;
+  @Column(name = "chat_room_id", nullable = false)
+  private Long chatRoomId;
 
-    protected ChatEntity() {
-    }
+  protected ChatEntity() {
+  }
 
-    @Builder
-    private ChatEntity(Long id, String message, Long userId, Long chatRoomId) {
-        this.id = id;
-        this.message = message;
-        this.userId = userId;
-        this.chatRoomId = chatRoomId;
-    }
+  @Builder
+  private ChatEntity(Long id, String message, Long userId, Long chatRoomId) {
+    this.id = id;
+    this.message = message;
+    this.userId = userId;
+    this.chatRoomId = chatRoomId;
+  }
 
-    public String getDispatchTime() {
-        return getCreatedAt().toString();
-    }
+  public String getDispatchTime() {
+    return getCreatedAt().toString();
+  }
 }

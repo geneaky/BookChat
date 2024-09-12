@@ -25,12 +25,13 @@ public class ParticipantEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
   @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
+  @Column(name = "participant_status", nullable = false)
   private ParticipantStatus participantStatus;
-  @Column(name = "user_id")
+  @Column(name = "user_id", nullable = false)
   private Long userId;
-  @Column(name = "chat_room_id")
+  @Column(name = "chat_room_id", nullable = false)
   private Long chatRoomId;
+  @Column(name = "is_connected")
   private Boolean isConnected;
 
   protected ParticipantEntity() {

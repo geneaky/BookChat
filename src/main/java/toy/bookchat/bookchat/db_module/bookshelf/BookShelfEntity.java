@@ -27,9 +27,12 @@ public class BookShelfEntity extends BaseEntity {
   private Long userId;
   @Column(name = "book_id", nullable = false)
   private Long bookId;
+  @Column(name = "pages")
   private Integer pages;
+  @Column(name = "reading_status")
   @Enumerated(EnumType.STRING)
   private ReadingStatus readingStatus;
+  @Column(name = "star")
   @Enumerated(EnumType.STRING)
   private Star star;
 

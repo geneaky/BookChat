@@ -17,9 +17,9 @@ public class ChatRoomHashTagEntity extends BaseEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-  @Column(name = "chat_room_id")
+  @Column(name = "chat_room_id", nullable = false)
   private Long chatRoomId;
-  @Column(name = "hash_tag_id")
+  @Column(name = "hash_tag_id", nullable = false)
   private Long hashTagId;
 
   protected ChatRoomHashTagEntity() {
