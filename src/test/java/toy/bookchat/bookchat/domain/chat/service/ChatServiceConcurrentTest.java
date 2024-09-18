@@ -26,7 +26,7 @@ import toy.bookchat.bookchat.db_module.participant.repository.ParticipantReposit
 import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.db_module.user.repository.UserRepository;
 import toy.bookchat.bookchat.domain.chatroom.service.ChatRoomService;
-import toy.bookchat.bookchat.infrastructure.broker.MessagePublisher;
+import toy.bookchat.bookchat.infrastructure.rabbitmq.MessagePublisher;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
 @SpringBootTest

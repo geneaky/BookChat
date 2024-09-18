@@ -25,7 +25,7 @@ import toy.bookchat.bookchat.db_module.device.repository.DeviceRepository;
 import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.db_module.user.repository.UserRepository;
 import toy.bookchat.bookchat.support.Status;
-import toy.bookchat.bookchat.domain.storage.StorageService;
+import toy.bookchat.bookchat.infrastructure.s3.StorageService;
 import toy.bookchat.bookchat.domain.user.UserProfile;
 import toy.bookchat.bookchat.domain.user.api.v1.request.ChangeUserNicknameRequest;
 import toy.bookchat.bookchat.domain.user.api.v1.request.UserSignInRequest;
@@ -33,7 +33,7 @@ import toy.bookchat.bookchat.domain.user.api.v1.request.UserSignUpRequest;
 import toy.bookchat.bookchat.domain.user.api.v1.response.MemberProfileResponse;
 import toy.bookchat.bookchat.exception.badrequest.user.UserAlreadySignUpException;
 import toy.bookchat.bookchat.exception.conflict.device.DeviceAlreadyRegisteredException;
-import toy.bookchat.bookchat.infrastructure.push.service.PushService;
+import toy.bookchat.bookchat.infrastructure.fcm.service.PushService;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {

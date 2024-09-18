@@ -43,10 +43,10 @@ import toy.bookchat.bookchat.domain.participant.service.ParticipantAppender;
 import toy.bookchat.bookchat.domain.participant.service.ParticipantCleaner;
 import toy.bookchat.bookchat.domain.participant.service.ParticipantReader;
 import toy.bookchat.bookchat.domain.participant.service.ParticipantValidator;
-import toy.bookchat.bookchat.domain.storage.ChatRoomStorageService;
+import toy.bookchat.bookchat.infrastructure.s3.ChatRoomStorageService;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.service.UserReader;
-import toy.bookchat.bookchat.infrastructure.broker.MessagePublisher;
+import toy.bookchat.bookchat.infrastructure.rabbitmq.MessagePublisher;
 
 @ExtendWith(MockitoExtension.class)
 class ChatRoomServiceTest {
