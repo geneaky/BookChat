@@ -3,9 +3,9 @@ package toy.bookchat.bookchat.db_module.agonyrecord.repository.query;
 import static toy.bookchat.bookchat.db_module.agony.QAgonyEntity.agonyEntity;
 import static toy.bookchat.bookchat.db_module.agonyrecord.QAgonyRecordEntity.agonyRecordEntity;
 import static toy.bookchat.bookchat.db_module.bookshelf.QBookShelfEntity.bookShelfEntity;
-import static toy.bookchat.bookchat.domain.common.RepositorySupport.extractOrderSpecifierFrom;
-import static toy.bookchat.bookchat.domain.common.RepositorySupport.numberBasedPagination;
-import static toy.bookchat.bookchat.domain.common.RepositorySupport.toSlice;
+import static toy.bookchat.bookchat.support.RepositorySupport.extractOrderSpecifierFrom;
+import static toy.bookchat.bookchat.support.RepositorySupport.numberBasedPagination;
+import static toy.bookchat.bookchat.support.RepositorySupport.toSlice;
 
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;

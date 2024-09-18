@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.domain.common;
+package toy.bookchat.bookchat.support;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -9,11 +9,11 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RateLimit {
 
-    String keyName() default "";
+  String keyName() default "";
 
-    long capacity();
+  long capacity();
 
-    long seconds();
+  long seconds();
 
-    long tokens();
+  long tokens();
 }

@@ -1,5 +1,6 @@
 package toy.bookchat.bookchat.domain.participant.api.v1;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,23 +11,21 @@ import toy.bookchat.bookchat.domain.participant.service.ParticipantService;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPayload;
 
+@RequiredArgsConstructor
+
 @RestController
-@RequestMapping("/v1/api")
+@RequestMapping("/v1/api/chatrooms")
 public class ParticipantController {
 
   private final ParticipantService participantService;
 
-  public ParticipantController(ParticipantService participantService) {
-    this.participantService = participantService;
-  }
-
-  @PatchMapping("/chatrooms/{roomId}/participants/{userId}")
+  @PatchMapping("/{roomId}/participants/{userId}")
   public void changeParticipantRights(@PathVariable Long roomId, @PathVariable Long userId,
       ParticipantStatus participantStatus, @UserPayload TokenPayload tokenPayload) {
     participantService.changeParticipantRights(roomId, userId, participantStatus, tokenPayload.getUserId());
   }
 
-  @DeleteMapping("/chatrooms/{roomId}/participants/{userId}")
+  @DeleteMapping("/{roomId}/participants/{userId}")
   public void deleteParticipant(@PathVariable Long roomId, @PathVariable Long userId,
       @UserPayload TokenPayload tokenPayload) {
     participantService.kickParticipant(roomId, userId, tokenPayload.getUserId());

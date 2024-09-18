@@ -2,7 +2,7 @@ package toy.bookchat.bookchat.db_module.scrap.repository.query;
 
 import static toy.bookchat.bookchat.db_module.bookshelf.QBookShelfEntity.bookShelfEntity;
 import static toy.bookchat.bookchat.db_module.scrap.QScrapEntity.scrapEntity;
-import static toy.bookchat.bookchat.domain.common.RepositorySupport.toSlice;
+import static toy.bookchat.bookchat.support.RepositorySupport.toSlice;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;

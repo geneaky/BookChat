@@ -1,6 +1,7 @@
 package toy.bookchat.bookchat.domain.device.api.v1;
 
 import javax.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,15 +11,13 @@ import toy.bookchat.bookchat.domain.device.service.DeviceService;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPayload;
 
+@RequiredArgsConstructor
+
 @RestController
 @RequestMapping("/v1/api/devices")
 public class DeviceController {
 
   private final DeviceService deviceService;
-
-  public DeviceController(DeviceService deviceService) {
-    this.deviceService = deviceService;
-  }
 
   @PutMapping("/fcm-token")
   public void updateFcmToken(@UserPayload TokenPayload tokenPayload,

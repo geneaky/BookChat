@@ -1,5 +1,5 @@
-package toy.bookchat.bookchat.domain.common;
+package toy.bookchat.bookchat.support;
 
 public enum Status {
-    ACTIVE, INACTIVE
+  ACTIVE, INACTIVE
 }

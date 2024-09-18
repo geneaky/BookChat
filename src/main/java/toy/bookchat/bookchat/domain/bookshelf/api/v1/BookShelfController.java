@@ -5,6 +5,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 import java.net.URI;
 import java.time.LocalDate;
 import javax.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -28,41 +29,39 @@ import toy.bookchat.bookchat.domain.bookshelf.service.BookShelfService;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPayload;
 
+@RequiredArgsConstructor
+
 @RestController
-@RequestMapping("/v1/api")
+@RequestMapping("/v1/api/bookshelves")
 public class BookShelfController {
 
   private final BookShelfService bookShelfService;
 
-  public BookShelfController(BookShelfService bookShelfService) {
-    this.bookShelfService = bookShelfService;
-  }
-
-  @GetMapping("/bookshelves/{bookShelfId}")
+  @GetMapping("/{bookShelfId}")
   public BookShelfResponse getBookOnBookShelf(@PathVariable Long bookShelfId, @UserPayload TokenPayload tokenPayload) {
     return BookShelfResponse.from(bookShelfService.getBookOnBookShelf(bookShelfId, tokenPayload.getUserId()));
   }
 
 
-  @PostMapping("/bookshelves")
+  @PostMapping
   public ResponseEntity<Void> putBookOnBookShelf(@Valid @RequestBody CreateBookShelfRequest createBookShelfRequest,
       @UserPayload TokenPayload tokenPayload) {
     Long bookShelfId = bookShelfService.putBookOnBookShelf(createBookShelfRequest.toTarget(),
         createBookShelfRequest.getBook(), tokenPayload.getUserId());
 
     return ResponseEntity.status(CREATED)
-        .headers(hs -> hs.setLocation(URI.create("/v1/api/bookshelves/" + bookShelfId)))
+        .headers(hs -> hs.setLocation(URI.create("/v1/api/" + bookShelfId)))
         .build();
   }
 
-  @GetMapping("/bookshelves")
+  @GetMapping
   public SearchBookShelfByReadingStatus takeBooksOutOfBookShelves(ReadingStatus readingStatus, Pageable pageable,
       @UserPayload TokenPayload tokenPayload) {
     return new SearchBookShelfByReadingStatus(
         bookShelfService.takeBooksOutOfBookShelves(readingStatus, pageable, tokenPayload.getUserId()));
   }
 
-  @GetMapping("/bookshelves/book")
+  @GetMapping("/book")
   public ExistenceBookOnBookShelfResponse findBookIfExistedOnBookShelves(@RequestParam String isbn,
       @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate publishAt,
       @UserPayload TokenPayload tokenPayload) {
@@ -71,13 +70,13 @@ public class BookShelfController {
     return ExistenceBookOnBookShelfResponse.from(bookShelf);
   }
 
-  @PutMapping("/bookshelves/{bookShelfId}")
+  @PutMapping("/{bookShelfId}")
   public void reviseBookOnBookShelf(@PathVariable Long bookShelfId,
       @Valid @RequestBody ReviseBookShelfRequest reviseBookShelfStarRequest, @UserPayload TokenPayload tokenPayload) {
     bookShelfService.reviseBookShelf(bookShelfId, reviseBookShelfStarRequest.toTarget(), tokenPayload.getUserId());
   }
 
-  @DeleteMapping("/bookshelves/{bookShelfId}")
+  @DeleteMapping("/{bookShelfId}")
   public void deleteBookOnBookShelf(@PathVariable Long bookShelfId, @UserPayload TokenPayload tokenPayload) {
     bookShelfService.deleteBookShelf(bookShelfId, tokenPayload.getUserId());
   }

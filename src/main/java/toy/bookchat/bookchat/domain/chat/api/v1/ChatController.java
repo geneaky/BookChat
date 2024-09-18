@@ -1,7 +1,7 @@
 package toy.bookchat.bookchat.domain.chat.api.v1;
 
 import javax.validation.Valid;
-import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -17,30 +17,29 @@ import toy.bookchat.bookchat.domain.chat.service.ChatService;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPayload;
 
-@Slf4j
+@RequiredArgsConstructor
+
 @RestController
 public class ChatController {
 
-    private final ChatService chatService;
+  private final ChatService chatService;
 
-    public ChatController(ChatService chatService) {
-        this.chatService = chatService;
-    }
+  @MessageMapping("/send/chatrooms/{roomId}")
+  public void sendMessage(@Valid MessageRequest messageRequest, @DestinationVariable Long roomId,
+      @UserPayload TokenPayload tokenPayload) {
+    chatService.sendMessage(tokenPayload.getUserId(), roomId, messageRequest.toTarget());
+  }
 
-    @MessageMapping("/send/chatrooms/{roomId}")
-    public void sendMessage(@Valid MessageRequest messageRequest, @DestinationVariable Long roomId, @UserPayload TokenPayload tokenPayload) {
-        chatService.sendMessage(tokenPayload.getUserId(), roomId, messageRequest.toTarget());
-    }
+  @GetMapping("/v1/api/chatrooms/{roomId}/chats")
+  public ChatRoomChatsResponse getChatRoomChats(@PathVariable Long roomId, Long postCursorId, Pageable pageable,
+      @UserPayload TokenPayload tokenPayload) {
+    Slice<Chat> slicedChat = chatService.getChatRoomChats(roomId, postCursorId, pageable, tokenPayload.getUserId());
+    return new ChatRoomChatsResponse(slicedChat);
+  }
 
-    @GetMapping("/v1/api/chatrooms/{roomId}/chats")
-    public ChatRoomChatsResponse getChatRoomChats(@PathVariable Long roomId, Long postCursorId, Pageable pageable, @UserPayload TokenPayload tokenPayload) {
-        Slice<Chat> slicedChat = chatService.getChatRoomChats(roomId, postCursorId, pageable, tokenPayload.getUserId());
-        return new ChatRoomChatsResponse(slicedChat);
-    }
-
-    @GetMapping("/v1/api/chats/{chatId}")
-    public ChatDetailResponse getChat(@PathVariable Long chatId, @UserPayload TokenPayload tokenPayload) {
-        Chat chat = chatService.getChatDetail(chatId, tokenPayload.getUserId());
-        return ChatDetailResponse.from(chat);
-    }
+  @GetMapping("/v1/api/chats/{chatId}")
+  public ChatDetailResponse getChat(@PathVariable Long chatId, @UserPayload TokenPayload tokenPayload) {
+    Chat chat = chatService.getChatDetail(chatId, tokenPayload.getUserId());
+    return ChatDetailResponse.from(chat);
+  }
 }

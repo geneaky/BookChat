@@ -1,6 +1,6 @@
 package toy.bookchat.bookchat.domain.user.service;
 
-import static toy.bookchat.bookchat.domain.common.Status.ACTIVE;
+import static toy.bookchat.bookchat.support.Status.ACTIVE;
 
 import java.util.List;
 import java.util.stream.Collectors;

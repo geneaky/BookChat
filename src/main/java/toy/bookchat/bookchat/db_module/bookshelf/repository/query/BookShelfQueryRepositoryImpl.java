@@ -2,7 +2,7 @@ package toy.bookchat.bookchat.db_module.bookshelf.repository.query;
 
 import static toy.bookchat.bookchat.db_module.book.QBookEntity.bookEntity;
 import static toy.bookchat.bookchat.db_module.bookshelf.QBookShelfEntity.bookShelfEntity;
-import static toy.bookchat.bookchat.domain.common.RepositorySupport.extractOrderSpecifierFrom;
+import static toy.bookchat.bookchat.support.RepositorySupport.extractOrderSpecifierFrom;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;

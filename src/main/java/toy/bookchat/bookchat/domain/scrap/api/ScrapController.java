@@ -5,6 +5,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 import java.net.URI;
 import java.util.List;
 import javax.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,17 +22,15 @@ import toy.bookchat.bookchat.domain.scrap.service.ScrapService;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPayload;
 
+@RequiredArgsConstructor
+
 @RestController
-@RequestMapping("/v1/api")
+@RequestMapping("/v1/api/scraps")
 public class ScrapController {
 
   private final ScrapService scrapService;
 
-  public ScrapController(ScrapService scrapService) {
-    this.scrapService = scrapService;
-  }
-
-  @PostMapping("/scraps")
+  @PostMapping
   public ResponseEntity<Void> scrapChat(@Valid @RequestBody CreateScrapRequest createScrapRequest,
       @UserPayload TokenPayload tokenPayload) {
     Long scrapId = scrapService.scrap(createScrapRequest, tokenPayload.getUserId());
@@ -41,18 +40,18 @@ public class ScrapController {
         .build();
   }
 
-  @GetMapping("/scraps")
+  @GetMapping
   public ScrapResponseSlice getScraps(Long bookShelfId, Long postCursorId, Pageable pageable,
       @UserPayload TokenPayload tokenPayload) {
     return scrapService.getScraps(bookShelfId, postCursorId, pageable, tokenPayload.getUserId());
   }
 
-  @GetMapping("/scraps/{scrapId}")
+  @GetMapping("/{scrapId}")
   public ScrapResponse getScrap(@PathVariable Long scrapId, @UserPayload TokenPayload tokenPayload) {
     return scrapService.getScrap(scrapId, tokenPayload.getUserId());
   }
 
-  @DeleteMapping("/scraps/{scrapIds}")
+  @DeleteMapping("/{scrapIds}")
   public void deleteScraps(Long bookShelfId, @PathVariable List<Long> scrapIds,
       @UserPayload TokenPayload tokenPayload) {
     scrapService.deleteScraps(bookShelfId, scrapIds, tokenPayload.getUserId());

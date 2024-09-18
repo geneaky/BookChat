@@ -2,6 +2,7 @@ package toy.bookchat.bookchat.domain.chatroom.api;
 
 import java.net.URI;
 import javax.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
@@ -29,15 +30,13 @@ import toy.bookchat.bookchat.domain.chatroom.service.ChatRoomService;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPayload;
 
+@RequiredArgsConstructor
+
 @RestController
 @RequestMapping("/v1/api")
 public class ChatRoomController {
 
   private final ChatRoomService chatRoomService;
-
-  public ChatRoomController(ChatRoomService chatRoomService) {
-    this.chatRoomService = chatRoomService;
-  }
 
   @PostMapping("/chatrooms")
   public ResponseEntity<Void> createChatRoom(@Valid @RequestPart CreateChatRoomRequest createChatRoomRequest,
@@ -66,8 +65,7 @@ public class ChatRoomController {
   }
 
   @GetMapping("/chatrooms")
-  public ChatRoomsResponseSlice getChatRooms(@ModelAttribute ChatRoomRequest chatRoomRequest,
-      @UserPayload TokenPayload tokenPayload, Pageable pageable) {
+  public ChatRoomsResponseSlice getChatRooms(@ModelAttribute ChatRoomRequest chatRoomRequest, Pageable pageable) {
     chatRoomRequest.validate();
     Slice<ChatRoomResponse> slicedChatRoomResponse = chatRoomService.getChatRooms(chatRoomRequest, pageable);
 

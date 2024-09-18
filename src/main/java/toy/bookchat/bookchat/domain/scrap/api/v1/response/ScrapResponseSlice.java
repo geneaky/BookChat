@@ -3,7 +3,7 @@ package toy.bookchat.bookchat.domain.scrap.api.v1.response;
 import java.util.List;
 import lombok.Getter;
 import org.springframework.data.domain.Slice;
-import toy.bookchat.bookchat.domain.common.CursorMeta;
+import toy.bookchat.bookchat.support.CursorMeta;
 
 @Getter
 public class ScrapResponseSlice {

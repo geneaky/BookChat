@@ -10,7 +10,7 @@ import static toy.bookchat.bookchat.db_module.chatroom.QChatRoomHashTagEntity.ch
 import static toy.bookchat.bookchat.db_module.chatroom.QHashTagEntity.hashTagEntity;
 import static toy.bookchat.bookchat.db_module.participant.QParticipantEntity.participantEntity;
 import static toy.bookchat.bookchat.db_module.user.QUserEntity.userEntity;
-import static toy.bookchat.bookchat.domain.common.RepositorySupport.toSlice;
+import static toy.bookchat.bookchat.support.RepositorySupport.toSlice;
 import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.HOST;
 
 import com.querydsl.core.types.dsl.BooleanExpression;

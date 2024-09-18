@@ -1,6 +1,6 @@
-package toy.bookchat.bookchat.domain.common;
+package toy.bookchat.bookchat.support;
 
 public interface RateLimiter {
 
-    boolean tryConsume();
+  boolean tryConsume();
 }

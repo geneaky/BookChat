@@ -4,7 +4,7 @@ import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.springframework.data.domain.Slice;
-import toy.bookchat.bookchat.domain.common.CursorMeta;
+import toy.bookchat.bookchat.support.CursorMeta;
 
 @Getter
 @EqualsAndHashCode(of = "chatRoomResponseList")
