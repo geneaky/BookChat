@@ -17,8 +17,6 @@ services:
     restart: always
 
   promtail:
-    depends_on:
-      - nginx
     container_name: promtail
     image: grafana/promtail
     environment:
