@@ -1,7 +1,7 @@
 package toy.bookchat.bookchat.domain.chat.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static toy.bookchat.bookchat.domain.common.Status.ACTIVE;
+import static toy.bookchat.bookchat.support.Status.ACTIVE;
 import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.HOST;
 
 import java.time.LocalDate;

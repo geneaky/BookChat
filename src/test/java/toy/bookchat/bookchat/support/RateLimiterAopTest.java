@@ -1,10 +1,9 @@
-package toy.bookchat.bookchat.domain.common;
+package toy.bookchat.bookchat.support;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.aop.aspectj.AspectJExpressionPointcut;
-import toy.bookchat.bookchat.support.RateLimit;
 
 class RateLimiterAopTest {
 

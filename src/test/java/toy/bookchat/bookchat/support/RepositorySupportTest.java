@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.domain.common;
+package toy.bookchat.bookchat.support;
 
 import static com.querydsl.core.types.PathMetadataFactory.forVariable;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import toy.bookchat.bookchat.domain.RepositoryTest;
-import toy.bookchat.bookchat.support.RepositorySupport;
 
 class RepositorySupportTest extends RepositoryTest {
 

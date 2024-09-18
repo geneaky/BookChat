@@ -10,7 +10,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.noInteractions;
-import static toy.bookchat.bookchat.domain.common.Status.ACTIVE;
+import static toy.bookchat.bookchat.support.Status.ACTIVE;
 
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -24,7 +24,7 @@ import toy.bookchat.bookchat.db_module.device.DeviceEntity;
 import toy.bookchat.bookchat.db_module.device.repository.DeviceRepository;
 import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.db_module.user.repository.UserRepository;
-import toy.bookchat.bookchat.domain.common.Status;
+import toy.bookchat.bookchat.support.Status;
 import toy.bookchat.bookchat.domain.storage.StorageService;
 import toy.bookchat.bookchat.domain.user.UserProfile;
 import toy.bookchat.bookchat.domain.user.api.v1.request.ChangeUserNicknameRequest;
