@@ -16,19 +16,6 @@ services:
       - java -jar ./build/libs/*.jar
     restart: always
 
-  nginx:
-    depends_on:
-      - app
-    container_name: nginx
-    image: nginx
-    environment:
-      TZ: "Asia/Seoul"
-    ports:
-      - 80:80
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-    restart: always
-
   promtail:
     depends_on:
       - nginx
