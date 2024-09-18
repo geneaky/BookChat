@@ -15,8 +15,8 @@ import toy.bookchat.bookchat.domain.participant.Host;
 import toy.bookchat.bookchat.domain.participant.ParticipantAdmin;
 import toy.bookchat.bookchat.domain.participant.ParticipantStatus;
 import toy.bookchat.bookchat.domain.participant.ParticipantWithChatRoom;
-import toy.bookchat.bookchat.infrastructure.broker.MessagePublisher;
-import toy.bookchat.bookchat.infrastructure.broker.message.NotificationMessage;
+import toy.bookchat.bookchat.infrastructure.rabbitmq.MessagePublisher;
+import toy.bookchat.bookchat.infrastructure.rabbitmq.message.NotificationMessage;
 
 @Service
 public class ParticipantService {

@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.infrastructure.broker.message;
+package toy.bookchat.bookchat.infrastructure.rabbitmq.message;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -12,31 +12,32 @@ import toy.bookchat.bookchat.domain.chat.Chat;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CommonMessage {
 
-    private Long chatRoomId;
-    private Long chatId;
-    private Long senderId;
-    private Integer receiptId;
-    private String message;
-    private String dispatchTime;
+  private Long chatRoomId;
+  private Long chatId;
+  private Long senderId;
+  private Integer receiptId;
+  private String message;
+  private String dispatchTime;
 
-    @Builder
-    private CommonMessage(Long chatRoomId, Long chatId, Long senderId, Integer receiptId, String dispatchTime, String message) {
-        this.chatRoomId = chatRoomId;
-        this.chatId = chatId;
-        this.senderId = senderId;
-        this.receiptId = receiptId;
-        this.message = message;
-        this.dispatchTime = dispatchTime;
-    }
+  @Builder
+  private CommonMessage(Long chatRoomId, Long chatId, Long senderId, Integer receiptId, String dispatchTime,
+      String message) {
+    this.chatRoomId = chatRoomId;
+    this.chatId = chatId;
+    this.senderId = senderId;
+    this.receiptId = receiptId;
+    this.message = message;
+    this.dispatchTime = dispatchTime;
+  }
 
-    public static CommonMessage from(Chat chat, Integer receiptId) {
-        return CommonMessage.builder()
-            .chatRoomId(chat.getChatRoomId())
-            .chatId(chat.getId())
-            .senderId(chat.getSenderId())
-            .receiptId(receiptId)
-            .message(chat.getMessage())
-            .dispatchTime(chat.getDispatchTime().toString())
-            .build();
-    }
+  public static CommonMessage from(Chat chat, Integer receiptId) {
+    return CommonMessage.builder()
+        .chatRoomId(chat.getChatRoomId())
+        .chatId(chat.getId())
+        .senderId(chat.getSenderId())
+        .receiptId(receiptId)
+        .message(chat.getMessage())
+        .dispatchTime(chat.getDispatchTime().toString())
+        .build();
+  }
 }

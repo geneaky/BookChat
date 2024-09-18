@@ -1,6 +1,6 @@
 package toy.bookchat.bookchat.domain.chat.service;
 
-import static toy.bookchat.bookchat.infrastructure.push.PushType.CHAT;
+import static toy.bookchat.bookchat.infrastructure.fcm.PushType.CHAT;
 
 import java.util.List;
 import org.springframework.data.domain.Pageable;
@@ -16,11 +16,11 @@ import toy.bookchat.bookchat.domain.device.service.DeviceReader;
 import toy.bookchat.bookchat.domain.participant.service.ParticipantValidator;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.service.UserReader;
-import toy.bookchat.bookchat.infrastructure.broker.MessagePublisher;
-import toy.bookchat.bookchat.infrastructure.broker.message.CommonMessage;
-import toy.bookchat.bookchat.infrastructure.push.ChatMessageBody;
-import toy.bookchat.bookchat.infrastructure.push.PushMessageBody;
-import toy.bookchat.bookchat.infrastructure.push.service.PushService;
+import toy.bookchat.bookchat.infrastructure.rabbitmq.MessagePublisher;
+import toy.bookchat.bookchat.infrastructure.rabbitmq.message.CommonMessage;
+import toy.bookchat.bookchat.infrastructure.fcm.ChatMessageBody;
+import toy.bookchat.bookchat.infrastructure.fcm.PushMessageBody;
+import toy.bookchat.bookchat.infrastructure.fcm.service.PushService;
 
 @Service
 public class ChatService {

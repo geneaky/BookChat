@@ -32,11 +32,11 @@ import toy.bookchat.bookchat.domain.participant.service.ParticipantAppender;
 import toy.bookchat.bookchat.domain.participant.service.ParticipantCleaner;
 import toy.bookchat.bookchat.domain.participant.service.ParticipantReader;
 import toy.bookchat.bookchat.domain.participant.service.ParticipantValidator;
-import toy.bookchat.bookchat.domain.storage.StorageService;
+import toy.bookchat.bookchat.infrastructure.s3.StorageService;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.service.UserReader;
-import toy.bookchat.bookchat.infrastructure.broker.MessagePublisher;
-import toy.bookchat.bookchat.infrastructure.broker.message.NotificationMessage;
+import toy.bookchat.bookchat.infrastructure.rabbitmq.MessagePublisher;
+import toy.bookchat.bookchat.infrastructure.rabbitmq.message.NotificationMessage;
 
 @Service
 public class ChatRoomService {

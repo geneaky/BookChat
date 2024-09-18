@@ -1,7 +1,7 @@
-package toy.bookchat.bookchat.infrastructure.push;
+package toy.bookchat.bookchat.infrastructure.fcm;
 
 public enum PushType {
 
-    LOGIN,
-    CHAT;
+  LOGIN,
+  CHAT;
 }

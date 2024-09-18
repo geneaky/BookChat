@@ -1,4 +1,4 @@
-package toy.bookchat.bookchat.infrastructure.broker.message;
+package toy.bookchat.bookchat.infrastructure.rabbitmq.message;
 
 import javax.validation.constraints.NotBlank;
 import lombok.AccessLevel;
