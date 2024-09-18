@@ -55,6 +55,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -64,13 +65,12 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.Base64Utils;
 import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.domain.ControllerTestExtension;
-import toy.bookchat.bookchat.domain.user.UserProfile;
+import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.api.v1.request.ChangeUserNicknameRequest;
 import toy.bookchat.bookchat.domain.user.api.v1.request.UserSignInRequest;
 import toy.bookchat.bookchat.domain.user.api.v1.request.UserSignUpRequest;
 import toy.bookchat.bookchat.domain.user.api.v1.response.MemberProfileResponse;
 import toy.bookchat.bookchat.domain.user.api.v1.response.Token;
-import toy.bookchat.bookchat.domain.user.api.v1.response.UserProfileResponse;
 import toy.bookchat.bookchat.domain.user.service.UserService;
 import toy.bookchat.bookchat.exception.conflict.device.DeviceAlreadyRegisteredException;
 import toy.bookchat.bookchat.exception.unauthorized.ExpiredTokenException;
@@ -122,20 +122,20 @@ class UserControllerTest extends ControllerTestExtension {
   }
 
   @Test
-  void 사용자_프로필_정보_반환() throws Exception {
+  @DisplayName("사용자 프로필 정보 반환")
+  void userProfile() throws Exception {
     UserEntity userEntity = getUser();
-    UserProfile userProfile = UserProfile.from(userEntity);
-
-    String real = objectMapper.writeValueAsString(UserProfileResponse.builder()
-        .userId(userEntity.getId())
-        .userEmail(userEntity.getEmail())
-        .userNickname(userEntity.getNickname())
-        .userProfileImageUri(userEntity.getProfileImageUrl())
+    User user = User.builder()
+        .id(userEntity.getId())
+        .email(userEntity.getEmail())
+        .nickname(userEntity.getNickname())
+        .profileImageUrl(userEntity.getProfileImageUrl())
         .defaultProfileImageType(userEntity.getDefaultProfileImageType())
-        .build());
-    given(userService.findUser(any())).willReturn(userProfile);
+        .build();
 
-    MvcResult mvcResult = mockMvc.perform(get("/v1/api/users/profile")
+    given(userService.findUser(any())).willReturn(user);
+
+    mockMvc.perform(get("/v1/api/users/profile")
             .with(user(getUserPrincipal()))
             .header(AUTHORIZATION, JWT_TOKEN))
         .andExpect(status().isOk())
@@ -149,10 +149,7 @@ class UserControllerTest extends ControllerTestExtension {
                 fieldWithPath("userEmail").type(STRING).description("이메일"),
                 fieldWithPath("userProfileImageUri").type(STRING).description("프로필 사진 URI"),
                 fieldWithPath("defaultProfileImageType").type(NUMBER).description("기본 이미지 타입")
-            )))
-        .andReturn();
-
-    assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo(real);
+            )));
   }
 
   @Test

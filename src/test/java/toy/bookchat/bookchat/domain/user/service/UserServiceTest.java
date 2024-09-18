@@ -24,9 +24,6 @@ import toy.bookchat.bookchat.db_module.device.DeviceEntity;
 import toy.bookchat.bookchat.db_module.device.repository.DeviceRepository;
 import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.db_module.user.repository.UserRepository;
-import toy.bookchat.bookchat.support.Status;
-import toy.bookchat.bookchat.infrastructure.s3.StorageService;
-import toy.bookchat.bookchat.domain.user.UserProfile;
 import toy.bookchat.bookchat.domain.user.api.v1.request.ChangeUserNicknameRequest;
 import toy.bookchat.bookchat.domain.user.api.v1.request.UserSignInRequest;
 import toy.bookchat.bookchat.domain.user.api.v1.request.UserSignUpRequest;
@@ -34,6 +31,8 @@ import toy.bookchat.bookchat.domain.user.api.v1.response.MemberProfileResponse;
 import toy.bookchat.bookchat.exception.badrequest.user.UserAlreadySignUpException;
 import toy.bookchat.bookchat.exception.conflict.device.DeviceAlreadyRegisteredException;
 import toy.bookchat.bookchat.infrastructure.fcm.service.PushService;
+import toy.bookchat.bookchat.infrastructure.s3.StorageService;
+import toy.bookchat.bookchat.support.Status;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -230,18 +229,10 @@ class UserServiceTest {
   }
 
   @Test
-  void 사용자_프로필_조회_성공() throws Exception {
-    UserEntity userEntity = UserEntity.builder()
-        .id(1L)
-        .nickname("user1")
-        .email("kKvTABYqa@test.com")
-        .profileImageUrl("profile-image-url")
-        .defaultProfileImageType(2)
-        .build();
-    given(userReader.readUserEntity(anyLong())).willReturn(userEntity);
+  @DisplayName("사용자 프로필 조회 성공")
+  void findUser() throws Exception {
+    userService.findUser(1L);
 
-    UserProfile userProfile = userService.findUser(1L);
-
-    verify(userReader).readUserEntity(anyLong());
+    verify(userReader).readUser(any());
   }
 }
