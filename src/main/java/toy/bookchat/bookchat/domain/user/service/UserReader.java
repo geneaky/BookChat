@@ -35,6 +35,7 @@ public class UserReader {
     return User.builder()
         .id(userEntity.getId())
         .nickname(userEntity.getNickname())
+        .email(userEntity.getEmail())
         .profileImageUrl(userEntity.getProfileImageUrl())
         .defaultProfileImageType(userEntity.getDefaultProfileImageType())
         .build();

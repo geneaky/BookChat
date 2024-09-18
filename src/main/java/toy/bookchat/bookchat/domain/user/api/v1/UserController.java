@@ -20,8 +20,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import toy.bookchat.bookchat.db_module.user.UserEntity;
-import toy.bookchat.bookchat.support.RateLimit;
-import toy.bookchat.bookchat.domain.user.UserProfile;
+import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.api.v1.request.ChangeUserNicknameRequest;
 import toy.bookchat.bookchat.domain.user.api.v1.request.UserSignInRequest;
 import toy.bookchat.bookchat.domain.user.api.v1.request.UserSignUpRequest;
@@ -34,6 +33,7 @@ import toy.bookchat.bookchat.security.token.jwt.JwtTokenRecorder;
 import toy.bookchat.bookchat.security.token.openid.IdTokenManager;
 import toy.bookchat.bookchat.security.user.TokenPayload;
 import toy.bookchat.bookchat.security.user.UserPayload;
+import toy.bookchat.bookchat.support.RateLimit;
 
 @RequiredArgsConstructor
 
@@ -55,8 +55,8 @@ public class UserController {
    */
   @GetMapping("/users/profile")
   public UserProfileResponse userProfile(@UserPayload TokenPayload tokenPayload) {
-    UserProfile userProfile = userService.findUser(tokenPayload.getUserId());
-    return UserProfileResponse.of(userProfile);
+    User user = userService.findUser(tokenPayload.getUserId());
+    return UserProfileResponse.of(user);
   }
 
   /**

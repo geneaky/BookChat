@@ -14,8 +14,7 @@ import toy.bookchat.bookchat.db_module.device.DeviceEntity;
 import toy.bookchat.bookchat.db_module.device.repository.DeviceRepository;
 import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.db_module.user.repository.UserRepository;
-import toy.bookchat.bookchat.infrastructure.s3.StorageService;
-import toy.bookchat.bookchat.domain.user.UserProfile;
+import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.api.v1.request.ChangeUserNicknameRequest;
 import toy.bookchat.bookchat.domain.user.api.v1.request.UserSignInRequest;
 import toy.bookchat.bookchat.domain.user.api.v1.request.UserSignUpRequest;
@@ -24,6 +23,7 @@ import toy.bookchat.bookchat.exception.badrequest.user.UserAlreadySignUpExceptio
 import toy.bookchat.bookchat.exception.conflict.device.DeviceAlreadyRegisteredException;
 import toy.bookchat.bookchat.infrastructure.fcm.PushMessageBody;
 import toy.bookchat.bookchat.infrastructure.fcm.service.PushService;
+import toy.bookchat.bookchat.infrastructure.s3.StorageService;
 
 @Service
 public class UserService {
@@ -154,8 +154,7 @@ public class UserService {
   }
 
   @Transactional(readOnly = true)
-  public UserProfile findUser(Long userId) {
-    UserEntity userEntity = userReader.readUserEntity(userId);
-    return UserProfile.from(userEntity);
+  public User findUser(Long userId) {
+    return userReader.readUser(userId);
   }
 }
