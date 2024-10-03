@@ -66,3 +66,7 @@ Content-Type: application/json
 ### 회원탈퇴
 DELETE localhost:8080/v1/api/users
 Authorization: {{jwt_token}}
+
+### 사용자 기본 프로필 조회
+GET localhost:8080/v1/api/users/profile
+Authorization: {{jwt_token}}

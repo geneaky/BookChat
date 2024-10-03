@@ -146,7 +146,6 @@ class UserControllerTest extends ControllerTestExtension {
             responseFields(
                 fieldWithPath("userId").type(NUMBER).description("사용자 ID"),
                 fieldWithPath("userNickname").type(STRING).description("닉네임"),
-                fieldWithPath("userEmail").type(STRING).description("이메일"),
                 fieldWithPath("userProfileImageUri").type(STRING).description("프로필 사진 URI"),
                 fieldWithPath("defaultProfileImageType").type(NUMBER).description("기본 이미지 타입")
             )));

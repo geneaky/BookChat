@@ -50,7 +50,7 @@ public class BookShelfController {
         createBookShelfRequest.getBook(), tokenPayload.getUserId());
 
     return ResponseEntity.status(CREATED)
-        .headers(hs -> hs.setLocation(URI.create("/v1/api/" + bookShelfId)))
+        .headers(hs -> hs.setLocation(URI.create("/v1/api/bookshelves/" + bookShelfId)))
         .build();
   }
 
