@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 import java.util.function.Consumer;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,8 @@ import toy.bookchat.bookchat.infrastructure.fcm.PushMessageBody;
 import toy.bookchat.bookchat.infrastructure.fcm.service.PushService;
 import toy.bookchat.bookchat.infrastructure.s3.StorageService;
 
+@RequiredArgsConstructor
+
 @Service
 public class UserService {
 
@@ -32,18 +35,9 @@ public class UserService {
   private final UserReader userReader;
   private final DeviceRepository deviceRepository;
   private final PushService pushService;
+  @Qualifier("userProfileStorageService")
   private final StorageService storageService;
   private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-  public UserService(UserRepository userRepository, UserReader userReader,
-      DeviceRepository deviceRepository, PushService pushService,
-      @Qualifier("userProfileStorageService") StorageService storageService) {
-    this.userRepository = userRepository;
-    this.userReader = userReader;
-    this.deviceRepository = deviceRepository;
-    this.pushService = pushService;
-    this.storageService = storageService;
-  }
 
   @Transactional(readOnly = true)
   public boolean isDuplicatedName(String nickname) {
@@ -53,23 +47,11 @@ public class UserService {
   @Transactional
   public void registerNewUser(UserSignUpRequest userSignUpRequest, MultipartFile userProfileImage, String userName,
       String userEmail) {
-    if (imageExistent(userProfileImage)) {
+    if (doesImageExist(userProfileImage)) {
       uploadWithImage(userSignUpRequest, userProfileImage, userName, userEmail);
       return;
     }
     uploadWithoutImage(userSignUpRequest, userName, userEmail);
-  }
-
-  private void uploadWithImage(UserSignUpRequest userSignUpRequest,
-      MultipartFile userProfileImage, String userName, String userEmail) {
-    String uploadFileUrl = storageService.upload(userProfileImage, UUID.randomUUID().toString(),
-        LocalDateTime.now().format(dateTimeFormatter));
-    saveUser(userSignUpRequest, userName, userEmail, uploadFileUrl);
-  }
-
-  private void uploadWithoutImage(UserSignUpRequest userSignUpRequest, String userName,
-      String userEmail) {
-    saveUser(userSignUpRequest, userName, userEmail, null);
   }
 
   @Transactional(readOnly = true)
@@ -87,7 +69,7 @@ public class UserService {
   public void updateUserProfile(ChangeUserNicknameRequest changeUserNicknameRequest, MultipartFile userProfileImage,
       Long userId) {
     UserEntity userEntity = userReader.readUserEntity(userId);
-    if (imageExistent(userProfileImage)) {
+    if (doesImageExist(userProfileImage)) {
       updateNicknameWithProfileImage(changeUserNicknameRequest, userProfileImage, userEntity);
       return;
     }
@@ -95,7 +77,43 @@ public class UserService {
     userEntity.changeProfileImageUrl(null);
   }
 
-  private boolean imageExistent(MultipartFile userProfileImage) {
+  @Transactional
+  public void checkDevice(UserSignInRequest userSignInRequest, Long userId) {
+    deviceRepository.findByUserId(userId)
+        .ifPresentOrElse(changeDeviceIfApproved(userSignInRequest),
+            registerUserDevice(userSignInRequest, userId));
+  }
+
+  @Transactional
+  public void deleteDevice(Long userId) {
+    deviceRepository.deleteByUserId(userId);
+  }
+
+  @Transactional(readOnly = true)
+  public MemberProfileResponse getMemberProfile(Long memberId) {
+    UserEntity userEntity = userReader.readUserEntity(memberId);
+    return MemberProfileResponse.of(userEntity);
+  }
+
+  @Transactional(readOnly = true)
+  public User findUser(Long userId) {
+    return userReader.readUser(userId);
+
+  }
+
+  private void uploadWithImage(UserSignUpRequest userSignUpRequest, MultipartFile userProfileImage, String userName,
+      String userEmail) {
+    String uploadFileUrl = storageService.upload(userProfileImage, UUID.randomUUID().toString(),
+        LocalDateTime.now().format(dateTimeFormatter));
+    saveUser(userSignUpRequest, userName, userEmail, uploadFileUrl);
+  }
+
+  private void uploadWithoutImage(UserSignUpRequest userSignUpRequest, String userName,
+      String userEmail) {
+    saveUser(userSignUpRequest, userName, userEmail, null);
+  }
+
+  private boolean doesImageExist(MultipartFile userProfileImage) {
     return userProfileImage != null;
   }
 
@@ -107,21 +125,13 @@ public class UserService {
     userEntity.changeProfileImageUrl(uploadFileUrl);
   }
 
-  private void saveUser(UserSignUpRequest userSignUpRequest, String userName,
-      String email, String profileImageUrl) {
+  private void saveUser(UserSignUpRequest userSignUpRequest, String userName, String email, String profileImageUrl) {
     userRepository.findByName(userName).ifPresentOrElse(user -> {
       throw new UserAlreadySignUpException();
     }, () -> {
       UserEntity userEntity = userSignUpRequest.getUser(userName, email, profileImageUrl);
       userRepository.save(userEntity);
     });
-  }
-
-  @Transactional
-  public void checkDevice(UserSignInRequest userSignInRequest, Long userId) {
-    deviceRepository.findByUserId(userId)
-        .ifPresentOrElse(changeDeviceIfApproved(userSignInRequest),
-            registerUserDevice(userSignInRequest, userId));
   }
 
   private Runnable registerUserDevice(UserSignInRequest userSignInRequest, Long userId) {
@@ -142,19 +152,4 @@ public class UserService {
     };
   }
 
-  @Transactional
-  public void deleteDevice(Long userId) {
-    deviceRepository.deleteByUserId(userId);
-  }
-
-  @Transactional(readOnly = true)
-  public MemberProfileResponse getMemberProfile(Long memberId) {
-    UserEntity userEntity = userReader.readUserEntity(memberId);
-    return MemberProfileResponse.of(userEntity);
-  }
-
-  @Transactional(readOnly = true)
-  public User findUser(Long userId) {
-    return userReader.readUser(userId);
-  }
 }

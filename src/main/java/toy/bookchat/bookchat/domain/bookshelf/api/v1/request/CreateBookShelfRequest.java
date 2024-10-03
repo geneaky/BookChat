@@ -68,10 +68,12 @@ public class CreateBookShelfRequest {
       return BookShelf.builder()
           .readingStatus(this.readingStatus)
           .star(this.star)
+          .pages(0)
           .build();
     }
     return BookShelf.builder()
         .readingStatus(this.readingStatus)
+        .pages(0)
         .build();
   }
 }

@@ -100,8 +100,7 @@ public class UserController {
       @RequestHeader(OIDC) @NotBlank @Pattern(regexp = "^(Bearer)\\s.+") String bearerToken) {
     String oauth2MemberNumber = idTokenManager.getOAuth2MemberNumberFromIdToken(bearerToken,
         userSignUpRequest.getOauth2Provider());
-    String userEmail = idTokenManager.getUserEmailFromToken(bearerToken,
-        userSignUpRequest.getOauth2Provider());
+    String userEmail = idTokenManager.getUserEmailFromToken(bearerToken, userSignUpRequest.getOauth2Provider());
 
     userService.registerNewUser(userSignUpRequest, userProfileImage, oauth2MemberNumber, userEmail);
   }
