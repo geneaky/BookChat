@@ -10,11 +10,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import lombok.extern.slf4j.Slf4j;
-import org.flywaydb.core.Flyway;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -27,13 +23,12 @@ import toy.bookchat.bookchat.db_module.participant.repository.ParticipantReposit
 import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.db_module.user.repository.UserRepository;
 import toy.bookchat.bookchat.domain.participant.ParticipantStatus;
-import toy.bookchat.bookchat.infrastructure.rabbitmq.MessagePublisher;
 import toy.bookchat.bookchat.infrastructure.fcm.service.PushService;
+import toy.bookchat.bookchat.infrastructure.rabbitmq.MessagePublisher;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 
 @Slf4j
 @SpringBootTest
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ParticipantServiceConcurrentTest {
 
   @Autowired
@@ -46,26 +41,12 @@ class ParticipantServiceConcurrentTest {
   private BookRepository bookRepository;
   @Autowired
   private ChatRoomRepository chatRoomRepository;
-  @Autowired
-  private Flyway flyway;
   @MockBean
   private MessagePublisher messagePublisher;
   @MockBean
   private PushService pushService;
   @MockBean
   private FirebaseMessaging firebaseMessaging;
-
-  @BeforeAll
-  public void tearUp() {
-    flyway.clean();
-    flyway.migrate();
-  }
-
-  @AfterAll
-  public void tearDown() {
-    flyway.clean();
-    flyway.migrate();
-  }
 
   @Test
   void 게스트_방장_위임_동시성_테스트() throws Exception {
@@ -92,7 +73,6 @@ class ParticipantServiceConcurrentTest {
     bookRepository.save(bookEntity);
 
     ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
-//            .hostId(userEntityList.get(0).getId())
         .bookId(bookEntity.getId())
         .defaultRoomImageType(1)
         .roomSize(200)
@@ -140,5 +120,10 @@ class ParticipantServiceConcurrentTest {
         .filter(p -> p.getParticipantStatus() == ParticipantStatus.HOST).count();
 
     assertThat(hostCount).isOne();
+
+    participantRepository.deleteAllInBatch();
+    chatRoomRepository.deleteAllInBatch();
+    userRepository.deleteAll();
+    bookRepository.deleteAllInBatch();
   }
 }

@@ -9,9 +9,10 @@ spring:
       hibernate:
         default_batch_fetch_size: 100
     open-in-view: false
-  flyway:
-    enabled: true
-    baseline-on-migrate: true
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:db/test_ddl.sql
 
 decorator:
   datasource:

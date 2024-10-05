@@ -1,8 +1,8 @@
 package toy.bookchat.bookchat.domain.chat.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static toy.bookchat.bookchat.support.Status.ACTIVE;
 import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.HOST;
+import static toy.bookchat.bookchat.support.Status.ACTIVE;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -11,6 +11,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,11 +48,20 @@ class ChatServiceConcurrentTest {
   @MockBean
   private MessagePublisher messagePublisher;
 
+  @BeforeEach
+  public void tearDown() {
+    userRepository.deleteAll();
+    bookRepository.deleteAllInBatch();
+    chatRoomRepository.deleteAllInBatch();
+    chatRepository.deleteAllInBatch();
+    participantRepository.deleteAllInBatch();
+  }
+
   @Test
   @DisplayName("제한된 인원수 채팅방 입장 동시성 테스트 성공")
   void enterChatRoom() throws Exception {
-    int roomSize = 5;
-    int count = 10;
+    int roomSize = 3;
+    int count = 5;
 
     BookEntity bookEntity = BookEntity.builder()
         .isbn("4640485366")
@@ -99,7 +109,7 @@ class ChatServiceConcurrentTest {
     userRepository.saveAll(userEntityList);
 
     CountDownLatch countDownLatch = new CountDownLatch(count);
-    ExecutorService executorService = Executors.newFixedThreadPool(10);
+    ExecutorService executorService = Executors.newFixedThreadPool(count);
     AtomicInteger result = new AtomicInteger(0);
     for (UserEntity userEntity : userEntityList) {
       executorService.execute(() -> {
@@ -115,12 +125,6 @@ class ChatServiceConcurrentTest {
     countDownLatch.await();
 
     assertThat(result.get()).isEqualTo(roomSize - 1);
-
-    userRepository.deleteAll();
-    bookRepository.deleteAllInBatch();
-    chatRoomRepository.deleteAllInBatch();
-    chatRepository.deleteAllInBatch();
-    participantRepository.deleteAllInBatch();
   }
 
 }

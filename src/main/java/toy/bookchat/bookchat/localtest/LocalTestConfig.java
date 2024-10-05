@@ -4,15 +4,13 @@ import static toy.bookchat.bookchat.support.Status.ACTIVE;
 
 import java.util.List;
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import org.flywaydb.core.Flyway;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-import toy.bookchat.bookchat.domain.user.ROLE;
-import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.db_module.user.repository.UserRepository;
+import toy.bookchat.bookchat.domain.user.ROLE;
+import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
 import toy.bookchat.bookchat.security.token.jwt.JwtTokenManager;
 import toy.bookchat.bookchat.security.user.TokenPayload;
@@ -23,18 +21,14 @@ import toy.bookchat.bookchat.security.user.TokenPayload;
 public class LocalTestConfig implements JwtTokenManager {
 
   private final UserRepository userRepository;
-  private final Flyway flyway;
   private UserEntity userEntity;
 
-  public LocalTestConfig(UserRepository userRepository, Flyway flyway) {
+  public LocalTestConfig(UserRepository userRepository) {
     this.userRepository = userRepository;
-    this.flyway = flyway;
   }
 
   @PostConstruct
   public void init() {
-    flyway.clean();
-    flyway.migrate();
     userEntity = UserEntity.builder()
         .name("google123")
         .nickname("geneaky")
@@ -47,11 +41,6 @@ public class LocalTestConfig implements JwtTokenManager {
         .status(ACTIVE)
         .build();
     userRepository.save(userEntity);
-  }
-
-  @PreDestroy
-  public void finalize() {
-    userRepository.deleteAll();
   }
 
   @Override

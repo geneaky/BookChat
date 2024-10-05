@@ -1,1 +1,0 @@
-alter table chat_room drop column host_id;

@@ -1,18 +1,19 @@
 ### 서재에 책 등록
 POST localhost:8080/v1/api/bookshelves
-Authorization: {{jwt_token}}
+#Authorization: {{jwt_token}}
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJCb29rQ2hhdCIsImRlZmF1bHRQcm9maWxlSW1hZ2VUeXBlIjoxLCJwcm92aWRlciI6Imdvb2dsZSIsInVzZXJOaWNrbmFtZSI6Iu2VnOudvOu0iTIyIiwidXNlck5hbWUiOiIxMDE3MzM1MTIzNDA3MjA5ODU1OTRnb29nbGUiLCJ1c2VyUHJvZmlsZUltYWdlVXJpIjoiaHR0cHM6Ly9ib29rY2hhdC1vcmlnaW5hbC5zMy5hcC1ub3J0aGVhc3QtMi5hbWF6b25hd3MuY29tL3VzZXJfcHJvZmlsZV9pbWFnZS8zMi05MC00MjAyN2Q1MzJjNDAtZTliNi00M2FiLTljYTMtNzViMDQ1OWE2YzBjLndlYnAiLCJ1c2VyUm9sZSI6IlJPTEVfVVNFUiIsImV4cCI6MTcyODEzNzUzNCwidXNlcklkIjoiMSIsImVtYWlsIjpudWxsfQ.2HpnEuxn2IqiOnCUJATGe2sY62KgFdHDEUZ6H0wf5Qc
 Content-Type: application/json
 
 {
   "bookRequest": {
-    "isbn": "1162240035 9791162240038",
-    "title": "Effective C#(이펙티브5)",
+    "isbn": "1156640199 9791156640196",
+    "title": "디자인 시스템 실무 with 피그마",
     "authors": [
-      "빌 와그너"
+      "이영주"
     ],
-    "publisher": "한빛미디어",
-    "bookCoverImageUrl": "https://search1.kakaocdn.net/thumb/R120x174.q85/?fname=http%3A%2F%2Ft1.daumcdn.net%2Flbook%2Fimage%2F1611826%3Ftimestamp%3D20221107221559",
-    "publishAt": "2017-11-06"
+    "publisher": "한빛아카데미",
+    "publishAt": "2024-02-09",
+    "bookCoverImageUrl": "https://search1.kakaocdn.net/thumb/R120x174.q85/?fname=http%3A%2F%2Ft1.daumcdn.net%2Flbook%2Fimage%2F6558820%3Ftimestamp%3D20241001160358"
   },
   "readingStatus": "READING",
   "star": null
