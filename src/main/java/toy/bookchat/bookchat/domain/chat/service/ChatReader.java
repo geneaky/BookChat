@@ -19,44 +19,44 @@ import toy.bookchat.bookchat.exception.notfound.pariticipant.ParticipantNotFound
 @Component
 public class ChatReader {
 
-    private final ChatRepository chatRepository;
-    private final UserReader userReader;
+  private final ChatRepository chatRepository;
+  private final UserReader userReader;
 
-    public ChatReader(ChatRepository chatRepository, UserReader userReader) {
-        this.chatRepository = chatRepository;
-        this.userReader = userReader;
-    }
+  public ChatReader(ChatRepository chatRepository, UserReader userReader) {
+    this.chatRepository = chatRepository;
+    this.userReader = userReader;
+  }
 
-    public Chat readChat(Long userId, Long chatId) {
-        ChatEntity chatEntity = chatRepository.getUserChatRoomChat(chatId, userId).orElseThrow(ParticipantNotFoundException::new);
-        User user = userReader.readUser(userId);
+  public Chat readChat(Long userId, Long chatId) {
+    ChatEntity chatEntity = chatRepository.getUserChatRoomChat(chatId, userId)
+        .orElseThrow(ParticipantNotFoundException::new);
+    User user = userReader.readUser(userId);
 
-        Sender sender = Sender.from(user);
+    Sender sender = Sender.from(user);
 
-        return Chat.builder()
-            .id(chatEntity.getId())
-            .chatRoomId(chatEntity.getChatRoomId())
-            .sender(sender)
-            .message(chatEntity.getMessage())
-            .dispatchTime(chatEntity.getCreatedAt())
-            .build();
-    }
+    return Chat.builder()
+        .id(chatEntity.getId())
+        .chatRoomId(chatEntity.getChatRoomId())
+        .sender(sender)
+        .message(chatEntity.getMessage())
+        .dispatchTime(chatEntity.getCreatedAt())
+        .build();
+  }
 
-    public Slice<Chat> readSlicedChat(Long userId, Long roomId, Long postCursorId, Pageable pageable) {
-        Slice<ChatEntity> slicedChatEntity = chatRepository.getChatRoomChats(roomId, postCursorId, pageable, userId);
-        Map<Long, Long> chatIdUserIdMap = slicedChatEntity.stream().collect(Collectors.toMap(ChatEntity::getId, ChatEntity::getUserId));
-        List<Long> userIds = slicedChatEntity.stream().map(ChatEntity::getUserId).collect(Collectors.toList());
-        List<User> users = userReader.readUsers(userIds);
-        Map<Long, User> userIdUserMap = users.stream().collect(Collectors.toMap(User::getId, identity()));
+  public Slice<Chat> readSlicedChat(Long userId, Long roomId, Long postCursorId, Pageable pageable) {
+    Slice<ChatEntity> slicedChatEntity = chatRepository.getChatRoomChats(roomId, postCursorId, pageable, userId);
+    List<Long> userIds = slicedChatEntity.stream().map(ChatEntity::getUserId).collect(Collectors.toList());
+    List<User> users = userReader.readUsers(userIds);
+    Map<Long, User> userIdUserMap = users.stream().collect(Collectors.toMap(User::getId, identity()));
 
-        return slicedChatEntity.map(sce ->
-            Chat.builder()
-                .id(sce.getId())
-                .chatRoomId(sce.getChatRoomId())
-                .sender(Sender.from(userIdUserMap.get(chatIdUserIdMap.get(sce.getId()))))
-                .message(sce.getMessage())
-                .dispatchTime(sce.getCreatedAt())
-                .build());
-    }
+    return slicedChatEntity.map(sce ->
+        Chat.builder()
+            .id(sce.getId())
+            .chatRoomId(sce.getChatRoomId())
+            .sender(Sender.from(userIdUserMap.get(sce.getUserId())))
+            .message(sce.getMessage())
+            .dispatchTime(sce.getCreatedAt())
+            .build());
+  }
 
 }
