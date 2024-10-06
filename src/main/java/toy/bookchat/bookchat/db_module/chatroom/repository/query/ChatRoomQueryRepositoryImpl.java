@@ -10,8 +10,8 @@ import static toy.bookchat.bookchat.db_module.chatroom.QChatRoomHashTagEntity.ch
 import static toy.bookchat.bookchat.db_module.chatroom.QHashTagEntity.hashTagEntity;
 import static toy.bookchat.bookchat.db_module.participant.QParticipantEntity.participantEntity;
 import static toy.bookchat.bookchat.db_module.user.QUserEntity.userEntity;
-import static toy.bookchat.bookchat.support.RepositorySupport.toSlice;
 import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.HOST;
+import static toy.bookchat.bookchat.support.RepositorySupport.toSlice;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
@@ -26,7 +26,6 @@ import org.springframework.stereotype.Repository;
 import toy.bookchat.bookchat.db_module.book.BookEntity;
 import toy.bookchat.bookchat.db_module.chat.QChatEntity;
 import toy.bookchat.bookchat.db_module.chatroom.ChatRoomEntity;
-import toy.bookchat.bookchat.db_module.chatroom.QHashTagEntity;
 import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.ChatRoomParticipantModel;
 import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.ChatRoomResponse;
 import toy.bookchat.bookchat.db_module.chatroom.repository.query.dto.QChatRoomParticipantModel;
@@ -49,7 +48,7 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
     this.queryFactory = queryFactory;
   }
 
-  private BooleanExpression inTags(QHashTagEntity hashTagEntity, List<String> tags) {
+  private BooleanExpression inTags(List<String> tags) {
     if (tags.isEmpty()) {
       return null;
     }
@@ -192,7 +191,8 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
             ltCursorId(chatRoomRequest.getPostCursorId()),
             eqIsbn(chatRoomRequest.getIsbn()),
             containsTitle(chatRoomRequest.getTitle()),
-            containsRoomName(chatRoomRequest.getRoomName())
+            containsRoomName(chatRoomRequest.getRoomName()),
+            inTags(chatRoomRequest.getTags())
         )
         .limit(pageable.getPageSize())
         .orderBy(chatEntity.id.desc(), chatRoomEntity.id.desc())

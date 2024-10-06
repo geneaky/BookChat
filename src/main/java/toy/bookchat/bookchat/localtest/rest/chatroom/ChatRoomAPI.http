@@ -62,5 +62,5 @@ Authorization: {{jwt_token}}
 
 
 ### 전체 채팅방 조회
-GET localhost:8080/v1/api/chatrooms?isbn=1234567890
+GET localhost:8080/v1/api/chatrooms?tags=a
 Authorization: {{jwt_token}}
