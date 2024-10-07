@@ -30,7 +30,7 @@ public class ChatReader {
   public Chat readChat(Long userId, Long chatId) {
     ChatEntity chatEntity = chatRepository.getUserChatRoomChat(chatId, userId)
         .orElseThrow(ParticipantNotFoundException::new);
-    User user = userReader.readUser(userId);
+    User user = userReader.readUser(chatEntity.getUserId());
 
     Sender sender = Sender.from(user);
 
