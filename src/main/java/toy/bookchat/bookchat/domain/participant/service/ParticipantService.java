@@ -90,6 +90,7 @@ public class ParticipantService {
 
     ChatRoomBlockedUser chatRoomBlockedUser = ChatRoomBlockedUser.builder()
         .userId(participantWithChatRoom.getParticipantUserId())
+        .chatRoomId(roomId)
         .build();
     chatRoomBlockedUserAppender.append(chatRoomBlockedUser);
 

@@ -42,7 +42,9 @@ public class ParticipantReader {
     ChatRoom chatRoom = chatRoomReader.readChatRoom(roomId);
 
     Participant participant = Participant.builder()
+        .id(participantEntity.getId())
         .userId(participantEntity.getUserId())
+        .chatRoomId(roomId)
         .status(participantEntity.getParticipantStatus())
         .build();
 

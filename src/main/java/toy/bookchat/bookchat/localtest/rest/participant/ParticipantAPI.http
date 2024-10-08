@@ -1,0 +1,7 @@
+### 방장 권한 위임
+PATCH localhost:8080/v1/api/chatrooms/1/participants/2?participantStatus=SUBHOST
+Authorization: {{jwt_token}}
+
+### 방장, 부방장의 게스트 강퇴
+DELETE localhost:8080/v1/api/chatrooms/1/participants/4
+Authorization: {{jwt_token}}
