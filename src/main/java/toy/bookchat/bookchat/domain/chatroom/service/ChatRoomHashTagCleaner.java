@@ -13,6 +13,6 @@ public class ChatRoomHashTagCleaner {
   }
 
   public void cleanAll(Long chatRoomId) {
-    chatRoomHashTagRepository.deleteAllByChatRoomId(chatRoomId);
+    chatRoomHashTagRepository.deleteByChatRoomId(chatRoomId);
   }
 }

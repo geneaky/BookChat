@@ -48,7 +48,7 @@ public class ChatRoomRequest {
       return;
     }
 
-    if (!tags.isEmpty()) {
+    if (tags != null && !tags.isEmpty()) {
       this.roomName = null;
       this.title = null;
       this.isbn = null;

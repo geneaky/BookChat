@@ -5,7 +5,6 @@ import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.HOST;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
@@ -32,11 +31,11 @@ import toy.bookchat.bookchat.domain.participant.service.ParticipantAppender;
 import toy.bookchat.bookchat.domain.participant.service.ParticipantCleaner;
 import toy.bookchat.bookchat.domain.participant.service.ParticipantReader;
 import toy.bookchat.bookchat.domain.participant.service.ParticipantValidator;
-import toy.bookchat.bookchat.infrastructure.s3.StorageService;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.service.UserReader;
 import toy.bookchat.bookchat.infrastructure.rabbitmq.MessagePublisher;
 import toy.bookchat.bookchat.infrastructure.rabbitmq.message.NotificationMessage;
+import toy.bookchat.bookchat.infrastructure.s3.StorageService;
 
 @Service
 public class ChatRoomService {
@@ -151,8 +150,7 @@ public class ChatRoomService {
     if (request.tagExistent()) {
       chatRoomHashTagCleaner.cleanAll(chatRoom.getId());
 
-      List<HashTag> hashTags = request.createHashTags();
-      for (HashTag hashTag : hashTags) {
+      for (HashTag hashTag : request.createHashTags()) {
         HashTag storedHashTag = hashTagAppender.append(hashTag);
         chatRoomHashTagAppender.append(chatRoom.getId(), storedHashTag);
       }
