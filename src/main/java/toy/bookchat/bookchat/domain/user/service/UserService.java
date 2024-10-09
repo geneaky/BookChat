@@ -69,12 +69,18 @@ public class UserService {
   public void updateUserProfile(ChangeUserNicknameRequest changeUserNicknameRequest, MultipartFile userProfileImage,
       Long userId) {
     UserEntity userEntity = userReader.readUserEntity(userId);
-    if (doesImageExist(userProfileImage)) {
+    if (changeUserNicknameRequest.doesChangeProfileImage() && doesImageExist(userProfileImage)) {
       updateNicknameWithProfileImage(changeUserNicknameRequest, userProfileImage, userEntity);
       return;
     }
+
+    if (changeUserNicknameRequest.doesChangeProfileImage() && !doesImageExist(userProfileImage)) {
+      userEntity.changeUserNickname(changeUserNicknameRequest.getNickname());
+      userEntity.changeProfileImageUrl(null);
+      return;
+    }
+
     userEntity.changeUserNickname(changeUserNicknameRequest.getNickname());
-    userEntity.changeProfileImageUrl(null);
   }
 
   @Transactional

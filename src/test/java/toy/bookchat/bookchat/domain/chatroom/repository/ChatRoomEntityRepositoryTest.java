@@ -532,7 +532,7 @@ class ChatRoomEntityRepositoryTest extends RepositoryTest {
         .hostName(userEntity1.getNickname())
         .hostDefaultProfileImageType(userEntity1.getDefaultProfileImageType())
         .hostProfileImageUri(userEntity1.getProfileImageUrl())
-        .tags("hashTag1,hashTag3")
+        .tags("hashTag1")
         .lastChatSenderId(chatEntity4.getUserId())
         .lastChatId(chatEntity4.getId())
         .lastChatMessage(chatEntity4.getMessage())

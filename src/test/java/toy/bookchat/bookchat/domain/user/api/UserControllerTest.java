@@ -525,8 +525,7 @@ class UserControllerTest extends ControllerTestExtension {
 
   @Test
   void 사용자_닉네임과_프로필이미지_변경성공() throws Exception {
-    ChangeUserNicknameRequest changeUserNicknameRequest = new ChangeUserNicknameRequest(
-        "newNickname");
+    ChangeUserNicknameRequest changeUserNicknameRequest = new ChangeUserNicknameRequest("newNickname", true);
     MockMultipartFile userProfileImage = new MockMultipartFile("userProfileImage",
         "test".getBytes());
 
@@ -548,7 +547,8 @@ class UserControllerTest extends ControllerTestExtension {
                     .description("프로필 이미지 [200 x 200].webp")
             ),
             requestPartFields("changeUserNicknameRequest",
-                fieldWithPath("nickname").type(STRING).description("변경할 닉네임")
+                fieldWithPath("nickname").type(STRING).description("변경할 닉네임"),
+                fieldWithPath("isProfileChanged").type(BOOLEAN).description("프로필 이미지 변경 여부")
             )));
 
     verify(userService).updateUserProfile(any(), any(), any());

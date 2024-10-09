@@ -17,6 +17,7 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.multipart;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
+import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -504,6 +505,7 @@ class ChatRoomControllerTest extends ControllerTestExtension {
         .roomSize(200)
         .roomName("changedRoomName")
         .tags(List.of("tag5", "tag6"))
+        .isProfileChanged(true)
         .build();
 
     MockMultipartFile chatRoomImagePart = new MockMultipartFile("chatRoomImage", "",
@@ -530,7 +532,8 @@ class ChatRoomControllerTest extends ControllerTestExtension {
                 fieldWithPath("roomId").type(NUMBER).description("채팅방 id"),
                 fieldWithPath("roomName").type(STRING).optional().description("채팅방 이름"),
                 fieldWithPath("roomSize").type(NUMBER).optional().description("채팅방 크기"),
-                fieldWithPath("tags").type(ARRAY).optional().description("채팅방 태그"))
+                fieldWithPath("tags").type(ARRAY).optional().description("채팅방 태그"),
+                fieldWithPath("isProfileChanged").type(BOOLEAN).description("프로필 이미지 변경 여부"))
         ));
 
     verify(chatRoomService).reviseChatRoom(any(), any(), any());

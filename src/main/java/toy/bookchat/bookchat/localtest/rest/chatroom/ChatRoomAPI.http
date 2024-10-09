@@ -32,7 +32,7 @@ Content-Disposition: form-data; name="chatRoomImage"; filename="test_chatroom_im
 --boundary
 
 ### 채팅방 수정
-POST localhost:8080/v1/api/chatrooms/1
+POST localhost:8080/v1/api/chatrooms/8
 Content-Type: multipart/form-data; boundary=boundary
 Authorization: {{jwt_token}}
 
@@ -41,9 +41,9 @@ Content-Type: application/json
 Content-Disposition: form-data; name="reviseChatRoomRequest"; filename="reviseChatRoomRequest"
 
 {
-  "roomId":1,
+  "roomId":8,
   "roomName":"changedRoomName",
-  "roomSize":200,
+  "roomSize":5,
   "tags":["tag5","tag6"]
  }
 
@@ -57,7 +57,7 @@ Content-Disposition: form-data; name="reviseChatRoomRequest"; filename="reviseCh
 #--boundary
 
 ### 사용자 채팅방 조회
-GET localhost:8080/v1/api/users/chatrooms?size=3
+GET localhost:8080/v1/api/users/chatrooms?size=10
 Authorization: {{jwt_token}}
 
 

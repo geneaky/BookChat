@@ -41,6 +41,18 @@ Content-Type: application/json
   client.log(client.global.get("refresh_token"));
 %}
 
+### 리프레시 토큰으로 엑세스 토큰 받기
+POST localhost:8080/v1/api/auth/token
+Content-Type: application/json
+
+{
+  "refreshToken": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJCb29rQ2hhdCIsImRlZmF1bHRQcm9maWxlSW1hZ2VUeXBlIjoyLCJwcm92aWRlciI6Imdvb2dsZSIsInVzZXJOaWNrbmFtZSI6IuuwlOuwpOuwlDIyIiwidXNlck5hbWUiOiIxMDE3MzM1MTIzNDA3MjA5ODU1OTRnb29nbGUiLCJ1c2VyUHJvZmlsZUltYWdlVXJpIjoiaHR0cHM6Ly9ib29rY2hhdC1vcmlnaW5hbC5zMy5hcC1ub3J0aGVhc3QtMi5hbWF6b25hd3MuY29tL3VzZXJfcHJvZmlsZV9pbWFnZS84MC0wMS00MjAyMzUxYjg4NmYtODA4Ny00MGNjLWJkMTktZWY3ODkxN2I0NmI3LndlYnAiLCJ1c2VyUm9sZSI6IlJPTEVfVVNFUiIsImV4cCI6MTcyOTYwNzM1NiwidXNlcklkIjoiNCIsImVtYWlsIjpudWxsfQ.8KXmm14drsy7Stp1P-r2KvwfjsaqmXQXSqA1MPiZarc"
+}
+
+> {%
+  client.global.set("jwt_token", "Bearer " + response.body.refreshToken);
+%}
+
 ### 사용자 프로필 정보 받기
 GET localhost:8080/v1/api/users/profile
 Authorization: Bearer abcd

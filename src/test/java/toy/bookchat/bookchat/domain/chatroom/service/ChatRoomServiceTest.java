@@ -43,10 +43,10 @@ import toy.bookchat.bookchat.domain.participant.service.ParticipantAppender;
 import toy.bookchat.bookchat.domain.participant.service.ParticipantCleaner;
 import toy.bookchat.bookchat.domain.participant.service.ParticipantReader;
 import toy.bookchat.bookchat.domain.participant.service.ParticipantValidator;
-import toy.bookchat.bookchat.infrastructure.s3.ChatRoomStorageService;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.service.UserReader;
 import toy.bookchat.bookchat.infrastructure.rabbitmq.MessagePublisher;
+import toy.bookchat.bookchat.infrastructure.s3.ChatRoomStorageService;
 
 @ExtendWith(MockitoExtension.class)
 class ChatRoomServiceTest {
@@ -172,7 +172,10 @@ class ChatRoomServiceTest {
   void reviseChatRoom1() throws Exception {
     ChatRoom chatRoom = ChatRoom.builder().roomSize(1).build();
     given(chatRoomReader.readChatRoom(any(), any(), any())).willReturn(chatRoom);
-    ReviseChatRoomRequest reviseChatRoomRequest = ReviseChatRoomRequest.builder().roomSize(3).build();
+    ReviseChatRoomRequest reviseChatRoomRequest = ReviseChatRoomRequest.builder()
+        .roomSize(3)
+        .isProfileChanged(true)
+        .build();
     MockMultipartFile chatRoomImage = new MockMultipartFile("newImageFile", "newImageFile",
         "image/webp", "content".getBytes());
 
@@ -188,7 +191,10 @@ class ChatRoomServiceTest {
   void reviseChatRoom2() throws Exception {
     ChatRoom chatRoom = ChatRoom.builder().roomSize(1).build();
     given(chatRoomReader.readChatRoom(any(), any(), any())).willReturn(chatRoom);
-    ReviseChatRoomRequest reviseChatRoomRequest = ReviseChatRoomRequest.builder().roomSize(3).build();
+    ReviseChatRoomRequest reviseChatRoomRequest = ReviseChatRoomRequest.builder()
+        .roomSize(3)
+        .isProfileChanged(false)
+        .build();
     chatRoomService.reviseChatRoom(reviseChatRoomRequest, null, 125L);
   }
 

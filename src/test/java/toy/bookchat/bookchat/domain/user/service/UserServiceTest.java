@@ -111,8 +111,7 @@ class UserServiceTest {
         .nickname("user1")
         .profileImageUrl("profile-image-url")
         .build();
-    ChangeUserNicknameRequest changeUserNicknameRequest = new ChangeUserNicknameRequest(
-        "user2");
+    ChangeUserNicknameRequest changeUserNicknameRequest = new ChangeUserNicknameRequest("user2", true);
     MultipartFile multipartFile = mock(MultipartFile.class);
 
     when(userReader.readUserEntity(userEntity.getId())).thenReturn(userEntity);
@@ -132,8 +131,7 @@ class UserServiceTest {
         .profileImageUrl("profile-image-url")
         .build();
 
-    ChangeUserNicknameRequest changeUserNicknameRequest = new ChangeUserNicknameRequest(
-        "user2");
+    ChangeUserNicknameRequest changeUserNicknameRequest = new ChangeUserNicknameRequest("user2", false);
 
     when(userReader.readUserEntity(userEntity.getId())).thenReturn(userEntity);
     userService.updateUserProfile(changeUserNicknameRequest, null, userEntity.getId());

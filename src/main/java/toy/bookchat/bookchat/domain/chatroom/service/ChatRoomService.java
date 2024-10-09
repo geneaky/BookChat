@@ -139,11 +139,13 @@ public class ChatRoomService {
   public void reviseChatRoom(ReviseChatRoomRequest request, MultipartFile chatRoomImage, Long userId) {
     ChatRoom chatRoom = chatRoomReader.readChatRoom(userId, request.getRoomId(), HOST);
 
-    if (hasImage(chatRoomImage)) {
+    if (request.doesChangeProfileImage() && hasImage(chatRoomImage)) {
       String roomImageUri = storageService.upload(chatRoomImage, UUID.randomUUID().toString(),
           LocalDateTime.now().format(dateTimeFormatter));
       chatRoom = chatRoom.withImageUrl(roomImageUri);
-    } else {
+    }
+
+    if (request.doesChangeProfileImage() && !hasImage(chatRoomImage)) {
       chatRoom = chatRoom.withoutImageUrl();
     }
 

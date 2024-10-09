@@ -20,14 +20,17 @@ public class ReviseChatRoomRequest {
   private String roomName;
   private Integer roomSize;
   private List<String> tags;
+  @NotNull
+  private Boolean isProfileChanged;
 
   @Builder
   private ReviseChatRoomRequest(Long roomId, String roomName, Integer roomSize,
-      List<String> tags) {
+      List<String> tags, Boolean isProfileChanged) {
     this.roomId = roomId;
     this.roomName = roomName;
     this.roomSize = roomSize;
     this.tags = tags;
+    this.isProfileChanged = isProfileChanged;
   }
 
   public boolean tagExistent() {
@@ -48,5 +51,9 @@ public class ReviseChatRoomRequest {
     }
 
     throw new NotEnoughRoomSizeException();
+  }
+
+  public boolean doesChangeProfileImage() {
+    return this.isProfileChanged;
   }
 }
