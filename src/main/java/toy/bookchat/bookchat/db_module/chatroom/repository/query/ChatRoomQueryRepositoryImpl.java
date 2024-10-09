@@ -136,7 +136,8 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
         .join(chatRoomEntity).on(chatRoomEntity.bookId.eq(bookEntity.id))
         .where(chatRoomEntity.id.in(chatRoomIds))
         .fetch();
-    Map<Long, BookEntity> bookIdBookEntityMap = bookEntities.stream().collect(toMap(BookEntity::getId, identity()));
+    Map<Long, BookEntity> bookIdBookEntityMap = bookEntities.stream()
+        .collect(toMap(BookEntity::getId, identity(), (book1, book2) -> book1));
 
     contents.forEach(c -> c.setBookInfo(bookIdBookEntityMap.get(chatRoomIdBookIdMap.get(c.getRoomId()))));
 
