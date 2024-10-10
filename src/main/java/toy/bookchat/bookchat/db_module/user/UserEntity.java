@@ -1,6 +1,7 @@
 package toy.bookchat.bookchat.db_module.user;
 
 import static javax.persistence.EnumType.STRING;
+import static toy.bookchat.bookchat.support.Status.ACTIVE;
 import static toy.bookchat.bookchat.support.Status.INACTIVE;
 
 import java.util.ArrayList;
@@ -19,10 +20,10 @@ import lombok.Builder;
 import lombok.Getter;
 import org.hibernate.annotations.DynamicInsert;
 import toy.bookchat.bookchat.db_module.BaseEntity;
-import toy.bookchat.bookchat.support.Status;
 import toy.bookchat.bookchat.domain.user.ROLE;
 import toy.bookchat.bookchat.domain.user.ReadingTaste;
 import toy.bookchat.bookchat.security.oauth.OAuth2Provider;
+import toy.bookchat.bookchat.support.Status;
 
 @Getter
 @Entity
@@ -95,5 +96,9 @@ public class UserEntity extends BaseEntity {
 
   public void inactive() {
     this.status = INACTIVE;
+  }
+
+  public void active() {
+    this.status = ACTIVE;
   }
 }

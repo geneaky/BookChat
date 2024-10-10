@@ -2,6 +2,8 @@ package toy.bookchat.bookchat.domain.participant.service;
 
 import static toy.bookchat.bookchat.domain.participant.ParticipantStatus.GUEST;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 import toy.bookchat.bookchat.db_module.participant.ParticipantEntity;
 import toy.bookchat.bookchat.db_module.participant.repository.ParticipantRepository;
@@ -52,6 +54,16 @@ public class ParticipantReader {
         .participant(participant)
         .chatRoom(chatRoom)
         .build();
+  }
+
+  public List<Participant> readParticipantWithChatRoom(Long userId) {
+    return participantRepository.findByUserId(userId).stream().map(participantEntity ->
+        Participant.builder()
+            .id(participantEntity.getId())
+            .userId(participantEntity.getUserId())
+            .chatRoomId(participantEntity.getChatRoomId())
+            .status(participantEntity.getParticipantStatus())
+            .build()).collect(Collectors.toList());
   }
 
   public Host readHostForUpdate(Long roomId, Long requesterId) {

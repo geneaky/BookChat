@@ -4,8 +4,10 @@ import static toy.bookchat.bookchat.infrastructure.fcm.PushType.LOGIN;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -15,12 +17,14 @@ import toy.bookchat.bookchat.db_module.device.DeviceEntity;
 import toy.bookchat.bookchat.db_module.device.repository.DeviceRepository;
 import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.db_module.user.repository.UserRepository;
+import toy.bookchat.bookchat.domain.participant.Participant;
+import toy.bookchat.bookchat.domain.participant.service.ParticipantManager;
+import toy.bookchat.bookchat.domain.participant.service.ParticipantReader;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.api.v1.request.ChangeUserNicknameRequest;
 import toy.bookchat.bookchat.domain.user.api.v1.request.UserSignInRequest;
 import toy.bookchat.bookchat.domain.user.api.v1.request.UserSignUpRequest;
 import toy.bookchat.bookchat.domain.user.api.v1.response.MemberProfileResponse;
-import toy.bookchat.bookchat.exception.badrequest.user.UserAlreadySignUpException;
 import toy.bookchat.bookchat.exception.conflict.device.DeviceAlreadyRegisteredException;
 import toy.bookchat.bookchat.infrastructure.fcm.PushMessageBody;
 import toy.bookchat.bookchat.infrastructure.fcm.service.PushService;
@@ -37,6 +41,8 @@ public class UserService {
   private final PushService pushService;
   @Qualifier("userProfileStorageService")
   private final StorageService storageService;
+  private final ParticipantReader participantReader;
+  private final ParticipantManager participantManager;
   private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
   @Transactional(readOnly = true)
@@ -63,6 +69,17 @@ public class UserService {
   public void deleteUser(Long userId) {
     UserEntity userEntity = userReader.readUserEntity(userId);
     userEntity.inactive();
+    List<Participant> participants = participantReader.readParticipantWithChatRoom(userId);
+
+    List<Participant> guestOrSubHostList = participants.stream().filter(Participant::isNotHost)
+        .collect(Collectors.toList());
+    participantManager.deleteAll(guestOrSubHostList);
+
+    List<Long> chatRoomIds = participants.stream().filter(Participant::isHost)
+        .map(Participant::getChatRoomId)
+        .collect(Collectors.toList());
+    participantManager.deleteAllWithChatRoom(chatRoomIds);
+
   }
 
   @Transactional
@@ -132,9 +149,7 @@ public class UserService {
   }
 
   private void saveUser(UserSignUpRequest userSignUpRequest, String userName, String email, String profileImageUrl) {
-    userRepository.findByName(userName).ifPresentOrElse(user -> {
-      throw new UserAlreadySignUpException();
-    }, () -> {
+    userRepository.findByName(userName).ifPresentOrElse(UserEntity::active, () -> {
       UserEntity userEntity = userSignUpRequest.getUser(userName, email, profileImageUrl);
       userRepository.save(userEntity);
     });

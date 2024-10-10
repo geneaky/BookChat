@@ -1,10 +1,14 @@
 package toy.bookchat.bookchat.domain.participant.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import org.springframework.stereotype.Component;
+import toy.bookchat.bookchat.db_module.chatroom.repository.ChatRoomRepository;
 import toy.bookchat.bookchat.db_module.participant.ParticipantEntity;
 import toy.bookchat.bookchat.db_module.participant.repository.ParticipantRepository;
 import toy.bookchat.bookchat.domain.participant.Host;
+import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.participant.ParticipantWithChatRoom;
 import toy.bookchat.bookchat.exception.notfound.pariticipant.ParticipantNotFoundException;
 
@@ -12,9 +16,11 @@ import toy.bookchat.bookchat.exception.notfound.pariticipant.ParticipantNotFound
 public class ParticipantManager {
 
   private final ParticipantRepository participantRepository;
+  private final ChatRoomRepository chatRoomRepository;
 
-  public ParticipantManager(ParticipantRepository participantRepository) {
+  public ParticipantManager(ParticipantRepository participantRepository, ChatRoomRepository chatRoomRepository) {
     this.participantRepository = participantRepository;
+    this.chatRoomRepository = chatRoomRepository;
   }
 
 
@@ -53,5 +59,17 @@ public class ParticipantManager {
         .orElseThrow(ParticipantNotFoundException::new);
 
     participantEntity.changeStatus(host.getStatus());
+  }
+
+  @Transactional
+  public void deleteAll(List<Participant> guestOrSubHostList) {
+    List<Long> participantIds = guestOrSubHostList.stream().map(Participant::getId).collect(Collectors.toList());
+    participantRepository.deleteAllByIdIn(participantIds);
+  }
+
+  @Transactional
+  public void deleteAllWithChatRoom(List<Long> chatRoomIds) {
+    participantRepository.deleteAllByChatRoomIdIn(chatRoomIds);
+    chatRoomRepository.deleteAllById(chatRoomIds);
   }
 }

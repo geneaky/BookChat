@@ -22,4 +22,14 @@ public interface ParticipantRepository extends ParticipantQueryRepository, JpaRe
 
   Optional<ParticipantEntity> findByChatRoomIdAndParticipantStatus(Long chatRoomId,
       ParticipantStatus participantStatus);
+
+  List<ParticipantEntity> findByUserId(Long userId);
+
+  @Modifying
+  @Query("delete from ParticipantEntity p where p.id in (:participantIds)")
+  void deleteAllByIdIn(@Param("participantIds") List<Long> participantIds);
+
+  @Modifying
+  @Query("delete from ParticipantEntity p where p.chatRoomId in (:chatRoomIds)")
+  void deleteAllByChatRoomIdIn(@Param("chatRoomIds") List<Long> chatRoomIds);
 }

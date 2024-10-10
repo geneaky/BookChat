@@ -33,4 +33,8 @@ public class Participant {
   public void changeStatus(ParticipantStatus participantStatus) {
     this.status = participantStatus;
   }
+
+  public boolean isHost() {
+    return status == HOST;
+  }
 }
