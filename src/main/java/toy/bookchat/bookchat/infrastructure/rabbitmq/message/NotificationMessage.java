@@ -15,16 +15,18 @@ public class NotificationMessage {
 
   private Long targetId;
   private Long chatId;
+  private Long chatRoomId;
   @NotBlank
   private String message;
   private String dispatchTime;
   private NotificationMessageType notificationMessageType;
 
   @Builder
-  private NotificationMessage(Long targetId, Long chatId, String dispatchTime,
+  private NotificationMessage(Long targetId, Long chatId, Long chatRoomId, String dispatchTime,
       NotificationMessageType notificationMessageType, String message) {
     this.targetId = targetId;
     this.chatId = chatId;
+    this.chatRoomId = chatRoomId;
     this.dispatchTime = dispatchTime;
     this.notificationMessageType = notificationMessageType;
     this.message = message;
@@ -34,6 +36,7 @@ public class NotificationMessage {
     return NotificationMessage.builder()
         .targetId(targetId)
         .chatId(chat.getId())
+        .chatRoomId(chat.getChatRoomId())
         .message(chat.getMessage())
         .notificationMessageType(NotificationMessageType.NOTICE_ENTER)
         .dispatchTime(chat.getDispatchTime().toString())
@@ -44,6 +47,7 @@ public class NotificationMessage {
     return NotificationMessage.builder()
         .targetId(targetId)
         .chatId(chat.getId())
+        .chatRoomId(chat.getChatRoomId())
         .message(chat.getMessage())
         .notificationMessageType(NotificationMessageType.NOTICE_EXIT)
         .dispatchTime(chat.getDispatchTime().toString())
@@ -53,6 +57,7 @@ public class NotificationMessage {
   public static NotificationMessage createHostExitMessage(Chat chat) {
     return NotificationMessage.builder()
         .chatId(chat.getId())
+        .chatRoomId(chat.getChatRoomId())
         .message("방장이 오픈채팅방을 종료했습니다.\n더 이상 대화를 할 수 없으며, \n채팅방을 나가면 다시 입장 할 수 없게 됩니다.")
         .notificationMessageType(NotificationMessageType.NOTICE_HOST_EXIT)
         .dispatchTime(chat.getDispatchTime().toString())
@@ -63,6 +68,7 @@ public class NotificationMessage {
     return NotificationMessage.builder()
         .targetId(targetId)
         .chatId(chat.getId())
+        .chatRoomId(chat.getChatRoomId())
         .message(chat.getMessage())
         .notificationMessageType(NotificationMessageType.NOTICE_SUB_HOST_DELEGATE)
         .dispatchTime(chat.getDispatchTime().toString())
@@ -73,6 +79,7 @@ public class NotificationMessage {
     return NotificationMessage.builder()
         .targetId(targetId)
         .chatId(chat.getId())
+        .chatRoomId(chat.getChatRoomId())
         .message(chat.getMessage())
         .notificationMessageType(NotificationMessageType.NOTICE_SUB_HOST_DISMISS)
         .dispatchTime(chat.getDispatchTime().toString())
@@ -83,6 +90,7 @@ public class NotificationMessage {
     return NotificationMessage.builder()
         .targetId(targetId)
         .chatId(chat.getId())
+        .chatRoomId(chat.getChatRoomId())
         .message(chat.getMessage())
         .notificationMessageType(NotificationMessageType.NOTICE_HOST_DELEGATE)
         .dispatchTime(chat.getDispatchTime().toString())
@@ -93,6 +101,7 @@ public class NotificationMessage {
     return NotificationMessage.builder()
         .targetId(targetId)
         .chatId(chat.getId())
+        .chatRoomId(chat.getChatRoomId())
         .message(chat.getMessage())
         .notificationMessageType(NotificationMessageType.NOTICE_KICK)
         .dispatchTime(chat.getDispatchTime().toString())
