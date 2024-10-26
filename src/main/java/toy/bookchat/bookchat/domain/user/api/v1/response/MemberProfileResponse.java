@@ -11,16 +11,14 @@ public class MemberProfileResponse {
 
   private Long userId;
   private String userNickname;
-  private String userEmail;
   private String userProfileImageUri;
   private Integer defaultProfileImageType;
 
   @Builder
-  private MemberProfileResponse(Long userId, String userNickname, String userEmail, String userProfileImageUri,
+  private MemberProfileResponse(Long userId, String userNickname, String userProfileImageUri,
       Integer defaultProfileImageType) {
     this.userId = userId;
     this.userNickname = userNickname;
-    this.userEmail = userEmail;
     this.userProfileImageUri = userProfileImageUri;
     this.defaultProfileImageType = defaultProfileImageType;
   }
@@ -29,7 +27,6 @@ public class MemberProfileResponse {
     return MemberProfileResponse.builder()
         .userId(userEntity.getId())
         .userNickname(userEntity.getNickname())
-        .userEmail(userEntity.getEmail())
         .userProfileImageUri(userEntity.getProfileImageUrl())
         .defaultProfileImageType(userEntity.getDefaultProfileImageType())
         .build();
