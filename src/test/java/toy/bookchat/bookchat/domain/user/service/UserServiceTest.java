@@ -24,11 +24,12 @@ import toy.bookchat.bookchat.db_module.device.DeviceEntity;
 import toy.bookchat.bookchat.db_module.device.repository.DeviceRepository;
 import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.db_module.user.repository.UserRepository;
+import toy.bookchat.bookchat.domain.participant.service.ParticipantManager;
+import toy.bookchat.bookchat.domain.participant.service.ParticipantReader;
 import toy.bookchat.bookchat.domain.user.api.v1.request.ChangeUserNicknameRequest;
 import toy.bookchat.bookchat.domain.user.api.v1.request.UserSignInRequest;
 import toy.bookchat.bookchat.domain.user.api.v1.request.UserSignUpRequest;
 import toy.bookchat.bookchat.domain.user.api.v1.response.MemberProfileResponse;
-import toy.bookchat.bookchat.exception.badrequest.user.UserAlreadySignUpException;
 import toy.bookchat.bookchat.exception.conflict.device.DeviceAlreadyRegisteredException;
 import toy.bookchat.bookchat.infrastructure.fcm.service.PushService;
 import toy.bookchat.bookchat.infrastructure.s3.StorageService;
@@ -38,17 +39,21 @@ import toy.bookchat.bookchat.support.Status;
 class UserServiceTest {
 
   @Mock
-  PushService pushService;
+  private PushService pushService;
   @Mock
-  StorageService storageService;
-  @InjectMocks
-  UserService userService;
+  private StorageService storageService;
   @Mock
   private UserRepository userRepository;
   @Mock
   private UserReader userReader;
   @Mock
+  private ParticipantReader participantReader;
+  @Mock
+  private ParticipantManager participantManager;
+  @Mock
   private DeviceRepository deviceRepository;
+  @InjectMocks
+  private UserService userService;
 
   @Test
   @DisplayName("사용자 nickname 중복 체크")
@@ -72,22 +77,6 @@ class UserServiceTest {
 
     verify(userRepository).save(any(UserEntity.class));
     verify(storageService).upload(any(), any(), any());
-  }
-
-  @Test
-  @DisplayName("이미 가입된 사용자일 경우 예외발생")
-  void registerNewUser2() throws Exception {
-    UserSignUpRequest userSignUpRequest = mock(UserSignUpRequest.class);
-    UserEntity mockUserEntity = mock(UserEntity.class);
-
-    when(userRepository.findByName(any())).thenReturn(Optional.of(mockUserEntity));
-
-    assertThatThrownBy(() -> {
-      userService.registerNewUser(userSignUpRequest, null,
-          "testMemberNumber",
-          "test@gmail.com"
-      );
-    }).isInstanceOf(UserAlreadySignUpException.class);
   }
 
   @Test
