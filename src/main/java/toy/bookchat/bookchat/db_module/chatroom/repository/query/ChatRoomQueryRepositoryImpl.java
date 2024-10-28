@@ -215,7 +215,7 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
         .where(chatRoomEntity.id.in(chatRoomIds))
         .fetch();
     Map<Long, List<String>> bookIdAuthorsMap = bookEntities.stream()
-        .collect(toMap(BookEntity::getId, BookEntity::getAuthors));
+        .collect(toMap(BookEntity::getId, BookEntity::getAuthors, (authors1, authors2) -> authors1));
 
     contents.forEach(c -> c.setBookAuthors(bookIdAuthorsMap.get(chatRoomBookIdMap.get(c.getRoomId()))));
 
