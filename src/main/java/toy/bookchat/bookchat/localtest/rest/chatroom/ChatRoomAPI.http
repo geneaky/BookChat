@@ -56,6 +56,10 @@ Content-Disposition: form-data; name="reviseChatRoomRequest"; filename="reviseCh
 #
 #--boundary
 
+### 채팅방 나가기
+DELETE localhost:8080/v1/api/leave/chatrooms/25
+Authorization: {{jwt_token}}
+
 ### 사용자 채팅방 조회
 GET localhost:8080/v1/api/users/chatrooms?size=10
 Authorization: {{jwt_token}}

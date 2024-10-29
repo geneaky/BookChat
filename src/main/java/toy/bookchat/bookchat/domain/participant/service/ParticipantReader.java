@@ -33,6 +33,7 @@ public class ParticipantReader {
         .orElseThrow(ParticipantNotFoundException::new);
 
     return Participant.builder()
+        .id(participantEntity.getId())
         .userId(participantEntity.getUserId())
         .chatRoomId(participantEntity.getChatRoomId())
         .build();
