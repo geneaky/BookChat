@@ -1,5 +1,7 @@
 package toy.bookchat.bookchat.domain.chat.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 import toy.bookchat.bookchat.db_module.chat.ChatEntity;
 import toy.bookchat.bookchat.db_module.chat.repository.ChatRepository;
@@ -50,5 +52,15 @@ public class ChatAppender {
         .message(announcement)
         .dispatchTime(chatEntity.getCreatedAt())
         .build();
+  }
+
+  public void appendAnnouncements(List<Long> chatRoomIds, String announcement) {
+    List<ChatEntity> chatEntities = chatRoomIds.stream().map(chatRoomId -> ChatEntity.builder()
+        .chatRoomId(chatRoomId)
+        .message(announcement)
+        .build()
+    ).collect(Collectors.toList());
+
+    chatRepository.saveAll(chatEntities);
   }
 }

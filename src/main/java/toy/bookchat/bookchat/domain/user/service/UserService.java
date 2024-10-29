@@ -17,6 +17,7 @@ import toy.bookchat.bookchat.db_module.device.DeviceEntity;
 import toy.bookchat.bookchat.db_module.device.repository.DeviceRepository;
 import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.db_module.user.repository.UserRepository;
+import toy.bookchat.bookchat.domain.chat.service.ChatAppender;
 import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.participant.service.ParticipantManager;
 import toy.bookchat.bookchat.domain.participant.service.ParticipantReader;
@@ -43,6 +44,7 @@ public class UserService {
   private final StorageService storageService;
   private final ParticipantReader participantReader;
   private final ParticipantManager participantManager;
+  private final ChatAppender chatAppender;
   private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
   @Transactional(readOnly = true)
@@ -80,6 +82,7 @@ public class UserService {
         .collect(Collectors.toList());
     participantManager.deleteAllWithChatRoom(chatRoomIds);
 
+    chatAppender.appendAnnouncements(chatRoomIds, "#" + userId + "#님이 퇴장하셨습니다.");
   }
 
   @Transactional
