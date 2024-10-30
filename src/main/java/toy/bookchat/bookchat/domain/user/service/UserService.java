@@ -71,6 +71,7 @@ public class UserService {
   public void deleteUser(Long userId) {
     UserEntity userEntity = userReader.readUserEntity(userId);
     userEntity.inactive();
+
     List<Participant> participants = participantReader.readParticipantWithChatRoom(userId);
 
     List<Participant> guestOrSubHostList = participants.stream().filter(Participant::isNotHost)
@@ -82,7 +83,8 @@ public class UserService {
         .collect(Collectors.toList());
     participantManager.deleteAllWithChatRoom(chatRoomIds);
 
-    chatAppender.appendAnnouncements(chatRoomIds, "#" + userId + "#님이 퇴장하셨습니다.");
+    chatAppender.appendAnnouncements(participants.stream().map(Participant::getId).collect(Collectors.toList()),
+        "#" + userId + "#님이 퇴장하셨습니다.");
   }
 
   @Transactional
