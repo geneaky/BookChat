@@ -83,7 +83,7 @@ public class UserService {
         .collect(Collectors.toList());
     participantManager.deleteAllWithChatRoom(chatRoomIds);
 
-    chatAppender.appendAnnouncements(participants.stream().map(Participant::getId).collect(Collectors.toList()),
+    chatAppender.appendAnnouncements(participants.stream().map(Participant::getChatRoomId).collect(Collectors.toList()),
         "#" + userId + "#님이 퇴장하셨습니다.");
   }
 
