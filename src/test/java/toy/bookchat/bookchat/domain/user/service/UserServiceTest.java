@@ -24,6 +24,7 @@ import toy.bookchat.bookchat.db_module.device.DeviceEntity;
 import toy.bookchat.bookchat.db_module.device.repository.DeviceRepository;
 import toy.bookchat.bookchat.db_module.user.UserEntity;
 import toy.bookchat.bookchat.db_module.user.repository.UserRepository;
+import toy.bookchat.bookchat.domain.chat.service.ChatAppender;
 import toy.bookchat.bookchat.domain.participant.service.ParticipantManager;
 import toy.bookchat.bookchat.domain.participant.service.ParticipantReader;
 import toy.bookchat.bookchat.domain.user.api.v1.request.ChangeUserNicknameRequest;
@@ -52,6 +53,8 @@ class UserServiceTest {
   private ParticipantManager participantManager;
   @Mock
   private DeviceRepository deviceRepository;
+  @Mock
+  private ChatAppender chatAppender;
   @InjectMocks
   private UserService userService;
 
