@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import toy.bookchat.bookchat.domain.chat.Chat;
+import toy.bookchat.bookchat.domain.chat.ChatWithHost;
 import toy.bookchat.bookchat.domain.chat.api.v1.request.MessageRequest;
 import toy.bookchat.bookchat.domain.chat.api.v1.response.ChatDetailResponse;
 import toy.bookchat.bookchat.domain.chat.api.v1.response.ChatRoomChatsResponse;
@@ -39,7 +40,7 @@ public class ChatController {
 
   @GetMapping("/v1/api/chats/{chatId}")
   public ChatDetailResponse getChat(@PathVariable Long chatId, @UserPayload TokenPayload tokenPayload) {
-    Chat chat = chatService.getChatDetail(chatId, tokenPayload.getUserId());
-    return ChatDetailResponse.from(chat);
+    ChatWithHost chatWithHost = chatService.getChatDetail(chatId, tokenPayload.getUserId());
+    return ChatDetailResponse.from(chatWithHost.getChat(), chatWithHost.getHost());
   }
 }

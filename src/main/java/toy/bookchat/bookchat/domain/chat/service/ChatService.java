@@ -3,26 +3,31 @@ package toy.bookchat.bookchat.domain.chat.service;
 import static toy.bookchat.bookchat.infrastructure.fcm.PushType.CHAT;
 
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import toy.bookchat.bookchat.domain.chat.Chat;
+import toy.bookchat.bookchat.domain.chat.ChatWithHost;
 import toy.bookchat.bookchat.domain.chat.Message;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
 import toy.bookchat.bookchat.domain.chatroom.service.ChatRoomReader;
 import toy.bookchat.bookchat.domain.device.Device;
 import toy.bookchat.bookchat.domain.device.service.DeviceReader;
+import toy.bookchat.bookchat.domain.participant.Host;
+import toy.bookchat.bookchat.domain.participant.service.ParticipantReader;
 import toy.bookchat.bookchat.domain.participant.service.ParticipantValidator;
 import toy.bookchat.bookchat.domain.user.User;
 import toy.bookchat.bookchat.domain.user.service.UserReader;
-import toy.bookchat.bookchat.infrastructure.rabbitmq.MessagePublisher;
-import toy.bookchat.bookchat.infrastructure.rabbitmq.message.CommonMessage;
 import toy.bookchat.bookchat.infrastructure.fcm.ChatMessageBody;
 import toy.bookchat.bookchat.infrastructure.fcm.PushMessageBody;
 import toy.bookchat.bookchat.infrastructure.fcm.service.PushService;
+import toy.bookchat.bookchat.infrastructure.rabbitmq.MessagePublisher;
+import toy.bookchat.bookchat.infrastructure.rabbitmq.message.CommonMessage;
 
 @Service
+@RequiredArgsConstructor
 public class ChatService {
 
   private final ChatReader chatReader;
@@ -30,22 +35,10 @@ public class ChatService {
   private final UserReader userReader;
   private final ChatRoomReader chatRoomReader;
   private final ParticipantValidator participantValidator;
+  private final ParticipantReader participantReader;
   private final DeviceReader deviceReader;
   private final MessagePublisher messagePublisher;
   private final PushService pushService;
-
-  public ChatService(UserReader userReader, ChatReader chatReader, ChatAppender chatAppender,
-      ChatRoomReader chatRoomReader, ParticipantValidator participantValidator, DeviceReader deviceReader,
-      MessagePublisher messagePublisher, PushService pushService) {
-    this.userReader = userReader;
-    this.chatReader = chatReader;
-    this.chatAppender = chatAppender;
-    this.chatRoomReader = chatRoomReader;
-    this.participantValidator = participantValidator;
-    this.deviceReader = deviceReader;
-    this.messagePublisher = messagePublisher;
-    this.pushService = pushService;
-  }
 
   @Transactional
   public void sendMessage(Long userId, Long roomId, Message message) {
@@ -76,7 +69,13 @@ public class ChatService {
   }
 
   @Transactional(readOnly = true)
-  public Chat getChatDetail(Long chatId, Long userId) {
-    return chatReader.readChat(userId, chatId);
+  public ChatWithHost getChatDetail(Long chatId, Long userId) {
+    Chat chat = chatReader.readChat(userId, chatId);
+    Host host = participantReader.readHost(chat.getChatRoomId());
+
+    return ChatWithHost.builder()
+        .chat(chat)
+        .host(host)
+        .build();
   }
 }

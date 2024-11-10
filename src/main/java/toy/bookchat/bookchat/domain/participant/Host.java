@@ -10,13 +10,20 @@ public class Host {
   private final Long id;
   private final Long userId;
   private final Long chatRoomId;
+  private final String nickname;
+  private final String profileImageUrl;
+  private final Integer defaultProfileImageType;
   private ParticipantStatus status;
 
   @Builder
-  private Host(Long id, Long userId, Long chatRoomId, ParticipantStatus status) {
+  private Host(Long id, Long userId, Long chatRoomId, String nickname, String profileImageUrl,
+      Integer defaultProfileImageType, ParticipantStatus status) {
     this.id = id;
     this.userId = userId;
     this.chatRoomId = chatRoomId;
+    this.nickname = nickname;
+    this.profileImageUrl = profileImageUrl;
+    this.defaultProfileImageType = defaultProfileImageType;
     this.status = status;
   }
 

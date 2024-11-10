@@ -14,6 +14,8 @@ import toy.bookchat.bookchat.domain.participant.Participant;
 import toy.bookchat.bookchat.domain.participant.ParticipantAdmin;
 import toy.bookchat.bookchat.domain.participant.ParticipantStatus;
 import toy.bookchat.bookchat.domain.participant.ParticipantWithChatRoom;
+import toy.bookchat.bookchat.domain.user.User;
+import toy.bookchat.bookchat.domain.user.service.UserReader;
 import toy.bookchat.bookchat.exception.forbidden.participant.NoPermissionParticipantException;
 import toy.bookchat.bookchat.exception.notfound.pariticipant.ParticipantNotFoundException;
 
@@ -22,10 +24,13 @@ public class ParticipantReader {
 
   private final ParticipantRepository participantRepository;
   private final ChatRoomReader chatRoomReader;
+  private final UserReader userReader;
 
-  public ParticipantReader(ParticipantRepository participantRepository, ChatRoomReader chatRoomReader) {
+  public ParticipantReader(ParticipantRepository participantRepository, ChatRoomReader chatRoomReader,
+      UserReader userReader) {
     this.participantRepository = participantRepository;
     this.chatRoomReader = chatRoomReader;
+    this.userReader = userReader;
   }
 
   public Participant readParticipant(Long userId, Long roomId) {
@@ -104,11 +109,15 @@ public class ParticipantReader {
     ParticipantEntity participantEntity = participantRepository.findByChatRoomIdAndParticipantStatus(roomId,
             ParticipantStatus.HOST)
         .orElseThrow(ParticipantNotFoundException::new);
+    User user = userReader.readUser(participantEntity.getUserId());
 
     return Host.builder()
         .id(participantEntity.getId())
-        .chatRoomId(participantEntity.getChatRoomId())
         .userId(participantEntity.getUserId())
+        .chatRoomId(participantEntity.getChatRoomId())
+        .nickname(user.getNickname())
+        .profileImageUrl(user.getProfileImageUrl())
+        .defaultProfileImageType(user.getDefaultProfileImageType())
         .status(participantEntity.getParticipantStatus())
         .build();
   }
