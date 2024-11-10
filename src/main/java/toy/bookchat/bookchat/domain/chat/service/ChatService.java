@@ -53,6 +53,7 @@ public class ChatService {
     ChatMessageBody chatMessageBody = ChatMessageBody.builder()
         .chatId(chat.getId())
         .chatRoomId(roomId)
+        .senderId(chat.getSenderId())
         .build();
     messagePublisher.sendCommonMessage(chatRoom.getSid(), commonMessage);
 
