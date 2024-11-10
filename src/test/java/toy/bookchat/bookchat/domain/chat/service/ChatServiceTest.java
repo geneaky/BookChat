@@ -21,11 +21,12 @@ import toy.bookchat.bookchat.domain.chat.Sender;
 import toy.bookchat.bookchat.domain.chatroom.ChatRoom;
 import toy.bookchat.bookchat.domain.chatroom.service.ChatRoomReader;
 import toy.bookchat.bookchat.domain.device.service.DeviceReader;
+import toy.bookchat.bookchat.domain.participant.service.ParticipantReader;
 import toy.bookchat.bookchat.domain.participant.service.ParticipantValidator;
 import toy.bookchat.bookchat.domain.user.service.UserReader;
+import toy.bookchat.bookchat.infrastructure.fcm.service.PushService;
 import toy.bookchat.bookchat.infrastructure.rabbitmq.MessagePublisher;
 import toy.bookchat.bookchat.infrastructure.rabbitmq.message.CommonMessage;
-import toy.bookchat.bookchat.infrastructure.fcm.service.PushService;
 
 @ExtendWith(MockitoExtension.class)
 class ChatServiceTest {
@@ -42,6 +43,8 @@ class ChatServiceTest {
   private DeviceReader deviceReader;
   @Mock
   private ParticipantValidator participantValidator;
+  @Mock
+  private ParticipantReader participantReader;
   @Mock
   private PushService pushService;
   @Mock
@@ -90,8 +93,12 @@ class ChatServiceTest {
 
   @Test
   void 채팅_채팅방_발신자정보를_조회_성공() throws Exception {
+    Chat chat = Chat.builder()
+        .chatRoomId(1L).build();
+    given(chatReader.readChat(any(), any())).willReturn(chat);
+
     chatService.getChatDetail(1L, 1L);
 
-    verify(chatReader).readChat(any(), any());
+    verify(participantReader).readHost(any());
   }
 }
